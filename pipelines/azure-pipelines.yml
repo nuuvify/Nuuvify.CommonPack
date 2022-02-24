@@ -44,4 +44,4 @@ stages:
 - stage: "Deploy"
   displayName: "Deploy Artifactory"
 
-- template: pipeline-templates/build-dotnetcore-nuget.yml@templates
+- template: pipeline-templates/deploy-dotnetcore-nuget.yml@templates
