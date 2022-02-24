@@ -40,3 +40,8 @@ stages:
         solution: '**/*.sln'
         buildConfiguration: 'Release'
 
+
+- stage: "Deploy"
+  displayName: "Deploy Artifactory"
+
+- template: pipeline-templates/build-dotnetcore-nuget.yml@templates
