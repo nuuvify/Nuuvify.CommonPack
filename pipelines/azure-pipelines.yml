@@ -1,0 +1,41 @@
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: SharedKernel/pipelines-store
+      endpoint: SharedKernel-Repos
+
+trigger:
+  branches:
+    include:
+    - dev
+    - qas
+    - main
+pr:
+  branches:
+    include:
+    - refs/*
+
+variables:
+  - template: variables/global.yml@templates
+
+
+stages: 
+
+- stage: 'Build'
+  displayName: 'Build Projects'
+        
+  jobs:
+  - job: 'Build_And_Package'
+    displayName: 'Build & package artifacts'
+
+    pool:
+      vmimage: $(vmImageName)
+    
+    steps:
+    
+    - template: pipeline-templates/build-dotnetcore-pack.yml@templates
+      parameters:
+        solution: '**/*.sln'
+        buildConfiguration: 'Release'
+

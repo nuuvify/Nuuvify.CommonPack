@@ -1,0 +1,56 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/CommonPack.sln",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "clean",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "clean",
+                "${workspaceFolder}",
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "remove-obj",
+            "windows": {
+                "command": "Remove-Item -Recurse ${workspaceFolder}\\src\\*\\bin; Remove-Item -Recurse ${workspaceFolder}\\src\\*\\obj; Remove-Item -Recurse ${workspaceFolder}\\src\\*\\Docs; Remove-Item -Recurse ${workspaceFolder}\\test\\*\\bin; Remove-Item -Recurse ${workspaceFolder}\\test\\*\\obj; Remove-Item -Recurse ${workspaceFolder}\\test\\*\\Docs; Remove-Item -Recurse ${workspaceFolder}\\test\\*\\coverage.*.xml",
+                "type": "shell",
+                "problemMatcher": "$msCompile"
+            },
+            "linux": {
+                "command": "rm -rf ${workspaceFolder}/src/*/bin ${workspaceFolder}/src/*/obj ${workspaceFolder}/src/*/Docs ${workspaceFolder}/test/*/bin ${workspaceFolder}/test/*/obj ${workspaceFolder}/test/*/Docs",
+                "type": "shell",
+                "problemMatcher": "$msCompile"
+            }
+        },
+        {
+            "label": "build-clean",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "clean",
+                "build"
+            ]
+        },
+        {
+            "label": "rebuild",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "remove-obj",
+                "build"
+            ]
+        }
+    ]
+}
