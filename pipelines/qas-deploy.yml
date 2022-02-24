@@ -19,7 +19,7 @@ variables:
   - template: variables/global.yml@templates
 
 stages:
-  - template: pipeline-templates/build-dotnetcore-pack.yml@templates
+  - template: pipeline-templates/build-dotnetcore-nuget.yml@templates
     parameters:
       solution: '**/*.sln'
       buildConfiguration: 'Release'
