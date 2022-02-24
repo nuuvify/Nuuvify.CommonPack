@@ -1,0 +1,25 @@
+resources:
+  pipelines:
+    - pipeline: pipepack
+      source: CI-Github-Nuuvify.CommonPack
+      trigger:
+        branches:
+          include: 
+          - qas
+        stages: 
+        - Build
+  repositories:
+    - repository: templates
+      type: git
+      name: SharedKernel/pipelines-store
+      endpoint: SharedKernel-Repos
+
+      
+variables:
+  - template: variables/global.yml@templates
+
+stages:
+  - template: pipeline-templates/build-dotnetcore-pack.yml@templates
+    parameters:
+      solution: '**/*.sln'
+      buildConfiguration: 'Release'
