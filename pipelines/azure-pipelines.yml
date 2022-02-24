@@ -15,6 +15,7 @@ pr:
   branches:
     include:
     - refs/*
+    
 
 variables:
   - template: variables/global.yml@templates
