@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Nuuvify.CommonPack.Middleware\Nuuvify.CommonPack.Middleware.csproj" />
+  </ItemGroup>
+
+  <Target Name="CopyConfigFile" AfterTargets="AfterBuild">
+    <Copy SourceFiles="./Configs/configTest.json" DestinationFolder="$(OutDir)" />
+  </Target>
+
+</Project>

@@ -1,0 +1,12 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <SourceCustomFilesAutoHistoryXml Include="$(MSBuildThisFileDirectory)..\content\*.xml" />
+    <SourceCustomFilesAutoHistorySql Include="$(MSBuildThisFileDirectory)..\content\*.sql" />
+  </ItemGroup>
+  <Target Name="AutoHCopyFilesToProject" BeforeTargets="Build">
+    <Copy SourceFiles="@(SourceCustomFilesAutoHistoryXml)" 
+      DestinationFolder="$(ProjectDir)\Docs" />
+    <Copy SourceFiles="@(SourceCustomFilesAutoHistorySql)" 
+      DestinationFolder="$(ProjectDir)\Migrations" />
+  </Target>
+</Project>

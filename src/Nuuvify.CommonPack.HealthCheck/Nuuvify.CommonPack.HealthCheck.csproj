@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Description>
+      HealthChecks - Setup e configuracao do endpoint /hc-ui e /hc
+    </Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.UI" Version="3.1.3" />
+    <PackageReference Include="AspNetCore.HealthChecks.UI.SQLite.Storage" Version="3.1.2" />
+  </ItemGroup>
+
+  <ItemGroup Label="Packaging">
+    <Content Include="./HealthChecks/dotnet.css;./HealthChecks/dotnet.png;">
+      <Pack>true</Pack>
+      <PackagePath>$(ContentTargetFolders)</PackagePath>
+      <flatten>false</flatten>
+    </Content>
+  </ItemGroup>
+
+</Project>

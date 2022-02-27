@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>
+      Possui classes para padronizar a comunicação com apis externas, padronizando inclusive o retorno da request.
+      A classe BaseStandardHttpClient deverá ser implementada como herança, em uma classe especifica no seu projeto de Infra.Data, siga as instruções contidas no Assempbly
+      Para chamadas de apis externas não , não utilize a classe BaseStandardHttpClient, apenas utilize IStandardHttpClient, e deserealize o retorno conforme o fornecedor
+      da api pede.
+    </Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="3.1.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nuuvify.CommonPack.Security.Abstraction\Nuuvify.CommonPack.Security.Abstraction.csproj" />
+  </ItemGroup>
+
+</Project>

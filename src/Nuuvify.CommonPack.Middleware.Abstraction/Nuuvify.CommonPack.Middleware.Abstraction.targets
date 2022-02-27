@@ -1,0 +1,9 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <ItemGroup>
+        <SourceCustomFilesMiddlewareAbsXml Include="$(MSBuildThisFileDirectory)..\content\*.xml" />
+    </ItemGroup>
+    <Target Name="MiddlewareAbsCopyFilesToProject" BeforeTargets="Build">
+        <Copy SourceFiles="@(SourceCustomFilesMiddlewareAbsXml)"
+                DestinationFolder="$(ProjectDir)\Docs" />
+    </Target>
+</Project>

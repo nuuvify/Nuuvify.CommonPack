@@ -1,0 +1,35 @@
+﻿{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Debug",
+      "System": "Information",
+      "Microsoft": "Information"
+    },
+    "LogLevelEF": {
+      "Microsoft.EntityFrameworkCore": "Information"
+    }
+  },
+  "JwtTokenOptions": {
+    "Issuer": "8c8a0652",
+    "Audience": "5260fa0d3d6e",
+    "SECRET_KEY": "3bb869c0-e17b-4a6f-bad1-123e5ea6ea9b"
+  },
+  "EmailConfig": {
+    "RemetenteEmail": {
+      "Email": "suporte@nuuve.com.br",
+      "Nome": "Lincoln"
+    },
+    "EmailHost": "servidormocado",
+    "SuporteEmailEndereco": "suporte@nuuve.com.br, lzoca00@gmail.com",
+    "EmailAdministradores": {
+      "suporte@nuuve.com.br": "Lincoln",
+      "lzoca00@gmail.com": "Lincoln Fake"
+    }
+  },
+  "AppConfig": {
+    "OwnerDB": "vendas",
+    "AppURLs": {
+      "UrlCredentialApi": "https://apifin.ecorp.zzz.com/CwsApi/",
+    }
+  }
+}

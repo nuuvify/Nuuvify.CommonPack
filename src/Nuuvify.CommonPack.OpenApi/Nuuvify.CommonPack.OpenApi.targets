@@ -1,0 +1,8 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <SourceCustomFilesOpenApiXml Include="$(MSBuildThisFileDirectory)..\content\*.xml" />
+  </ItemGroup>
+  <Target Name="OpenApiCopyFilesToProject" BeforeTargets="Build">
+    <Copy SourceFiles="@(SourceCustomFilesOpenApiXml)" DestinationFolder="$(ProjectDir)\Docs" />
+  </Target>
+</Project>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <Description>
+            Armazena a chave privada para geracao de token em banco de dados e fornece uma chave publica
+            para que seja validado pelos clients.
+            Essa biblioteca destinase apenas a aplicação que fornece um token.
+        </Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.6" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Nuuvify.CommonPack.Security.JwtCredentials\Nuuvify.CommonPack.Security.JwtCredentials.csproj" />
+    </ItemGroup>
+
+
+</Project>

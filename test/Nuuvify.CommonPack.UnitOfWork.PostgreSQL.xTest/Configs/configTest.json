@@ -1,0 +1,42 @@
+﻿{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Debug",
+      "System": "Information",
+      "Microsoft": "Information"
+    },
+    "LogLevelEF": {
+      "Microsoft.EntityFrameworkCore": "Information"
+    }
+  },
+  "VirtualPath": "api",
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "vendas": "database=;"
+  },
+  "EmailConfig": {
+    "RemetenteEmail": {
+      "Email": "suporte@nuuve.com.br",
+      "Nome": "Lincoln"
+    },
+    "EmailHost": "servidormocado",
+    "SuporteEmailEndereco": "suporte@nuuve.com.br, lzoca00@gmail.com",
+    "EmailAdministradores": {
+      "suporte@nuuve.com.br": "Lincoln",
+      "lzoca00@gmail.com": "Lincoln Fake"
+    }
+  },
+  "TestOptions": {
+    "DataBaseTesteInMemory": false,
+    "DataBaseTesteOracle": true,
+    "DataBaseTestePostgreSQL": true,
+    "RemoveTables": true
+  },
+  "AppConfig": {
+    "OwnerDB": "vendas",
+    "AppURLs": {
+      "UrlCredentialApi": "https://nuuve.com.br/api-credential",
+      "UrlCredentialApiToken": "api/v1/userauthenticate/token"
+    }
+  }
+}

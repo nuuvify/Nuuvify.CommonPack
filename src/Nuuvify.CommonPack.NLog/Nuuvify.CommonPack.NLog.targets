@@ -1,0 +1,13 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <ItemGroup>
+        <SourceCustomNLogFilesLog Include="$(MSBuildThisFileDirectory)..\content\nlog.*" />
+        <SourceCustomNLogXml Include="$(MSBuildThisFileDirectory)..\content\*.xml" />
+    </ItemGroup>
+    <Target Name="NLogCopyFilesToProject" BeforeTargets="Build">
+        <Copy SourceFiles="@(SourceCustomNLogFilesLog)"
+                DestinationFolder="$(ProjectDir)\NLogConfigs" 
+                Condition="!Exists('$(ProjectDir)\NLogConfigs')" />
+        <Copy SourceFiles="@(SourceCustomNLogXml)"
+                DestinationFolder="$(ProjectDir)\Docs" />
+    </Target>
+</Project>
