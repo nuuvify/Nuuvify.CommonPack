@@ -1,0 +1,8 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <ItemGroup>
+        <SourceCustomFilesUoWAbsXml Include="$(MSBuildThisFileDirectory)..\content\*.xml" />
+    </ItemGroup>
+    <Target Name="UoWAbsCopyFilesToProject" BeforeTargets="Build">
+        <Copy SourceFiles="@(SourceCustomFilesUoWAbsXml)" DestinationFolder="$(ProjectDir)\Docs" />
+    </Target>
+</Project>

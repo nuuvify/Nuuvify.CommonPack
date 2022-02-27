@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>
+      Essa biblioteca possui as abstrações, ou, as interfaces que podevem ser utilizadas 
+      em qualquer projeto. Porém a biblioteca contendo as implmentações, deve ser instalada
+      no seu projeto de Infra.Data 
+    </Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nuuvify.CommonPack.Extensions\Nuuvify.CommonPack.Extensions.csproj" />
+  </ItemGroup>
+  
+</Project>

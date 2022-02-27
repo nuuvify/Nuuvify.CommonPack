@@ -1,0 +1,41 @@
+﻿{
+  "Logging": {
+    "LogLevel": {
+      "*": "Information",
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information",
+      "Microsoft.EntityFrameworkCore": "Information"
+    }
+  },
+  "EmailConfig": {
+    "EmailServerConfiguration": {
+      "ServerHost": "server.mail",
+      "Port": 0,
+      "Security": 0,
+      "AccountUserName": "",
+      "AccountPassword": ""
+    },
+    "RemetenteEmail": {
+      "lzoca00@gmail.com": "Lincoln Fake"
+    },
+    "SuporteEmailEndereco": {
+      "suporte@nuuve.com.br": "Lincoln",
+      "lzoca00@gmail.com": "Lincoln Fake"
+    },
+    "EmailAdministradores": {
+      "suporte@nuuve.com.br": "Lincoln",
+      "lzoca00@gmail.com": "Lincoln Fake"
+    },
+    "EmailResponsavel": {
+      "suporte@nuuve.com.br": "Lincoln"
+    }
+  },
+  "AppConfig": {
+    "OwnerDB": "vendas",
+    "AppURLs": {
+      "UrlCredentialApi": "https://credential.nuuve.com.br/",
+      "UrlCredentialApiToken": "api/v1/userauthenticate/token"
+    }
+  }
+}

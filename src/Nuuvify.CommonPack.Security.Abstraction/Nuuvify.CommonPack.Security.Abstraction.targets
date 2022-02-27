@@ -1,0 +1,8 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <SourceCustomFilesSecurityAbstractionXml Include="$(MSBuildThisFileDirectory)..\content\*.xml" />
+  </ItemGroup>
+  <Target Name="SecurityAbsCopyFilesToProject" BeforeTargets="Build">
+    <Copy SourceFiles="@(SourceCustomFilesSecurityAbstractionXml)" DestinationFolder="$(ProjectDir)\Docs" />
+  </Target>
+</Project>

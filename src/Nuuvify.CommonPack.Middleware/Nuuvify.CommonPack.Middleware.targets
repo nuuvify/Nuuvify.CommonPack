@@ -1,0 +1,13 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <ItemGroup>
+        <SourceCustomFilesLog Include="$(MSBuildThisFileDirectory)..\content\nlog.*" />
+        <SourceCustomFilesMiddlewareXml Include="$(MSBuildThisFileDirectory)..\content\*.xml" />
+    </ItemGroup>
+    <Target Name="MiddlewareCopyFilesToProject" BeforeTargets="Build">
+        <Copy SourceFiles="@(SourceCustomFilesLog)" 
+                DestinationFolder="$(ProjectDir)\NLogConfigs" 
+                Condition="!Exists('$(ProjectDir)\NLogConfigs')" />
+        <Copy SourceFiles="@(SourceCustomFilesMiddlewareXml)"
+                DestinationFolder="$(ProjectDir)\Docs" />
+    </Target>
+</Project>

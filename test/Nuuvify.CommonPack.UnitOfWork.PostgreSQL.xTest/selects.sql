@@ -1,0 +1,27 @@
+SELECT TOP (1000) [Fatura_Id]
+      ,[DataCadastro]
+      ,[UsuarioCadastro]
+      ,[DataAlteracao]
+      ,[UsuarioAlteracao]
+      ,[NumeroFatura]
+      ,[Observacao]
+      ,[FaturaLogradouro]
+      ,[FaturaCidade]
+      ,[EntregaLogradouro]
+      ,[EntregaCidade]
+  FROM [].[b8ct2].[Faturas]
+
+  SELECT TOP (1000)
+    [ID]
+      , [ROW_ID]
+      , [CORRELATION_ID]
+      , [TABLE_NAME]
+      , [BEFORE]
+      , [AFTER]
+      , [KIND]
+      , [CREATED]
+      , [PERSIST]
+      , [USERNAME]
+FROM [].[b8ct2].[AUTOHISTORY]
+where CORRELATION_ID is null
+order by CREATED
