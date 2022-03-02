@@ -8,7 +8,8 @@ namespace Nuuvify.CommonPack.Security.Abstraction
         long ToUnixEpochDate(DateTime date);
         IJwtBuilder WithJwtClaims();
 
-        IJwtBuilder WithJwtUserClaims(PersonWithRolesQueryResult personGroups);
+        IJwtBuilder WithJwtUserClaims<T>(PersonWithRolesQueryResult personGroups)
+            where T : IPersonBuilder;
 
         ClaimsIdentity GetClaimsIdentity();
 

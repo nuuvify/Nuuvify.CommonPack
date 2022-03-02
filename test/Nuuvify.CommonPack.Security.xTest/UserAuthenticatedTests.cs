@@ -1,14 +1,14 @@
 ﻿using System;
-using Nuuvify.CommonPack.Security.Abstraction;
-using Nuuvify.CommonPack.Security.Helpers;
-using Nuuvify.CommonPack.Security.Jwt;
+using System.IO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.SqlServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Internal;
 using Moq;
-using System.IO;
+using Nuuvify.CommonPack.Security.Abstraction;
+using Nuuvify.CommonPack.Security.Helpers;
+using Nuuvify.CommonPack.Security.Jwt;
 
 namespace Nuuvify.CommonPack.Security.xTest
 {
@@ -51,7 +51,7 @@ namespace Nuuvify.CommonPack.Security.xTest
 
             var jwtClass = new JwtBuilder()
                 .WithJwtOptions(_jwtOptions)
-                .WithJwtUserClaims(cwsComGrupo);
+                .WithJwtUserClaims<PersonWithRolesQueryResult>(cwsComGrupo);
 
 
 
