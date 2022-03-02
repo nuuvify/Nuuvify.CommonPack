@@ -48,7 +48,7 @@ namespace Nuuvify.CommonPack.Security.xTest
 
             var jwtBuilder = new JwtBuilder()
                 .WithJwtOptions(_jwtOptions)
-                .WithJwtUserClaims<PersonWithRolesQueryResult>(fakeCws);
+                .WithJwtUserClaims(fakeCws);
 
             var userToken = jwtBuilder.GetUserToken();
 

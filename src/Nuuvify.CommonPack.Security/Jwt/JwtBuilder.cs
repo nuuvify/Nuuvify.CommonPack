@@ -26,9 +26,9 @@ namespace Nuuvify.CommonPack.Security.Jwt
     public class JwtBuilder : IJwtBuilder
     {
 
-        protected JwtTokenOptions _jwtTokenOptions;
-        protected ICollection<Claim> _jwtClaims;
-        protected ClaimsIdentity _identityClaims;
+        public JwtTokenOptions _jwtTokenOptions;
+        public ICollection<Claim> _jwtClaims;
+        public ClaimsIdentity _identityClaims;
 
 
 
@@ -100,8 +100,7 @@ namespace Nuuvify.CommonPack.Security.Jwt
         /// </summary>
         /// <param name="personGroups">Classe obtida pelo seu metodo que autenticou o usuario/senha</param>
         /// <returns></returns>
-        public virtual IJwtBuilder WithJwtUserClaims<T>(PersonWithRolesQueryResult personGroups)
-            where T : IPersonBuilder
+        public virtual IJwtBuilder WithJwtUserClaims(PersonWithRolesQueryResult personGroups)
         {
 
             if (string.IsNullOrWhiteSpace(personGroups?.Login))
