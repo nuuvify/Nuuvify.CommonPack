@@ -1,6 +1,6 @@
 ﻿namespace Nuuvify.CommonPack.Security.Abstraction
 {
-    public class PersonQueryResult : IPersonBuilder
+    public class PersonQueryResult
     {
 
         /// <summary>

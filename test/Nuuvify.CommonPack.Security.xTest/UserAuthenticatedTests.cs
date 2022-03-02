@@ -51,7 +51,7 @@ namespace Nuuvify.CommonPack.Security.xTest
 
             var jwtClass = new JwtBuilder()
                 .WithJwtOptions(_jwtOptions)
-                .WithJwtUserClaims<PersonWithRolesQueryResult>(cwsComGrupo);
+                .WithJwtUserClaims(cwsComGrupo);
 
 
 
