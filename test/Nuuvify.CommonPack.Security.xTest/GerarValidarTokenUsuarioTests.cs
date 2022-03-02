@@ -1,8 +1,8 @@
 ﻿using System;
-using Nuuvify.CommonPack.Security.Jwt;
 using Microsoft.Extensions.Configuration;
-using Xunit;
 using Nuuvify.CommonPack.Security.Abstraction;
+using Nuuvify.CommonPack.Security.Jwt;
+using Xunit;
 
 namespace Nuuvify.CommonPack.Security.xTest
 {
@@ -48,15 +48,15 @@ namespace Nuuvify.CommonPack.Security.xTest
 
             var jwtBuilder = new JwtBuilder()
                 .WithJwtOptions(_jwtOptions)
-                .WithJwtUserClaims(fakeCws);
-                
+                .WithJwtUserClaims<PersonWithRolesQueryResult>(fakeCws);
+
             var userToken = jwtBuilder.GetUserToken();
 
             Assert.NotNull(userToken);
 
         }
 
-        
+
 
     }
 }
