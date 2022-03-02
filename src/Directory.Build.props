@@ -10,8 +10,7 @@
     <Company>Lincoln Zocateli</Company>
     <Copyright>Copyright ©2022 $(Company)</Copyright>
     <Product>Libraries with common implementations, with separation of responsibilities between their projects using Abstractions.</Product>
-    <License>https://github.com/lzocateli00/Nuuvify.CommonPack/blob/main/LICENSE</License>
-    <license>LICENSE</license>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/lzocateli00/Nuuvify.CommonPack</PackageProjectUrl>
     <PackageIcon>logonuuvify.jpg</PackageIcon>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -35,6 +34,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="../LICENSE" Pack="true" PackagePath="" />
     <None Include="../../Images/logonuuvify.jpg" Pack="true" PackagePath="" />
   </ItemGroup>
 
