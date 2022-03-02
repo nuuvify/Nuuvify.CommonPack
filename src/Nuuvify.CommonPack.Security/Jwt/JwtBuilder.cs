@@ -23,7 +23,7 @@ namespace Nuuvify.CommonPack.Security.Jwt
     /// </code>
     /// </example>
     /// </summary>
-    public class JwtBuilder
+    public class JwtBuilder : IJwtBuilder
     {
 
         private JwtTokenOptions _jwtTokenOptions;
@@ -31,10 +31,6 @@ namespace Nuuvify.CommonPack.Security.Jwt
         private ClaimsIdentity _identityClaims;
 
 
-
-        private static long ToUnixEpochDate(DateTime date)
-            => (long)Math.Round((date.ToUniversalTime() - new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero))
-                .TotalSeconds);
 
         private void ThrowIfInvalidOptions(JwtTokenOptions jwtTokenOptions)
         {
@@ -57,13 +53,18 @@ namespace Nuuvify.CommonPack.Security.Jwt
 
         }
 
+        public virtual long ToUnixEpochDate(DateTime date)
+            => (long)Math.Round((date.ToUniversalTime() - new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero))
+                .TotalSeconds);
+
+
 
         /// <summary>
         /// Use esse metodo primeiro, após receber IOptions{JwtTokenOptions} em seu metodo de chamada
         /// </summary>
         /// <param name="jwtTokenOptions">Tag encontrado no appsettings.json</param>
         /// <returns></returns>
-        public JwtBuilder WithJwtOptions(JwtTokenOptions jwtTokenOptions)
+        public virtual IJwtBuilder WithJwtOptions(JwtTokenOptions jwtTokenOptions)
         {
 
             ThrowIfInvalidOptions(jwtTokenOptions);
@@ -77,7 +78,7 @@ namespace Nuuvify.CommonPack.Security.Jwt
         /// classe  WithJwtUserClaims(), isso ira gerar outra claim com essas informações )
         /// </summary>
         /// <returns></returns>
-        public JwtBuilder WithJwtClaims()
+        public virtual IJwtBuilder WithJwtClaims()
         {
             if (_jwtClaims is null)
             {
@@ -99,7 +100,7 @@ namespace Nuuvify.CommonPack.Security.Jwt
         /// </summary>
         /// <param name="personGroups">Classe obtida pelo seu metodo que autenticou o usuario/senha</param>
         /// <returns></returns>
-        public JwtBuilder WithJwtUserClaims(PersonWithRolesQueryResult personGroups)
+        public virtual IJwtBuilder WithJwtUserClaims(PersonWithRolesQueryResult personGroups)
         {
 
             if (string.IsNullOrWhiteSpace(personGroups?.Login))
@@ -128,7 +129,7 @@ namespace Nuuvify.CommonPack.Security.Jwt
             return this;
         }
 
-        public ClaimsIdentity GetClaimsIdentity()
+        public virtual ClaimsIdentity GetClaimsIdentity()
         {
             return _identityClaims;
         }
@@ -137,7 +138,7 @@ namespace Nuuvify.CommonPack.Security.Jwt
         /// Esse metodo gera um JwtToken, e retorno o mesmo como string
         /// </summary>
         /// <returns>Retorna um token como string</returns>
-        public string BuildToken()
+        public virtual string BuildToken()
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(new SecurityTokenDescriptor
@@ -158,7 +159,7 @@ namespace Nuuvify.CommonPack.Security.Jwt
         /// de criação e expiração do token
         /// </summary>
         /// <returns></returns>
-        public CredentialToken GetUserToken()
+        public virtual CredentialToken GetUserToken()
         {
             var result = new CredentialToken
             {
@@ -176,7 +177,7 @@ namespace Nuuvify.CommonPack.Security.Jwt
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        public bool CheckTokenIsValid(string token)
+        public virtual bool CheckTokenIsValid(string token)
         {
             if (string.IsNullOrWhiteSpace(token))
             {
