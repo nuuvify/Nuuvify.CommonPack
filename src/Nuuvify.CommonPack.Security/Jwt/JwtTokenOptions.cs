@@ -82,9 +82,8 @@ namespace Nuuvify.CommonPack.Security.Jwt
 
         public SigningCredentials SigningCredentials()
         {
-            var signingCredentials = new SigningCredentials(
-                                     new SymmetricSecurityKey(KeyEncoding()),
-                                         SecurityAlgorithms.HmacSha256);
+            var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(KeyEncoding()),
+                SecurityAlgorithms.HmacSha256);
 
 
             if (signingCredentials.Key.KeySize < 288)

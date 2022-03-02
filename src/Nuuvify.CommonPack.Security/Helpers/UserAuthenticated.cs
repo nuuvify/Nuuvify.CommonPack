@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using Nuuvify.CommonPack.Security.Abstraction;
 using Microsoft.AspNetCore.Http;
+using Nuuvify.CommonPack.Security.Abstraction;
 
 namespace Nuuvify.CommonPack.Security.Helpers
 {
@@ -10,8 +10,8 @@ namespace Nuuvify.CommonPack.Security.Helpers
     public class UserAuthenticated : IUserAuthenticated
     {
 
-        private readonly IHttpContextAccessor _accessor;
-        
+        protected readonly IHttpContextAccessor _accessor;
+
 
         public UserAuthenticated(IHttpContextAccessor accessor)
         {
