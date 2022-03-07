@@ -52,6 +52,9 @@ namespace Nuuvify.CommonPack.Security.Abstraction
 
         private long _expiresIn;
 
+        /// <summary>
+        /// Valor deve ser diferente de 0 para que Expires seja calculado
+        /// </summary>
         public long ExpiresIn
         {
             get
@@ -61,7 +64,8 @@ namespace Nuuvify.CommonPack.Security.Abstraction
             set
             {
                 _expiresIn = value;
-                Expires = DateTimeOffset.Now.AddSeconds(_expiresIn);
+                if (_expiresIn != 0)
+                    Expires = DateTimeOffset.Now.AddSeconds(_expiresIn);
             }
         }
 
