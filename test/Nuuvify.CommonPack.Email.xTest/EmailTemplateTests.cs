@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Nuuvify.CommonPack.Email.Abstraction;
-using Nuuvify.CommonPack.Email.xTest.Arrange;
-using Nuuvify.CommonPack.Email.xTest.Configs;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Moq;
+using Nuuvify.CommonPack.Email.Abstraction;
+using Nuuvify.CommonPack.Email.xTest.Configs;
 using Xunit;
 
 namespace Nuuvify.CommonPack.Email.xTest
@@ -28,7 +27,7 @@ namespace Nuuvify.CommonPack.Email.xTest
 
             configMock = new Mock<IConfiguration>();
 
-            config = AppSettingsConfig.GetConfig();
+            config = AppSettingsConfig.GetConfig(false);
 
 
             emailServerConfiguration = new EmailServerConfiguration();
@@ -93,10 +92,10 @@ namespace Nuuvify.CommonPack.Email.xTest
                 { "@emissionDate", $"Emission Date: {DateTimeOffset.Now}" },
                 { "@fornecedor", $"Supplier Code: H987654" }
             };
-            var message = testarEnvio.GetEmailTemplate(variables, Path.Combine(AppSettingsConfig.ProjectPath, "template-email.html"));
+            var message = testarEnvio.GetEmailTemplate(variables, Path.Combine(AppSettingsConfig.TemplatePath, "template-email.html"));
 
-            testarEnvio.WithAttachment(Path.Combine(AppSettingsConfig.ProjectPath, "BB - Layout - CNAB240.pdf"), EmailMidiaType.Application, EmailMidiaSubType.Pdf)
-                       .WithAttachment(Path.Combine(AppSettingsConfig.ProjectPath, "SOLID.jpeg"), EmailMidiaType.Image, EmailMidiaSubType.Jpg);
+            testarEnvio.WithAttachment(Path.Combine(AppSettingsConfig.TemplatePath, "BB - Layout - CNAB240.pdf"), EmailMidiaType.Application, EmailMidiaSubType.Pdf)
+                       .WithAttachment(Path.Combine(AppSettingsConfig.TemplatePath, "SOLID.jpeg"), EmailMidiaType.Image, EmailMidiaSubType.Jpg);
 
 
             var emailEnviado = await testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, message);
@@ -108,11 +107,13 @@ namespace Nuuvify.CommonPack.Email.xTest
 
         }
 
-        [Fact]
+        [LocalTestFact]
         [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
         public async Task EnviaEmailComTemplateComAnexoReal()
         {
             const string assunto = "Teste automatizado da classe de envio de email";
+
+            var config = AppSettingsConfig.GetConfig(true);
 
 
             configEmailServer = new ConfigureFromConfigurationOptions<EmailServerConfiguration>(
@@ -127,9 +128,9 @@ namespace Nuuvify.CommonPack.Email.xTest
             };
 
             var remetentes = config.GetSection("EmailConfig:RemetenteEmail")
-                                    .GetChildren()?
-                                    .Where(x => !string.IsNullOrWhiteSpace(x.Value))?
-                                    .ToDictionary(x => x.Key, x => x.Value);
+                .GetChildren()?
+                .Where(x => !string.IsNullOrWhiteSpace(x.Value))?
+                .ToDictionary(x => x.Key, x => x.Value);
 
 
 
@@ -142,12 +143,12 @@ namespace Nuuvify.CommonPack.Email.xTest
             {
                 { "@numeroAl", $"Number AL: 123456" },
                 { "@emissionDate", $"Emission Date: {DateTimeOffset.Now}" },
-                { "@fornecedor", $"Supplier Code: G8761M1" }
+                { "@fornecedor", $"Supplier Code: G666M1" }
             };
-            var message = testarEnvio.GetEmailTemplate(variables, Path.Combine(AppSettingsConfig.ProjectPath, "template-email.html"));
+            var message = testarEnvio.GetEmailTemplate(variables, Path.Combine(AppSettingsConfig.TemplatePath, "template-email.html"));
 
-            testarEnvio.WithAttachment(Path.Combine(AppSettingsConfig.ProjectPath, "BB - Layout - CNAB240.pdf"), EmailMidiaType.Application, EmailMidiaSubType.Pdf)
-                       .WithAttachment(Path.Combine(AppSettingsConfig.ProjectPath, "SOLID.jpeg"), EmailMidiaType.Image, EmailMidiaSubType.Jpg);
+            testarEnvio.WithAttachment(Path.Combine(AppSettingsConfig.TemplatePath, "BB - Layout - CNAB240.pdf"), EmailMidiaType.Application, EmailMidiaSubType.Pdf)
+                       .WithAttachment(Path.Combine(AppSettingsConfig.TemplatePath, "SOLID.jpeg"), EmailMidiaType.Image, EmailMidiaSubType.Jpg);
 
             var emailEnviado = await testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, message);
 

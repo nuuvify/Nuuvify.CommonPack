@@ -64,8 +64,8 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// <param name="messageBody"></param>
         /// <param name="mediaType"></param>
         /// <returns></returns>
-        Task<HttpStandardReturn> Post(string urlRoute, 
-                                      MultipartFormDataContent messageBody, 
+        Task<HttpStandardReturn> Post(string urlRoute,
+                                      MultipartFormDataContent messageBody,
                                       string mediaType = "multipart/form-data");
 
         Task<HttpStandardReturn> Put(string urlRoute, object messageBody);
@@ -109,7 +109,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// <returns></returns>
         IStandardHttpClient WithAuthorization(string schema = "bearer", string token = null, string userClaim = null);
 
-       
+
         /// <summary>
         /// Incluir Headers para a instancia do HttpClient
         /// </summary>
@@ -149,8 +149,20 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// <param name="maxResponseContentBufferSize">Padrão é 2 GB</param>
         /// <param name="httpCompletionOption">Como a resposta deve se comportar <see cref="HttpCompletionOption"/> </param>
         void Configure(TimeSpan timeOut, long maxResponseContentBufferSize = default, HttpCompletionOption httpCompletionOption = HttpCompletionOption.Defult);
-        
 
+        /// <summary>
+        /// Faz um Dto do HttpResponseMessage do Aspnet para a classe customizada HttpStandardReturn
+        /// </summary>
+        /// <param name="response"></param>
+        /// <returns></returns>
+        Task<HttpStandardReturn> HandleResponseMessage(HttpResponseMessage response);
+
+        /// <summary>
+        /// Faz um Dto do HttpResponseMessage do Aspnet para a classe customizada HttpStandardStreamReturn para Stream
+        /// </summary>
+        /// <param name="response"></param>
+        /// <returns></returns>
+        Task<HttpStandardStreamReturn> HandleResponseMessageStream(HttpResponseMessage response);
     }
 
 }

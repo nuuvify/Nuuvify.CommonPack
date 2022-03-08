@@ -4,12 +4,12 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using Nuuvify.CommonPack.StandardHttpClient.Results;
-using Nuuvify.CommonPack.StandardHttpClient.xTest.Configs;
-using Nuuvify.CommonPack.StandardHttpClient.xTest.Fixtures;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using Nuuvify.CommonPack.StandardHttpClient.Results;
+using Nuuvify.CommonPack.StandardHttpClient.xTest.Configs;
+using Nuuvify.CommonPack.StandardHttpClient.xTest.Fixtures;
 using Xunit;
 
 namespace Nuuvify.CommonPack.StandardHttpClient.xTest
@@ -25,22 +25,22 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
         {
             mockFactory = new Mock<IHttpClientFactory>();
 
-            Config = AppSettingsConfig.GetConfig();
+            Config = AppSettingsConfig.GetConfig(false);
         }
 
 
- 
+
 
         [Fact]
         public async Task EnviaArquivoPorStreamComPost()
         {
-            string[] FilesToPost = {"ubuntu3d--dark-blue.jpg", "Excel Example File.xlsx"};
+            string[] FilesToPost = { "ubuntu3d--dark-blue.jpg", "Excel Example File.xlsx" };
 
             var api = "http://localhost:5001/";
             var pathName = AppDomain.CurrentDomain.BaseDirectory.Split(new String[] { @"bin\" }, StringSplitOptions.None)[0];
 
 
-            var tokenFactory = new TokenFactory();
+            var tokenFactory = new TokenFactory(Config);
             var tokenResult = tokenFactory.ObtemTokenValido(
                 Config.GetSection("ApisCredentials:Username")?.Value,
                 Config.GetSection("ApisCredentials:Password")?.Value)

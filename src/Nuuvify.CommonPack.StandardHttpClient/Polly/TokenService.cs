@@ -1,14 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.Extensions.Notificator;
 using Nuuvify.CommonPack.Security.Abstraction;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Nuuvify.CommonPack.StandardHttpClient.Polly
 {
@@ -18,7 +20,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
         private readonly ILogger<TokenService> _logger;
         private readonly IStandardHttpClient _standardHttpClient;
         private readonly IConfiguration _configuration;
-        private readonly IUserAuthenticated _userAuthenticated;
+        protected readonly IHttpContextAccessor _accessor;
         private CredentialToken _credentialToken;
 
 
@@ -29,11 +31,12 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
             IOptions<CredentialToken> credentialToken,
             IStandardHttpClient standardHttpClient,
             IConfiguration configuration,
-            ILogger<TokenService> logger, IUserAuthenticated userAuthenticated)
+            ILogger<TokenService> logger,
+            IHttpContextAccessor accessor)
         {
             _standardHttpClient = standardHttpClient;
             _configuration = configuration;
-            _userAuthenticated = userAuthenticated;
+            _accessor = accessor;
             _logger = logger;
 
             _credentialToken = credentialToken.Value;
@@ -45,10 +48,8 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
 
         public string GetUsername()
         {
-            return _userAuthenticated.Username();
+            return _accessor.HttpContext.User.GetLogin();
         }
-
-
 
         ///<inheritdoc/>
         public CredentialToken GetActualToken()
@@ -67,8 +68,8 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
                 Password = password
             };
 
-            var userName = _userAuthenticated.Username();
-            if (userClaim == null) 
+            var userName = _accessor.HttpContext.User.GetLogin();
+            if (userClaim == null)
                 userClaim = userName;
 
             _standardHttpClient.CreateClient();
@@ -169,7 +170,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
             _logger.LogDebug(messageLog + " - Inicio");
 
 
-            if (!_userAuthenticated.IsAuthenticated(out string token))
+            if (!IsAuthenticated(out string token))
             {
                 _logger.LogWarning(messageLog + " - Não foi encontrado Authorization no HttpContextAccessor, usuario não esta logado com um token");
                 return string.Empty;
@@ -179,6 +180,22 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
             _logger.LogDebug(messageLog + " - Final");
 
             return token;
+        }
+
+        private bool IsAuthenticated(out string token)
+        {
+            token = "";
+            if (_accessor.HttpContext == null) return false;
+            var esquemaAutenticacao = _accessor.HttpContext.Request.Headers
+                .FirstOrDefault(x => x.Key.Equals("Authorization")).Value;
+
+            foreach (var item in esquemaAutenticacao)
+            {
+                token = item?.Replace("bearer", "").Replace("Bearer", "").Trim();
+            }
+
+            if (_accessor.HttpContext == null) return false;
+            return _accessor.HttpContext.User.Identity.IsAuthenticated;
         }
 
         private T ReturnClass<T>(HttpStandardReturn returnResult) where T : class

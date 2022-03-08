@@ -36,8 +36,8 @@
   "AppConfig": {
     "OwnerDB": "vendas",
     "AppURLs": {
-      "UrlCredentialApi": "https://credential.nuuve.com.br/",
-      "UrlCredentialApiToken": "api/v1/UserAuthenticate/Token"
+      "UrlLoginApi": "https://credential.nuuve.com.br/",
+      "UrlLoginApiToken": "api/v1/UserAuthenticate/Token"
     }
   }
 }

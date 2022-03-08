@@ -1,41 +1,13 @@
 ﻿{
-  "Logging": {
-    "LogLevel": {
-      "*": "Information",
-      "Default": "Information",
-      "Microsoft": "Warning",
-      "Microsoft.Hosting.Lifetime": "Information",
-      "Microsoft.EntityFrameworkCore": "Information"
-    }
-  },
-  "EmailConfig": {
-    "EmailServerConfiguration": {
-      "ServerHost": "server.mail",
-      "Port": 0,
-      "Security": 0,
-      "AccountUserName": "",
-      "AccountPassword": ""
-    },
-    "RemetenteEmail": {
-      "lzoca00@gmail.com": "Lincoln Fake"
-    },
-    "SuporteEmailEndereco": {
-      "suporte@nuuve.com.br": "Lincoln",
-      "lzoca00@gmail.com": "Lincoln Fake"
-    },
-    "EmailAdministradores": {
-      "suporte@nuuve.com.br": "Lincoln",
-      "lzoca00@gmail.com": "Lincoln Fake"
-    },
-    "EmailResponsavel": {
-      "suporte@nuuve.com.br": "Lincoln"
-    }
+  "ApisCredentials": {
+    "Username": "fulano",
+    "Password": "xyzqw9.$"
   },
   "AppConfig": {
-    "OwnerDB": "vendas",
     "AppURLs": {
-      "UrlCredentialApi": "https://credential.nuuve.com.br/",
-      "UrlCredentialApiToken": "api/v1/userauthenticate/token"
+      "UrlLoginApi": "https://login.seudominio.com.br/",
+      "UrlLoginApiToken": "api/v1/userauthenticate/token",
+      "UrlPessoasApi": "https://pessoas.seudominio.com.br/"
     }
   }
 }

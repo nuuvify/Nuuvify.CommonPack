@@ -5,14 +5,14 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Nuuvify.CommonPack.StandardHttpClient.Results;
-using Nuuvify.CommonPack.StandardHttpClient.xTest.Configs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using Nuuvify.CommonPack.Security.Abstraction;
+using Nuuvify.CommonPack.StandardHttpClient.Results;
+using Nuuvify.CommonPack.StandardHttpClient.xTest.Configs;
 using Xunit;
 using Xunit.Extensions.Ordering;
-using Nuuvify.CommonPack.Security.Abstraction;
 
 namespace Nuuvify.CommonPack.StandardHttpClient.xTest
 {
@@ -27,7 +27,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
         {
             mockFactory = new Mock<IHttpClientFactory>();
 
-            Config = AppSettingsConfig.GetConfig();
+            Config = AppSettingsConfig.GetConfig(false);
         }
 
 
@@ -93,9 +93,12 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
         [LocalTestFact, Order(2)]
         public void PostApiRealDeveRetornarMensagemComSucesso()
         {
-
-            var tokenFactory = new TokenFactory();
-            var tokenValido = tokenFactory.ObtemTokenValido().Result;
+            var config = AppSettingsConfig.GetConfig(true);
+            var tokenFactory = new TokenFactory(config);
+            var tokenValido = tokenFactory.ObtemTokenValido(
+                loginId: config.GetSection("ApisCredentials:Username")?.Value,
+                password: config.GetSection("ApisCredentials:Password")?.Value
+            ).Result;
 
             var notification = tokenFactory?.Notifications.LastOrDefault();
             var expected = false;
@@ -111,7 +114,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
         {
             var correlationId = Guid.NewGuid().ToString();
 
-            var tokenFactory = new TokenFactory();
+            var tokenFactory = new TokenFactory(Config);
             var tokenResult = tokenFactory.ObtemTokenValido("SapUser", "Y6K3Z3-s6w3b9").Result;
 
 

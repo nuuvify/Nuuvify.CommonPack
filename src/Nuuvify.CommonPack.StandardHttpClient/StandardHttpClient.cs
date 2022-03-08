@@ -5,10 +5,10 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Nuuvify.CommonPack.Extensions.Implementation;
-using Nuuvify.CommonPack.StandardHttpClient.Results;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
+using Nuuvify.CommonPack.Extensions.Implementation;
+using Nuuvify.CommonPack.StandardHttpClient.Results;
 
 namespace Nuuvify.CommonPack.StandardHttpClient
 {
@@ -81,7 +81,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         }
 
 
-        private async Task<HttpStandardReturn> HandleResponseMessage(HttpResponseMessage response)
+        public async Task<HttpStandardReturn> HandleResponseMessage(HttpResponseMessage response)
         {
             var returnMessage = new HttpStandardReturn();
 
@@ -101,7 +101,8 @@ namespace Nuuvify.CommonPack.StandardHttpClient
 
             return returnMessage;
         }
-        private async Task<HttpStandardStreamReturn> HandleResponseMessageStream(HttpResponseMessage response)
+
+        public async Task<HttpStandardStreamReturn> HandleResponseMessageStream(HttpResponseMessage response)
         {
             var returnMessage = new HttpStandardStreamReturn();
 
