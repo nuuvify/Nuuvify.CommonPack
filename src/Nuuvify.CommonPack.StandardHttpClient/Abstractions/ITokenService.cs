@@ -28,7 +28,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// Esse metodo sempre ira obter um novo token a partir de CredentialApi
         /// </summary>
         /// <remarks>
-        /// É necessario possuir as seguintes entradas no appsettings: AppConfig:AppURLs:UrlCredentialApi e AppConfig:AppURLs:UrlCredentialToken  <br/>
+        /// É necessario possuir as seguintes entradas no appsettings: AppConfig:AppURLs:UrlLoginApi e AppConfig:AppURLs:UrlCredentialToken  <br/>
         /// Nunca use esse metodo depois de ResetStandardHttpClient
         /// </remarks>
         /// <param name="login">Login, usuario ou applicação</param>
@@ -51,7 +51,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// <summary>
         /// Obtem as mensagens de inconsistencias ocorridas dentro da classe
         /// </summary>
-        List<NotificationR> Notifications {get; set; }
-        
+        List<NotificationR> Notifications { get; set; }
+
     }
 }

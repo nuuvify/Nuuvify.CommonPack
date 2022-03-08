@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
-using System;
+﻿using System;
 using System.IO;
+using Microsoft.Extensions.Configuration;
 
 namespace Nuuvify.CommonPack.Middleware.xTest.Configs
 {
@@ -9,7 +9,8 @@ namespace Nuuvify.CommonPack.Middleware.xTest.Configs
 
         public static IConfiguration GetConfig()
         {
-            string projectPath = AppDomain.CurrentDomain.BaseDirectory.Split(new String[] { @"bin\" }, StringSplitOptions.None)[0];
+            string projectPath = AppDomain.CurrentDomain.BaseDirectory;
+            //.Split(new String[] { @"bin\" }, StringSplitOptions.None)[0];
 
             var config = new ConfigurationBuilder()
                .SetBasePath(projectPath)

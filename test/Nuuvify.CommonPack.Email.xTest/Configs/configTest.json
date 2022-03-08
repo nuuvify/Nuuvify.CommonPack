@@ -33,25 +33,25 @@
       "AccountPassword": ""
     },
     "RemetenteEmail": {
-      "lzoca00@gmail.com": "Lincoln Fake"
+      "lalala@teste.com": "Lincoln Fake"
     },
     "SuporteEmailEndereco": {
-      "suporte@nuuve.com.br": "Lincoln",
-      "lzoca00@gmail.com": "Lincoln Fake"
+      "suporte@teste.com.br": "Lincoln",
+      "zoca@teste.com": "Lincoln Fake"
     },
     "EmailAdministradores": {
-      "suporte@nuuve.com.br": "Lincoln",
-      "lzoca00@gmail.com": "Lincoln Fake"
+      "suporte@teste.com.br": "Lincoln",
+      "zoca@teste.com": "Lincoln Fake"
     },
     "EmailResponsavel": {
-      "suporte@nuuve.com.br": "Lincoln"
+      "suporte@teste.com.br": "Lincoln"
     }
   },
   "AppConfig": {
     "OwnerDB": "vendas",
     "AppURLs": {
-      "UrlCredentialApi": "https://nuuve.com.br/api-credential/",
-      "UrlCredentialApiToken": "api/v1/UserAuthenticate/Token"
+      "UrlLoginApi": "https://seudominio.com.br/api-login/",
+      "UrlLoginApiToken": "api/v1/UserAuthenticate/Token"
     }
   }
 }

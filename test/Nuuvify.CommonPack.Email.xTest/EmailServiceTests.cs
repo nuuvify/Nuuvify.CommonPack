@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Nuuvify.CommonPack.Email.Abstraction;
-using Nuuvify.CommonPack.Email.xTest.Configs;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Moq;
+using Nuuvify.CommonPack.Email.Abstraction;
+using Nuuvify.CommonPack.Email.xTest.Configs;
 using Xunit;
 
 namespace Nuuvify.CommonPack.Email.xTest
@@ -24,7 +24,7 @@ namespace Nuuvify.CommonPack.Email.xTest
             configMock = new Mock<IConfiguration>();
 
 
-            config = AppSettingsConfig.GetConfig();
+            config = AppSettingsConfig.GetConfig(false);
 
 
             emailServerConfiguration = new EmailServerConfiguration();

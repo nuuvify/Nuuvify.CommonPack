@@ -1,9 +1,9 @@
 ﻿using System;
-using Nuuvify.CommonPack.StandardHttpClient.Polly;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nuuvify.CommonPack.Security.Abstraction;
+using Nuuvify.CommonPack.StandardHttpClient.Polly;
 
 namespace Nuuvify.CommonPack.StandardHttpClient
 {
@@ -12,8 +12,8 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// <summary>
         /// Inclua esse setup antes das demais configurações de HttpClient <br/>
         /// Você precisa incluir as tags no seu arquivo appsettings.json <br/>
-        ///     "AppConfig:AppURLs:UrlCredentialApi" <br/>
-        ///     "AppConfig:AppURLs:UrlCredentialApiToken"
+        ///     "AppConfig:AppURLs:UrlLoginApi" <br/>
+        ///     "AppConfig:AppURLs:UrlLoginApiToken"
         /// </summary>
         /// <remarks>
         ///  O CwsApi já é registrado automaticamente ao configurar essa classe
@@ -23,7 +23,6 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         public static void AddStandardHttpClientSetup(this IServiceCollection services,
             IConfiguration configuration)
         {
-
             services.AddScoped<IStandardHttpClient, StandardHttpClient>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddTransient<CredentialToken>();
@@ -35,8 +34,8 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// <summary>
         /// Inclua esse setup antes das demais configurações de HttpClient <br/>
         /// Você precisa incluir as tags no seu arquivo appsettings.json <br/>
-        ///     "AppConfig:AppURLs:UrlCredentialApi" <br/>
-        ///     "AppConfig:AppURLs:UrlCredentialApiToken"
+        ///     "AppConfig:AppURLs:UrlLoginApi" <br/>
+        ///     "AppConfig:AppURLs:UrlLoginApiToken"
         /// </summary>
         /// <remarks>
         ///  O CwsApi já é registrado automaticamente ao configurar essa classe
@@ -65,7 +64,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
 
             services.AddHttpClient("CredentialApi", client =>
             {
-                client.BaseAddress = new Uri(configuration.GetSection("AppConfig:AppURLs:UrlCredentialApi")?.Value);
+                client.BaseAddress = new Uri(configuration.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value);
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
             })
             .AddPolicyWithTokenHandlers(services, retryTotal: 2, breakDurationMilliSeconds: 2000);

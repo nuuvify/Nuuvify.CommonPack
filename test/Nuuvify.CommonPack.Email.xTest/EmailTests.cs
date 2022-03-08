@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Nuuvify.CommonPack.Email.Abstraction;
-using Nuuvify.CommonPack.Email.xTest.Configs;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Moq;
+using Nuuvify.CommonPack.Email.Abstraction;
+using Nuuvify.CommonPack.Email.xTest.Configs;
 using Xunit;
 
 namespace Nuuvify.CommonPack.Email.xTest
@@ -26,7 +26,7 @@ namespace Nuuvify.CommonPack.Email.xTest
         {
 
 
-            config = AppSettingsConfig.GetConfig();
+            config = AppSettingsConfig.GetConfig(false);
 
             emailServerConfiguration = new EmailServerConfiguration();
 
@@ -340,7 +340,7 @@ namespace Nuuvify.CommonPack.Email.xTest
             var mockSmpt = new Mock<SmtpClient>();
             mockSmpt.Setup(s => s.ConnectAsync(config.GetSection("EmailConfig:EmailServerConfigurationFake:ServerHost").Value, 0, MailKit.Security.SecureSocketOptions.Auto, default))
                 .Throws<Exception>();
-            
+
 
             var testarEnvio = new Email(emailServerConfiguration);
             //testarEnvio.EmailServerConfiguration = emailServerConfiguration;
