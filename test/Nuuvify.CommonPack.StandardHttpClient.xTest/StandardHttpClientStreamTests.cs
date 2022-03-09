@@ -36,22 +36,10 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
         {
             string[] FilesToPost = { "ubuntu3d--dark-blue.jpg", "Excel Example File.xlsx" };
 
-            var api = "http://localhost:5001/";
-            var pathName = AppDomain.CurrentDomain.BaseDirectory.Split(new String[] { @"bin\" }, StringSplitOptions.None)[0];
-
-
-            var tokenFactory = new TokenFactory(Config);
-            var tokenResult = tokenFactory.ObtemTokenValido(
-                Config.GetSection("ApisCredentials:Username")?.Value,
-                Config.GetSection("ApisCredentials:Password")?.Value)
-                .Result;
+            var api = "http://localhost:5000/";
+            var pathName = AppDomain.CurrentDomain.BaseDirectory;
 
             var uri = new Uri(api);
-            // var handler = new HttpClientHandler();
-            // var client = new HttpClient(handler, true)
-            // {
-            //     BaseAddress = uri
-            // };
 
             var clientHandlerStub = new DelegatingHandlerStub(new HttpResponseMessage()
             {
@@ -133,7 +121,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
 
 
                 result = await standardClient
-                    .WithAuthorization("bearer", tokenResult)
+                    .WithAuthorization(schema: "bearer", token: "XYZ")
                     .Post(url, multipartContent);
 
             }

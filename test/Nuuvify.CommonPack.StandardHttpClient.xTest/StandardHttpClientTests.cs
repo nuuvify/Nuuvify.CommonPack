@@ -41,9 +41,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
                 Descricao = "Isso é um teste"
             };
 
-
             var jsonConverted = JsonSerializer.Serialize(fakeClassReturn);
-
 
             var resultDefault = new HttpStandardReturn
             {
@@ -51,9 +49,6 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
                 ReturnMessage = jsonConverted,
                 Success = true
             };
-
-            var urlReturn = "https://meuteste/api/externafake?codigo=123456";
-
 
             var clientHandlerStub = new DelegatingHandlerStub(new HttpResponseMessage()
             {
@@ -70,10 +65,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
 
             mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(client);
 
-
             var url = "api/externafake";
-
-
 
             var standardClient = new StandardHttpClient(mockFactory.Object, new NullLogger<StandardHttpClient>());
             standardClient.CreateClient();
@@ -82,6 +74,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
                 .WithQueryString("codigo", fakeClassReturn.Codigo)
                 .Get(url);
 
+            var urlReturn = "https://meuteste/api/externafake?codigo=123456";
 
             Assert.Equal(resultDefault.ReturnCode, result.ReturnCode);
             Assert.Equal(resultDefault.ReturnMessage, result.ReturnMessage);
@@ -109,31 +102,34 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
 
         }
 
-        [Fact(Skip = "true")]
+        [Fact, Order(3)]
         public void DeleteApiRealDeveRetornarMensagemComSucesso()
         {
-            var correlationId = Guid.NewGuid().ToString();
-
-            var tokenFactory = new TokenFactory(Config);
-            var tokenResult = tokenFactory.ObtemTokenValido("SapUser", "Y6K3Z3-s6w3b9").Result;
-
-
-            var handler = new HttpClientHandler();
-            var client = new HttpClient(handler, true)
+            var resultDefault = new HttpStandardReturn
             {
-                BaseAddress = new Uri(Config.GetSection("AppConfig:AppURLs:UrlSapConnectorApi")?.Value)
+                ReturnCode = "200",
+                ReturnMessage = "Excluido com sucesso",
+                Success = true
             };
-            client.DefaultRequestHeaders.Add("X-SAP-ENVIRONMENT", "BEQ");
+
+            var jsonConverted = JsonSerializer.Serialize(resultDefault);
+
+            var clientHandlerStub = new DelegatingHandlerStub(new HttpResponseMessage()
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(jsonConverted, Encoding.UTF8, "application/json")
+            });
+
+            var client = new HttpClient(clientHandlerStub, true)
+            {
+                BaseAddress = new Uri("https://meuteste/")
+            };
             client.DefaultRequestHeaders.Add("Accept", "application/json");
 
 
-            mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>()))
-                .Returns(client);
+            mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(client);
 
-
-            var url = Config.GetSection("AppConfig:AppURLs:UrlSapConnectorApiPagamentos")?.Value;
-            url = $"{url}/{correlationId}/28/{Guid.NewGuid()}";
-
+            var url = "api/cliente";
 
             var standardClient = new StandardHttpClient(mockFactory.Object, new NullLogger<StandardHttpClient>());
             standardClient.CreateClient();
@@ -141,22 +137,12 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
 
             var result = standardClient
                 .WithHeader("Accept-Language", "pt-BR")
-                .WithCurrelationHeader(correlationId)
-                .WithAuthorization("bearer", tokenResult)
+                .WithCurrelationHeader("zxzxzxzxzxzxzxzxzxz")
+                .WithAuthorization("bearer", "xyz")
                 .Delete(url).Result;
 
 
-            var expected = string.Empty;
-            var actual = string.Empty;
-
-            foreach (var item in tokenFactory?.Notifications)
-            {
-                actual = item.Message.ToString();
-            }
-
-            Assert.Equal(expected, actual);
-            Assert.Contains("200", result.ReturnCode);
-
+            Assert.Equal(resultDefault.ReturnCode, result.ReturnCode);
 
         }
 

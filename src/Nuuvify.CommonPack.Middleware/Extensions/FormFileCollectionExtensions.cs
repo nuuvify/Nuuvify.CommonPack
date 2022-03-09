@@ -21,7 +21,7 @@ namespace Nuuvify.CommonPack.Middleware.Extensions
 
             var list = new Dictionary<string, byte[]>();
 
-            if (files == null || files.Count == 0) 
+            if (files == null || files.Count == 0)
                 return list;
 
 
