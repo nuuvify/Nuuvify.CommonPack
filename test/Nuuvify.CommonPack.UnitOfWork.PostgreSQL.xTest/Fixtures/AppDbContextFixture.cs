@@ -1,11 +1,11 @@
 using System;
 using System.Diagnostics;
 using System.Text;
-using Nuuvify.CommonPack.Middleware.Abstraction;
-using Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Arrange;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Moq;
+using Nuuvify.CommonPack.Middleware.Abstraction;
+using Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Arrange;
 
 namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Fixtures
 {
@@ -25,7 +25,10 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Fixtures
 
             PreventDisposal = true;
             IConfiguration config = AppSettingsConfig.GetConfig();
-            var cnnString = config.GetConnectionString(CnnTag);
+
+            var cnnStringEnv = Environment.GetEnvironmentVariable("PostgreSQLVendas");
+            var cnnString = config.GetConnectionString(CnnTag) ?? cnnStringEnv;
+
             Schema = config.GetSection(SchemaTag)?.Value;
             RemoveTables = config.GetSection("TestOptions:RemoveTables")?.Value;
 
