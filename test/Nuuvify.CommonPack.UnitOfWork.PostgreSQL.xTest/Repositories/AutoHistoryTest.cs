@@ -50,7 +50,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Repositories
         [Trait("PostgreSQL", "AutoHistory")]
         public async Task DomainEvent_ComAutoHistory_ComClassesIguaisComVersoesDiferentes_DeveGerarEventComAmbasVersoes()
         {
-            _outputHelper.WriteLine($"{this.GetType().Name} - Order(1)");
+            _outputHelper.WriteLine($"{this.GetType().Name} - Order(1) - Database: {_dbContext.GetCnnStringToLog()}");
 
             const int RegistrosGravadosMaisHistory = 2;
 
@@ -82,7 +82,8 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Repositories
         [Trait("PostgreSQL", "AutoHistory")]
         public async Task AutoHistory_ComCorrelationId_DeveGravarCampoCorrelationId()
         {
-            _outputHelper.WriteLine($"{this.GetType().Name} - Order(2)");
+            _outputHelper.WriteLine($"{this.GetType().Name} - Order(2) - Database: {_dbContext.GetCnnStringToLog()}");
+
 
 
             _dbContext.PreventDisposal = false;

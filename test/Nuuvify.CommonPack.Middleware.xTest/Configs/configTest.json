@@ -1,36 +1,51 @@
 ﻿{
-  "Logging": {
-    "LogLevel": {
-      "Default": "Debug",
-      "System": "Information",
-      "Microsoft": "Information"
-    },
-    "LogLevelEF": {
-      "Microsoft.EntityFrameworkCore": "Information"
-    }
-  },
   "VirtualPath": "api",
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "vendas": ""
+  },
+  "TestOptions": {
+    "DataBaseTesteInMemory": false,
+    "DataBaseTesteOracle": false,
+    "DataBaseTesteSqlServer": false,
+    "DataBaseTestePostgreSQL": true,
+    "RemoveTables": true
+  },
   "EmailConfig": {
     "EmailServerConfiguration": {
       "ServerHost": "smtp.gmail.com",
       "Port": 587,
+      "Security": 192,
+      "AccountUserName": "",
+      "AccountPassword": ""
+    },
+    "EmailServerConfigurationFake": {
+      "ServerHost": "servidor.com",
+      "Port": 0,
+      "Security": 0,
+      "AccountUserName": "",
+      "AccountPassword": ""
+    },
+    "EmailServerConfigurationFakeNull": {
+      "ServerHost": "",
+      "Port": 0,
       "Security": 0,
       "AccountUserName": "",
       "AccountPassword": ""
     },
     "RemetenteEmail": {
-      "lzoca00@gmail.com": "Lincoln Fake"
+      "lalala@teste.com": "Lincoln Fake"
     },
     "SuporteEmailEndereco": {
-      "suporte@nuuve.com.br": "Lincoln",
-      "lzoca00@gmail.com": "Lincoln Fake"
+      "suporte@teste.com.br": "Lincoln",
+      "zoca@teste.com": "Lincoln Fake"
     },
     "EmailAdministradores": {
-      "suporte@nuuve.com.br": "Lincoln",
-      "lzoca00@gmail.com": "Lincoln Fake"
+      "suporte@teste.com.br": "Lincoln",
+      "zoca@teste.com": "Lincoln Fake"
     },
     "EmailResponsavel": {
-      "suporte@nuuve.com.br": "Lincoln"
+      "suporte@teste.com.br": "Lincoln"
     }
   },
   "AppConfig": {

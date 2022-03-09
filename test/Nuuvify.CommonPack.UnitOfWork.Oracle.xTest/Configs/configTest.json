@@ -1,37 +1,54 @@
 ﻿{
-  "Logging": {
-    "LogLevel": {
-      "Default": "Debug",
-      "System": "Information",
-      "Microsoft": "Information"
-    },
-    "LogLevelEF": {
-      "Microsoft.EntityFrameworkCore": "Information"
-    }
-  },
   "VirtualPath": "api",
   "AllowedHosts": "*",
   "ConnectionStrings": {
     "Oracle": "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=teste.com.br)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=nuuve.com.br)));User ID=XXXXXX;Password=XXXXXX;Persist Security Info=True;",
-    "SqlServer": "Server=seuserver.com.br;Initial Catalog=;Integrated Security=False;User ID=usr_testintegrated;Password=XXXXXXXX;Connect Timeout=15;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"
-  },
-  "EmailConfig": {
-    "RemetenteEmail": {
-      "Email": "suporte@nuuve.com.br",
-      "Nome": "Lincoln"
-    },
-    "EmailHost": "servidormocado",
-    "SuporteEmailEndereco": "suporte@nuuve.com.br, lzoca00@gmail.com",
-    "EmailAdministradores": {
-      "suporte@nuuve.com.br": "Lincoln",
-      "lzoca00@gmail.com": "Lincoln Fake"
-    }
+    "SqlServer": "Server=seuserver.com.br;Initial Catalog=;Integrated Security=False;User ID=usr_testintegrated;Password=XXXXXXXX;Connect Timeout=15;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False",
+    "vendas": ""
   },
   "TestOptions": {
     "DataBaseTesteInMemory": false,
-    "DataBaseTesteOracle": true,
-    "DataBaseTesteSqlServer": true,
+    "DataBaseTesteOracle": false,
+    "DataBaseTesteSqlServer": false,
+    "DataBaseTestePostgreSQL": true,
     "RemoveTables": true
+  },
+  "EmailConfig": {
+    "EmailServerConfiguration": {
+      "ServerHost": "smtp.gmail.com",
+      "Port": 587,
+      "Security": 192,
+      "AccountUserName": "",
+      "AccountPassword": ""
+    },
+    "EmailServerConfigurationFake": {
+      "ServerHost": "servidor.com",
+      "Port": 0,
+      "Security": 0,
+      "AccountUserName": "",
+      "AccountPassword": ""
+    },
+    "EmailServerConfigurationFakeNull": {
+      "ServerHost": "",
+      "Port": 0,
+      "Security": 0,
+      "AccountUserName": "",
+      "AccountPassword": ""
+    },
+    "RemetenteEmail": {
+      "lalala@teste.com": "Lincoln Fake"
+    },
+    "SuporteEmailEndereco": {
+      "suporte@teste.com.br": "Lincoln",
+      "zoca@teste.com": "Lincoln Fake"
+    },
+    "EmailAdministradores": {
+      "suporte@teste.com.br": "Lincoln",
+      "zoca@teste.com": "Lincoln Fake"
+    },
+    "EmailResponsavel": {
+      "suporte@teste.com.br": "Lincoln"
+    }
   },
   "AppConfig": {
     "OwnerDB": "vendas",

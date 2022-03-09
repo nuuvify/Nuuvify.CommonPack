@@ -1,14 +1,15 @@
 ﻿{
-  "TestOptions": {
-    "BypassEmailSend": true
+  "VirtualPath": "api",
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "vendas": ""
   },
-  "Logging": {
-    "LogLevel": {
-      "": "Debug",
-      "Default": "Debug",
-      "System": "Information",
-      "Microsoft": "Information"
-    }
+  "TestOptions": {
+    "DataBaseTesteInMemory": false,
+    "DataBaseTesteOracle": false,
+    "DataBaseTesteSqlServer": false,
+    "DataBaseTestePostgreSQL": true,
+    "RemoveTables": true
   },
   "EmailConfig": {
     "EmailServerConfiguration": {

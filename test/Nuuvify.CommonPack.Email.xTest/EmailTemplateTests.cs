@@ -107,7 +107,8 @@ namespace Nuuvify.CommonPack.Email.xTest
 
         }
 
-        [LocalTestFact]
+        //[LocalTestFact]
+        [Fact]
         [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
         public async Task EnviaEmailComTemplateComAnexoReal()
         {
@@ -135,6 +136,12 @@ namespace Nuuvify.CommonPack.Email.xTest
 
 
             emailServerConfiguration.ServerHost = config.GetSection("EmailConfig:EmailServerConfiguration:ServerHost")?.Value;
+            emailServerConfiguration.AccountUserName = string.IsNullOrWhiteSpace(emailServerConfiguration.AccountUserName)
+                ? Environment.GetEnvironmentVariable("EmailAccountUserName")
+                : emailServerConfiguration.AccountUserName;
+            emailServerConfiguration.AccountPassword = string.IsNullOrWhiteSpace(emailServerConfiguration.AccountPassword)
+                ? Environment.GetEnvironmentVariable("EmailAccountPassword")
+                : emailServerConfiguration.AccountPassword;
 
             var testarEnvio = new Email(emailServerConfiguration);
 

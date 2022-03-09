@@ -36,7 +36,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
             string userSecret;
             if (Environment.OSVersion.Platform == PlatformID.Unix)
             {
-                userSecret = ".microsoft/usersecrets//nuuvify";
+                userSecret = ".microsoft/usersecrets/nuuvify";
             }
             else
             {

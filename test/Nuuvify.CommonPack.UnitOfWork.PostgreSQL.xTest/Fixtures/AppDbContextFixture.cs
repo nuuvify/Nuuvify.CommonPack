@@ -16,6 +16,22 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Fixtures
 
         private string RemoveTables { get; }
         public string Schema { get; }
+        public string CnnString { get; }
+
+        public string GetCnnStringToLog()
+        {
+            if (string.IsNullOrWhiteSpace(CnnString)) return "";
+
+            var lenCnn = CnnString.Length;
+
+            if (lenCnn >= 15)
+            {
+                return CnnString.Substring(0, 15);
+            }
+
+            return CnnString.Substring(0, 3);
+
+        }
 
         public AppDbContextFixture()
         {
@@ -27,8 +43,8 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Fixtures
             IConfiguration config = AppSettingsConfig.GetConfig();
 
             var cnnStringEnv = Environment.GetEnvironmentVariable("PostgreSQLVendas");
-            var cnnString = config.GetConnectionString(CnnTag);
-            cnnString = string.IsNullOrWhiteSpace(cnnString) ? cnnStringEnv : cnnString;
+            CnnString = config.GetConnectionString(CnnTag);
+            CnnString = string.IsNullOrWhiteSpace(CnnString) ? cnnStringEnv : CnnString;
 
             Schema = config.GetSection(SchemaTag)?.Value;
             RemoveTables = config.GetSection("TestOptions:RemoveTables")?.Value;
@@ -38,12 +54,12 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Fixtures
             mockIConfigurationCustom.Setup(x => x.GetSectionValue(SchemaTag))
                 .Returns(Schema);
             mockIConfigurationCustom.Setup(x => x.GetConnectionString(CnnTag))
-                .Returns(cnnString);
+                .Returns(CnnString);
             mockIConfigurationCustom.Setup(x => x.GetCorrelationId())
                 .Returns(CorrelationFake);
 
             var options = new DbContextOptionsBuilder<StubDbContext>()
-                .UseNpgsql(cnnString)
+                .UseNpgsql(CnnString)
                 .UseSnakeCaseNamingConvention()
                 .UseLazyLoadingProxies()
                 .EnableDetailedErrors()

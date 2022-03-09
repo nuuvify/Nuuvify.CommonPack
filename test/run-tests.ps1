@@ -37,7 +37,8 @@ function GenerateReportCoverage {
         # dotnet tool install dotnet-reportgenerator-globaltool --tool-path $pathDotnetTool
     }
 
-    aliasReport "-reports:./*/TestResults/*/coverage.*.xml" `
+    #aliasReport
+    dotnet tool run reportgenerator "-reports:./*/TestResults/*/coverage.*.xml" `
         "-targetdir:TestResults/Reports" `
         "-reportTypes:Html;Badges;SonarQube" `
         "-assemblyfilters:-xunit.*" 
