@@ -130,7 +130,7 @@ namespace Nuuvify.CommonPack.Email.xTest
 
             var destinatarios = new Dictionary<string, string>
             {
-                { "lzoca00@gmail.com.br", "Zoca00" }
+                { "lzoca00@gmail.com", "Zoca00" }
             };
 
             var remetentes = new Dictionary<string, string>

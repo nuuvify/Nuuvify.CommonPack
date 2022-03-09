@@ -34,7 +34,6 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Repositories
             _outputHelper = outputHelper;
             _seedDbFixture = seedDbFixture;
 
-
             var uow = new UnitOfWork<DbContext>(_dbContext.Db)
             {
                 UsernameContext = UserRequest

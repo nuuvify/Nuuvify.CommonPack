@@ -34,7 +34,8 @@
       "AccountPassword": ""
     },
     "EmailAdministradores": {
-      "teste@dominio.com": "Fulano"
+      "teste@dominio.com": "Fulano",
+      "teste1@dominio.com": "Cicrano"
     }
   },
   "AppConfig": {

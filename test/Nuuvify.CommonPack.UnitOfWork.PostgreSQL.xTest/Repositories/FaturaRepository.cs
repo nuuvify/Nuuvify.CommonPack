@@ -30,11 +30,11 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Repositories
             ITestOutputHelper outputHelper,
             SeedDbFixture seedDbFixture)
         {
+
             _dbContext = dbContext;
             _dataFixture = dataFixture;
             _outputHelper = outputHelper;
             _seedDbFixture = seedDbFixture;
-
 
             var uow = new UnitOfWork<DbContext>(_dbContext.Db)
             {
