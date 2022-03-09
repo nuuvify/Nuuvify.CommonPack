@@ -1,14 +1,58 @@
 ﻿{
+  "VirtualPath": "api",
+  "AllowedHosts": "*",
   "ConnectionStrings": {
     "vendas": ""
   },
   "TestOptions": {
     "DataBaseTesteInMemory": false,
-    "DataBaseTesteOracle": true,
+    "DataBaseTesteOracle": false,
+    "DataBaseTesteSqlServer": false,
     "DataBaseTestePostgreSQL": true,
     "RemoveTables": true
   },
+  "EmailConfig": {
+    "EmailServerConfiguration": {
+      "ServerHost": "smtp.gmail.com",
+      "Port": 587,
+      "Security": 192,
+      "AccountUserName": "",
+      "AccountPassword": ""
+    },
+    "EmailServerConfigurationFake": {
+      "ServerHost": "servidor.com",
+      "Port": 0,
+      "Security": 0,
+      "AccountUserName": "",
+      "AccountPassword": ""
+    },
+    "EmailServerConfigurationFakeNull": {
+      "ServerHost": "",
+      "Port": 0,
+      "Security": 0,
+      "AccountUserName": "",
+      "AccountPassword": ""
+    },
+    "RemetenteEmail": {
+      "lalala@teste.com": "Lincoln Fake"
+    },
+    "SuporteEmailEndereco": {
+      "suporte@teste.com.br": "Lincoln",
+      "zoca@teste.com": "Lincoln Fake"
+    },
+    "EmailAdministradores": {
+      "suporte@teste.com.br": "Lincoln",
+      "zoca@teste.com": "Lincoln Fake"
+    },
+    "EmailResponsavel": {
+      "suporte@teste.com.br": "Lincoln"
+    }
+  },
   "AppConfig": {
-    "OwnerDB": "vendas"
+    "OwnerDB": "vendas",
+    "AppURLs": {
+      "UrlLoginApi": "https://seudominio.com.br/api-login/",
+      "UrlLoginApiToken": "api/v1/UserAuthenticate/Token"
+    }
   }
 }
