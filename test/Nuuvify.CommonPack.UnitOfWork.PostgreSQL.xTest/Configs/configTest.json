@@ -1,4 +1,7 @@
 ﻿{
+  "ConnectionStrings": {
+    "vendas": ""
+  },
   "TestOptions": {
     "DataBaseTesteInMemory": false,
     "DataBaseTesteOracle": true,
