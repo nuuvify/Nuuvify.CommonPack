@@ -10,8 +10,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest
 
         public static IConfiguration GetConfig()
         {
-            string projectPath = AppDomain.CurrentDomain.BaseDirectory
-                .Split(new string[] { @"bin\" }, StringSplitOptions.None)[0];
+            string projectPath = AppDomain.CurrentDomain.BaseDirectory;
 
             var config = new ConfigurationBuilder()
                .SetBasePath(projectPath)
