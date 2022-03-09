@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using Nuuvify.CommonPack.Middleware.Abstraction;
 using Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Arrange;
+using Xunit.Abstractions;
 
 namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Fixtures
 {
@@ -14,26 +15,19 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Fixtures
     public class AppDbContextFixture : BaseAppDbContextFixture
     {
 
-        private string RemoveTables { get; }
-        public string Schema { get; }
-        public string CnnString { get; }
+        private string RemoveTables { get; set; }
+        public string Schema { get; private set; }
+        public string CnnString { get; private set; }
 
-        public string GetCnnStringToLog()
+        public ITestOutputHelper OutputHelper;
+
+
+        public AppDbContextFixture()
         {
-            if (string.IsNullOrWhiteSpace(CnnString)) return "";
-
-            var lenCnn = CnnString.Length;
-
-            if (lenCnn >= 15)
-            {
-                return CnnString.Substring(0, 15);
-            }
-
-            return CnnString.Substring(0, 3);
 
         }
 
-        public AppDbContextFixture()
+        public void SetAppDbContext()
         {
             const string CnnTag = "vendas";
             const string SchemaTag = "AppConfig:OwnerDB";
@@ -42,7 +36,9 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Fixtures
             PreventDisposal = true;
             IConfiguration config = AppSettingsConfig.GetConfig();
 
-            var cnnStringEnv = Environment.GetEnvironmentVariable("PostgreSQLVendas");
+            var cnnStringEnv = Environment.GetEnvironmentVariable("POSTGRESQLVENDAS");
+            OutputHelper.WriteLine($"String Conex: {GetCnnStringToLog(cnnStringEnv)}");
+
             CnnString = config.GetConnectionString(CnnTag);
             CnnString = string.IsNullOrWhiteSpace(CnnString) ? cnnStringEnv : CnnString;
 
@@ -68,6 +64,24 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Fixtures
 
 
             Db = new StubDbContext(options, mockIConfigurationCustom.Object);
+        }
+
+        public string GetCnnStringToLog(string stringToLog = null)
+        {
+            if (string.IsNullOrWhiteSpace(stringToLog))
+            {
+                stringToLog = CnnString;
+            }
+            if (string.IsNullOrWhiteSpace(stringToLog)) return "";
+
+            var lenCnn = stringToLog.Length;
+
+            if (lenCnn >= 15)
+            {
+                return stringToLog.Substring(0, 15);
+            }
+
+            return stringToLog.Substring(0, 3);
 
         }
 
