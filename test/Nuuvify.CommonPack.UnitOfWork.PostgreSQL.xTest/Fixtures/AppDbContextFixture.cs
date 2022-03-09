@@ -27,7 +27,8 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Fixtures
             IConfiguration config = AppSettingsConfig.GetConfig();
 
             var cnnStringEnv = Environment.GetEnvironmentVariable("PostgreSQLVendas");
-            var cnnString = config.GetConnectionString(CnnTag) ?? cnnStringEnv;
+            var cnnString = config.GetConnectionString(CnnTag);
+            cnnString = string.IsNullOrWhiteSpace(cnnString) ? cnnStringEnv : cnnString;
 
             Schema = config.GetSection(SchemaTag)?.Value;
             RemoveTables = config.GetSection("TestOptions:RemoveTables")?.Value;
