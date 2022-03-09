@@ -15,7 +15,7 @@
   },
   "EmailConfig": {
     "EmailServerConfiguration": {
-      "ServerHost": "smtp.gmail.com",
+      "ServerHost": "smtp.zoho.com",
       "Port": 587,
       "Security": 192,
       "AccountUserName": "",
@@ -35,19 +35,8 @@
       "AccountUserName": "",
       "AccountPassword": ""
     },
-    "RemetenteEmail": {
-      "lalala@teste.com": "Lincoln Fake"
-    },
-    "SuporteEmailEndereco": {
-      "suporte@teste.com.br": "Lincoln",
-      "zoca@teste.com": "Lincoln Fake"
-    },
     "EmailAdministradores": {
-      "suporte@teste.com.br": "Lincoln",
-      "zoca@teste.com": "Lincoln Fake"
-    },
-    "EmailResponsavel": {
-      "suporte@teste.com.br": "Lincoln"
+      "teste@dominio.com": "Fulano"
     }
   },
   "AppConfig": {

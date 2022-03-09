@@ -10,6 +10,7 @@ using Moq;
 using Nuuvify.CommonPack.Email.Abstraction;
 using Nuuvify.CommonPack.Email.xTest.Configs;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Nuuvify.CommonPack.Email.xTest
 {
@@ -21,10 +22,12 @@ namespace Nuuvify.CommonPack.Email.xTest
         private readonly IConfiguration config;
         private readonly Mock<IConfiguration> configMock;
         private ConfigureFromConfigurationOptions<EmailServerConfiguration> configEmailServer;
+        private readonly ITestOutputHelper _outputHelper;
 
-        public EmailTemplateTests()
+
+        public EmailTemplateTests(ITestOutputHelper outputHelper)
         {
-
+            _outputHelper = outputHelper;
             configMock = new Mock<IConfiguration>();
 
             config = AppSettingsConfig.GetConfig(false);
@@ -122,22 +125,25 @@ namespace Nuuvify.CommonPack.Email.xTest
 
             configEmailServer.Configure(emailServerConfiguration);
 
+            var envEmailUsername = Environment.GetEnvironmentVariable("EmailAccountUserName");
+            _outputHelper.WriteLine($"{this.GetType().Name} - Email: {envEmailUsername}");
 
             var destinatarios = new Dictionary<string, string>
             {
-                { "suporte@nuuve.com.br", "Lincoln" }
+                { "lzoca00@gmail.com.br", "Zoca00" }
             };
 
-            var remetentes = config.GetSection("EmailConfig:RemetenteEmail")
-                .GetChildren()?
-                .Where(x => !string.IsNullOrWhiteSpace(x.Value))?
-                .ToDictionary(x => x.Key, x => x.Value);
+            var remetentes = new Dictionary<string, string>
+            {
+                { envEmailUsername, "dotnet teste" }
+            };
+
 
 
 
             emailServerConfiguration.ServerHost = config.GetSection("EmailConfig:EmailServerConfiguration:ServerHost")?.Value;
             emailServerConfiguration.AccountUserName = string.IsNullOrWhiteSpace(emailServerConfiguration.AccountUserName)
-                ? Environment.GetEnvironmentVariable("EmailAccountUserName")
+                ? envEmailUsername
                 : emailServerConfiguration.AccountUserName;
             emailServerConfiguration.AccountPassword = string.IsNullOrWhiteSpace(emailServerConfiguration.AccountPassword)
                 ? Environment.GetEnvironmentVariable("EmailAccountPassword")

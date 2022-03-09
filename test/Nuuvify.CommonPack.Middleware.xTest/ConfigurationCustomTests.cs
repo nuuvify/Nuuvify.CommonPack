@@ -57,7 +57,7 @@ namespace Nuuvify.CommonPack.Middleware.xTest
         [Fact]
         public void ConfigurationOptionsDeveRetornarClasseTipada()
         {
-            const string ServerHostActual = "smtp.gmail.com";
+            const string ServerHostActual = "smtp.zoho.com";
 
             var configuration = new ConfigurationCustom(Config, null, null);
             var emailServerConfiguration = configuration.ConfigurationOptions<EmailServerConfiguration>("EmailConfig:EmailServerConfiguration");
@@ -131,7 +131,7 @@ namespace Nuuvify.CommonPack.Middleware.xTest
             Assert.Equal(request.CorrelationId, valor);
 
         }
- 
+
         [Fact]
         public void ConfigurationCustom_ComRequestConfigurationSemCorrelation_RetornaNull()
         {

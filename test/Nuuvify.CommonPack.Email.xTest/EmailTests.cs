@@ -36,10 +36,11 @@ namespace Nuuvify.CommonPack.Email.xTest
             remetenteMock1.Setup(s => s.Key).Returns("cat@zzz.com");
             remetenteMock1.Setup(s => s.Value).Returns("Teste Automatizado");
 
-            Remetentes = config.GetSection("EmailConfig:RemetenteEmail")
-                                .GetChildren()?
-                                .Where(x => !string.IsNullOrWhiteSpace(x.Value))?
-                                .ToDictionary(x => x.Key, x => x.Value);
+            var envEmailUsername = Environment.GetEnvironmentVariable("EmailAccountUserName");
+            Remetentes = new Dictionary<string, string>
+            {
+                { envEmailUsername, "dotnet teste" }
+            };
 
 
 
