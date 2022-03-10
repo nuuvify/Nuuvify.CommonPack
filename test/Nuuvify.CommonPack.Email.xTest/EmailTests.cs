@@ -74,7 +74,7 @@ namespace Nuuvify.CommonPack.Email.xTest
 
 
             var testarEnvio = new Email(emailServerConfiguration);
-            //testarEnvio.EmailServerConfiguration = emailServerConfiguration;
+
 
             var emailEnviado = testarEnvio.EnviarAsync(destinatarios, null, assunto, mensagem);
 
@@ -101,7 +101,7 @@ namespace Nuuvify.CommonPack.Email.xTest
 
 
             var testarEnvio = new Email(emailServerConfiguration);
-            //testarEnvio.EmailServerConfiguration = emailServerConfiguration;
+
 
             var emailEnviado = testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
 
@@ -127,7 +127,7 @@ namespace Nuuvify.CommonPack.Email.xTest
 
 
             var testarEnvio = new Email(emailServerConfiguration);
-            //testarEnvio.EmailServerConfiguration = emailServerConfiguration;
+
 
             var emailEnviado = testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
 
@@ -151,7 +151,7 @@ namespace Nuuvify.CommonPack.Email.xTest
 
 
             var testarEnvio = new Email(emailServerConfiguration);
-            //testarEnvio.EmailServerConfiguration = emailServerConfiguration;
+
 
 
             var emailEnviado = testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
@@ -173,7 +173,7 @@ namespace Nuuvify.CommonPack.Email.xTest
 
 
             var testarEnvio = new Email(emailServerConfiguration);
-            //testarEnvio.EmailServerConfiguration = emailServerConfiguration;
+
 
 
             var emailEnviado = testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
@@ -198,7 +198,7 @@ namespace Nuuvify.CommonPack.Email.xTest
 
 
             var testarEnvio = new Email(emailServerConfiguration);
-            //testarEnvio.EmailServerConfiguration = emailServerConfiguration;
+
 
 
             var emailEnviado = testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
@@ -227,7 +227,7 @@ namespace Nuuvify.CommonPack.Email.xTest
 
 
             var testarEnvio = new Email(emailServerConfiguration);
-            //testarEnvio.EmailServerConfiguration = emailServerConfiguration;
+
 
 
             var emailEnviado = testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, mensagem);
@@ -255,7 +255,7 @@ namespace Nuuvify.CommonPack.Email.xTest
 
 
             var testarEnvio = new Email(emailServerConfiguration);
-            //testarEnvio.EmailServerConfiguration = emailServerConfiguration;
+
 
 
             var emailEnviado = testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, mensagem);
@@ -280,7 +280,7 @@ namespace Nuuvify.CommonPack.Email.xTest
 
 
             var testarEnvio = new Email(emailServerConfiguration);
-            //testarEnvio.EmailServerConfiguration = emailServerConfiguration;
+
 
 
             var emailEnviado = testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, mensagem);
@@ -310,7 +310,7 @@ namespace Nuuvify.CommonPack.Email.xTest
 
 
             var testarEnvio = new Email(emailServerConfiguration);
-            //testarEnvio.EmailServerConfiguration = emailServerConfiguration;
+
 
 
             var emailEnviado = testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, mensagem);
@@ -343,7 +343,7 @@ namespace Nuuvify.CommonPack.Email.xTest
 
 
             var testarEnvio = new Email(emailServerConfiguration);
-            //testarEnvio.EmailServerConfiguration = emailServerConfiguration;
+
 
 
             var emailEnviado = testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, mensagem);
