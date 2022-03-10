@@ -30,11 +30,11 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Repositories
             ITestOutputHelper outputHelper,
             SeedDbFixture seedDbFixture)
         {
+
             _dbContext = dbContext;
             _dataFixture = dataFixture;
             _outputHelper = outputHelper;
             _seedDbFixture = seedDbFixture;
-
 
             var uow = new UnitOfWork<DbContext>(_dbContext.Db)
             {
@@ -53,7 +53,8 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Repositories
         [Trait("PostgreSQL", "Fatura Repository - Write")]
         public async Task DomainEvent_ComClassesIguaisComVersoesDiferentes_DeveGerarEventComAmbasVersoes()
         {
-            _outputHelper.WriteLine($"{this.GetType().Name} - Order(1)");
+            _outputHelper.WriteLine($"{this.GetType().Name} - Order(1) - Conex: {_dbContext.GetCnnStringToLog()}");
+
 
             _seedDbFixture.CreateData(
                 _dbContext,
@@ -85,7 +86,8 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Repositories
         [Trait("PostgreSQL", "Fatura Repository - ReadOnly")]
         public async Task FindAsync_DeveRetornarEntidadeNotNull_MesmoSemEncontrarId()
         {
-            _outputHelper.WriteLine($"{this.GetType().Name} - Order(2)");
+            _outputHelper.WriteLine($"{this.GetType().Name} - Order(2) - Conex: {_dbContext.GetCnnStringToLog()}");
+
 
             var faturaFinded = await _faturaRepository.FindAsync(keyValues: Guid.NewGuid().ToString());
 
@@ -98,7 +100,8 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Repositories
         [Trait("PostgreSQL", "Fatura Repository - Write")]
         public void FromSqlDeveRetornarEntidadeValida()
         {
-            _outputHelper.WriteLine($"{this.GetType().Name} - Order(3)");
+            _outputHelper.WriteLine($"{this.GetType().Name} - Order(3) - Conex: {_dbContext.GetCnnStringToLog()}");
+
 
             var sql = $"SELECT * FROM {_dbContext.Schema}.FATURAS WHERE numero_fatura = {_seedDbFixture.Fatura.NumeroFatura}";
 
@@ -112,7 +115,8 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Repositories
         [Trait("PostgreSQL", "Fatura Repository - ReadOnly")]
         public async Task FirstOrDefaultComPredicateDeveRetornarEntidadeValida()
         {
-            _outputHelper.WriteLine($"{this.GetType().Name} - Order(4)");
+            _outputHelper.WriteLine($"{this.GetType().Name} - Order(4) - Conex: {_dbContext.GetCnnStringToLog()}");
+
 
             var faturaFinded = await _faturaRepository.GetFirstOrDefaultAsync(predicate: x =>
                 x.NumeroFatura == _seedDbFixture.Fatura.NumeroFatura,
@@ -127,7 +131,8 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Repositories
         [Trait("PostgreSQL", "Fatura Repository - ReadOnly")]
         public async Task FirstOrDefaultComPredicateComIncludeDeveRetornarEntidadeValida()
         {
-            _outputHelper.WriteLine($"{this.GetType().Name} - Order(5)");
+            _outputHelper.WriteLine($"{this.GetType().Name} - Order(5) - Conex: {_dbContext.GetCnnStringToLog()}");
+
 
             const int npedido = 3;
 
@@ -157,7 +162,8 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Repositories
         [Trait("PostgreSQL", "Fatura Repository - ReadOnly")]
         public async Task GetListComPredicateDeveRetornarEntidadeValida()
         {
-            _outputHelper.WriteLine($"{this.GetType().Name} - Order(6)");
+            _outputHelper.WriteLine($"{this.GetType().Name} - Order(6) - Conex: {_dbContext.GetCnnStringToLog()}");
+
 
             var hoje = new DateTime(DateTime.Today.Year,
                 DateTime.Today.Month,

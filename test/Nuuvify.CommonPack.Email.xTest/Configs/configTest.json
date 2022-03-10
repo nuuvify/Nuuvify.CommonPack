@@ -1,18 +1,19 @@
 ﻿{
-  "TestOptions": {
-    "BypassEmailSend": true
+  "VirtualPath": "api",
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "vendas": ""
   },
-  "Logging": {
-    "LogLevel": {
-      "": "Debug",
-      "Default": "Debug",
-      "System": "Information",
-      "Microsoft": "Information"
-    }
+  "TestOptions": {
+    "DataBaseTesteInMemory": false,
+    "DataBaseTesteOracle": false,
+    "DataBaseTesteSqlServer": false,
+    "DataBaseTestePostgreSQL": true,
+    "RemoveTables": true
   },
   "EmailConfig": {
     "EmailServerConfiguration": {
-      "ServerHost": "smtp.gmail.com",
+      "ServerHost": "smtp.zoho.com",
       "Port": 587,
       "Security": 192,
       "AccountUserName": "",
@@ -32,19 +33,9 @@
       "AccountUserName": "",
       "AccountPassword": ""
     },
-    "RemetenteEmail": {
-      "lalala@teste.com": "Lincoln Fake"
-    },
-    "SuporteEmailEndereco": {
-      "suporte@teste.com.br": "Lincoln",
-      "zoca@teste.com": "Lincoln Fake"
-    },
     "EmailAdministradores": {
-      "suporte@teste.com.br": "Lincoln",
-      "zoca@teste.com": "Lincoln Fake"
-    },
-    "EmailResponsavel": {
-      "suporte@teste.com.br": "Lincoln"
+      "teste@dominio.com": "Fulano",
+      "teste1@dominio.com": "Cicrano"
     }
   },
   "AppConfig": {

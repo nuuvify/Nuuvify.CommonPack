@@ -15,14 +15,9 @@ param(
 
 function GenerateReportCoverage {
 
-    Write-Host "********************* Gerando report *********************"
+    Write-Host "****************** Generating report in: $dirTests\TestResults\Reports\ *********************"
     Set-Location $dirTests
 
-    # dotnet new tool-manifest
-    # dotnet tool install dotnet-reportgenerator-globaltool
-
-    # $pathDotnetTool = "./dotnet-tools"
-    # $pathReportExe = "./dotnet-tools/reportgenerator.exe"
     $pathReportExe = "dotnet tool run reportgenerator"
     Set-Alias aliasReport $pathReportExe
     
@@ -30,19 +25,18 @@ function GenerateReportCoverage {
     $Instaled = dotnet tool list | Where-Object { $_ -like '*reportgenerator*' }
     
     if ([string]::IsNullOrWhiteSpace($Instaled)) {
-    
         Write-Host "Instaling $pathReportExe"
         dotnet new tool-manifest -o $dirManifest
         dotnet tool install --local dotnet-reportgenerator-globaltool
-        # dotnet tool install dotnet-reportgenerator-globaltool --tool-path $pathDotnetTool
     }
 
-    aliasReport "-reports:./*/TestResults/*/coverage.*.xml" `
+    #aliasReport
+    dotnet tool run reportgenerator "-reports:./*/TestResults/*/coverage.*.xml" `
         "-targetdir:TestResults/Reports" `
         "-reportTypes:Html;Badges;SonarQube" `
         "-assemblyfilters:-xunit.*" 
 
-    Write-Host "********************* Report gerado *********************"
+    Write-Host "********************* Report generated *********************"
 
 
     if (Test-Path $dirTests\TestResults\Reports\index.html -PathType leaf) {
