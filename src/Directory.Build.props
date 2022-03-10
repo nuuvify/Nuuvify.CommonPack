@@ -19,7 +19,7 @@
       ou
       1.54.18 (para versão definitiva)
       -->
-    <Version>1.0.0-preview.1</Version>
+    <Version>1.0.1-preview.1</Version>
     <FileVersion>21.10.01.1609</FileVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1705;1591</NoWarn>

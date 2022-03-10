@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
@@ -9,28 +8,33 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Nuuvify.CommonPack.Email.Abstraction;
 using Nuuvify.CommonPack.Email.xTest.Configs;
+using Nuuvify.CommonPack.Email.xTest.Fixtures;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace Nuuvify.CommonPack.Email.xTest
 {
+    [Collection(nameof(DataCollection))]
     public class EmailTemplateTests
     {
 
-        private EmailServerConfiguration emailServerConfiguration;
+        private readonly EmailServerConfiguration emailServerConfiguration;
 
         private readonly IConfiguration config;
         private readonly Mock<IConfiguration> configMock;
         private ConfigureFromConfigurationOptions<EmailServerConfiguration> configEmailServer;
         private readonly ITestOutputHelper _outputHelper;
+        private readonly EmailConfigFixture _emailConfigFixture;
 
-
-        public EmailTemplateTests(ITestOutputHelper outputHelper)
+        public EmailTemplateTests(ITestOutputHelper outputHelper,
+            EmailConfigFixture emailConfigFixture)
         {
             _outputHelper = outputHelper;
+            _emailConfigFixture = emailConfigFixture;
+
             configMock = new Mock<IConfiguration>();
 
-            config = AppSettingsConfig.GetConfig(false);
+            config = AppSettingsConfig.GetConfig();
 
 
             emailServerConfiguration = new EmailServerConfiguration();
@@ -110,14 +114,13 @@ namespace Nuuvify.CommonPack.Email.xTest
 
         }
 
-        //[LocalTestFact]
         [Fact]
         [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
         public async Task EnviaEmailComTemplateComAnexoReal()
         {
             const string assunto = "Teste automatizado da classe de envio de email";
 
-            var config = AppSettingsConfig.GetConfig(true);
+            var config = AppSettingsConfig.GetConfig();
 
 
             configEmailServer = new ConfigureFromConfigurationOptions<EmailServerConfiguration>(
@@ -125,8 +128,7 @@ namespace Nuuvify.CommonPack.Email.xTest
 
             configEmailServer.Configure(emailServerConfiguration);
 
-            var envEmailUsername = Environment.GetEnvironmentVariable("EmailAccount".ToUpper());
-            var envEmailPassword = Environment.GetEnvironmentVariable("EmailPassword".ToUpper());
+            var (envEmailUsername, envEmailPassword) = _emailConfigFixture.GetEmailCredential(config);
 
             var destinatarios = new Dictionary<string, string>
             {

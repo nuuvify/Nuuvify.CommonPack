@@ -25,7 +25,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
         {
             mockFactory = new Mock<IHttpClientFactory>();
 
-            Config = AppSettingsConfig.GetConfig(false);
+            Config = AppSettingsConfig.GetConfig();
         }
 
 

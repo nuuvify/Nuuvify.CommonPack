@@ -1,6 +1,6 @@
-﻿using Nuuvify.CommonPack.Email.Abstraction;
-using MailKit.Net.Smtp;
+﻿using MailKit.Net.Smtp;
 using Moq;
+using Nuuvify.CommonPack.Email.Abstraction;
 
 namespace Nuuvify.CommonPack.Email.xTest
 {
@@ -11,11 +11,13 @@ namespace Nuuvify.CommonPack.Email.xTest
 
 
         public EmailService(EmailServerConfiguration emailServerConfiguration)
-            :base(emailServerConfiguration)
+            : base(emailServerConfiguration)
         {
 
 
             SmtpCustomClient = MockSmpt.Object;
         }
+
+
     }
 }
