@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
@@ -36,7 +35,7 @@ namespace Nuuvify.CommonPack.Email.xTest
             remetenteMock1.Setup(s => s.Key).Returns("cat@zzz.com");
             remetenteMock1.Setup(s => s.Value).Returns("Teste Automatizado");
 
-            var envEmailUsername = Environment.GetEnvironmentVariable("EMAILACCOUNTUSERNAME");
+            var envEmailUsername = Environment.GetEnvironmentVariable("EmailAccount".ToUpper());
             Remetentes = new Dictionary<string, string>
             {
                 { envEmailUsername, "dotnet teste" }
