@@ -36,7 +36,7 @@ namespace Nuuvify.CommonPack.Email.xTest
             remetenteMock1.Setup(s => s.Key).Returns("cat@zzz.com");
             remetenteMock1.Setup(s => s.Value).Returns("Teste Automatizado");
 
-            var envEmailUsername = Environment.GetEnvironmentVariable("EmailAccountUserName");
+            var envEmailUsername = Environment.GetEnvironmentVariable("EMAILACCOUNTUSERNAME");
             Remetentes = new Dictionary<string, string>
             {
                 { envEmailUsername, "dotnet teste" }
