@@ -125,8 +125,8 @@ namespace Nuuvify.CommonPack.Email.xTest
 
             configEmailServer.Configure(emailServerConfiguration);
 
-            var envEmailUsername = Environment.GetEnvironmentVariable("EmailAccountUserName");
-            _outputHelper.WriteLine($"{this.GetType().Name} - Email: {envEmailUsername}");
+            var envEmailUsername = Environment.GetEnvironmentVariable("EmailAccountUserName".ToUpper());
+            var envEmailPassword = Environment.GetEnvironmentVariable("EmailAccountPassword".ToUpper());
 
             var destinatarios = new Dictionary<string, string>
             {
@@ -146,7 +146,7 @@ namespace Nuuvify.CommonPack.Email.xTest
                 ? envEmailUsername
                 : emailServerConfiguration.AccountUserName;
             emailServerConfiguration.AccountPassword = string.IsNullOrWhiteSpace(emailServerConfiguration.AccountPassword)
-                ? Environment.GetEnvironmentVariable("EmailAccountPassword")
+                ? envEmailPassword
                 : emailServerConfiguration.AccountPassword;
 
             var testarEnvio = new Email(emailServerConfiguration);
