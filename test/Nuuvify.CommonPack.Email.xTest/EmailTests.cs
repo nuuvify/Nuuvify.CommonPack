@@ -7,25 +7,29 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Nuuvify.CommonPack.Email.Abstraction;
 using Nuuvify.CommonPack.Email.xTest.Configs;
+using Nuuvify.CommonPack.Email.xTest.Fixtures;
 using Xunit;
 
 namespace Nuuvify.CommonPack.Email.xTest
 {
+    [Collection(nameof(DataCollection))]
     public class EmailTests
     {
 
-        private EmailServerConfiguration emailServerConfiguration;
+        private readonly EmailServerConfiguration emailServerConfiguration;
         private Dictionary<string, string> Remetentes { get; set; }
         private readonly IConfiguration config;
-        private ConfigureFromConfigurationOptions<EmailServerConfiguration> configEmailServer;
+        private readonly ConfigureFromConfigurationOptions<EmailServerConfiguration> configEmailServer;
 
 
 
-        public EmailTests()
+        private readonly EmailConfigFixture _emailConfigFixture;
+
+        public EmailTests(EmailConfigFixture emailConfigFixture)
         {
+            _emailConfigFixture = emailConfigFixture;
 
-
-            config = AppSettingsConfig.GetConfig(false);
+            config = AppSettingsConfig.GetConfig();
 
             emailServerConfiguration = new EmailServerConfiguration();
 
@@ -35,7 +39,8 @@ namespace Nuuvify.CommonPack.Email.xTest
             remetenteMock1.Setup(s => s.Key).Returns("cat@zzz.com");
             remetenteMock1.Setup(s => s.Value).Returns("Teste Automatizado");
 
-            var envEmailUsername = Environment.GetEnvironmentVariable("EmailAccount".ToUpper());
+            var (envEmailUsername, envEmailPassword) = _emailConfigFixture.GetEmailCredential(config);
+
             Remetentes = new Dictionary<string, string>
             {
                 { envEmailUsername, "dotnet teste" }
@@ -159,6 +164,7 @@ namespace Nuuvify.CommonPack.Email.xTest
             Assert.NotNull(emailEnviado);
             Assert.True(testarEnvio.IsValid());
         }
+
         [Fact]
         [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
         public void EmailComVariosDestinatariosConcatenadosIncorreto()

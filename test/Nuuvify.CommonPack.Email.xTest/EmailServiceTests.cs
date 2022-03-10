@@ -13,7 +13,7 @@ namespace Nuuvify.CommonPack.Email.xTest
     public class EmailServiceTests
     {
 
-        private EmailServerConfiguration emailServerConfiguration;
+        private readonly EmailServerConfiguration emailServerConfiguration;
         private readonly IConfiguration config;
         private readonly Mock<IConfiguration> configMock;
         private ConfigureFromConfigurationOptions<EmailServerConfiguration> configEmailServer;
@@ -24,7 +24,7 @@ namespace Nuuvify.CommonPack.Email.xTest
             configMock = new Mock<IConfiguration>();
 
 
-            config = AppSettingsConfig.GetConfig(false);
+            config = AppSettingsConfig.GetConfig();
 
 
             emailServerConfiguration = new EmailServerConfiguration();
@@ -79,10 +79,6 @@ namespace Nuuvify.CommonPack.Email.xTest
 
 
             var testarEnvio = new EmailService(emailServerConfiguration);
-            // {
-            //     EmailServerConfiguration = emailServerConfiguration
-            // };
-
             var emailEnviado = testarEnvio.EnviarAsync(destinatarios, null, assunto, mensagem);
 
             Assert.True(emailEnviado.Result.Equals(EmailService.Teste));

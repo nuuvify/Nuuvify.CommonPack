@@ -34,7 +34,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
             mockUserAuthenticated = new Mock<IHttpContextAccessor>();
 
 
-            Config = AppSettingsConfig.GetConfig(false);
+            Config = AppSettingsConfig.GetConfig();
         }
 
 
@@ -103,7 +103,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
         [LocalTestFact, Order(2)]
         public async Task ObtemCadastroPessoaValido()
         {
-            var config = AppSettingsConfig.GetConfig(true);
+            var config = AppSettingsConfig.GetConfig();
 
 
             var tokenFactory = new TokenFactory(config);

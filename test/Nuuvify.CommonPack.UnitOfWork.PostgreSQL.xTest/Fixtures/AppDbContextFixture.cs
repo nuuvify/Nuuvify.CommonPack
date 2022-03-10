@@ -29,7 +29,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Fixtures
             IConfiguration config = AppSettingsConfig.GetConfig();
 
             var cnnStringEnv = Environment.GetEnvironmentVariable("PostgreVendas".ToUpper());
-            Console.WriteLine($"String Conex: {GetCnnStringToLog(cnnStringEnv)}");
+            Console.WriteLine($"Environment String Conex: {GetCnnStringToLog(cnnStringEnv)}");
 
             CnnString = config.GetConnectionString(CnnTag);
             CnnString = string.IsNullOrWhiteSpace(CnnString) ? cnnStringEnv : CnnString;

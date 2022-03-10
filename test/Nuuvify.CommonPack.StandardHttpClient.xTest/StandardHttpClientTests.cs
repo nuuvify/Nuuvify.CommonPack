@@ -27,7 +27,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
         {
             mockFactory = new Mock<IHttpClientFactory>();
 
-            Config = AppSettingsConfig.GetConfig(false);
+            Config = AppSettingsConfig.GetConfig();
         }
 
 
@@ -86,7 +86,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
         [LocalTestFact, Order(2)]
         public void PostApiRealDeveRetornarMensagemComSucesso()
         {
-            var config = AppSettingsConfig.GetConfig(true);
+            var config = AppSettingsConfig.GetConfig();
             var tokenFactory = new TokenFactory(config);
             var tokenValido = tokenFactory.ObtemTokenValido(
                 loginId: config.GetSection("ApisCredentials:Username")?.Value,
