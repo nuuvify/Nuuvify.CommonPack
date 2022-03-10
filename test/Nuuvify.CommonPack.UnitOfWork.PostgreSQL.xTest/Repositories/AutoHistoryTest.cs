@@ -31,7 +31,6 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Repositories
             _outputHelper = outputHelper;
             _seedDbFixture = seedDbFixture;
 
-
             var uow = new UnitOfWork<DbContext>(_dbContext.Db)
             {
                 UsernameContext = UserRequest
@@ -50,7 +49,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Repositories
         [Trait("PostgreSQL", "AutoHistory")]
         public async Task DomainEvent_ComAutoHistory_ComClassesIguaisComVersoesDiferentes_DeveGerarEventComAmbasVersoes()
         {
-            _outputHelper.WriteLine($"{this.GetType().Name} - Order(1)");
+            _outputHelper.WriteLine($"{this.GetType().Name} - Order(1) - Conex: {_dbContext.GetCnnStringToLog()}");
 
             const int RegistrosGravadosMaisHistory = 2;
 
@@ -82,13 +81,18 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Repositories
         [Trait("PostgreSQL", "AutoHistory")]
         public async Task AutoHistory_ComCorrelationId_DeveGravarCampoCorrelationId()
         {
-            _outputHelper.WriteLine($"{this.GetType().Name} - Order(2)");
+            _outputHelper.WriteLine($"{this.GetType().Name} - Order(2) - Conex: {_dbContext.GetCnnStringToLog()}");
 
 
             _dbContext.PreventDisposal = false;
 
             const int RegistrosGravadosMaisHistory = 2;
 
+            _seedDbFixture.CreateData(
+                _dbContext,
+                _dataFixture,
+                UserRequest,
+                1, 1, true);
 
             var fatura = await _faturaRepository.FindAsync(_seedDbFixture.Fatura.Id);
             fatura.Update("Testando correlationId no AutoHistory");

@@ -21,9 +21,10 @@ namespace Nuuvify.CommonPack.OpenApi
 
 
 
-        public SwaggerInfoModel(string developerName, string developerEmail, string licenseType)
+        public SwaggerInfoModel(string developerName, string developerEmail, string licenseType,
+            string urlRepository, string urlTermService, string urlLicense)
         {
-            DeveloperName=developerName;
+            DeveloperName = developerName;
             DeveloperEmail = developerEmail;
             LicenseType = licenseType;
 
@@ -35,23 +36,17 @@ namespace Nuuvify.CommonPack.OpenApi
             AppVersion = $"{Assembly.GetEntryAssembly().GetName().Version.Major}." +
                             $"{Assembly.GetEntryAssembly().GetName().Version.Minor}." +
                             $"{Assembly.GetEntryAssembly().GetName().Version.Build}";
-            
+
+
+            Uri.TryCreate(urlRepository, UriKind.RelativeOrAbsolute, out Uri _urlAppValid);
+            Uri.TryCreate(urlTermService, UriKind.RelativeOrAbsolute, out Uri _urlTermsValid);
+            Uri.TryCreate(urlLicense, UriKind.RelativeOrAbsolute, out Uri _urlLicenseValid);
+
+            UrlAppValid = _urlAppValid;
+            UrlTermsValid = _urlTermsValid;
+            UrlLicenseValid = _urlLicenseValid;
         }
 
-
-
-        public void DefineUrls(string urlApp, string urlRepository, string urlTermService, string urlLicense)
-        {
-
-            if (!Uri.TryCreate(urlApp, UriKind.RelativeOrAbsolute, out Uri UrlAppValid))
-            {
-                Uri.TryCreate(urlRepository, UriKind.RelativeOrAbsolute, out UrlAppValid);
-            }
-            Uri.TryCreate(urlTermService, UriKind.RelativeOrAbsolute, out Uri UrlTermsValid);
-            Uri.TryCreate(urlLicense, UriKind.RelativeOrAbsolute, out Uri UrlLicenseValid);
-
-
-        }
 
         public OpenApiInfo CreateInfoForApiVersion()
         {
@@ -78,12 +73,12 @@ namespace Nuuvify.CommonPack.OpenApi
                 TermsOfService = UrlTermsValid,
                 License = new OpenApiLicense
                 {
-                    Name = LicenseType,
+                    Name = $"License Type: {LicenseType}",
                     Url = UrlLicenseValid
                 },
             };
 
             return info;
-        } 
+        }
     }
 }

@@ -10,21 +10,13 @@ namespace Nuuvify.CommonPack.Email.xTest.Configs
         private static string ProjectPath { get; set; }
         public static string TemplatePath { get; set; }
 
-        public static IConfiguration GetConfig(bool integrationTest)
+        public static IConfiguration GetConfig()
         {
-            ProjectPath = AppDomain.CurrentDomain.BaseDirectory;
-            TemplatePath = ProjectPath;
-            if (integrationTest)
-            {
-                ProjectPath = GetPathSecret();
-            }
+
+            ProjectPath = GetPathSecret();
+            TemplatePath = AppDomain.CurrentDomain.BaseDirectory;
 
             var fileConfig = Path.Combine(ProjectPath, "configTest.json");
-
-            if (!File.Exists(fileConfig))
-            {
-                throw new FileNotFoundException($"Arquivo de configuração para teste: {fileConfig} não existe.");
-            }
 
             var config = new ConfigurationBuilder()
                .SetBasePath(ProjectPath)
@@ -40,7 +32,7 @@ namespace Nuuvify.CommonPack.Email.xTest.Configs
             string userSecret;
             if (Environment.OSVersion.Platform == PlatformID.Unix)
             {
-                userSecret = ".microsoft/usersecrets//nuuvify";
+                userSecret = ".microsoft/usersecrets/nuuvify";
             }
             else
             {
@@ -56,7 +48,7 @@ namespace Nuuvify.CommonPack.Email.xTest.Configs
                 return pathSecret;
             }
 
-            throw new DirectoryNotFoundException($"Pasta: {pathSecret} para o arquivo de configuração configTest.json não existe.");
+            return AppDomain.CurrentDomain.BaseDirectory;
 
         }
 

@@ -7,23 +7,19 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
     public static class AppSettingsConfig
     {
 
-        public static IConfiguration GetConfig(bool integrationTest)
+        private static string ProjectPath { get; set; }
+        public static string TemplatePath { get; set; }
+
+        public static IConfiguration GetConfig()
         {
-            string projectPath = AppDomain.CurrentDomain.BaseDirectory;
-            if (integrationTest)
-            {
-                projectPath = GetPathSecret();
-            }
 
-            var fileConfig = Path.Combine(projectPath, "configTest.json");
+            ProjectPath = GetPathSecret();
+            TemplatePath = AppDomain.CurrentDomain.BaseDirectory;
 
-            if (!File.Exists(fileConfig))
-            {
-                throw new FileNotFoundException($"Arquivo de configuração para teste: {fileConfig} não existe.");
-            }
+            var fileConfig = Path.Combine(ProjectPath, "configTest.json");
 
             var config = new ConfigurationBuilder()
-               .SetBasePath(projectPath)
+               .SetBasePath(ProjectPath)
                .AddJsonFile(fileConfig)
                .Build();
 
@@ -36,7 +32,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
             string userSecret;
             if (Environment.OSVersion.Platform == PlatformID.Unix)
             {
-                userSecret = ".microsoft/usersecrets//nuuvify";
+                userSecret = ".microsoft/usersecrets/nuuvify";
             }
             else
             {
@@ -52,7 +48,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
                 return pathSecret;
             }
 
-            throw new DirectoryNotFoundException($"Pasta: {pathSecret} para o arquivo de configuração configTest.json não existe.");
+            return AppDomain.CurrentDomain.BaseDirectory;
 
         }
 

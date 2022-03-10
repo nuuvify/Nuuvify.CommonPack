@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -14,11 +13,14 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Fixtures
     public class AppDbContextFixture : BaseAppDbContextFixture
     {
 
-        private string RemoveTables { get; }
+        private string RemoveTables { get; set; }
         public string Schema { get; }
+        private string CnnString { get; set; }
+
 
         public AppDbContextFixture()
         {
+
             const string CnnTag = "vendas";
             const string SchemaTag = "AppConfig:OwnerDB";
             const string CorrelationFake = "MinhaApp_4e1f0c64-f02e-435a-baa7-c78923ad371a_PostgreSQL";
@@ -26,8 +28,11 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Fixtures
             PreventDisposal = true;
             IConfiguration config = AppSettingsConfig.GetConfig();
 
-            var cnnStringEnv = Environment.GetEnvironmentVariable("PostgreSQLVendas");
-            var cnnString = config.GetConnectionString(CnnTag) ?? cnnStringEnv;
+            var cnnStringEnv = Environment.GetEnvironmentVariable("PostgreVendas".ToUpper());
+            Console.WriteLine($"Environment String Conex: {GetCnnStringToLog(cnnStringEnv)}");
+
+            CnnString = config.GetConnectionString(CnnTag);
+            CnnString = string.IsNullOrWhiteSpace(CnnString) ? cnnStringEnv : CnnString;
 
             Schema = config.GetSection(SchemaTag)?.Value;
             RemoveTables = config.GetSection("TestOptions:RemoveTables")?.Value;
@@ -37,12 +42,12 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Fixtures
             mockIConfigurationCustom.Setup(x => x.GetSectionValue(SchemaTag))
                 .Returns(Schema);
             mockIConfigurationCustom.Setup(x => x.GetConnectionString(CnnTag))
-                .Returns(cnnString);
+                .Returns(CnnString);
             mockIConfigurationCustom.Setup(x => x.GetCorrelationId())
                 .Returns(CorrelationFake);
 
             var options = new DbContextOptionsBuilder<StubDbContext>()
-                .UseNpgsql(cnnString)
+                .UseNpgsql(CnnString)
                 .UseSnakeCaseNamingConvention()
                 .UseLazyLoadingProxies()
                 .EnableDetailedErrors()
@@ -51,6 +56,24 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Fixtures
 
 
             Db = new StubDbContext(options, mockIConfigurationCustom.Object);
+        }
+
+        public string GetCnnStringToLog(string stringToLog = null)
+        {
+            if (string.IsNullOrWhiteSpace(stringToLog))
+            {
+                stringToLog = CnnString;
+            }
+            if (string.IsNullOrWhiteSpace(stringToLog)) return "";
+
+            var lenCnn = stringToLog.Length;
+
+            if (lenCnn >= 15)
+            {
+                return stringToLog.Substring(0, 15);
+            }
+
+            return stringToLog.Substring(0, 3);
 
         }
 
@@ -61,7 +84,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Fixtures
             {
                 if (!Db.Database.IsInMemory() && RemoveTables.Equals("true", StringComparison.OrdinalIgnoreCase))
                 {
-                    Debug.WriteLine("Excluindo tabelas de teste...");
+                    Console.WriteLine("Excluindo tabelas de teste...");
 
                     var delete = new StringBuilder("DELETE FROM ")
                         .AppendFormat("{0}.", Schema);
@@ -92,11 +115,11 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Fixtures
                     Db.Database.ExecuteSqlRaw(sql.ToString());
 
 
-                    Debug.WriteLine("Tabelas de teste excluidas.");
+                    Console.WriteLine("Tabelas de teste excluidas.");
                 }
                 else
                 {
-                    Debug.WriteLine("Tabelas de teste não foram excluidas.");
+                    Console.WriteLine("Tabelas de teste não foram excluidas.");
                 }
 
                 Db.Dispose();

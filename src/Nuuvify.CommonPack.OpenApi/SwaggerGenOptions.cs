@@ -20,12 +20,14 @@ namespace Nuuvify.CommonPack.OpenApi
 
 
             _swaggerInfoModel = new SwaggerInfoModel(
-                developerName:  _config.GetSection("SwaggerInfo:DesenvolvedorNome").Value,
+                developerName: _config.GetSection("SwaggerInfo:DesenvolvedorNome").Value,
                 developerEmail: _config.GetSection("SwaggerInfo:DesenvolvedorEmail").Value,
-                licenseType: _config.GetSection("SwaggerInfo:LicencaTipo").Value);
+                licenseType: _config.GetSection("SwaggerInfo:LicencaTipo").Value,
+                urlRepository: _config.GetSection("SwaggerInfo:UrlRepositoryVsts").Value,
+                urlTermService: _config.GetSection("SwaggerInfo:TermoDeServico").Value,
+                urlLicense: _config.GetSection("SwaggerInfo:LicencaUrl").Value
+            );
 
-
-            ApplicationSettings();
 
         }
 
@@ -46,19 +48,5 @@ namespace Nuuvify.CommonPack.OpenApi
         }
 
 
-        private void ApplicationSettings()
-        {
-
-            var urlRepository = _config.GetSection("SwaggerInfo:UrlRepositorioVsts").Value;
-
-
-            _swaggerInfoModel.DefineUrls(
-                $"{urlRepository}{_swaggerInfoModel.AppName}",
-                urlRepository,
-                _config.GetSection("SwaggerInfo:TermoDeServico").Value,
-                _config.GetSection("SwaggerInfo:LicencaUrl").Value);
-
-
-        }
     }
 }
