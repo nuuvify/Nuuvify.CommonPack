@@ -28,7 +28,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Fixtures
             PreventDisposal = true;
             IConfiguration config = AppSettingsConfig.GetConfig();
 
-            var cnnStringEnv = Environment.GetEnvironmentVariable("POSTGRESQLVENDAS");
+            var cnnStringEnv = Environment.GetEnvironmentVariable("PostgreSQLVendas".ToUpper());
             Console.WriteLine($"String Conex: {GetCnnStringToLog(cnnStringEnv)}");
 
             CnnString = config.GetConnectionString(CnnTag);
