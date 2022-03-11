@@ -28,6 +28,13 @@ namespace Nuuvify.CommonPack.HealthCheck.Helpers
                 segmentSearch += "/";
             }
 
+
+            if (uri is null)
+            {
+                throw new ArgumentNullException(paramName: nameof(uri), message: "Uri informada não pode ser null.");
+            }
+
+
             var segments = uri.Segments;
             if (segments.Any(x => x.Equals(segmentSearch, StringComparison.InvariantCultureIgnoreCase)))
             {

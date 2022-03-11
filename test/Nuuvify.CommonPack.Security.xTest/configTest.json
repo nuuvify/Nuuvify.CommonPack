@@ -46,7 +46,7 @@
   "AppConfig": {
     "OwnerDB": "vendas",
     "AppURLs": {
-      "UrlLoginApi": "https://apifin.ecorp.zzz.com/CwsApi/",
+      "UrlLoginApi": "https://apifin.ecorp.zzz.com/"
     }
   }
 }
