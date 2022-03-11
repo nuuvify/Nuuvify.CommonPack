@@ -22,7 +22,7 @@ namespace Nuuvify.CommonPack.Security.Abstraction
         /// Informar o Login da aplicação ou de um usuario, ao informas essa propriedade, <br/>
         /// as demais serão alteradas para seus valores padrão.
         /// </summary>
-        /// <example>ZOCATEL<example>
+        /// <example>ZOCATEL</example>
         public string LoginId
         {
             get
