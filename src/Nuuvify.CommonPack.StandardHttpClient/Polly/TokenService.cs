@@ -48,7 +48,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
 
         public string GetUsername()
         {
-            return _accessor.HttpContext.User.GetLogin();
+            return _accessor?.HttpContext?.User.GetLogin();
         }
 
         ///<inheritdoc/>
@@ -68,7 +68,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
                 Password = password
             };
 
-            var userName = _accessor.HttpContext.User.GetLogin();
+            var userName = _accessor?.HttpContext?.User.GetLogin();
             if (userClaim == null)
                 userClaim = userName;
 
@@ -185,8 +185,8 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
         private bool IsAuthenticated(out string token)
         {
             token = "";
-            if (_accessor.HttpContext == null) return false;
-            var esquemaAutenticacao = _accessor.HttpContext.Request.Headers
+            if (_accessor?.HttpContext == null) return false;
+            var esquemaAutenticacao = _accessor?.HttpContext.Request.Headers
                 .FirstOrDefault(x => x.Key.Equals("Authorization")).Value;
 
             foreach (var item in esquemaAutenticacao)
@@ -194,7 +194,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
                 token = item?.Replace("bearer", "").Replace("Bearer", "").Trim();
             }
 
-            if (_accessor.HttpContext == null) return false;
+            if (_accessor?.HttpContext == null) return false;
             return _accessor.HttpContext.User.Identity.IsAuthenticated;
         }
 
