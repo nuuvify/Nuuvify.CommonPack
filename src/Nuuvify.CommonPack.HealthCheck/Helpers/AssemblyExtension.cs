@@ -37,8 +37,8 @@ namespace Nuuvify.CommonPack.HealthCheck.Helpers
             get
             {
                 var applicationVersion = $"{Assembly.GetEntryAssembly().GetName().Version.Major}." +
-                                     $"{Assembly.GetEntryAssembly().GetName().Version.Minor}." +
-                                     $"{Assembly.GetEntryAssembly().GetName().Version.Build}";
+                    $"{Assembly.GetEntryAssembly().GetName().Version.Minor}." +
+                    $"{Assembly.GetEntryAssembly().GetName().Version.Build}";
 
 
                 return applicationVersion;

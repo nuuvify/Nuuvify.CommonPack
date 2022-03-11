@@ -127,7 +127,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// Exemplo de uso:
         /// <example>
         /// <code>
-        ///     _standardHttpClient.CreateClient("CwsApi");
+        ///     _standardHttpClient.CreateClient("CredentialApi");
         ///     var resultHttp = await _standardHttpClient
         ///         .WithQueryString("procurarTexto", loginId)
         ///         .WithQueryString("campoProcura", "catloginid")

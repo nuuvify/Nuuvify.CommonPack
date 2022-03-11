@@ -1,7 +1,7 @@
 using System;
-using Nuuvify.CommonPack.HealthCheck.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Nuuvify.CommonPack.HealthCheck.Helpers;
 
 namespace Nuuvify.CommonPack.HealthCheck
 {
@@ -48,7 +48,7 @@ namespace Nuuvify.CommonPack.HealthCheck
                     services.AddHealthChecks()
                         .AddCheck<MemoryHealthCheck>(
                             name: "host-memory",
-                            tags: new[] {"memory"})
+                            tags: new[] { "memory" })
                         .AddCheck<LocalStorageHealthCheck>(
                             name: "host-storage",
                             tags: new[] { "storage" });
@@ -57,7 +57,7 @@ namespace Nuuvify.CommonPack.HealthCheck
                         !AssemblyExtension.GetApplicationNameByAssembly.Contains("Cws.Api", StringComparison.InvariantCultureIgnoreCase) &&
                         !AssemblyExtension.GetApplicationNameByAssembly.Contains("credential", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        services.AddHealthChecks().AddCheck<HttpCwsApiHealthCheck>("http-CredentialApi");
+                        services.AddHealthChecks().AddCheck<HttpCredentialApiHealthCheck>("http-CredentialApi");
                     }
 
                 }

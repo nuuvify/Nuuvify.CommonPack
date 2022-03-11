@@ -5,22 +5,24 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Nuuvify.CommonPack.HealthCheck.Helpers;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Nuuvify.CommonPack.HealthCheck.Helpers;
 
 namespace Nuuvify.CommonPack.HealthCheck
 {
-    public class HttpCwsApiHealthCheck : IHealthCheck
+    public class HttpCredentialApiHealthCheck : IHealthCheck
     {
 
-        private const string ObjectCheckName = "CwsApi";
+        public string SegmentSearch = "api/";
+
+        private const string ObjectCheckName = "CredentialApi";
         private const string UrlHealthCheck = "hc-ui-api";
         private Uri UrlPrefix;
 
         private readonly JsonSerializerOptions jsonOptions;
         private readonly IHttpClientFactory _httpClientFactory;
 
-        public HttpCwsApiHealthCheck(
+        public HttpCredentialApiHealthCheck(
             IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
@@ -45,7 +47,7 @@ namespace Nuuvify.CommonPack.HealthCheck
                 using (HttpClient client = _httpClientFactory.CreateClient(ObjectCheckName))
                 {
 
-                    UrlPrefix = client.BaseAddress.HasSegment("api/", UrlHealthCheck);
+                    UrlPrefix = client.BaseAddress.HasSegment(SegmentSearch, UrlHealthCheck);
 
                     var response = await client.GetAsync(UrlPrefix.LocalPath);
 
