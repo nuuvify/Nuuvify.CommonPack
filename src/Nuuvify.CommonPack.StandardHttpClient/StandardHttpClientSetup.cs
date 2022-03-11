@@ -16,7 +16,8 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         ///     "AppConfig:AppURLs:UrlLoginApiToken"
         /// </summary>
         /// <remarks>
-        ///  O CwsApi já é registrado automaticamente ao configurar essa classe
+        ///  A CredentialApi já é registrado automaticamente ao configurar essa classe <br/>
+        ///  Assim como: IStandardHttpClient, ITokenService e CredentialToken
         /// </remarks>
         /// <param name="services"></param>
         /// <param name="configuration"></param>
@@ -38,7 +39,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         ///     "AppConfig:AppURLs:UrlLoginApiToken"
         /// </summary>
         /// <remarks>
-        ///  O CwsApi já é registrado automaticamente ao configurar essa classe
+        ///  A CredentialApi já é registrado automaticamente ao configurar essa classe
         /// </remarks>
         /// <param name="services"></param>
         /// <param name="configuration"></param>
