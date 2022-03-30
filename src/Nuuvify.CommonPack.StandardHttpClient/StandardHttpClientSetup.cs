@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Net.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,20 +18,22 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         ///     "AppConfig:AppURLs:UrlLoginApiToken"
         /// </summary>
         /// <remarks>
-        ///  A CredentialApi já é registrado automaticamente ao configurar essa classe <br/>
+        ///  Use AddServiceCredentialRegister para registrar CredentialApi <br/>
+        ///  com parametros HttpClientHandler
         ///  Assim como: IStandardHttpClient, ITokenService e CredentialToken
         /// </remarks>
         /// <param name="services"></param>
         /// <param name="configuration"></param>
-        /// <param name="webProxy">Sera utilizado para configurar CredentialApi, voce pode utilizar WebRequest.DefaultWebProxy</param>
+        /// <param name="registerCredential">True = Registra CredentialApi ou False = Use AddServiceCredentialRegister</param>
         public static void AddStandardHttpClientSetup(this IServiceCollection services,
-            IConfiguration configuration, IWebProxy webProxy = null)
+            IConfiguration configuration, bool registerCredential = true)
         {
             services.AddScoped<IStandardHttpClient, StandardHttpClient>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddTransient<CredentialToken>();
 
-            AddServiceCredentialRegister(services, configuration, webProxy);
+            if (registerCredential)
+                AddServiceCredentialRegister(services, configuration);
 
         }
 
@@ -40,30 +43,44 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         ///     "AppConfig:AppURLs:UrlLoginApi" <br/>
         ///     "AppConfig:AppURLs:UrlLoginApiToken"
         /// </summary>
-        /// <remarks>
-        ///  A CredentialApi já é registrado automaticamente ao configurar essa classe
-        /// </remarks>
         /// <param name="services"></param>
         /// <param name="configuration"></param>
-        /// <param name="webProxy">Sera utilizado para configurar CredentialApi, voce pode utilizar WebRequest.DefaultWebProxy</param>
+        /// <param name="registerCredential">True = Registra CredentialApi ou False = Use AddServiceCredentialRegister</param>
         public static void AddStandardHttpClientSetupSingleton(this IServiceCollection services,
-            IConfiguration configuration, IWebProxy webProxy = null)
+            IConfiguration configuration, bool registerCredential = true)
         {
 
             services.AddSingleton<IStandardHttpClient, StandardHttpClient>();
             services.AddSingleton<ITokenService, TokenService>();
             services.AddSingleton<CredentialToken>();
 
-            AddServiceCredentialRegister(services, configuration, webProxy);
+            if (registerCredential)
+                AddServiceCredentialRegister(services, configuration);
 
         }
 
-
-        private static void AddServiceCredentialRegister(IServiceCollection services,
-            IConfiguration configuration, IWebProxy webProxy = null)
+        /// <summary>
+        /// Registra CredentialApi e IHttpContextAccessor. Use HttpClientHandler para registrar <br/>
+        /// com proxy e demais parametros do HttpClient
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="configuration"></param>
+        /// <param name="httpClientHandler"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddServiceCredentialRegister(this IServiceCollection services,
+            IConfiguration configuration, HttpClientHandler httpClientHandler = null)
         {
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+
+            if (httpClientHandler == null)
+            {
+                httpClientHandler = new HttpClientHandler
+                {
+                    UseProxy = true
+                };
+            }
 
 
             services.AddHttpClient("CredentialApi", client =>
@@ -71,8 +88,10 @@ namespace Nuuvify.CommonPack.StandardHttpClient
                 client.BaseAddress = new Uri(configuration.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value);
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
             })
-            .AddPolicyWithTokenHandlers(services, retryTotal: 2, breakDurationMilliSeconds: 2000, webProxy: webProxy);
+            .ConfigurePrimaryHttpMessageHandler(() => httpClientHandler)
+            .AddPolicyWithTokenHandlers(services, retryTotal: 2, breakDurationMilliSeconds: 2000);
 
+            return services;
         }
 
 
