@@ -27,6 +27,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
         ///<inheritdoc/>
         public List<NotificationR> Notifications { get; set; }
 
+
         public TokenService(
             IOptions<CredentialToken> credentialToken,
             IStandardHttpClient standardHttpClient,
@@ -45,6 +46,16 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
         }
 
 
+        private string GetHttpClientTokenName { get; set; }
+
+        public string HttpClientTokenName(string httpClientName = "CredentialApi")
+        {
+            GetHttpClientTokenName = string.IsNullOrWhiteSpace(httpClientName)
+                ? null
+                : httpClientName;
+
+            return GetHttpClientTokenName;
+        }
 
         public string GetUsername()
         {
@@ -72,9 +83,14 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
             if (userClaim == null)
                 userClaim = userName;
 
-            _standardHttpClient.CreateClient();
+
+
+            _standardHttpClient.CreateClient(GetHttpClientTokenName ?? HttpClientTokenName());
+
             if (!string.IsNullOrWhiteSpace(userClaim))
                 _standardHttpClient.WithHeader(Constants.UserClaimHeader, userClaim);
+
+
 
             _logger.LogDebug(messageLog + " - _standardHttpClient.GetNewToken()");
 
