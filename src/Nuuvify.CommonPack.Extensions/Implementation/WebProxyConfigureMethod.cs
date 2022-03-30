@@ -26,8 +26,8 @@ namespace Nuuvify.CommonPack.Extensions.Implementation
 
         }
 
-        private string HttpProxyField { get; set; }
-        private string[] HttpNoProxyField { get; set; }
+        public string HttpProxyField { get; private set; }
+        public string[] HttpNoProxyField { get; private set; }
         private string HttpNoProxyString { get; set; }
 
 
