@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,14 +22,15 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// </remarks>
         /// <param name="services"></param>
         /// <param name="configuration"></param>
+        /// <param name="webProxy">Sera utilizado para configurar CredentialApi, voce pode utilizar WebRequest.DefaultWebProxy</param>
         public static void AddStandardHttpClientSetup(this IServiceCollection services,
-            IConfiguration configuration)
+            IConfiguration configuration, IWebProxy webProxy = null)
         {
             services.AddScoped<IStandardHttpClient, StandardHttpClient>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddTransient<CredentialToken>();
 
-            AddServiceCredentialRegister(services, configuration);
+            AddServiceCredentialRegister(services, configuration, webProxy);
 
         }
 
@@ -43,21 +45,22 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// </remarks>
         /// <param name="services"></param>
         /// <param name="configuration"></param>
+        /// <param name="webProxy">Sera utilizado para configurar CredentialApi, voce pode utilizar WebRequest.DefaultWebProxy</param>
         public static void AddStandardHttpClientSetupSingleton(this IServiceCollection services,
-            IConfiguration configuration)
+            IConfiguration configuration, IWebProxy webProxy = null)
         {
 
             services.AddSingleton<IStandardHttpClient, StandardHttpClient>();
             services.AddSingleton<ITokenService, TokenService>();
             services.AddSingleton<CredentialToken>();
 
-            AddServiceCredentialRegister(services, configuration);
+            AddServiceCredentialRegister(services, configuration, webProxy);
 
         }
 
 
         private static void AddServiceCredentialRegister(IServiceCollection services,
-            IConfiguration configuration)
+            IConfiguration configuration, IWebProxy webProxy = null)
         {
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -68,7 +71,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
                 client.BaseAddress = new Uri(configuration.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value);
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
             })
-            .AddPolicyWithTokenHandlers(services, retryTotal: 2, breakDurationMilliSeconds: 2000);
+            .AddPolicyWithTokenHandlers(services, retryTotal: 2, breakDurationMilliSeconds: 2000, webProxy: webProxy);
 
         }
 
