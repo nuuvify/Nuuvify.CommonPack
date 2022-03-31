@@ -1,6 +1,4 @@
 using System;
-using System.Net;
-using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Nuuvify.CommonPack.Security.Abstraction;
@@ -28,13 +26,11 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
         /// <param name="services"></param>
         /// <param name="retryTotal">Numero de vezes que será feito nova tentativa</param>
         /// <param name="breakDurationMilliSeconds">Tempo em que o circuito ficara aberto caso o serviço não responda</param>
-        /// <param name="webProxy">Configuração para Proxy</param>
         /// <returns></returns>
         public static IHttpClientBuilder AddPolicyWithTokenHandlers(this IHttpClientBuilder httpClientBuilder,
             IServiceCollection services,
             int retryTotal = 2,
-            int breakDurationMilliSeconds = 5000,
-            IWebProxy webProxy = null)
+            int breakDurationMilliSeconds = 5000)
         {
 
             var sp = services.BuildServiceProvider();
@@ -59,25 +55,6 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
 
 
 
-
-            if (webProxy != null)
-            {
-
-                return httpClientBuilder.ConfigurePrimaryHttpMessageHandler(() =>
-                    {
-                        return new HttpClientHandler()
-                        {
-                            Proxy = webProxy
-
-                        };
-                    })
-                    .AddRetryPolicyHandler(logger, tokenService, retryPolicyConfig)
-                    .AddCircuitBreakerFallBackHandler(logger)
-                    .AddCircuitBreakerHandler(logger, circuitBreakerPolicyConfig);
-
-            }
-
-
             return httpClientBuilder.AddRetryPolicyHandler(logger, tokenService, retryPolicyConfig)
                 .AddCircuitBreakerFallBackHandler(logger)
                 .AddCircuitBreakerHandler(logger, circuitBreakerPolicyConfig);
@@ -91,13 +68,11 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
         /// <param name="services"></param>
         /// <param name="retryTotal">Numero de vezes que será feito nova tentativa</param>
         /// <param name="breakDurationMilliSeconds">Tempo em que o circuito ficara aberto caso o serviço não responda</param>
-        /// <param name="webProxy">Configuração para Proxy</param>
         /// <returns></returns>
         public static IHttpClientBuilder AddPolicyHandlers(this IHttpClientBuilder httpClientBuilder,
             IServiceCollection services,
             int retryTotal = 2,
-            int breakDurationMilliSeconds = 5000,
-            IWebProxy webProxy = null)
+            int breakDurationMilliSeconds = 5000)
         {
 
             var sp = services.BuildServiceProvider();
@@ -115,27 +90,9 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
 
 
 
-            if (webProxy != null)
-            {
-
-                return httpClientBuilder.ConfigurePrimaryHttpMessageHandler(() =>
-                    {
-                        return new HttpClientHandler()
-                        {
-                            Proxy = webProxy
-
-                        };
-                    })
-                    .AddRetryPolicyHandler(logger, retryPolicyConfig)
-                    .AddCircuitBreakerFallBackHandler(logger)
-                    .AddCircuitBreakerHandler(logger, circuitBreakerPolicyConfig);
-
-            }
-
-
             return httpClientBuilder.AddRetryPolicyHandler(logger, retryPolicyConfig)
-                                    .AddCircuitBreakerFallBackHandler(logger)
-                                    .AddCircuitBreakerHandler(logger, circuitBreakerPolicyConfig);
+                .AddCircuitBreakerFallBackHandler(logger)
+                .AddCircuitBreakerHandler(logger, circuitBreakerPolicyConfig);
 
         }
 
