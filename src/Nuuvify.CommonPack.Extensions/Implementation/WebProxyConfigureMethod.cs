@@ -12,7 +12,6 @@ namespace Nuuvify.CommonPack.Extensions.Implementation
         /// ira utilizar as variaveis de ambiente do OS. <br/>
         /// Uma maneira de utilizar esse metodo é:   WebRequest.DefaultWebProxy = GetProxyWithVariable(); <br/>
         /// </summary>
-        /// <returns></returns>
         /// <param name="httpProxyField">Informe o proxy nesse formato: proxy.sudominio.com:80 ou qualquer outra porta</param>
         /// <param name="httpNoProxyField">Lista de dominios para desconsiderar no proxy. Exemplo: <br/>
         /// httpNoProxyField = new string[] {"meudominio.com","outrodominio.com.br"}
