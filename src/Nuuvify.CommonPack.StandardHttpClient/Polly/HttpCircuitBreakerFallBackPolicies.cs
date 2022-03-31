@@ -15,16 +15,16 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
         public static AsyncFallbackPolicy<HttpResponseMessage> GetHttpFallBackPolicy(HttpRequestMessage request, ILogger logger)
         {
             return HttpPolicyBuilders.GetBaseBuilder()
-                    .OrInner<BrokenCircuitException>()
-                    .FallbackAsync(
-                        fallbackAction: (responseToFailedRequest, context, cancellationToken) =>
-                        {
-                            return FallbackAction(responseToFailedRequest, context, logger, request, cancellationToken);
-                        },
-                        onFallbackAsync: (responseToFailedRequest, context) =>
-                        {
-                            return OnFallbackAsync(responseToFailedRequest, context, logger, request);
-                        });
+                .OrInner<BrokenCircuitException>()
+                .FallbackAsync(
+                    fallbackAction: (responseToFailedRequest, context, cancellationToken) =>
+                    {
+                        return FallbackAction(responseToFailedRequest, context, logger, request, cancellationToken);
+                    },
+                    onFallbackAsync: (responseToFailedRequest, context) =>
+                    {
+                        return OnFallbackAsync(responseToFailedRequest, context, logger, request);
+                    });
 
         }
 
