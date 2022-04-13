@@ -16,21 +16,19 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         ///     "AppConfig:AppURLs:UrlLoginApiToken"
         /// </summary>
         /// <remarks>
-        ///  Esse metodo tambem registra: IStandardHttpClient, ITokenService e CredentialToken
+        ///  A CredentialApi já é registrado automaticamente ao configurar essa classe <br/>
+        ///  Assim como: IStandardHttpClient, ITokenService e CredentialToken
         /// </remarks>
         /// <param name="services"></param>
         /// <param name="configuration"></param>
-        /// <param name="registerCredential">True = Registra CredentialApi ou False = Use AddServiceCredentialRegister</param>
-        /// <returns></returns>
         public static void AddStandardHttpClientSetup(this IServiceCollection services,
-            IConfiguration configuration, bool registerCredential = true)
+            IConfiguration configuration)
         {
             services.AddScoped<IStandardHttpClient, StandardHttpClient>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddTransient<CredentialToken>();
 
-            if (registerCredential)
-                AddServiceCredentialRegister(services, configuration);
+            AddServiceCredentialRegister(services, configuration);
 
         }
 
@@ -41,39 +39,31 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         ///     "AppConfig:AppURLs:UrlLoginApiToken"
         /// </summary>
         /// <remarks>
-        ///  Esse metodo tambem registra: IStandardHttpClient, ITokenService e CredentialToken
+        ///  A CredentialApi já é registrado automaticamente ao configurar essa classe
         /// </remarks>
         /// <param name="services"></param>
         /// <param name="configuration"></param>
-        /// <param name="registerCredential">True = Registra CredentialApi ou False = Use AddServiceCredentialRegister</param>
-        /// <returns></returns>
         public static void AddStandardHttpClientSetupSingleton(this IServiceCollection services,
-            IConfiguration configuration, bool registerCredential = true)
+            IConfiguration configuration)
         {
 
             services.AddSingleton<IStandardHttpClient, StandardHttpClient>();
             services.AddSingleton<ITokenService, TokenService>();
             services.AddSingleton<CredentialToken>();
 
-            if (registerCredential)
-                AddServiceCredentialRegister(services, configuration);
+            AddServiceCredentialRegister(services, configuration);
 
         }
 
-        /// <summary>
-        /// Registra CredentialApi e IHttpContextAccessor. <br/>
-        /// Use .ConfigurePrimaryHttpMessageHandler para registro com proxy e demais parametros do HttpClient
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="configuration"></param>
-        public static IHttpClientBuilder AddServiceCredentialRegister(this IServiceCollection services,
+
+        private static void AddServiceCredentialRegister(IServiceCollection services,
             IConfiguration configuration)
         {
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 
-            return services.AddHttpClient("CredentialApi", client =>
+            services.AddHttpClient("CredentialApi", client =>
             {
                 client.BaseAddress = new Uri(configuration.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value);
                 client.DefaultRequestHeaders.Add("Accept", "application/json");

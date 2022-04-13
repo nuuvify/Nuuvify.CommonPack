@@ -25,8 +25,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// <summary>
         /// Obtem um novo token para as credenciais informadas, se não informar as credenciais, 
         /// será usado a chave do appsettings ApisCredentials:Username e Password <br/>
-        /// Esse metodo sempre ira obter um novo token a partir de CredentialApi ou <br/>
-        /// informe um valor para HttpClientTokenName caso queira outro nome
+        /// Esse metodo sempre ira obter um novo token a partir de CredentialApi
         /// </summary>
         /// <remarks>
         /// É necessario possuir as seguintes entradas no appsettings: AppConfig:AppURLs:UrlLoginApi e AppConfig:AppURLs:UrlCredentialToken  <br/>
@@ -53,14 +52,6 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// Obtem as mensagens de inconsistencias ocorridas dentro da classe
         /// </summary>
         List<NotificationR> Notifications { get; set; }
-
-        /// <summary>
-        /// Retorna o nome para uma instancia HttpClient, informe null, caso não queira nomear
-        /// </summary>
-        /// <param name="httpClientName">Informe um nome para ser utilizado no <br />
-        /// TokenService para instancia HttpClient ou Null para instancia sem nome</param>
-        /// <returns></returns>
-        string HttpClientTokenName(string httpClientName = "CredentialApi");
 
     }
 }

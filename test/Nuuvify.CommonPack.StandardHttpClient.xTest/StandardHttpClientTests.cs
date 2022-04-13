@@ -7,10 +7,8 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
 using Moq;
 using Nuuvify.CommonPack.Security.Abstraction;
-using Nuuvify.CommonPack.StandardHttpClient.Polly;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 using Nuuvify.CommonPack.StandardHttpClient.xTest.Configs;
 using Xunit;
@@ -253,77 +251,6 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
 
 
             Assert.False(_credentialToken.IsValidToken());
-
-
-        }
-
-        [Fact]
-        public async Task Caso_HttpContextAccessor_igual_null_nao_deve_retornar_exception()
-        {
-            var urlLogin = Config.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value;
-            var urlToken = Config.GetSection("AppConfig:AppURLs:UrlLoginApiToken")?.Value;
-
-
-            var credentialToken = new CredentialToken()
-            {
-                LoginId = "fulano",
-                Password = "xyz9",
-                Created = DateTimeOffset.Now,
-                Expires = DateTimeOffset.Now.AddMinutes(60),
-                Token = "meu token",
-            };
-            var returnClass = new
-            {
-                Success = true,
-                Data = credentialToken
-            };
-
-
-            var mockConfiguration = new Mock<IConfiguration>();
-            mockConfiguration.Setup(x => x.GetSection("ApisCredentials:Username").Value)
-                .Returns(credentialToken.LoginId);
-            mockConfiguration.Setup(x => x.GetSection("ApisCredentials:Password").Value)
-                .Returns(credentialToken.Password);
-            mockConfiguration.Setup(x => x.GetSection("AppConfig:AppURLs:UrlLoginApiToken").Value)
-                .Returns(urlToken);
-            mockConfiguration.Setup(x => x.GetSection("AppConfig:AppURLs:UrlLoginApi").Value)
-                .Returns(urlLogin);
-
-            var mockCredentialToken = new Mock<IOptions<CredentialToken>>();
-            mockCredentialToken.Setup(ap => ap.Value)
-                .Returns(credentialToken);
-
-            var jsonConverted = JsonSerializer.Serialize(returnClass);
-
-            var resultDefault = new HttpStandardReturn
-            {
-                ReturnCode = "200",
-                ReturnMessage = jsonConverted,
-                Success = true
-            };
-            var clientHandlerStub = new DelegatingHandlerStub(new HttpResponseMessage()
-            {
-                StatusCode = HttpStatusCode.OK,
-                Content = new StringContent(jsonConverted, Encoding.UTF8, "application/json")
-            });
-            var client = new HttpClient(clientHandlerStub, true)
-            {
-                BaseAddress = new Uri($"{urlLogin}/{urlToken}")
-            };
-
-            mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>()))
-                .Returns(client);
-
-
-            var standardClient = new StandardHttpClient(mockFactory.Object, new NullLogger<StandardHttpClient>());
-
-
-            var tokenService = new TokenService(mockCredentialToken.Object, standardClient, mockConfiguration.Object, new NullLogger<TokenService>(), null);
-            var newToken = await tokenService.GetToken();
-
-
-
-            Assert.True(newToken.IsValidToken());
 
 
         }

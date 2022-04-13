@@ -56,8 +56,8 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
 
 
             return httpClientBuilder.AddRetryPolicyHandler(logger, tokenService, retryPolicyConfig)
-                .AddCircuitBreakerFallBackHandler(logger)
-                .AddCircuitBreakerHandler(logger, circuitBreakerPolicyConfig);
+                                    .AddCircuitBreakerFallBackHandler(logger)
+                                    .AddCircuitBreakerHandler(logger, circuitBreakerPolicyConfig);
         }
 
         /// <summary cref="AddPolicyWithTokenHandlers">
@@ -91,9 +91,8 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
 
 
             return httpClientBuilder.AddRetryPolicyHandler(logger, retryPolicyConfig)
-                .AddCircuitBreakerFallBackHandler(logger)
-                .AddCircuitBreakerHandler(logger, circuitBreakerPolicyConfig);
-
+                                    .AddCircuitBreakerFallBackHandler(logger)
+                                    .AddCircuitBreakerHandler(logger, circuitBreakerPolicyConfig);
         }
 
 
@@ -113,6 +112,6 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
         {
             return httpClientBuilder.AddPolicyHandler(request => HttpCircuitBreakerFallBackPolicies.GetHttpFallBackPolicy(request, logger));
         }
-
+    
     }
 }
