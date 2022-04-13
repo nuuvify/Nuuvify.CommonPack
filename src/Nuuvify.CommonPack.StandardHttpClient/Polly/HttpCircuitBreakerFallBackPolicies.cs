@@ -15,16 +15,16 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
         public static AsyncFallbackPolicy<HttpResponseMessage> GetHttpFallBackPolicy(HttpRequestMessage request, ILogger logger)
         {
             return HttpPolicyBuilders.GetBaseBuilder()
-                    .OrInner<BrokenCircuitException>()
-                    .FallbackAsync(
-                        fallbackAction: (responseToFailedRequest, context, cancellationToken) =>
-                        {
-                            return FallbackAction(responseToFailedRequest, context, logger, request, cancellationToken);
-                        },
-                        onFallbackAsync: (responseToFailedRequest, context) =>
-                        {
-                            return OnFallbackAsync(responseToFailedRequest, context, logger, request);
-                        });
+                .OrInner<BrokenCircuitException>()
+                .FallbackAsync(
+                    fallbackAction: (responseToFailedRequest, context, cancellationToken) =>
+                    {
+                        return FallbackAction(responseToFailedRequest, context, logger, request, cancellationToken);
+                    },
+                    onFallbackAsync: (responseToFailedRequest, context) =>
+                    {
+                        return OnFallbackAsync(responseToFailedRequest, context, logger, request);
+                    });
 
         }
 
@@ -33,7 +33,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
             context = request.GetPolicyExecutionContext();
             var serviceBreak = context.GetServiceName();
 
-            logger.LogWarning("OnFallbackAsync was triggered, service: {0} failed", serviceBreak);
+            logger.LogWarning("###### OnFallbackAsync was triggered, service: {0} failed ######", serviceBreak);
 
             return Task.CompletedTask;
         }
@@ -43,7 +43,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
             context = request.GetPolicyExecutionContext();
             var serviceBreak = context.GetServiceName();
 
-            logger.LogWarning("FallbackAction was triggered, service: {0} failed, customized warning message is being returned.", serviceBreak);
+            logger.LogWarning("###### FallbackAction was triggered, service: {0} failed, customized warning message is being returned. ######", serviceBreak);
 
             HttpResponseMessage httpResponseMessage;
 
@@ -52,7 +52,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
             {
                 httpResponseMessage = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable)
                 {
-                    Content = new StringContent($"The fallback executed, the service: {serviceBreak} is down, please wait and try again later.")
+                    Content = new StringContent($"###### The fallback executed, the service: {serviceBreak} is down, please wait and try again later. ######")
                 };
 
             }
@@ -60,7 +60,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
             {
                 httpResponseMessage = new HttpResponseMessage(responseToFailedRequest.Result.StatusCode)
                 {
-                    Content = new StringContent($"The fallback executed, the original error was: {responseToFailedRequest.Result.ReasonPhrase}")
+                    Content = new StringContent($"###### The fallback executed, the original error was: {responseToFailedRequest.Result.ReasonPhrase} ######")
                 };
 
             }

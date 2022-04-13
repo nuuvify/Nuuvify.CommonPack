@@ -27,6 +27,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
         ///<inheritdoc/>
         public List<NotificationR> Notifications { get; set; }
 
+
         public TokenService(
             IOptions<CredentialToken> credentialToken,
             IStandardHttpClient standardHttpClient,
@@ -45,10 +46,20 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
         }
 
 
+        private string GetHttpClientTokenName { get; set; }
+
+        public string HttpClientTokenName(string httpClientName = "CredentialApi")
+        {
+            GetHttpClientTokenName = string.IsNullOrWhiteSpace(httpClientName)
+                ? null
+                : httpClientName;
+
+            return GetHttpClientTokenName;
+        }
 
         public string GetUsername()
         {
-            return _accessor.HttpContext.User.GetLogin();
+            return _accessor?.HttpContext?.User.GetLogin();
         }
 
         ///<inheritdoc/>
@@ -68,13 +79,18 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
                 Password = password
             };
 
-            var userName = _accessor.HttpContext.User.GetLogin();
+            var userName = _accessor?.HttpContext?.User.GetLogin();
             if (userClaim == null)
                 userClaim = userName;
 
-            _standardHttpClient.CreateClient();
+
+
+            _standardHttpClient.CreateClient(GetHttpClientTokenName ?? HttpClientTokenName());
+
             if (!string.IsNullOrWhiteSpace(userClaim))
                 _standardHttpClient.WithHeader(Constants.UserClaimHeader, userClaim);
+
+
 
             _logger.LogDebug(messageLog + " - _standardHttpClient.GetNewToken()");
 
@@ -185,8 +201,8 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
         private bool IsAuthenticated(out string token)
         {
             token = "";
-            if (_accessor.HttpContext == null) return false;
-            var esquemaAutenticacao = _accessor.HttpContext.Request.Headers
+            if (_accessor?.HttpContext == null) return false;
+            var esquemaAutenticacao = _accessor?.HttpContext.Request.Headers
                 .FirstOrDefault(x => x.Key.Equals("Authorization")).Value;
 
             foreach (var item in esquemaAutenticacao)
@@ -194,7 +210,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
                 token = item?.Replace("bearer", "").Replace("Bearer", "").Trim();
             }
 
-            if (_accessor.HttpContext == null) return false;
+            if (_accessor?.HttpContext == null) return false;
             return _accessor.HttpContext.User.Identity.IsAuthenticated;
         }
 
