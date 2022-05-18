@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Configuration;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.Security.Abstraction;
 using Nuuvify.CommonPack.Security.Jwt;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Configuration;
 
 namespace Nuuvify.CommonPack.Security.JwtOpenId
 {
@@ -22,13 +22,13 @@ namespace Nuuvify.CommonPack.Security.JwtOpenId
     /// </summary>
     public class AddRolesClaimsTransformation : IClaimsTransformation
     {
-        
-        private readonly IUserAccountRepository _cwsRepository;
+
+        private readonly IUserAccountRepository _userAccountRepository;
         private dynamic policyGroups;
 
-        public AddRolesClaimsTransformation(IUserAccountRepository cwsRepository, IConfiguration configuration)
+        public AddRolesClaimsTransformation(IUserAccountRepository userAccountRepository, IConfiguration configuration)
         {
-            _cwsRepository = cwsRepository;
+            _userAccountRepository = userAccountRepository;
             policyGroups = new PolicyGroupsApplication(configuration);
         }
 
@@ -43,7 +43,7 @@ namespace Nuuvify.CommonPack.Security.JwtOpenId
                 var loginId = principal.GetLogin();
 
 
-                var gruposDoUsuario = await _cwsRepository.GetUserRoles(loginId);
+                var gruposDoUsuario = await _userAccountRepository.GetUserRoles(loginId);
                 var isValidAuthenticated = false;
 
 

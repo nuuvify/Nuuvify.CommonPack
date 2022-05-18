@@ -7,6 +7,12 @@ using Nuuvify.CommonPack.Security.Abstraction;
 
 namespace Nuuvify.CommonPack.Security.JwtOpenId
 {
+
+    /// <summary>
+    /// Essa classe customiza a autorização do Aspnet, para casos que o token não venha com <br/>
+    /// com role, assim é possivel pesquisar no repositorio IUserAccountRepository, pelo login <br/>
+    /// se o mesmo possui acesso as claims informadas em ControllerOpenIdAuthorizationRequirement
+    /// </summary>
     public class ControllerOpenIdAuthorizationHandler : AuthorizationHandler<ControllerOpenIdAuthorizationRequirement>
     {
 
@@ -32,6 +38,9 @@ namespace Nuuvify.CommonPack.Security.JwtOpenId
 
                 foreach (ControllerOpenIdAuthorizationRequirement item in context.PendingRequirements)
                 {
+                    //FIXME: Incluir "catloginid" como uma propriedade dessa classe onde possa ser informado dinamicamente
+                    //no momento do setup dessa classe.
+
                     var catloginid = context.User.Claims
                         .FirstOrDefault(x => x.Type.EndsWith("catloginid", StringComparison.InvariantCultureIgnoreCase))?
                         .Value;
@@ -40,9 +49,9 @@ namespace Nuuvify.CommonPack.Security.JwtOpenId
                     {
                         using (var scope = _serviceProvider.CreateScope())
                         {
-                            var cwsRepository = scope.ServiceProvider.GetRequiredService<IUserAccountRepository>();
+                            var userAccountRepository = scope.ServiceProvider.GetRequiredService<IUserAccountRepository>();
 
-                            var isMemberOf = cwsRepository.PersonIsMemberOf(catloginid, item.ClaimType).Result;
+                            var isMemberOf = userAccountRepository.PersonIsMemberOf(catloginid, item.ClaimType).Result;
                             isAuthenticated = isMemberOf;
                             if (isAuthenticated) break;
                         }
