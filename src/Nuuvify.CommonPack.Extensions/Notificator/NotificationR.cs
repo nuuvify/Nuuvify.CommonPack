@@ -1,13 +1,14 @@
 using System;
-using Nuuvify.CommonPack.Extensions.Interfaces;
 using Microsoft.Extensions.Logging;
+using Nuuvify.CommonPack.Extensions.Interfaces;
 
 namespace Nuuvify.CommonPack.Extensions.Notificator
 {
+
     public class NotificationR : INotPersistingAsTable
     {
 
-        protected NotificationR() {}
+        protected NotificationR() { }
         public NotificationR(string property, string message)
         {
             DefineProperty(property);

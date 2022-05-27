@@ -26,7 +26,9 @@ namespace Nuuvify.CommonPack.HealthCheck.Helpers
         {
             get
             {
-                var buildNumber = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyFileVersionAttribute>().Version;
+                var buildNumber = Assembly.GetEntryAssembly()
+                    .GetCustomAttribute<AssemblyFileVersionAttribute>()
+                    .Version;
 
                 return buildNumber;
             }
