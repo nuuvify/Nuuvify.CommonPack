@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -12,21 +11,18 @@ namespace Nuuvify.CommonPack.OpenApi
         public static void Configuration(this IServiceCollection services)
         {
 
-            services.AddSwaggerExamplesFromAssemblies(Assembly.GetEntryAssembly());
 
             services.AddSwaggerGen(options =>
             {
 
-                options.ExampleFilters();
                 options.EnableAnnotations();
-
 
                 options.OperationFilter<AddHeaderOperationFilter>("CorrelationId", "Correlation Id for the request", false);
 
                 var documentFile = string.Empty;
                 var baseDirectory = AppContext.BaseDirectory;
 
-                var filesXml = Directory.GetFiles(baseDirectory, ".*.xml", SearchOption.TopDirectoryOnly);
+                var filesXml = Directory.GetFiles(baseDirectory, "*.xml", SearchOption.TopDirectoryOnly);
 
                 foreach (var item in filesXml)
                 {
@@ -39,6 +35,7 @@ namespace Nuuvify.CommonPack.OpenApi
 
 
             });
+
 
         }
 
