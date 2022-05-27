@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 
 namespace Nuuvify.CommonPack.Extensions.Notificator
@@ -17,6 +18,7 @@ namespace Nuuvify.CommonPack.Extensions.Notificator
 
 
 
+        [JsonIgnore]
         public virtual IReadOnlyCollection<NotificationR> Notifications => _notifications;
 
         /// <summary>
@@ -82,13 +84,13 @@ namespace Nuuvify.CommonPack.Extensions.Notificator
         public void AddNotification(NotificationR notification)
         {
             if (notification == null) return;
-                _notifications.Add(notification);
+            _notifications.Add(notification);
         }
 
         public void AddNotifications(IReadOnlyCollection<NotificationR> notifications)
         {
             if (notifications == null) return;
-                _notifications.AddRange(notifications);
+            _notifications.AddRange(notifications);
         }
 
         public void AddNotifications(IList<NotificationR> notifications)

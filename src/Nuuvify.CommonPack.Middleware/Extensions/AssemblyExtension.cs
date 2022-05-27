@@ -16,7 +16,8 @@ namespace Nuuvify.CommonPack.Middleware.Extensions
 
                 var appCustomName = entryAssembly?
                     .Replace("Nuuvify.", "")
-                    .Replace(".WebApi", "");
+                    .Replace(".WebApi", "")
+                    .Replace(".", "");
 
 
                 return appCustomName;
@@ -28,7 +29,9 @@ namespace Nuuvify.CommonPack.Middleware.Extensions
         {
             get
             {
-                var buildNumber = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyFileVersionAttribute>().Version;
+                var buildNumber = Assembly.GetEntryAssembly()
+                    .GetCustomAttribute<AssemblyFileVersionAttribute>()
+                    .Version;
 
                 return buildNumber;
             }
