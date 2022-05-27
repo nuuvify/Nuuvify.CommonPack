@@ -29,13 +29,16 @@ namespace Nuuvify.CommonPack.OpenApi
             LicenseType = licenseType;
 
 
-            AppName = Assembly.GetEntryAssembly().GetName().Name?
-                                .Replace(".WebApi", "");
+            AppName = Assembly.GetEntryAssembly()
+                .GetName()
+                .Name?
+                .Replace(".WebApi", "")
+                .Replace(".", "");
 
             BuildVersion = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyFileVersionAttribute>().Version;
             AppVersion = $"{Assembly.GetEntryAssembly().GetName().Version.Major}." +
-                            $"{Assembly.GetEntryAssembly().GetName().Version.Minor}." +
-                            $"{Assembly.GetEntryAssembly().GetName().Version.Build}";
+                         $"{Assembly.GetEntryAssembly().GetName().Version.Minor}." +
+                         $"{Assembly.GetEntryAssembly().GetName().Version.Build}";
 
 
             Uri.TryCreate(urlRepository, UriKind.RelativeOrAbsolute, out Uri _urlAppValid);
