@@ -1,18 +1,18 @@
 ﻿using System;
-using Nuuvify.CommonPack.Domain;
-using Nuuvify.CommonPack.UnitOfWork.Abstraction;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Nuuvify.CommonPack.Domain;
+using Nuuvify.CommonPack.UnitOfWork.Abstraction;
 
 
 namespace Nuuvify.CommonPack.UnitOfWork
 {
     /// <summary>
-    /// Esta classe deve ser herdada pela sua classe de config do EntityFramework,
-    /// ela configura os campos de auditoria.
+    /// Esta classe deve ser herdada pela sua classe de config do EntityFramework, <br/>
+    /// ela configura os campos de auditoria. <br/>
     /// <para>
     /// IMPORTANTE: O namespace da sua classe de config deve terminar sempre com o nome <br/>
-    /// da classe de contexto que ela faz parte, exemplo: namespace .Penf.Infra.Data.Configs.AppDbContext <br/>
+    /// da classe de contexto que ela faz parte, exemplo: namespace MinhaEmpresa.MinhaApp.Infra.Data.Configs.AppDbContext <br/>
     ///  <br/>
     /// Utilize:  DefaultConfig(builder, "FATURAS", "FATURA"); <br/>
     /// Auditoria:      AuditConfig(builder);  <br/>
@@ -31,7 +31,7 @@ namespace Nuuvify.CommonPack.UnitOfWork
 
 
         /// <summary>
-        /// Sera mapeado a PK para o EF conforme o parametro informado, 
+        /// Sera mapeado a PK para o EF conforme o parametro informado, <br/>
         /// <para>
         /// esse campo na tabela será mapeado com a propriedade ID contida na classe 
         /// de dominio TEntity <br/>
@@ -61,7 +61,8 @@ namespace Nuuvify.CommonPack.UnitOfWork
 
 
 
-            if (ProviderSelected.IsProviderOracle())
+            if (ProviderSelected.IsProviderOracle() ||
+                ProviderSelected.IsProviderDb2())
             {
                 builder.ToTable(tableName.ToUpper());
 
@@ -70,19 +71,8 @@ namespace Nuuvify.CommonPack.UnitOfWork
 
                 builder.Property(x => x.Id)
                     .HasColumnName($"{idColumnName.ToUpper()}{pkSufix}")
-                    .HasColumnType($"VARCHAR2({DomainEntity.MaxId})")
-                    .IsRequired();
-            }
-            else if (ProviderSelected.IsProviderDb2())
-            {
-                builder.ToTable(tableName.ToUpper());
-
-                builder.HasKey(x => x.Id)
-                    .HasName($"PK_{idColumnName.ToUpper()}");
-
-                builder.Property(x => x.Id)
-                    .HasColumnName($"{idColumnName.ToUpper()}{pkSufix}")
-                    .HasColumnType($"CHAR({DomainEntity.MaxId})")
+                    .IsUnicode(false)
+                    .HasMaxLength(DomainEntity.MaxId)
                     .IsRequired();
             }
             else if (ProviderSelected.IsProviderSqlServer() ||
@@ -96,7 +86,8 @@ namespace Nuuvify.CommonPack.UnitOfWork
 
                 builder.Property(x => x.Id)
                     .HasColumnName($"{idColumnName}{pkSufix}")
-                    .HasColumnType($"VARCHAR({DomainEntity.MaxId})")
+                    .IsUnicode(false)
+                    .HasMaxLength(DomainEntity.MaxId)
                     .IsRequired();
             }
             else if (ProviderSelected.IsProviderPostgreSQL())
@@ -109,6 +100,7 @@ namespace Nuuvify.CommonPack.UnitOfWork
 
                 builder.Property(x => x.Id)
                     .HasColumnName($"{idColumnName}{pkSufix}")
+                    .IsUnicode(false)
                     .HasMaxLength(DomainEntity.MaxId)
                     .IsRequired();
             }
@@ -132,35 +124,19 @@ namespace Nuuvify.CommonPack.UnitOfWork
         protected virtual void AuditConfig(EntityTypeBuilder<TEntity> builder)
         {
 
-            if (ProviderSelected.IsProviderOracle())
+            if (ProviderSelected.IsProviderOracle() ||
+                ProviderSelected.IsProviderDb2())
             {
                 builder.Property(x => x.UsuarioCadastro)
                     .IsRequired()
                     .HasColumnName("USUARIO_INCLUSAO")
-                    .HasColumnType($"VARCHAR2({DomainEntity.MaxUsuarioCadastro})");
+                    .IsUnicode(false)
+                    .HasMaxLength(DomainEntity.MaxUsuarioCadastro);
 
                 builder.Property(x => x.UsuarioAlteracao)
                     .HasColumnName("USUARIO_ALTERACAO")
-                    .HasColumnType($"VARCHAR2({DomainEntity.MaxUsuarioAlteracao})");
-
-                builder.Property(x => x.DataCadastro)
-                    .IsRequired()
-                    .HasColumnName("DATA_INCLUSAO");
-
-                builder.Property(x => x.DataAlteracao)
-                    .HasColumnName("DATA_ALTERACAO");
-
-            }
-            else if (ProviderSelected.IsProviderDb2())
-            {
-                builder.Property(x => x.UsuarioCadastro)
-                    .IsRequired()
-                    .HasColumnName("USUARIO_INCLUSAO")
-                    .HasColumnType($"CHAR({DomainEntity.MaxUsuarioCadastro})");
-
-                builder.Property(x => x.UsuarioAlteracao)
-                    .HasColumnName("USUARIO_ALTERACAO")
-                    .HasColumnType($"CHAR({DomainEntity.MaxUsuarioAlteracao})");
+                    .IsUnicode(false)
+                    .HasMaxLength(DomainEntity.MaxUsuarioAlteracao);
 
                 builder.Property(x => x.DataCadastro)
                     .IsRequired()
@@ -176,11 +152,13 @@ namespace Nuuvify.CommonPack.UnitOfWork
                 builder.Property(x => x.UsuarioCadastro)
                     .IsRequired()
                     .HasColumnName("USUARIO_INCLUSAO")
-                    .HasColumnType($"VARCHAR({DomainEntity.MaxUsuarioCadastro})");
+                    .IsUnicode(false)
+                    .HasMaxLength(DomainEntity.MaxUsuarioCadastro);
 
                 builder.Property(x => x.UsuarioAlteracao)
                     .HasColumnName("USUARIO_ALTERACAO")
-                    .HasColumnType($"VARCHAR({DomainEntity.MaxUsuarioAlteracao})");
+                    .IsUnicode(false)
+                    .HasMaxLength(DomainEntity.MaxUsuarioAlteracao);
 
                 builder.Property(x => x.DataCadastro)
                     .IsRequired()
@@ -193,9 +171,11 @@ namespace Nuuvify.CommonPack.UnitOfWork
             {
                 builder.Property(x => x.UsuarioCadastro)
                     .IsRequired()
+                    .IsUnicode(false)
                     .HasMaxLength(DomainEntity.MaxUsuarioCadastro);
 
                 builder.Property(x => x.UsuarioAlteracao)
+                    .IsUnicode(false)
                     .HasMaxLength(DomainEntity.MaxUsuarioAlteracao);
 
                 builder.Property(x => x.DataCadastro)
@@ -239,27 +219,19 @@ namespace Nuuvify.CommonPack.UnitOfWork
         protected virtual void AuditUserIdConfig(EntityTypeBuilder<TEntity> builder)
         {
 
-            if (ProviderSelected.IsProviderOracle())
+            if (ProviderSelected.IsProviderOracle() ||
+                ProviderSelected.IsProviderDb2())
             {
                 builder.Property(x => x.UsuarioIdCadastro)
                     .IsRequired()
                     .HasColumnName("USUARIO_ID_INCLUSAO")
-                    .HasColumnType($"VARCHAR2({DomainEntity.MaxUsuarioIdCadastro})");
+                    .IsUnicode(false)
+                    .HasMaxLength(DomainEntity.MaxUsuarioIdCadastro);
 
                 builder.Property(x => x.UsuarioIdAlteracao)
                     .HasColumnName("USUARIO_ID_ALTERACAO")
-                    .HasColumnType($"VARCHAR2({DomainEntity.MaxUsuarioIdAlteracao})");
-            }
-            else if (ProviderSelected.IsProviderDb2())
-            {
-                builder.Property(x => x.UsuarioIdCadastro)
-                    .IsRequired()
-                    .HasColumnName("USUARIO_ID_INCLUSAO")
-                    .HasColumnType($"CHAR({DomainEntity.MaxUsuarioIdCadastro})");
-
-                builder.Property(x => x.UsuarioIdAlteracao)
-                    .HasColumnName("USUARIO_ID_ALTERACAO")
-                    .HasColumnType($"CHAR({DomainEntity.MaxUsuarioIdAlteracao})");
+                    .IsUnicode(false)
+                    .HasMaxLength(DomainEntity.MaxUsuarioIdAlteracao);
             }
             else if (ProviderSelected.IsProviderSqlServer() ||
                      ProviderSelected.IsProviderSqLite())
@@ -267,19 +239,23 @@ namespace Nuuvify.CommonPack.UnitOfWork
                 builder.Property(x => x.UsuarioIdCadastro)
                     .IsRequired()
                     .HasColumnName("USUARIO_ID_INCLUSAO")
-                    .HasColumnType($"VARCHAR({DomainEntity.MaxUsuarioIdCadastro})");
+                    .IsUnicode(false)
+                    .HasMaxLength(DomainEntity.MaxUsuarioIdCadastro);
 
                 builder.Property(x => x.UsuarioIdAlteracao)
                     .HasColumnName("USUARIO_ID_ALTERACAO")
-                    .HasColumnType($"VARCHAR({DomainEntity.MaxUsuarioIdAlteracao})");
+                    .IsUnicode(false)
+                    .HasMaxLength(DomainEntity.MaxUsuarioIdAlteracao);
             }
             else if (ProviderSelected.IsProviderPostgreSQL())
             {
                 builder.Property(x => x.UsuarioIdCadastro)
                     .IsRequired()
+                    .IsUnicode(false)
                     .HasMaxLength(DomainEntity.MaxUsuarioIdCadastro);
 
                 builder.Property(x => x.UsuarioIdAlteracao)
+                    .IsUnicode(false)
                     .HasMaxLength(DomainEntity.MaxUsuarioIdAlteracao);
             }
             else
