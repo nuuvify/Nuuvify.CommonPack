@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Nuuvify.CommonPack.Extensions.Notificator;
 using Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace Nuuvify.CommonPack.UnitOfWork
 {
@@ -66,6 +66,63 @@ namespace Nuuvify.CommonPack.UnitOfWork
         {
             return await _dbSet.ToListAsync();
         }
+
+
+
+
+        ///<inheritdoc/>
+        public async Task<IList<TResult>> GetAllAsync<TResult>(
+            Expression<Func<TEntity, TResult>> selector,
+            Expression<Func<TEntity, bool>> predicate,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            bool disableTracking = true,
+            bool ignoreQueryFilters = false,
+            int skip = 0,
+            int take = 25)
+        {
+            IQueryable<TEntity> query = _dbSet;
+
+
+
+            if (disableTracking)
+            {
+                query = query.AsNoTracking();
+            }
+
+
+            if (Includes?.Count > 0)
+            {
+                query = SetWithIncludes(query);
+
+            }
+
+            if (predicate != null)
+            {
+                query = query.Where(predicate);
+            }
+
+            if (ignoreQueryFilters)
+            {
+                query = query.IgnoreQueryFilters();
+            }
+
+            if (take > 0)
+            {
+                query = query.Skip(skip).Take(take);
+            }
+
+            if (orderBy != null)
+            {
+                return await orderBy(query).Select(selector).ToArrayAsync();
+            }
+            else
+            {
+                return await query.Select(selector).ToArrayAsync();
+            }
+
+
+        }
+
 
         ///<inheritdoc/>
         public async Task<IList<TEntity>> GetAllAsync(

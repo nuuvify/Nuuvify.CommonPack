@@ -1,9 +1,6 @@
 ﻿{
   "VirtualPath": "api",
   "AllowedHosts": "*",
-  "ConnectionStrings": {
-    "vendas": ""
-  },
   "TestOptions": {
     "DataBaseTesteInMemory": false,
     "DataBaseTesteOracle": false,
