@@ -14,11 +14,11 @@ namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces
     /// Example use:
     /// <example>
     /// <code>
-    ///     var projection = _repository.GetFirstOrDefault(b => new { Name = b.Title, Link = b.Url }, predicate: x => x.Title.Contains(term));
+    ///     var projection = _repository.GetFirstOrDefault(selector: b => new MyClassQueryResult { Name = b.Title, Link = b.Url }, predicate: x => x.Title.Contains(term));
     ///
     ///     var list = _repository.GetAllAsync(include: source => source.Include(blog => blog.Posts).ThenInclude(post => post.Comments));
     /// PageList:
-    ///     var items = _repository.GetPagedList(b => new { Name = b.Title, Link = b.Url });
+    ///     var items = _repository.GetPagedList(selector: b => MyClassQueryResult new { Name = b.Title, Link = b.Url });
     /// or
     ///     return await _repository.GetPagedListAsync(pageIndex: pageIndex, pageSize: pageSize);
     /// OrderBy:
@@ -44,6 +44,9 @@ namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces
 
         /// <summary>
         /// Gets the <see cref="IPagedList{TResult}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
+        /// <example>
+        /// var items = _repository.GetPagedList(selector: b => new MyClassQueryResult { Name = b.Title, Link = b.Url });
+        /// </example>
         /// </summary>
         /// <remarks>This method default no-tracking query.</remarks>
         /// <param name="selector">The selector for projection.</param>
@@ -85,6 +88,9 @@ namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces
 
         /// <summary>
         /// Gets the <see cref="IPagedList{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
+        /// <example>
+        /// var items = _repository.GetPagedListAsync(selector: b => new MyClassQueryResult { Name = b.Title, Link = b.Url });
+        /// </example>
         /// </summary>
         /// <remarks>This method default no-tracking query.</remarks>
         /// <param name="selector">The selector for projection.</param>
@@ -143,6 +149,9 @@ namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces
 
         /// <summary>
         /// Gets the first or default entity based on a predicate, orderby delegate and include delegate. This method defaults to a read-only, no-tracking query.
+        /// <example>
+        /// var items = _repository.GetFirstOrDefault(selector: b => new MyClassQueryResult { Name = b.Title, Link = b.Url });
+        /// </example>
         /// </summary>
         /// <remarks>This method defaults to a read-only, no-tracking query.</remarks>
         /// <param name="selector">The selector for projection.</param>
@@ -159,6 +168,9 @@ namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces
 
         /// <summary>
         /// Gets the first or default entity based on a predicate, orderby delegate and include delegate. This method defaults to a read-only, no-tracking query.
+        /// <example>
+        /// var items = _repository.GetFirstOrDefaultAsync(selector: b => new MyClassQueryResult { Name = b.Title, Link = b.Url });
+        /// </example>
         /// </summary>
         /// <remarks>Ex: This method defaults to a read-only, no-tracking query.</remarks>
         /// <param name="selector">The selector for projection.</param>
@@ -243,6 +255,29 @@ namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces
             int take = 25);
 
 
+
+        /// <summary>
+        /// Gets all entities based on a predicate, with only the properties you choose with selector 
+        /// <example>
+        /// var items = _repository.GetAllAsync(selector: b => new MyClassQueryResult { Name = b.Title, Link = b.Url });
+        /// </example>
+        /// </summary>
+        /// <remarks>Ex: This method defaults to a read-only, no-tracking</remarks>
+        /// <param name="selector">Select the properties you want to get as a return.</param>
+        /// <param name="predicate">A function to test each element for a condition.</param>
+        /// <param name="orderBy">A function to order elements.</param>
+        /// <param name="disableTracking"><c>true</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
+        /// <param name="ignoreQueryFilters">Ignore query filters</param>
+        /// <param name="skip">Number of records that the query should skip</param>
+        /// <param name="take">Number of records that the query should return, If this parameter is 0, skip, take will be ignored</param>
+        Task<IList<TResult>> GetAllAsync<TResult>(
+            Expression<Func<TEntity, TResult>> selector,
+            Expression<Func<TEntity, bool>> predicate,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            bool disableTracking = true,
+            bool ignoreQueryFilters = false,
+            int skip = 0,
+            int take = 25);
 
         /// <summary>
         /// Gets all entities based on a predicate.

@@ -18,10 +18,10 @@ namespace Nuuvify.CommonPack.AutoHistory.Extensions
                 b.ToTable(b.Metadata.ClrType.Name.ToUpper());
 
                 b.HasKey(c => c.Id).HasName("PK_AUTOHISTORY_ID");
-                b.Property(c => c.Id).IsRequired().HasColumnName("ID").HasColumnType($"VARCHAR(36)");
-                b.Property(c => c.RowId).IsRequired().HasColumnName("ROW_ID").HasColumnType($"VARCHAR({options.RowIdMaxLength})");
-                b.Property(c => c.CorrelationId).HasColumnName("CORRELATION_ID").HasColumnType($"VARCHAR({options.CorrelationIdMaxLength})");
-                b.Property(c => c.TableName).IsRequired().HasColumnName("TABLE_NAME").HasColumnType($"VARCHAR({options.TableMaxLength})");
+                b.Property(c => c.Id).IsRequired().HasColumnName("ID").IsUnicode(false).HasMaxLength(36);
+                b.Property(c => c.RowId).IsRequired().HasColumnName("ROW_ID").IsUnicode(false).HasMaxLength(options.RowIdMaxLength);
+                b.Property(c => c.CorrelationId).HasColumnName("CORRELATION_ID").IsUnicode(false).HasMaxLength(options.CorrelationIdMaxLength);
+                b.Property(c => c.TableName).IsRequired().HasColumnName("TABLE_NAME").IsUnicode(false).HasMaxLength(options.TableMaxLength);
 
                 var max = 0;
                 if (options.LimitChangedLength)
@@ -43,13 +43,14 @@ namespace Nuuvify.CommonPack.AutoHistory.Extensions
                 b.Property(c => c.Kind)
                     .IsRequired()
                     .HasColumnName("KIND")
-                    .HasColumnType($"VARCHAR({options.KindMaxLength})")
+                    .IsUnicode(false)
+                    .HasMaxLength(options.KindMaxLength)
                     .HasConversion(v => v.ToString(),
                                    v => (EntityState)Enum.Parse(typeof(EntityState), v));
 
                 b.Property(c => c.Created).IsRequired().HasColumnName("CREATED");
-                b.Property(c => c.Username).HasColumnName("USERNAME").HasColumnType($"VARCHAR(36)");
-                b.Property(c => c.PersistInDatabase).HasColumnName("PERSIST").HasColumnType($"VARCHAR(10)");
+                b.Property(c => c.Username).HasColumnName("USERNAME").IsUnicode(false).HasMaxLength(36);
+                b.Property(c => c.PersistInDatabase).HasColumnName("PERSIST").IsUnicode(false).HasMaxLength(10);
 
             });
 

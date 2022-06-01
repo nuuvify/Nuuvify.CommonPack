@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
-using Nuuvify.CommonPack.AutoHistory.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Nuuvify.CommonPack.AutoHistory.Extensions;
 
 namespace Nuuvify.CommonPack.UnitOfWork
 {
@@ -78,13 +79,13 @@ namespace Nuuvify.CommonPack.UnitOfWork
                             .FirstOrDefault(x => x.Name == "DataCadastro") != null))
                     {
                         DbContext.SetAggregatesChanges();
-                        Console.WriteLine($"Entity: {entry.Entity.GetType().Name}, State: {entry.State}");
+                        Debug.WriteLine($"Entity: {entry.Entity.GetType().Name}, State: {entry.State}");
 
 
                         switch (entry.State)
                         {
                             case EntityState.Added:
-                                entry.Property("DataCadastro").CurrentValue = PropertyDateType(entry.Property("DataCadastro").Metadata); 
+                                entry.Property("DataCadastro").CurrentValue = PropertyDateType(entry.Property("DataCadastro").Metadata);
                                 entry.Property("UsuarioCadastro").CurrentValue = UsernameContext;
                                 entry.Property("DataAlteracao").IsModified = false;
                                 entry.Property("UsuarioAlteracao").IsModified = false;
@@ -111,7 +112,7 @@ namespace Nuuvify.CommonPack.UnitOfWork
                         .Where(entry => entry.CurrentValues.Properties
                             .FirstOrDefault(x => x.Name == "UsuarioIdCadastro") != null))
                     {
-                        Console.WriteLine($"UserId Entity: {entry.Entity.GetType().Name}, State: {entry.State}");
+                        Debug.WriteLine($"UserId Entity: {entry.Entity.GetType().Name}, State: {entry.State}");
 
 
                         switch (entry.State)
