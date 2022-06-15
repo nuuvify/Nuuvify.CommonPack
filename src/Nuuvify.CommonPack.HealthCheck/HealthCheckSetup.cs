@@ -9,8 +9,8 @@ namespace Nuuvify.CommonPack.HealthCheck
     public static class HealthCheckCommonSetup
     {
         /// <summary>
-        /// O endpoint para obter o json é /hc no final da url da sua aplicação
-        /// Aqui estão sendo incluidos health cheks para Local Storage, Memory e
+        /// O endpoint para obter o json é /hc no final da url da sua aplicação <br/>
+        /// Aqui estão sendo incluidos health cheks para Local Storage, Memory e <br/>
         /// CredentialApi. Configure a tag healthCheckCustomConfiguration no appsettings
         /// </summary>
         /// <param name="services"></param>
@@ -28,10 +28,11 @@ namespace Nuuvify.CommonPack.HealthCheck
 
             if (healthCheckCustomConfiguration.IsValid())
             {
+                var assemblyName = AssemblyExtension.GetApplicationNameByAssembly;
+
                 services.AddHealthChecksUI(s =>
                 {
-
-                    s.AddHealthCheckEndpoint(AssemblyExtension.GetApplicationNameByAssembly, healthCheckCustomConfiguration.UrlHealthCheck ?? "/hc");
+                    s.AddHealthCheckEndpoint(assemblyName, healthCheckCustomConfiguration.UrlHealthCheck);
                     if (healthCheckCustomConfiguration.MaximumHistoryEntriesPerEndpoint > 0)
                     {
                         s.MaximumHistoryEntriesPerEndpoint(healthCheckCustomConfiguration.MaximumHistoryEntriesPerEndpoint);
@@ -43,21 +44,23 @@ namespace Nuuvify.CommonPack.HealthCheck
                 })
                 .AddSqliteStorage("Data Source = healthchecks.db");
 
+
                 if (healthCheckCustomConfiguration.EnableChecksStandard)
                 {
                     services.AddHealthChecks()
-                        .AddCheck<MemoryHealthCheck>(
-                            name: "host-memory",
-                            tags: new[] { "memory" })
-                        .AddCheck<LocalStorageHealthCheck>(
-                            name: "host-storage",
-                            tags: new[] { "storage" });
+                    .AddCheck<MemoryHealthCheck>(
+                        name: "host-memory",
+                        tags: new[] { "memory" })
+                    .AddCheck<LocalStorageHealthCheck>(
+                        name: "host-storage",
+                        tags: new[] { "storage" });
 
-                    if (!AssemblyExtension.GetApplicationNameByAssembly.Contains("CwsApi", StringComparison.InvariantCultureIgnoreCase) &&
-                        !AssemblyExtension.GetApplicationNameByAssembly.Contains("Cws.Api", StringComparison.InvariantCultureIgnoreCase) &&
-                        !AssemblyExtension.GetApplicationNameByAssembly.Contains("credential", StringComparison.InvariantCultureIgnoreCase))
+                    if (!assemblyName.Contains("CwsApi", StringComparison.InvariantCultureIgnoreCase) &&
+                        !assemblyName.Contains("Cws.Api", StringComparison.InvariantCultureIgnoreCase) &&
+                        !assemblyName.Contains("credential", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        services.AddHealthChecks().AddCheck<HttpCredentialApiHealthCheck>("http-CredentialApi");
+                        services.AddHealthChecks()
+                            .AddCheck<HttpCredentialApiHealthCheck>("http-CredentialApi");
                     }
 
                 }
