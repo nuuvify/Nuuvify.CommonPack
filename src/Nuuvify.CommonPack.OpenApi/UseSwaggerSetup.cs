@@ -7,6 +7,8 @@ namespace Nuuvify.CommonPack.OpenApi
     public static class UseSwaggerSetup
     {
         /// <summary>
+        /// Se precisar indicar manualmente um caminho para swaggger inclua a seguinte entrada no appsettings <br/>
+        /// "VirtualPath": "api"
         /// Caso esteja recebendo erro, tente executar o endpoint da sua aplicação com o complemento: /swagger/v1/swagger.json
         /// <para>
         /// Exemplo: http://localhost:5000/swagger/v1/swagger.json
@@ -18,12 +20,12 @@ namespace Nuuvify.CommonPack.OpenApi
         /// <param name="app"></param>
         /// <param name="configuration"></param>
         /// <param name="provider"></param>
-        public static void UseSwaggerConfiguration(this IApplicationBuilder app, 
-            IConfiguration configuration, 
+        public static void UseSwaggerConfiguration(this IApplicationBuilder app,
+            IConfiguration configuration,
             IApiVersionDescriptionProvider provider)
         {
 
-            var vpath = configuration.GetSection("VirtualPath")?.Value.Trim() ?? string.Empty;
+            var vpath = configuration.GetSection("VirtualPath")?.Value?.Trim() ?? string.Empty;
             vpath = string.IsNullOrWhiteSpace(vpath) ? "/swagger/" : $"/{vpath}/swagger/";
 
             app.UseSwagger();
