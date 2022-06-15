@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Microsoft.OpenApi.Models;
 
 namespace Nuuvify.CommonPack.OpenApi
@@ -20,6 +21,23 @@ namespace Nuuvify.CommonPack.OpenApi
         public Uri UrlAppValid { get; private set; }
 
 
+        public string PlatformNameHost()
+        {
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return $"{OSPlatform.Windows}";
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                return $"{OSPlatform.Linux}";
+            }
+            else
+            {
+                return RuntimeInformation.OSDescription;
+            }
+
+        }
 
         public SwaggerInfoModel(string developerName, string developerEmail, string licenseType,
             string urlRepository, string urlTermService, string urlLicense)
@@ -60,11 +78,11 @@ namespace Nuuvify.CommonPack.OpenApi
                 Title = AppName,
                 Version = VersionName,
                 Description = $@"Api documentation
-
-# Application version #
+## OS ##
+{PlatformNameHost()}
+## Application version ##
 {AppVersion}
-
-# Build number #
+## Build number ##
 {BuildVersion}",
 
                 Contact = new OpenApiContact
