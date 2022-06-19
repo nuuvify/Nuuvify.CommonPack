@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest.Fixtures;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Extensions.Ordering;
@@ -55,8 +55,8 @@ namespace Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest.Repositories
             _outputHelper.WriteLine($"{this.GetType().Name} - Order(1)");
 
             _seedDbFixture.CreateData(
-                _dbContext, 
-                _dataFixture, 
+                _dbContext,
+                _dataFixture,
                 UserRequest,
                 2, 5, true);
 
@@ -99,7 +99,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest.Repositories
         {
             _outputHelper.WriteLine($"{this.GetType().Name} - Order(4)");
 
-            var faturaFinded = await _faturaRepository.GetFirstOrDefaultAsync(predicate: x => 
+            var faturaFinded = await _faturaRepository.GetFirstOrDefaultAsync(predicate: x =>
                 x.NumeroFatura == _seedDbFixture.Fatura.NumeroFatura);
 
 
@@ -145,8 +145,6 @@ namespace Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest.Repositories
             _outputHelper.WriteLine($"{this.GetType().Name} - Order(6)");
 
 
-            _dbContext.PreventDisposal = false;
-
             var hoje = new DateTime(DateTime.Today.Year,
                 DateTime.Today.Month,
                 DateTime.Today.Day);
@@ -162,6 +160,56 @@ namespace Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest.Repositories
 
             Assert.NotNull(faturasFinded);
             Assert.True(faturasFinded.Items.NotNullOrZero());
+        }
+
+        [SqlServerTestFact, Order(7)]
+        [Trait("SqlServer", "Fatura Repository - ReadOnly")]
+        public async Task GetListComSelectorDeveRetornarEntidadeQueryResultValida()
+        {
+            _outputHelper.WriteLine($"{this.GetType().Name} - Order(7)");
+
+
+
+            var hoje = new DateTime(DateTime.Today.Year,
+                DateTime.Today.Month,
+                DateTime.Today.Day);
+
+
+
+            var faturaQueryResult = await _faturaRepository.GetAllAsync(
+                selector: s => new FaturaQueryResult { NumeroFatura = s.NumeroFatura, EntregaCidade = s.EnderecoEntrega.Cidade },
+                predicate: x => x.NumeroFatura == _seedDbFixture.Fatura.NumeroFatura &&
+                x.DataCadastro >= hoje,
+                disableTracking: false,
+                ignoreQueryFilters: true);
+
+
+            Assert.True(faturaQueryResult.NotNullOrZero());
+        }
+
+        [SqlServerTestFact, Order(8)]
+        [Trait("SqlServer", "Fatura Repository - ReadOnly")]
+        public async Task GetListSemSelectorDeveRetornarEntidadeDeDominioValida()
+        {
+            _outputHelper.WriteLine($"{this.GetType().Name} - Order(8)");
+
+
+            _dbContext.PreventDisposal = false;
+
+            var hoje = new DateTime(DateTime.Today.Year,
+                DateTime.Today.Month,
+                DateTime.Today.Day);
+
+
+
+            var fatura = await _faturaRepository.GetAllAsync(
+                predicate: x => x.NumeroFatura == _seedDbFixture.Fatura.NumeroFatura &&
+                x.DataCadastro >= hoje,
+                disableTracking: false,
+                ignoreQueryFilters: true);
+
+
+            Assert.True(fatura.NotNullOrZero());
         }
 
     }

@@ -34,6 +34,8 @@ namespace Nuuvify.CommonPack.HealthCheck.Helpers
                 throw new ArgumentNullException(paramName: nameof(uri), message: "Uri informada não pode ser null.");
             }
 
+            if (string.IsNullOrWhiteSpace(segmentSearch))
+                return uri;
 
             var segments = uri.Segments;
             if (segments.Any(x => x.Equals(segmentSearch, StringComparison.InvariantCultureIgnoreCase)))

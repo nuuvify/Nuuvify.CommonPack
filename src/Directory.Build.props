@@ -20,7 +20,7 @@
       1.54.18 (para versão definitiva)
       -->
     <Version>1.0.3-preview.1</Version>
-    <FileVersion>21.10.01.1609</FileVersion>
+    <FileVersion>22.05.18.1520</FileVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1705;1591</NoWarn>
     <DocumentationFile>Docs\$(MSBuildProjectName).xml</DocumentationFile>

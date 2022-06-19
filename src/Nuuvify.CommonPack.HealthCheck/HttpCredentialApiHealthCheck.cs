@@ -96,7 +96,7 @@ namespace Nuuvify.CommonPack.HealthCheck
             }
             catch (Exception ex)
             {
-                return await Task.FromResult(HealthCheckResult.Unhealthy($"{ObjectCheckName} Failed", ex));
+                return await Task.FromResult(HealthCheckResult.Unhealthy($"{ObjectCheckName} Failed Exception", ex));
             }
 
         }

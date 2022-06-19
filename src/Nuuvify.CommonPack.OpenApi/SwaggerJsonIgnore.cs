@@ -28,7 +28,8 @@ namespace Nuuvify.CommonPack.OpenApi
             var ignoredProperties = context.MethodInfo.GetParameters()
                 .SelectMany(p => p.ParameterType.GetProperties()
                                  .Where(prop => prop.GetCustomAttribute<JsonIgnoreAttribute>() != null)
-                                 );
+                );
+
             if (ignoredProperties.Any())
             {
                 foreach (var property in ignoredProperties)
