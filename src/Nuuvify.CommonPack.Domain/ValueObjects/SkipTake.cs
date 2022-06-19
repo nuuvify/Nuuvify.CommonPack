@@ -52,7 +52,11 @@ namespace Nuuvify.CommonPack.Domain.ValueObjects
             }
         }
 
-
+        /// <summary>
+        /// Retorna true caso o Take for maior que 0 <br/>
+        /// Quando take = 0 os metodos que usam essa classe irão ignorar paginação
+        /// </summary>
+        /// <returns></returns>
         public virtual bool HasPagination()
         {
             return Take > 0;

@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Nuuvify.CommonPack.Extensions.Implementation;
-using Nuuvify.CommonPack.Extensions.Interfaces;
-using Nuuvify.CommonPack.UnitOfWork.Abstraction;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Nuuvify.CommonPack.Extensions.Implementation;
+using Nuuvify.CommonPack.Extensions.Interfaces;
 
 namespace Nuuvify.CommonPack.UnitOfWork
 {
@@ -61,26 +60,8 @@ namespace Nuuvify.CommonPack.UnitOfWork
                 {
                     Debug.WriteLine($"Entity: {entity} property: {property.Name}");
 
-                    if (ProviderSelected.IsProviderOracle())
-                    {
-                        property.SetColumnType("VARCHAR2(50)");
-                    }
-                    else if (ProviderSelected.IsProviderDb2())
-                    {
-                        property.SetColumnType("CHAR(50)");
-                    }
-                    else if (ProviderSelected.IsProviderSqlServer())
-                    {
-                        property.SetColumnType("VARCHAR(50)");
-                    }
-                    else if (ProviderSelected.IsProviderPostgreSQL())
-                    {
-                        property.SetMaxLength(50);
-                    }
-                    else
-                    {
-                        property.SetColumnType("VARCHAR(50)");
-                    }
+                    property.SetMaxLength(50);
+                    property.SetIsUnicode(false);
 
                 }
             }
