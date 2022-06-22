@@ -1,5 +1,5 @@
 ﻿**************************************************************************************
-IMPORTANTE: IBM DB2 até a versão 3.1.0.400 não é possivel usar SaveChangesAsync, 
+IMPORTANTE: IBM DB2 até a versão 3.1.0.500 não é possivel usar SaveChangesAsync, 
             pois causa exception ao fazer Add, apesar de funcionar com Update e Delete, dessa
             forma utilize SaveChanges (sincrono) em AppDbContext.cs
 
