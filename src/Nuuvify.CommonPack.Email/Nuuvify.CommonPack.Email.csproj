@@ -4,20 +4,22 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Description>
-      This library is an abstraction for emailing. <br/>
-      Add to an INFRA project, and use the IEmail interface of the EMAIL.ABSTRACTION project  <br/>
+      This library is an abstraction for emailing.
+      <br />
+      Add to an INFRA project, and use the IEmail interface of the EMAIL.ABSTRACTION project
+      <br />
       to consume the service in other layers.
     </Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MailKit" Version="2.8.0" />
+    <PackageReference Include="MailKit" Version="3.3.0" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.1.6" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.1.26" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Nuuvify.CommonPack.Email.Abstraction\Nuuvify.CommonPack.Email.Abstraction.csproj" />
   </ItemGroup>
-  
+
 </Project>
