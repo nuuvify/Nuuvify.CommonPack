@@ -5,26 +5,27 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMoqCore" Version="1.0.0" />
-    <PackageReference Include="Bogus" Version="29.0.2" />
-    <PackageReference Include="CountryData.Bogus" Version="3.35.0" />
+    <PackageReference Include="AutoMoqCore" Version="2.1.0" />
+    <PackageReference Include="Bogus" Version="33.1.1" />
+    <PackageReference Include="CountryData.Bogus" Version="3.61.0" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="EFCore.NamingConventions" Version="1.1.1" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.1.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.6">
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.18" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.1.26" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.26" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.26">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.6" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.6" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.26" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.26" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Nuuvify.CommonPack.AutoHistory\Nuuvify.CommonPack.AutoHistory.csproj" />
+    <ProjectReference Include="..\..\src\Nuuvify.CommonPack.Extensions\Nuuvify.CommonPack.Extensions.csproj" />
     <ProjectReference Include="..\..\src\Nuuvify.CommonPack.Domain\Nuuvify.CommonPack.Domain.csproj" />
     <ProjectReference Include="..\..\src\Nuuvify.CommonPack.Middleware.Abstraction\Nuuvify.CommonPack.Middleware.Abstraction.csproj" />
     <ProjectReference Include="..\..\src\Nuuvify.CommonPack.UnitOfWork\Nuuvify.CommonPack.UnitOfWork.csproj" />

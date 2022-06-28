@@ -2,14 +2,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <Description>Biblioteca com implementaçôes comuns para projetos DOMAIN</Description>
   </PropertyGroup>
 
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="10.1.1" />
-    <PackageReference Include="MediatR" Version="9.0.0" />
+    <PackageReference Include="AutoMapper" Version="11.0.1" />
+    <PackageReference Include="MediatR" Version="10.0.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -57,5 +57,5 @@
       <LastGenOutput>MsgFluentValidator.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  
+
 </Project>
