@@ -14,7 +14,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Entities.StubDbContext
 
             builder.Property(e => e.NumeroFatura)
                 .IsRequired()
-                .HasColumnType("NUMERIC(8)");
+                .HasColumnType("numeric(8)");
 
 
             builder.OwnsOne(
@@ -23,10 +23,12 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Entities.StubDbContext
                 {
                     pp.Property(p => p.Cidade)
                         .HasColumnName("EntregaCidade")
+                        .IsUnicode(false)
                         .HasMaxLength(Endereco.MaxCidade);
 
                     pp.Property(p => p.Logradouro)
                         .HasColumnName("EntregaLogradouro")
+                        .IsUnicode(false)
                         .HasMaxLength(Endereco.MaxLogradouro);
 
                 });
@@ -37,10 +39,12 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Entities.StubDbContext
                 {
                     pp.Property(p => p.Cidade)
                         .HasColumnName("FaturaCidade")
+                        .IsUnicode(false)
                         .HasMaxLength(Endereco.MaxCidade);
 
                     pp.Property(p => p.Logradouro)
                         .HasColumnName("FaturaLogradouro")
+                        .IsUnicode(false)
                         .HasMaxLength(Endereco.MaxLogradouro);
 
                 });
