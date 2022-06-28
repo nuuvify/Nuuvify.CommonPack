@@ -1,4 +1,5 @@
 ﻿using Nuuvify.CommonPack.Domain;
+using Nuuvify.CommonPack.Extensions.Implementation;
 
 namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest
 {
@@ -8,7 +9,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest
         protected PedidoItem() { }
         public PedidoItem(string codigoMercadoria, decimal quantidade, decimal valorUnitario)
         {
-            CodigoMercadoria = codigoMercadoria;
+            CodigoMercadoria = codigoMercadoria.SubstringNotNull(0, 10);
             Quantidade = quantidade;
             ValorUnitario = valorUnitario;
 
