@@ -14,6 +14,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Entities.StubDbContext
 
             builder.Property(e => e.CodigoMercadoria)
                 .IsRequired()
+                .IsUnicode(false)
                 .HasMaxLength(10);
 
             builder.Property(e => e.Quantidade)
@@ -28,6 +29,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Entities.StubDbContext
 
             builder.Property(e => e.PedidoId)
                 .IsRequired()
+                .IsUnicode(false)
                 .HasMaxLength(DomainEntity.MaxId);
 
 

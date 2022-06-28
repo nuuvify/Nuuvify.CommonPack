@@ -29,6 +29,9 @@ function GenerateReportCoverage {
         dotnet new tool-manifest -o $dirManifest
         dotnet tool install --local dotnet-reportgenerator-globaltool
     }
+    else {
+        dotnet tool restore
+    }
 
     #aliasReport
     dotnet tool run reportgenerator "-reports:./*/TestResults/*/coverage.*.xml" `
