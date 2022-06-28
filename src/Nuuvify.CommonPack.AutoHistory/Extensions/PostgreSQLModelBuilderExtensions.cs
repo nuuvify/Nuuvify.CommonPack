@@ -19,10 +19,10 @@ namespace Nuuvify.CommonPack.AutoHistory.Extensions
 
                 b.HasKey(c => c.Id).HasName("pk_autohistory_id");
 
-                b.Property(c => c.Id).IsRequired().HasMaxLength(36);
-                b.Property(c => c.RowId).IsRequired().HasMaxLength(options.RowIdMaxLength);
-                b.Property(c => c.CorrelationId).HasMaxLength(options.CorrelationIdMaxLength);
-                b.Property(c => c.TableName).IsRequired().HasMaxLength(options.TableMaxLength);
+                b.Property(c => c.Id).IsRequired().IsUnicode(false).HasMaxLength(36);
+                b.Property(c => c.RowId).IsRequired().IsUnicode(false).HasMaxLength(options.RowIdMaxLength);
+                b.Property(c => c.CorrelationId).IsUnicode(false).HasMaxLength(options.CorrelationIdMaxLength);
+                b.Property(c => c.TableName).IsUnicode(false).IsRequired().HasMaxLength(options.TableMaxLength);
 
                 var max = 0;
                 if (options.LimitChangedLength)
@@ -43,13 +43,14 @@ namespace Nuuvify.CommonPack.AutoHistory.Extensions
 
                 b.Property(c => c.Kind)
                     .IsRequired()
+                    .IsUnicode(false)
                     .HasMaxLength(options.KindMaxLength)
                     .HasConversion(v => v.ToString(),
                                    v => (EntityState)Enum.Parse(typeof(EntityState), v));
 
                 b.Property(c => c.Created).IsRequired();
-                b.Property(c => c.Username).HasMaxLength(36);
-                b.Property(c => c.PersistInDatabase).HasColumnName("persist").HasMaxLength(10);
+                b.Property(c => c.Username).IsUnicode(false).HasMaxLength(36);
+                b.Property(c => c.PersistInDatabase).IsUnicode(false).HasColumnName("persist").HasMaxLength(10);
 
             });
 
