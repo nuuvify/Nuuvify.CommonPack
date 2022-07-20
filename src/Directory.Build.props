@@ -11,7 +11,7 @@
     <Copyright>Copyright ©2022 $(Company)</Copyright>
     <Product>Libraries with common implementations, with separation of responsibilities between their projects using Abstractions.</Product>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <PackageProjectUrl>https://github.com/lzocateli00/Nuuvify.CommonPack</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/lzocateli/Nuuvify.CommonPack</PackageProjectUrl>
     <PackageIcon>logonuuvify.jpg</PackageIcon>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <!-- Utilise esse padrão para versionamento: 
