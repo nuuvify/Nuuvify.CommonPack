@@ -5,9 +5,9 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using Nuuvify.CommonPack.StandardHttpClient.Results;
-using Nuuvify.CommonPack.Extensions.Implementation;
 using Microsoft.Extensions.Logging;
+using Nuuvify.CommonPack.Extensions.Implementation;
+using Nuuvify.CommonPack.StandardHttpClient.Results;
 
 namespace Nuuvify.CommonPack.StandardHttpClient.WebServices
 {
@@ -54,6 +54,11 @@ namespace Nuuvify.CommonPack.StandardHttpClient.WebServices
 
             _httpWebRequest = WebRequest.CreateHttp(url);
 
+        }
+        ///<inheritdoc/>
+        public void CreateHttp(HttpWebRequest httpWebRequest)
+        {
+            _httpWebRequest = httpWebRequest;
         }
 
         public void Configure(int timeOut)
