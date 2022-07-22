@@ -8,7 +8,12 @@
     <ItemGroup>
         <ProjectReference Include="..\..\src\Nuuvify.CommonPack.AzureStorage\Nuuvify.CommonPack.AzureStorage.csproj" />
         <ProjectReference Include="..\..\src\Nuuvify.CommonPack.AzureStorage.Abstraction\Nuuvify.CommonPack.AzureStorage.Abstraction.csproj" />
+        <ProjectReference Include="..\..\src\Nuuvify.CommonPack.Extensions\Nuuvify.CommonPack.Extensions.csproj" />
     </ItemGroup>
 
+    <Target Name="CopyCustomFiles" AfterTargets="AfterBuild">
+        <Copy SourceFiles="FilesTest\dotnet.png" DestinationFolder="$(OutDir)" />
+        <Copy SourceFiles="FilesTest\MeuArquivo de teste.txt" DestinationFolder="$(OutDir)" />
+    </Target>
 
 </Project>
