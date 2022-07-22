@@ -2,36 +2,47 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Nuuvify.CommonPack.AzureStorage;
 using Nuuvify.CommonPack.AzureStorage.Abstraction;
+using Nuuvify.CommonPack.Extensions;
 using Xunit;
 
 namespace Nuuvify.CommonPack.AzureStorage.xTest
 {
     public class StorageTests
     {
-        [Fact]
-        public async Task TestName()
+
+        [Fact(Skip = "Executar apenas localmente")]
+        // [Fact]
+        public async Task DeveGravar_e_RecuperarArquivosNoBlobStorage()
         {
             var configuration = new StorageConfiguration
             {
                 BlobContainerName = "sgkqas",
-                ConnectionName = "DefaultEndpointsProtocol=https;AccountName=sgkqas;AccountKey=n7UVk0C4PPckFMJgySCWlBZMKQu7GvNkVf7moERZ9UhTAJfLp3lnSKcACFYFgi8+CRfXmhYeHLfBfjxl6pizcw==;EndpointSuffix=core.windows.net"
+                ConnectionName = "DefaultEndpointsProtocol=https;AccountName=sgkqas;AccountKey=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;EndpointSuffix=core.windows.net"
             };
 
             var storage = new StorageService(configuration);
 
-
             var byteFiles = new Dictionary<string, byte[]>();
-            byteFiles.Add("teste1", );
+            var fileData = new FileData();
+            var guid = "2d029467-d75e-4680-8dc3-9c86069967f7";
+            Console.WriteLine(guid);
+
+            fileData.FileToByteArray("./dotnet.png");
+            byteFiles.Add($"{guid}:teste1", fileData.Content);
+            fileData.FileToByteArray("./MeuArquivo de teste.txt");
+            byteFiles.Add($"{guid}:teste2", fileData.Content);
+
 
             var addResult = await storage.AddOrUpdateBlob(byteFiles, default);
 
 
+            var chaves = byteFiles.Keys.AsEnumerable();
+            var blobResult = await storage.GetBlobById(chaves);
 
 
-            var files = new string[] { "", "" };
-            var blobResult = await storage.GetBlobById(files);
+            Assert.Equal(expected: 2, actual: blobResult.Blobs.Count());
+            Assert.Equal(expected: "File(s) Added success.", actual: addResult);
 
 
         }
