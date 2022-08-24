@@ -34,19 +34,19 @@ Remove-Item -Recurse "../src/*/bin" ; Remove-Item -Recurse "../src/*/obj" ; Remo
 
 dotnet pack "../$soluctionName.sln" -c Release -p:PackageVersion=$version -o $pathPublish 
 
-$pacotes = Get-ChildItem -Path $pathPublish -Filter *.nupkg
+$pacotes = Get-ChildItem -Filter *.nupkg -LiteralPath $pathPublish 
 if ($pacotes.Count -gt 0) {
 
-    Set-Location $pathPublish
-    # http://timestamp.sectigo.com
-    # https://sectigo.com/resource-library/time-stamping-server
+    # Set-Location $pathPublish
+    # # http://timestamp.sectigo.com
+    # # https://sectigo.com/resource-library/time-stamping-server
 
-    foreach ($pacote in $pacotes) {
-        /mnt/c/Users/Lincoln/Downloads/nuget.exe sign $pacote.Name -CertificatePath /mnt/c/Projetos/SecurityFiles/nuget-sign-package.cer -Timestamper "http://timestamp.sectigo.com"
-        Start-Sleep -Seconds 15
-    }
-    # C:\Users\Lincoln\Downloads\nuget.exe sign $pathPublish\*.nupkg -CertificatePath C:\projetos\SecurityFiles\nuget-sign-package.cer -Timestamper "http://timestamp.sectigo.com"
-    
+    # foreach ($pacote in $pacotes) {
+    #     Write-Host "Signing: $($pacote.Name)"
+    #     C:/Users/Lincoln/nuget.exe sign $pacote.Name -CertificatePath C:/Projetos/SecurityFiles/nuget-sign-package.pkt -Timestamper "http://timestamp.sectigo.com" 
+    #     Start-Sleep -Seconds 15
+    # }
+   
     
     #dotnet nuget push --source "TesteLocal" $pathPublish\*.nupkg
 
