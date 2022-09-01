@@ -6,6 +6,8 @@
 
 Clear-Host
 
+# /home/lincoln/projs/Nuuvify.CommonPack/test
+
 $isOsWindows = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows))
 $soluctionName = "CommonPack"
 
@@ -32,8 +34,20 @@ Remove-Item -Recurse "../src/*/bin" ; Remove-Item -Recurse "../src/*/obj" ; Remo
 
 dotnet pack "../$soluctionName.sln" -c Release -p:PackageVersion=$version -o $pathPublish 
 
-if (Test-Path "$pathPublish\*.nupkg" -PathType leaf) {
+$pacotes = Get-ChildItem -Filter *.nupkg -LiteralPath $pathPublish 
+if ($pacotes.Count -gt 0) {
 
+    # Set-Location $pathPublish
+    # # http://timestamp.sectigo.com
+    # # https://sectigo.com/resource-library/time-stamping-server
+
+    # foreach ($pacote in $pacotes) {
+    #     Write-Host "Signing: $($pacote.Name)"
+    #     C:/Users/Lincoln/nuget.exe sign $pacote.Name -CertificatePath C:/Projetos/SecurityFiles/nuget-sign-package.pkt -Timestamper "http://timestamp.sectigo.com" 
+    #     Start-Sleep -Seconds 15
+    # }
+   
+    
     #dotnet nuget push --source "TesteLocal" $pathPublish\*.nupkg
 
     #dotnet nuget push --source "nugetvsts" --api-key PrivateFeed $pathPublish\*.nupkg
