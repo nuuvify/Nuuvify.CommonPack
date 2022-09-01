@@ -13,10 +13,10 @@ namespace Nuuvify.CommonPack.AzureStorage.Abstraction
         /// É necessario ter as seguintes tags em seu arquivo appsettings.json
         /// <code>
         ///   "ConnectionStrings": {
-        ///     "BLABLA": "DefaultEndpointsProtocol=https;AccountName=dafwebqa;AccountKey=kwkwkwkwkwkwkwkwkwkwkwkwkwkwkwkwkw/kokokokokokokoko==;EndpointSuffix=core.windows.net",
+        ///     "BLABLA": "DefaultEndpointsProtocol=https;AccountName=MyAccount;AccountKey=kwkwkwkwkwkwkwkwkwkwkwkwkwkwkwkwkw/kokokokokokokoko==;EndpointSuffix=core.windows.net",
         ///   },
         ///   "AppConfig": {
-        ///     "BLABLABlobContainerName": "dafweb-qa"
+        ///     "BlobContainerName": "dafweb-qa"
         ///   }
         /// </code>
         /// </summary>
