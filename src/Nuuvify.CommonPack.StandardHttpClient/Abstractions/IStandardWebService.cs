@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Threading.Tasks;
 using System.Xml;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
@@ -21,6 +22,13 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// <param name="url">A url é obrigatorio</param>
         void CreateHttp(string url);
 
+
+        /// <summary>
+        /// Recebe uma instancia de WebRequest.CreateHttp(url) onde você pode incluir outras configurações
+        /// como Proxy e delegate para verificação de certificados.
+        /// </summary>
+        /// <param name="httpWebRequest"></param>
+        void CreateHttp(HttpWebRequest httpWebRequest);
 
         /// <summary>
         /// Executa o WebService, retornando o conteudo de forma padronizada
@@ -48,7 +56,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// <returns></returns>
         IStandardWebService WithCurrelationHeader(string correlationId);
 
-       
+
         /// <summary>
         /// Incluir Headers para a instancia do HttpClient
         /// </summary>
@@ -78,7 +86,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
 
 
         void Configure(int timeOut);
-        
+
 
     }
 
