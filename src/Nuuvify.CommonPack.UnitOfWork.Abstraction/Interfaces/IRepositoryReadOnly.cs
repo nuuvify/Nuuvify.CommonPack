@@ -54,6 +54,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces
         /// <param name="orderBy">A function to order elements.</param>
         /// <param name="pageIndex">The index of page.</param>
         /// <param name="pageSize">The size of the page.</param>
+        /// <param name="indexFrom">The start index value.</param>
         /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
         /// <param name="ignoreQueryFilters">Ignore query filters</param>
         /// <returns>An <see cref="IPagedList{TResult}"/> that contains elements that satisfy the condition specified by <paramref name="predicate"/>.</returns>
@@ -63,6 +64,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             int pageIndex = 0,
             int pageSize = 20,
+            int indexFrom = 0,
             bool disableTracking = true,
             bool ignoreQueryFilters = false) where TResult : class;
 
@@ -75,6 +77,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces
         /// <param name="orderBy">A function to order elements.</param>
         /// <param name="pageIndex">The index of page.</param>
         /// <param name="pageSize">The size of the page.</param>
+        /// <param name="indexFrom">The start index value.</param>
         /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
         /// <param name="ignoreQueryFilters">Ignore query filters</param>
         /// <returns>An <see cref="IPagedList{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="predicate"/>.</returns>
@@ -83,6 +86,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             int pageIndex = 0,
             int pageSize = 20,
+            int indexFrom = 0,
             bool disableTracking = true,
             bool ignoreQueryFilters = false);
 
@@ -98,6 +102,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces
         /// <param name="orderBy">A function to order elements.</param>
         /// <param name="pageIndex">The index of page.</param>
         /// <param name="pageSize">The size of the page.</param>
+        /// <param name="indexFrom">The start index value.</param>
         /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
         /// <param name="ignoreQueryFilters">Ignore query filters</param>
         /// <param name="cancellationToken">to observe while waiting for the task to complete. </param>
@@ -108,6 +113,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             int pageIndex = 0,
             int pageSize = 20,
+            int indexFrom = 0,
             bool disableTracking = true,
             bool ignoreQueryFilters = false,
             CancellationToken cancellationToken = default) where TResult : class;
@@ -120,6 +126,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces
         /// <param name="orderBy">A function to order elements.</param>
         /// <param name="pageIndex">The index of page.</param>
         /// <param name="pageSize">The size of the page.</param>
+        /// <param name="indexFrom">The start index value.</param>
         /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
         /// <param name="ignoreQueryFilters">Ignore query filters</param>
         /// <param name="cancellationToken">to observe while waiting for the task to complete. </param>
@@ -129,6 +136,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             int pageIndex = 0,
             int pageSize = 20,
+            int indexFrom = 0,
             bool disableTracking = true,
             bool ignoreQueryFilters = false,
             CancellationToken cancellationToken = default);
