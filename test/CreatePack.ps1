@@ -47,7 +47,8 @@ if ($pacotes.Count -gt 0) {
     #     Start-Sleep -Seconds 15
     # }
    
-    
+    ## Não precisa executar o push porque o dotnet pack já esta gerando o pacote no mesmo caminho do 
+    ## "TesteLocal" que esta no NuGet.Config
     #dotnet nuget push --source "TesteLocal" $pathPublish\*.nupkg
 
     #dotnet nuget push --source "nugetvsts" --api-key PrivateFeed $pathPublish\*.nupkg
