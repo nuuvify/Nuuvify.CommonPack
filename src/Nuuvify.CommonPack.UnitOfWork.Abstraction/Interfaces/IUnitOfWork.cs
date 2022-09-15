@@ -1,7 +1,8 @@
-﻿namespace Nuuvify.CommonPack.UnitOfWork
+﻿namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces
 {
     using System;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -29,8 +30,9 @@
         /// </param>
         /// <param name="limitCommit">Number of records to run Commit</param>
         /// <param name="toSave">Persist the data in the database</param>
+        /// <param name="cancellationToken"></param>
         /// <returns>A <see cref="Task{TResult}"/> that represents the asynchronous save operation. The task result contains the number of state entities written to database.</returns>
-        Task<int> SaveChangesAsync(bool ensureAutoHistory = false, int actualRegistry = 1, int limitCommit = 1, bool toSave = true);
+        Task<int> SaveChangesAsync(bool ensureAutoHistory = false, int actualRegistry = 1, int limitCommit = 1, bool toSave = true, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Executes the specified SQL command with the ExecuteSqlRaw method 
