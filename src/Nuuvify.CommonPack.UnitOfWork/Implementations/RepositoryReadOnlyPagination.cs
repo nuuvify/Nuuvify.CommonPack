@@ -3,8 +3,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 
 namespace Nuuvify.CommonPack.UnitOfWork
 {
@@ -18,6 +18,7 @@ namespace Nuuvify.CommonPack.UnitOfWork
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             int pageIndex = 0,
             int pageSize = 20,
+            int indexFrom = 0,
             bool disableTracking = true,
             bool ignoreQueryFilters = false)
         {
@@ -49,11 +50,11 @@ namespace Nuuvify.CommonPack.UnitOfWork
 
             if (orderBy != null)
             {
-                return orderBy(query).ToPagedList(pageIndex, pageSize, 0);
+                return orderBy(query).ToPagedList(pageIndex, pageSize, indexFrom);
             }
             else
             {
-                return query.ToPagedList(pageIndex, pageSize, 0);
+                return query.ToPagedList(pageIndex, pageSize, indexFrom);
             }
         }
 
@@ -65,6 +66,7 @@ namespace Nuuvify.CommonPack.UnitOfWork
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             int pageIndex = 0,
             int pageSize = 20,
+            int indexFrom = 0,
             bool disableTracking = true,
             bool ignoreQueryFilters = false) where TResult : class
         {
@@ -93,11 +95,11 @@ namespace Nuuvify.CommonPack.UnitOfWork
 
             if (orderBy != null)
             {
-                return orderBy(query).Select(selector).ToPagedList(pageIndex, pageSize, 0);
+                return orderBy(query).Select(selector).ToPagedList(pageIndex, pageSize, indexFrom);
             }
             else
             {
-                return query.Select(selector).ToPagedList(pageIndex, pageSize, 0);
+                return query.Select(selector).ToPagedList(pageIndex, pageSize, indexFrom);
             }
         }
 
@@ -107,11 +109,12 @@ namespace Nuuvify.CommonPack.UnitOfWork
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             int pageIndex = 0,
             int pageSize = 20,
+            int indexFrom = 0,
             bool disableTracking = true,
             bool ignoreQueryFilters = false,
             CancellationToken cancellationToken = default)
         {
-            
+
             IQueryable<TEntity> query = _dbSet;
 
             if (disableTracking)
@@ -137,11 +140,11 @@ namespace Nuuvify.CommonPack.UnitOfWork
 
             if (orderBy != null)
             {
-                return orderBy(query).ToPagedListAsync(pageIndex, pageSize, 0, cancellationToken);
+                return orderBy(query).ToPagedListAsync(pageIndex, pageSize, indexFrom, cancellationToken);
             }
             else
             {
-                return query.ToPagedListAsync(pageIndex, pageSize, 0, cancellationToken);
+                return query.ToPagedListAsync(pageIndex, pageSize, indexFrom, cancellationToken);
             }
         }
 
@@ -152,6 +155,7 @@ namespace Nuuvify.CommonPack.UnitOfWork
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             int pageIndex = 0,
             int pageSize = 20,
+            int indexFrom = 0,
             bool disableTracking = true,
             bool ignoreQueryFilters = false,
             CancellationToken cancellationToken = default) where TResult : class
@@ -181,15 +185,15 @@ namespace Nuuvify.CommonPack.UnitOfWork
 
             if (orderBy != null)
             {
-                return orderBy(query).Select(selector).ToPagedListAsync(pageIndex, pageSize, 0, cancellationToken);
+                return orderBy(query).Select(selector).ToPagedListAsync(pageIndex, pageSize, indexFrom, cancellationToken);
             }
             else
             {
-                return query.Select(selector).ToPagedListAsync(pageIndex, pageSize, 0, cancellationToken);
+                return query.Select(selector).ToPagedListAsync(pageIndex, pageSize, indexFrom, cancellationToken);
             }
         }
 
 
- 
+
     }
 }

@@ -3,7 +3,14 @@ using Nuuvify.CommonPack.Extensions.Notificator;
 
 namespace Nuuvify.CommonPack.Domain
 {
-    public abstract class DomainEvent<TSourceId> : NotifiableR, ICommandR
+    /// <summary>
+    /// Use essa classe base em uma classe de outro contexto, para que ela seja disparada pelo mediator.Publish(SuaClasseCommandResult)
+    /// Exemplo:
+    /// onde a classe TransportadorObserve, é outro contexto e, SuaClasseCommandResult foi populada no contexto original.
+    /// public class TransportadorObserve : INotificationHandler{SuaClasseCommandResult}
+    /// </summary>
+    /// <typeparam name="TSourceId">Representa um object, que devera ser utilizado em um Observable</typeparam>
+    public abstract class DomainEvent<TSourceId> : NotifiableR, ICommandResultR
     {
         public TSourceId SourceId { get; private set; }
         public DateTimeOffset When { get; private set; }
@@ -13,8 +20,7 @@ namespace Nuuvify.CommonPack.Domain
         /// </summary>
         /// <example>Daf_AAAAA-BBBBB-CCCC</example>
         public string Version { get; private set; }
-        public bool SaveChanges { get; set; } = true;
-        public bool RemoveNotificationsBeginning { get; set; }
+
 
         protected DomainEvent(TSourceId sourceId, string version)
         {
@@ -34,7 +40,7 @@ namespace Nuuvify.CommonPack.Domain
                 Version = version;
                 When = DateTimeOffset.Now;
             }
-            
+
         }
 
         public const int MaxVersion = 100;

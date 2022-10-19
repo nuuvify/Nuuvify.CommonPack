@@ -8,8 +8,8 @@ namespace Nuuvify.CommonPack.UnitOfWork.Migrations
     public static class TypeRowOperationBuilder
     {
         public static OperationBuilder<SqlOperation> CreateTypeRow<TObject>(
-            this MigrationBuilder migrationBuilder) 
-            where TObject : CustomObjectSqlOperation, new() 
+            this MigrationBuilder migrationBuilder)
+            where TObject : CustomObjectSqlOperation, new()
         {
             Console.WriteLine($"******* Migration: {nameof(TypeRowOperationBuilder.CreateTypeRow)} {typeof(TObject).Name} *******");
 
@@ -23,16 +23,16 @@ namespace Nuuvify.CommonPack.UnitOfWork.Migrations
                     }
                 case "Microsoft.EntityFrameworkCore.SqlServer":
                     {
-                        throw new NotImplementedException("CreateObject to SqlServer not Implemented");
+                        return migrationBuilder.Sql(databaseObject.GetObjectBuilder().ToString());
                     }
             }
 
             throw new TypeLoadException($"Unexpected provider: {migrationBuilder.ActiveProvider}");
         }
-        
+
         public static OperationBuilder<SqlOperation> DropTypeRow<TObject>(
-            this MigrationBuilder migrationBuilder) 
-            where TObject : CustomObjectSqlOperation, new() 
+            this MigrationBuilder migrationBuilder)
+            where TObject : CustomObjectSqlOperation, new()
         {
 
             Console.WriteLine($"******* Migration: {nameof(TypeRowOperationBuilder.DropTypeRow)} {typeof(TObject).Name} *******");

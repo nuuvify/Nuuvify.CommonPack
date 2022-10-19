@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Nuuvify.CommonPack.AutoHistory.Extensions;
+using Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 
 namespace Nuuvify.CommonPack.UnitOfWork
 {
@@ -51,7 +53,7 @@ namespace Nuuvify.CommonPack.UnitOfWork
         }
 
         ///<inheritdoc/>
-        public virtual async Task<int> SaveChangesAsync(bool ensureAutoHistory = false, int actualRegistry = 1, int limitCommit = 1, bool toSave = true)
+        public virtual async Task<int> SaveChangesAsync(bool ensureAutoHistory = false, int actualRegistry = 1, int limitCommit = 1, bool toSave = true, CancellationToken cancellationToken = default)
         {
 
             if (ensureAutoHistory)
@@ -138,7 +140,7 @@ namespace Nuuvify.CommonPack.UnitOfWork
                     }
 
 
-                    return await DbContext.SaveChangesAsync();
+                    return await DbContext.SaveChangesAsync(cancellationToken);
                 }
             }
 
@@ -146,24 +148,22 @@ namespace Nuuvify.CommonPack.UnitOfWork
         }
 
         ///<inheritdoc/>
-        public virtual async Task<int> SaveChangesAsync(bool ensureAutoHistory = false, int actualRegistry = 1, int limitCommit = 1, bool toSave = true, params IUnitOfWork[] unitOfWorks)
+        public virtual async Task<int> SaveChangesAsync(bool ensureAutoHistory = false, int actualRegistry = 1, int limitCommit = 1, bool toSave = true, CancellationToken cancellationToken = default, params IUnitOfWork[] unitOfWorks)
         {
             CheckDisposed();
 
-            using (var ts = new TransactionScope())
+            using var ts = new TransactionScope();
+            var count = 0;
+            foreach (var unitOfWork in unitOfWorks)
             {
-                var count = 0;
-                foreach (var unitOfWork in unitOfWorks)
-                {
-                    count += await unitOfWork.SaveChangesAsync(ensureAutoHistory, actualRegistry, limitCommit, toSave);
-                }
-
-                count += await SaveChangesAsync(ensureAutoHistory, actualRegistry, limitCommit, toSave);
-
-                ts.Complete();
-
-                return count;
+                count += await unitOfWork.SaveChangesAsync(ensureAutoHistory, actualRegistry, limitCommit, toSave, cancellationToken);
             }
+
+            count += await SaveChangesAsync(ensureAutoHistory, actualRegistry, limitCommit, toSave, cancellationToken);
+
+            ts.Complete();
+
+            return count;
 
 
         }

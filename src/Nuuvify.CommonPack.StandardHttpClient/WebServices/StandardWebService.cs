@@ -97,10 +97,8 @@ namespace Nuuvify.CommonPack.StandardHttpClient.WebServices
 
         private void GetResponseStream(WebResponse webResponse)
         {
-            using (Stream data = webResponse.GetResponseStream())
-            {
-                GetStreamReader(data);
-            }
+            using Stream data = webResponse.GetResponseStream();
+            GetStreamReader(data);
 
         }
 
@@ -244,7 +242,10 @@ namespace Nuuvify.CommonPack.StandardHttpClient.WebServices
 
 
         ///<inheritdoc/>
-        public async Task<HttpStandardReturn> RequestSoap(string urlRoute, StandardHttpMethods method, XmlDocument messageBody, string mediaType = "application/xml")
+        public async Task<HttpStandardReturn> RequestSoap(string urlRoute,
+            StandardHttpMethods method,
+            XmlDocument messageBody,
+            string mediaType = "application/xml")
         {
             var url = $"{urlRoute}{_queryString}";
 
