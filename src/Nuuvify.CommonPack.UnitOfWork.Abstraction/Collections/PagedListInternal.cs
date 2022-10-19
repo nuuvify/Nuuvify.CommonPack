@@ -16,12 +16,12 @@ namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Collections
         /// <summary>
         /// Gets the index of the page.
         /// </summary>
-        /// <value>The index of the page.</value>
+        /// <value>10</value>
         public int PageIndex { get; }
         /// <summary>
         /// Gets the size of the page.
         /// </summary>
-        /// <value>The size of the page.</value>
+        /// <value>20</value>
         public int PageSize { get; }
         /// <summary>
         /// Gets the total count.
@@ -36,7 +36,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Collections
         /// <summary>
         /// Gets the index from.
         /// </summary>
-        /// <value>The index from.</value>
+        /// <value>2</value>
         public int IndexFrom { get; }
 
         /// <summary>
@@ -65,13 +65,13 @@ namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Collections
         /// <param name="pageIndex">The index of the page</param>
         /// <param name="pageSize">The size of the page</param>
         /// <param name="indexFrom">The start index value</param>
-        public PagedList(IEnumerable<TSource> source, 
-            Func<IEnumerable<TSource>, IEnumerable<TResult>> converter, 
-            int pageIndex, 
-            int pageSize, 
+        public PagedList(IEnumerable<TSource> source,
+            Func<IEnumerable<TSource>, IEnumerable<TResult>> converter,
+            int pageIndex,
+            int pageSize,
             int indexFrom)
         {
-            
+
             if (indexFrom > pageIndex)
             {
                 throw new ArgumentException($"indexFrom: {indexFrom} > pageIndex: {pageIndex}, must indexFrom <= pageIndex");
@@ -112,7 +112,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Collections
         /// </summary>
         /// <param name="source">The source.</param>
         /// <param name="converter">The converter.</param>
-        public PagedList(IPagedList<TSource> source, 
+        public PagedList(IPagedList<TSource> source,
             Func<IEnumerable<TSource>, IEnumerable<TResult>> converter)
         {
             PageIndex = source.PageIndex;
@@ -122,7 +122,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Collections
             TotalPages = source.TotalPages;
 
             Items = new List<TResult>(converter(source.Items));
-        
+
         }
 
 

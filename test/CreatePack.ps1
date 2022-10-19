@@ -18,7 +18,7 @@ else {
     $pathPublish = "~/software/$soluctionName"
 }
 
-$version = "3.0.1-alpha.1" #VersionPack.ps1 1 $False ../
+$version = "1.1.0-alpha.1" #VersionPack.ps1 1 $False ../
 
 if ($null -eq $version) {
     Write-Error "Não foi possivel determinar a versão !" 
@@ -27,7 +27,8 @@ if ($null -eq $version) {
 
 
 if (Test-Path $pathPublish) {
-    Remove-Item -Path $pathPublish -Recurse -Force
+    Remove-Item -Path $pathPublish/Nuuvify.$soluctionName.*.$version -Recurse -Force
+    Remove-Item -Path "$($HOME)/.nuget/packages/Nuuvify.$soluctionName.*/$version" -Recurse -Force
 }
 
 Remove-Item -Recurse "../src/*/bin" ; Remove-Item -Recurse "../src/*/obj" ; Remove-Item -Recurse "../test/*/bin" ; Remove-Item -Recurse "../test/*/obj"
@@ -47,7 +48,8 @@ if ($pacotes.Count -gt 0) {
     #     Start-Sleep -Seconds 15
     # }
    
-    
+    ## Não precisa executar o push porque o dotnet pack já esta gerando o pacote no mesmo caminho do 
+    ## "TesteLocal" que esta no NuGet.Config
     #dotnet nuget push --source "TesteLocal" $pathPublish\*.nupkg
 
     #dotnet nuget push --source "nugetvsts" --api-key PrivateFeed $pathPublish\*.nupkg
