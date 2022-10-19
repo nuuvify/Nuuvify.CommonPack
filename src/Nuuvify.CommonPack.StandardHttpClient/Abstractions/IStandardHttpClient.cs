@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
@@ -41,10 +42,11 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// Recebe arquivos (stream)
         /// </summary>
         /// <param name="urlRoute"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<HttpStandardStreamReturn> GetStream(string urlRoute);
-        Task<HttpStandardReturn> Get(string urlRoute);
-        Task<HttpStandardReturn> Post(string urlRoute, object messageBody);
+        Task<HttpStandardStreamReturn> GetStream(string urlRoute, CancellationToken cancellationToken = default);
+        Task<HttpStandardReturn> Get(string urlRoute, CancellationToken cancellationToken = default);
+        Task<HttpStandardReturn> Post(string urlRoute, object messageBody, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Informe parametro adicional informando o tipo do messageBody
@@ -52,10 +54,12 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// <param name="urlRoute"></param>
         /// <param name="messageBody"></param>
         /// <param name="mediaType">exemplo: "application/xml"</param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<HttpStandardReturn> Post(string urlRoute,
                                       object messageBody,
-                                      string mediaType);
+                                      string mediaType,
+                                      CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Parametros para envio de arquivos
@@ -63,14 +67,16 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// <param name="urlRoute"></param>
         /// <param name="messageBody"></param>
         /// <param name="mediaType"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<HttpStandardReturn> Post(string urlRoute,
                                       MultipartFormDataContent messageBody,
-                                      string mediaType = "multipart/form-data");
+                                      string mediaType = "multipart/form-data",
+                                      CancellationToken cancellationToken = default);
 
-        Task<HttpStandardReturn> Put(string urlRoute, object messageBody);
-        Task<HttpStandardReturn> Patch(string urlRoute, object messageBody);
-        Task<HttpStandardReturn> Delete(string urlRoute);
+        Task<HttpStandardReturn> Put(string urlRoute, object messageBody, CancellationToken cancellationToken = default);
+        Task<HttpStandardReturn> Patch(string urlRoute, object messageBody, CancellationToken cancellationToken = default);
+        Task<HttpStandardReturn> Delete(string urlRoute, CancellationToken cancellationToken = default);
 
 
         /// <summary>

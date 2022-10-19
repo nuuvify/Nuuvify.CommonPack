@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
@@ -201,7 +202,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
             return WithHeader(header.Key, header.Value);
         }
 
-        private async Task<HttpStandardReturn> StandardSendAsync(string url, HttpRequestMessage message)
+        private async Task<HttpStandardReturn> StandardSendAsync(string url, HttpRequestMessage message, CancellationToken cancellationToken = default)
         {
             _logger.LogDebug("Url and message before config {0} {1}", message, _httpClient.BaseAddress);
 
@@ -245,12 +246,12 @@ namespace Nuuvify.CommonPack.StandardHttpClient
                 System.Net.Http.HttpCompletionOption HttpOption;
                 HttpOption = (System.Net.Http.HttpCompletionOption)CompletionOption;
 
-                response = await _httpClient.SendAsync(message, HttpOption);
+                response = await _httpClient.SendAsync(message, HttpOption, cancellationToken);
 
             }
             else
             {
-                response = await _httpClient.SendAsync(message);
+                response = await _httpClient.SendAsync(message, cancellationToken);
             }
 
 
@@ -262,7 +263,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
 
             return httpStandardReturn;
         }
-        private async Task<HttpStandardStreamReturn> StandardStreamSendAsync(string url, HttpRequestMessage message)
+        private async Task<HttpStandardStreamReturn> StandardStreamSendAsync(string url, HttpRequestMessage message, CancellationToken cancellationToken = default)
         {
             _logger.LogDebug("Url and message before config {0} {1}", message, _httpClient.BaseAddress);
 
@@ -305,12 +306,12 @@ namespace Nuuvify.CommonPack.StandardHttpClient
                 System.Net.Http.HttpCompletionOption HttpOption;
                 HttpOption = (System.Net.Http.HttpCompletionOption)CompletionOption;
 
-                response = await _httpClient.SendAsync(message, HttpOption);
+                response = await _httpClient.SendAsync(message, HttpOption, cancellationToken);
 
             }
             else
             {
-                response = await _httpClient.SendAsync(message);
+                response = await _httpClient.SendAsync(message, cancellationToken);
             }
 
 
@@ -325,7 +326,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         }
 
         ///<inheritdoc/>
-        public async Task<HttpStandardStreamReturn> GetStream(string urlRoute)
+        public async Task<HttpStandardStreamReturn> GetStream(string urlRoute, CancellationToken cancellationToken = default)
         {
             var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
@@ -335,10 +336,10 @@ namespace Nuuvify.CommonPack.StandardHttpClient
                 .CustomRequestHeader(_headerStandard)
                 .AddAuthorizationHeader(_headerAuthorization);
 
-            return await StandardStreamSendAsync(url, message);
+            return await StandardStreamSendAsync(url, message, cancellationToken);
         }
 
-        public async Task<HttpStandardReturn> Get(string urlRoute)
+        public async Task<HttpStandardReturn> Get(string urlRoute, CancellationToken cancellationToken = default)
         {
             var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
@@ -348,10 +349,10 @@ namespace Nuuvify.CommonPack.StandardHttpClient
                 .CustomRequestHeader(_headerStandard)
                 .AddAuthorizationHeader(_headerAuthorization);
 
-            return await StandardSendAsync(url, message);
+            return await StandardSendAsync(url, message, cancellationToken);
         }
 
-        public async Task<HttpStandardReturn> Post(string urlRoute, object messageBody)
+        public async Task<HttpStandardReturn> Post(string urlRoute, object messageBody, CancellationToken cancellationToken = default)
         {
             var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
@@ -367,12 +368,12 @@ namespace Nuuvify.CommonPack.StandardHttpClient
             .AddAuthorizationHeader(_headerAuthorization);
 
 
-            return await StandardSendAsync(url, message);
+            return await StandardSendAsync(url, message, cancellationToken);
 
         }
 
         ///<inheritdoc/>
-        public async Task<HttpStandardReturn> Post(string urlRoute, object messageBody, string mediaType)
+        public async Task<HttpStandardReturn> Post(string urlRoute, object messageBody, string mediaType, CancellationToken cancellationToken = default)
         {
             var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
@@ -390,12 +391,12 @@ namespace Nuuvify.CommonPack.StandardHttpClient
             .AddAuthorizationHeader(_headerAuthorization);
 
 
-            return await StandardSendAsync(url, message);
+            return await StandardSendAsync(url, message, cancellationToken);
 
         }
 
         ///<inheritdoc/>
-        public async Task<HttpStandardReturn> Post(string urlRoute, MultipartFormDataContent messageBody, string mediaType = "multipart/form-data")
+        public async Task<HttpStandardReturn> Post(string urlRoute, MultipartFormDataContent messageBody, string mediaType = "multipart/form-data", CancellationToken cancellationToken = default)
         {
             var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
@@ -410,11 +411,11 @@ namespace Nuuvify.CommonPack.StandardHttpClient
             .AddAuthorizationHeader(_headerAuthorization);
 
 
-            return await StandardSendAsync(url, message);
+            return await StandardSendAsync(url, message, cancellationToken);
 
         }
 
-        public async Task<HttpStandardReturn> Put(string urlRoute, object messageBody)
+        public async Task<HttpStandardReturn> Put(string urlRoute, object messageBody, CancellationToken cancellationToken = default)
         {
 
             var url = $"{urlRoute}{_queryString.ToQueryString()}";
@@ -430,11 +431,11 @@ namespace Nuuvify.CommonPack.StandardHttpClient
             .CustomRequestHeader(_headerStandard)
             .AddAuthorizationHeader(_headerAuthorization);
 
-            return await StandardSendAsync(url, message);
+            return await StandardSendAsync(url, message, cancellationToken);
 
         }
 
-        public async Task<HttpStandardReturn> Patch(string urlRoute, object messageBody)
+        public async Task<HttpStandardReturn> Patch(string urlRoute, object messageBody, CancellationToken cancellationToken = default)
         {
 
             var patch = await Put(urlRoute, messageBody);
@@ -442,7 +443,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
 
         }
 
-        public async Task<HttpStandardReturn> Delete(string urlRoute)
+        public async Task<HttpStandardReturn> Delete(string urlRoute, CancellationToken cancellationToken = default)
         {
             var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
@@ -452,7 +453,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
                 .AddAuthorizationHeader(_headerAuthorization);
 
 
-            return await StandardSendAsync(url, message);
+            return await StandardSendAsync(url, message, cancellationToken);
 
         }
 
