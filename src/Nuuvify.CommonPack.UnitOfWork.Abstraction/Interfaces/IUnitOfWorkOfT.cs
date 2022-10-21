@@ -1,12 +1,12 @@
-﻿using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
-namespace Nuuvify.CommonPack.UnitOfWork
+namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces
 {
     /// <summary>
     /// Defines the interface(s) for generic unit of work.
     /// </summary>
-    public interface IUnitOfWork<TContext> : IUnitOfWork where TContext : DbContext
+    public interface IUnitOfWork<TContext> : IUnitOfWork where TContext : class
     {
 
         /// <value>Gets the db context.</value>
@@ -29,9 +29,10 @@ namespace Nuuvify.CommonPack.UnitOfWork
         /// <param name="actualRegistry">In a processing loop, pass the registry count</param>
         /// <param name="limitCommit">Number of records to run Commit</param>
         /// <param name="toSave">Persist the data in the database</param>
+        /// <param name="cancellationToken"></param>
         /// <param name="unitOfWorks">An optional <see cref="IUnitOfWork"/> array.</param>
         /// <returns>A <see cref="Task{TResult}"/> that represents the asynchronous save operation. The task result contains the number of state entities written to database.</returns>
-        Task<int> SaveChangesAsync(bool ensureAutoHistory = false, int actualRegistry = 1, int limitCommit = 1, bool toSave = true, params IUnitOfWork[] unitOfWorks);
-        
+        Task<int> SaveChangesAsync(bool ensureAutoHistory = false, int actualRegistry = 1, int limitCommit = 1, bool toSave = true, CancellationToken cancellationToken = default, params IUnitOfWork[] unitOfWorks);
+
     }
 }

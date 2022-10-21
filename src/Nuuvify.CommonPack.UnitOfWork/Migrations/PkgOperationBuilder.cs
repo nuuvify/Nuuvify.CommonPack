@@ -8,8 +8,8 @@ namespace Nuuvify.CommonPack.UnitOfWork.Migrations
     public static class PkgOperationBuilder
     {
         public static OperationBuilder<SqlOperation> CreatePkg<TObject>(
-            this MigrationBuilder migrationBuilder) 
-            where TObject : CustomPkgSqlOperation, new() 
+            this MigrationBuilder migrationBuilder)
+            where TObject : CustomPkgSqlOperation, new()
         {
             Console.WriteLine($"******* Migration: {nameof(PkgOperationBuilder.CreatePkg)} {typeof(TObject).Name} *******");
 
@@ -27,16 +27,19 @@ namespace Nuuvify.CommonPack.UnitOfWork.Migrations
                     }
                 case "Microsoft.EntityFrameworkCore.SqlServer":
                     {
-                        throw new NotImplementedException("CreatePkg to SqlServer not Implemented");
+                        var sql = pkg.GetPkgBuilder();
+                        sql.Append(pkg.Grant());
+
+                        return migrationBuilder.Sql(sql.ToString());
                     }
             }
 
             throw new TypeLoadException($"Unexpected provider: {migrationBuilder.ActiveProvider}");
         }
-        
+
         public static OperationBuilder<SqlOperation> DropPkg<TObject>(
-            this MigrationBuilder migrationBuilder) 
-            where TObject : CustomPkgSqlOperation, new() 
+            this MigrationBuilder migrationBuilder)
+            where TObject : CustomPkgSqlOperation, new()
         {
 
             Console.WriteLine($"******* Migration: {nameof(PkgOperationBuilder.DropPkg)} {typeof(TObject).Name} *******");

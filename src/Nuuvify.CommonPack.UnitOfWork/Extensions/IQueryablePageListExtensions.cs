@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Nuuvify.CommonPack.UnitOfWork.Abstraction.Collections;
 using Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace Nuuvify.CommonPack.UnitOfWork
 {
@@ -25,7 +25,7 @@ namespace Nuuvify.CommonPack.UnitOfWork
         /// <param name="source">The source to paging.</param>
         /// <param name="pageIndex">The index of the page.</param>
         /// <param name="pageSize">The size of the page.</param>
-        /// <param name="indexFrom">The start index value.</param>
+        /// <param name="indexFrom">The start index value. indexFrom must always be less than pageIndex</param>
         /// <param name="cancellationToken">to observe while waiting for the task to complete.</param>
         /// <returns>An instance of the inherited from <see cref="IPagedList{T}"/> interface.</returns>
         public static async Task<IPagedList<T>> ToPagedListAsync<T>(this IQueryable<T> source,
