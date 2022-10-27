@@ -4,13 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Nuuvify.CommonPack.Extensions.Implementation;
-using Nuuvify.CommonPack.Middleware.Abstraction;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
+using Nuuvify.CommonPack.Extensions.Implementation;
+using Nuuvify.CommonPack.Middleware.Abstraction;
 
 namespace Nuuvify.CommonPack.Middleware.Handle
 {
@@ -61,7 +61,9 @@ namespace Nuuvify.CommonPack.Middleware.Handle
 
             using (_logger.BeginScope(requestConfiguration.MapLoggerContext()))
             {
+                _logger.LogInformation("### LOG DE ENTRADA DA REQUEST ###");
                 await _next(context);
+                _logger.LogInformation("### LOG DE SAIDA DA REQUEST ###");
 
             }
 
