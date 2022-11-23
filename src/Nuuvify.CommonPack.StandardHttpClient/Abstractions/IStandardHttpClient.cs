@@ -44,9 +44,16 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// <param name="urlRoute"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<HttpStandardStreamReturn> GetStream(string urlRoute, CancellationToken cancellationToken = default);
-        Task<HttpStandardReturn> Get(string urlRoute, CancellationToken cancellationToken = default);
-        Task<HttpStandardReturn> Post(string urlRoute, object messageBody, CancellationToken cancellationToken = default);
+        Task<HttpStandardStreamReturn> GetStream(
+            string urlRoute,
+            CancellationToken cancellationToken = default);
+        Task<HttpStandardReturn> Get(
+            string urlRoute,
+            CancellationToken cancellationToken = default);
+        Task<HttpStandardReturn> Post(
+            string urlRoute,
+            object messageBody,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Informe parametro adicional informando o tipo do messageBody
@@ -56,10 +63,11 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// <param name="mediaType">exemplo: "application/xml"</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<HttpStandardReturn> Post(string urlRoute,
-                                      object messageBody,
-                                      string mediaType,
-                                      CancellationToken cancellationToken = default);
+        Task<HttpStandardReturn> Post(
+            string urlRoute,
+            object messageBody,
+            string mediaType,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Parametros para envio de arquivos
@@ -69,14 +77,23 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// <param name="mediaType"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<HttpStandardReturn> Post(string urlRoute,
-                                      MultipartFormDataContent messageBody,
-                                      string mediaType = "multipart/form-data",
-                                      CancellationToken cancellationToken = default);
+        Task<HttpStandardReturn> Post(
+            string urlRoute,
+            MultipartFormDataContent messageBody,
+            string mediaType = "multipart/form-data",
+            CancellationToken cancellationToken = default);
 
-        Task<HttpStandardReturn> Put(string urlRoute, object messageBody, CancellationToken cancellationToken = default);
-        Task<HttpStandardReturn> Patch(string urlRoute, object messageBody, CancellationToken cancellationToken = default);
-        Task<HttpStandardReturn> Delete(string urlRoute, CancellationToken cancellationToken = default);
+        Task<HttpStandardReturn> Put(
+            string urlRoute,
+            object messageBody,
+            CancellationToken cancellationToken = default);
+        Task<HttpStandardReturn> Patch(
+            string urlRoute,
+            object messageBody,
+            CancellationToken cancellationToken = default);
+        Task<HttpStandardReturn> Delete(
+            string urlRoute,
+            CancellationToken cancellationToken = default);
 
 
         /// <summary>
@@ -95,19 +112,22 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         IStandardHttpClient WithCurrelationHeader(string correlationId);
 
         /// <summary>
-        /// Informe o schema de autenticação, senha, PAT ou token
+        /// Informe o schema de autenticação, senha, PAT ou token <br/>
+        /// Para basic, o metodo ira transformar o parametro "token" (que sera usuario,senha) em base64
         /// <example>
         /// <code>
         ///     
         /// _standardHttpClient.WithAuthorization("bearer", _tokenService.GetTokenAcessor());
         ///     ou
         /// _standardHttpClient.WithAuthorization("bearer", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...");
+        ///     Basic
+        /// _standardHttpClient.WithAuthorization("basic", $"{Username},{UserPassword}");
         ///
         /// </code>
         /// </example>
         /// </summary>
-        /// <param name="schema">Suporte a bearer ou basic</param>
-        /// <param name="token">PAT oou senha se for basic ou token para bearer</param>
+        /// <param name="schema">bearer ou basic</param>
+        /// <param name="token">PAT ou "usuario,senha" se for basic. Token para bearer</param>
         /// <param name="userClaim">Inclui um Header na requet <see cref="Constants.UserClaimHeader"/> com o usuario informado, <br/>
         /// isso é utilizado para comunicação com o backend, pois ele usara esse usuario <br/>
         /// durante o savechanges
@@ -154,7 +174,10 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// <param name="timeOut">Padrão é 00:01:40</param>
         /// <param name="maxResponseContentBufferSize">Padrão é 2 GB</param>
         /// <param name="httpCompletionOption">Como a resposta deve se comportar <see cref="HttpCompletionOption"/> </param>
-        void Configure(TimeSpan timeOut, long maxResponseContentBufferSize = default, HttpCompletionOption httpCompletionOption = HttpCompletionOption.Defult);
+        void Configure(
+            TimeSpan timeOut,
+            long maxResponseContentBufferSize = default,
+            HttpCompletionOption httpCompletionOption = HttpCompletionOption.Defult);
 
         /// <summary>
         /// Faz um Dto do HttpResponseMessage do Aspnet para a classe customizada HttpStandardReturn
