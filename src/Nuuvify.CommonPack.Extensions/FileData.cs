@@ -14,6 +14,19 @@ namespace Nuuvify.CommonPack.Extensions
 
 
         /// <summary>
+        /// Retorna uma string concatenando Id_Name
+        /// </summary>
+        /// <returns></returns>
+        public string GetIdAndNameFile()
+        {
+            return string.IsNullOrWhiteSpace(Id)
+                ? Name
+                : $"{Id}_{Name}";
+
+        }
+
+
+        /// <summary>
         /// Informe um Stream, e fileLength, sera populado as propriedades: <br/>
         /// Name = Nome do arquivo que foi informado <br/>
         /// Content = Conteudo do arquivo no formato byte array <br/> 
