@@ -23,6 +23,12 @@ namespace Nuuvify.CommonPack.AzureStorage.Abstraction
         StorageConfiguration StorageConfiguration { get; set; }
 
 
+        /// <summary>
+        /// Obtem um lista com todos os arquivos de um determinado blob container <br/>
+        /// Atualize as proprieades StorageConfiguration.BlobConnectionName e StorageConfiguration.BlobContainerName
+        /// </summary>
+        /// <returns></returns>
+        Task<BlobStorageResult> GetAllBlobs();
 
         /// <summary>
         /// <para>Key: Deve conter o Id do arquivo que sera gravado no storage, geralmente "prefixo_NomeArquivo"</para>

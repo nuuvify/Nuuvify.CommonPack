@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Microsoft.Extensions.Configuration;
 using Nuuvify.CommonPack.AzureStorage.Abstraction;
 
 namespace Nuuvify.CommonPack.AzureStorage
@@ -23,7 +24,7 @@ namespace Nuuvify.CommonPack.AzureStorage
             }
             set
             {
-                if (string.IsNullOrWhiteSpace(value.ConnectionName) ||
+                if (string.IsNullOrWhiteSpace(value.BlobConnectionName) ||
                     string.IsNullOrWhiteSpace(value.BlobContainerName))
                 {
                     throw new FieldAccessException($"{nameof(StorageConfiguration)} Cannot be null.");
@@ -38,9 +39,12 @@ namespace Nuuvify.CommonPack.AzureStorage
 
 
         private StorageConfiguration _storageConfiguration;
-        public StorageService(StorageConfiguration storageConfiguration)
+        private readonly IConfiguration Configuration;
+        public StorageService(
+            IConfiguration configuration,
+            StorageConfiguration storageConfiguration)
         {
-
+            Configuration = configuration;
             _storageConfiguration = storageConfiguration;
             StorageConfiguration = _storageConfiguration;
 
@@ -49,10 +53,37 @@ namespace Nuuvify.CommonPack.AzureStorage
 
         private BlobClient BlobClientInstance(string Id)
         {
-            return new BlobClient(StorageConfiguration.ConnectionName,
+            var blobCnn = Configuration.GetConnectionString(StorageConfiguration.BlobConnectionName);
+
+            return new BlobClient(
+                blobCnn,
                 StorageConfiguration.BlobContainerName,
                 Id);
-        } 
+        }
+
+
+        public async Task<BlobStorageResult> GetAllBlobs()
+        {
+
+            var blobCnn = Configuration.GetConnectionString(StorageConfiguration.BlobConnectionName);
+
+
+            var blobServiceClient = new BlobServiceClient(blobCnn);
+            var blobContainerClient = blobServiceClient.GetBlobContainerClient(StorageConfiguration.BlobContainerName);
+
+            var blobs = blobContainerClient.GetBlobs(BlobTraits.All, BlobStates.Version);
+
+
+            var blobFiles = new List<string>();
+            foreach (var item in blobs)
+            {
+                blobFiles.Add(item.Name);
+            }
+
+
+            var files = await GetBlobById(blobFiles);
+            return files;
+        }
 
         ///<inheritdoc/>
         public async Task<string> AddOrUpdateBlob(IDictionary<string, byte[]> attachments, CancellationToken cancellationToken)
@@ -67,7 +98,7 @@ namespace Nuuvify.CommonPack.AzureStorage
                 _blobClient = BlobClientInstance(fileBase64.Key);
 
                 using var ms = new MemoryStream(fileBase64.Value);
-                
+
                 await _blobClient.UploadAsync(ms, true, cancellationToken);
 
             }
