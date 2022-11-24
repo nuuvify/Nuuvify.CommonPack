@@ -25,12 +25,12 @@ namespace Nuuvify.CommonPack.Middleware.Abstraction
         /// <example>1.0.0-2021.11.01.1959</example>
         public string ApplicationRelease
         {
-            get 
-            { 
-                return $"{ApplicationVersion}-{BuildNumber}"; 
+            get
+            {
+                return $"{ApplicationVersion}-{BuildNumber}";
             }
         }
-        
+
 
         /// <summary>
         /// Captura a chave "CorrelationId" enviada no Header de uma request
@@ -69,19 +69,20 @@ namespace Nuuvify.CommonPack.Middleware.Abstraction
 
         }
 
-        public KeyValuePair<string, object>[] MapLoggerContext()
+        public Dictionary<string, object> MapLoggerContext()
         {
-            var logHeader = new[]
+            var logHeader = new Dictionary<string, object>
             {
-                new KeyValuePair<string, object>(nameof(AppName), AppName),
-                new KeyValuePair<string, object>(nameof(CorrelationId), CorrelationId),
-                new KeyValuePair<string, object>(nameof(Environment), Environment),
-                new KeyValuePair<string, object>(nameof(ApplicationVersion), ApplicationVersion),
-                new KeyValuePair<string, object>(nameof(BuildNumber), BuildNumber),
-                new KeyValuePair<string, object>(nameof(RemoteIp), RemoteIp),
-                new KeyValuePair<string, object>(nameof(RemotePort), RemotePort),
-                new KeyValuePair<string, object>(nameof(LocalIp), LocalIp),
-                new KeyValuePair<string, object>(nameof(LocalPort), LocalPort)
+                {nameof(AppName), AppName},
+                {nameof(CorrelationId), CorrelationId},
+                {nameof(Environment), Environment},
+                {nameof(ApplicationVersion), ApplicationVersion},
+                {nameof(ApplicationRelease), ApplicationRelease},
+                {nameof(RemoteIp), RemoteIp},
+                {nameof(RemotePort), RemotePort},
+                {nameof(LocalIp), LocalIp},
+                {nameof(LocalPort), LocalPort},
+                {nameof(UserClaim), UserClaim}
             };
 
             return logHeader;
