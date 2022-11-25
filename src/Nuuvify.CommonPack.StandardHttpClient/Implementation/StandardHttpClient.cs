@@ -91,7 +91,10 @@ namespace Nuuvify.CommonPack.StandardHttpClient
 
 
         ///<inheritdoc/>
-        public IStandardHttpClient WithAuthorization(string schema = "bearer", string token = null, string userClaim = null)
+        public IStandardHttpClient WithAuthorization(
+            string schema = "bearer",
+            string token = null,
+            string userClaim = null)
         {
 
             if (!string.IsNullOrWhiteSpace(schema) &&
@@ -102,7 +105,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
                 {
                     _headerAuthorization.Remove("Authorization");
                 }
-                _headerAuthorization.Add("Authorization", $"{schema} {token}");
+                _headerAuthorization.Add("Authorization", $"{schema.ToLowerInvariantNotNull()} {token}");
 
             }
 
