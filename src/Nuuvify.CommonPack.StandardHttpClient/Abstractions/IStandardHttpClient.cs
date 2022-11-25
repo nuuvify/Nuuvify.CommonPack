@@ -113,7 +113,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
 
         /// <summary>
         /// Informe o schema de autenticação, senha, PAT ou token <br/>
-        /// Para basic, o metodo ira transformar o parametro "token" (que sera usuario,senha) em base64
+        /// Para basic, o metodo ira transformar o parametro "token" (que sera usuario:senha) em base64
         /// <example>
         /// <code>
         ///     
@@ -121,13 +121,13 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         ///     ou
         /// _standardHttpClient.WithAuthorization("bearer", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...");
         ///     Basic
-        /// _standardHttpClient.WithAuthorization("basic", $"{Username},{UserPassword}");
+        /// _standardHttpClient.WithAuthorization("basic", $"{Username}:{UserPassword}");
         ///
         /// </code>
         /// </example>
         /// </summary>
         /// <param name="schema">bearer ou basic</param>
-        /// <param name="token">PAT ou "usuario,senha" se for basic. Token para bearer</param>
+        /// <param name="token">PAT ou "usuario:senha" se for basic. Token para bearer</param>
         /// <param name="userClaim">Inclui um Header na requet <see cref="Constants.UserClaimHeader"/> com o usuario informado, <br/>
         /// isso é utilizado para comunicação com o backend, pois ele usara esse usuario <br/>
         /// durante o savechanges
