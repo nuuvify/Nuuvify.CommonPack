@@ -97,7 +97,9 @@ namespace Nuuvify.CommonPack.StandardHttpClient
                 }
 
                 request.Headers.Authorization =
-                    new AuthenticationHeaderValue(scheme, tokenOrPassword?.Replace("bearer", "").TrimStart());
+                    new AuthenticationHeaderValue(scheme, tokenOrPassword?
+                        .Replace("bearer", "")
+                        .TrimStart());
             }
             else if (scheme.Equals("basic", StringComparison.InvariantCultureIgnoreCase))
             {
@@ -106,7 +108,12 @@ namespace Nuuvify.CommonPack.StandardHttpClient
                     request.Headers.Remove("Authorization");
                 }
 
-                var token = tokenOrPassword?.Replace("basic", "").TrimStart();
+                var token = tokenOrPassword?
+                    .Replace("basic", "")
+                    .Replace("Basic", "")
+                    .Replace("BASIC", "")
+                    .TrimStart();
+
                 var userPassword = Encoding.ASCII.GetBytes(token);
                 var base64 = Convert.ToBase64String(userPassword);
 
