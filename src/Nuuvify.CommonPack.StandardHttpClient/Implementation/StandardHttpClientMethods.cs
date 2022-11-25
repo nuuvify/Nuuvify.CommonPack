@@ -34,6 +34,10 @@ namespace Nuuvify.CommonPack.StandardHttpClient
                 recurseValue = recurseValue.SubstringNotNull(1, recurseValue.Length - 1);
 
                 logString.AppendLine($"{item.Key} : {recurseValue}");
+
+                if (item.Key.StartsWith("authorization", StringComparison.InvariantCultureIgnoreCase))
+                    AuthorizationLog = recurseValue;
+
             }
 
             logString.AppendLine($"Content: {message.Content}")
