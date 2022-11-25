@@ -31,6 +31,12 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         public string CorrelationId { get; }
 
         /// <summary>
+        /// Retorna authorization incluido no header da request
+        /// </summary>
+        /// <value></value>
+        public string AuthorizationLog { get; }
+
+        /// <summary>
         /// Cria uma nova instancia do HttpClient ou, se informado o nome de um lient já registrado
         /// retonara sua instancia
         /// </summary>
@@ -113,27 +119,30 @@ namespace Nuuvify.CommonPack.StandardHttpClient
 
         /// <summary>
         /// Informe o schema de autenticação, senha, PAT ou token <br/>
-        /// Para basic, o metodo ira transformar o parametro "token" (que sera usuario,senha) em base64
+        /// Para basic, o metodo ira transformar o parametro "token" (que sera usuario:senha) em base64
         /// <example>
         /// <code>
         ///     
-        /// _standardHttpClient.WithAuthorization("bearer", _tokenService.GetTokenAcessor());
+        /// _standardHttpClient.WithAuthorization("Bearer", _tokenService.GetTokenAcessor());
         ///     ou
-        /// _standardHttpClient.WithAuthorization("bearer", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...");
+        /// _standardHttpClient.WithAuthorization("Bearer", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...");
         ///     Basic
-        /// _standardHttpClient.WithAuthorization("basic", $"{Username},{UserPassword}");
+        /// _standardHttpClient.WithAuthorization("Basic", $"{Username}:{UserPassword}");
         ///
         /// </code>
         /// </example>
         /// </summary>
         /// <param name="schema">bearer ou basic</param>
-        /// <param name="token">PAT ou "usuario,senha" se for basic. Token para bearer</param>
+        /// <param name="token">PAT ou "usuario:senha" se for basic. Token para bearer</param>
         /// <param name="userClaim">Inclui um Header na requet <see cref="Constants.UserClaimHeader"/> com o usuario informado, <br/>
         /// isso é utilizado para comunicação com o backend, pois ele usara esse usuario <br/>
         /// durante o savechanges
         /// </param>
         /// <returns></returns>
-        IStandardHttpClient WithAuthorization(string schema = "bearer", string token = null, string userClaim = null);
+        IStandardHttpClient WithAuthorization(
+            string schema = "Bearer",
+            string token = null,
+            string userClaim = null);
 
 
         /// <summary>
