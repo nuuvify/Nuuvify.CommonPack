@@ -16,48 +16,69 @@ namespace Nuuvify.CommonPack.AzureStorage
     {
 
 
-        public StorageConfiguration StorageConfiguration
+        /// <summary>
+        /// No Azure Storage, essa propriedade esta localizada em "Access Key"
+        /// </summary>
+        /// <value></value>
+        public string BlobConnectionName
         {
             get
             {
-                return _storageConfiguration;
+                return _blobConnectionName;
             }
             set
             {
-                if (string.IsNullOrWhiteSpace(value.BlobConnectionName) ||
-                    string.IsNullOrWhiteSpace(value.BlobContainerName))
+                if (string.IsNullOrWhiteSpace(value))
                 {
-                    throw new FieldAccessException($"{nameof(StorageConfiguration)} Cannot be null.");
+                    throw new FieldAccessException($"{nameof(BlobConnectionName)} Cannot be null.");
                 }
                 else
                 {
-                    _storageConfiguration = value;
+                    _blobConnectionName = value;
+                }
+
+            }
+        }
+
+        public string BlobContainerName
+        {
+            get
+            {
+                return _blobContainerName;
+            }
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    throw new FieldAccessException($"{nameof(BlobContainerName)} Cannot be null.");
+                }
+                else
+                {
+                    _blobContainerName = value;
                 }
 
             }
         }
 
 
-        private StorageConfiguration _storageConfiguration;
+
+        private string _blobConnectionName;
+        private string _blobContainerName;
         private readonly IConfiguration Configuration;
-        public StorageService(
-            IConfiguration configuration,
-            StorageConfiguration storageConfiguration)
+        public StorageService(IConfiguration configuration)
         {
             Configuration = configuration;
-            _storageConfiguration = storageConfiguration;
-            StorageConfiguration = _storageConfiguration;
 
         }
 
 
         private BlobClient BlobClientInstance(string Id)
         {
-            var blobCnn = Configuration.GetConnectionString(StorageConfiguration.BlobConnectionName);
+            var blobCnn = Configuration.GetConnectionString(BlobConnectionName);
 
             return new BlobClient(
                 blobCnn,
-                StorageConfiguration.BlobContainerName,
+                BlobContainerName,
                 Id);
         }
 
@@ -65,11 +86,11 @@ namespace Nuuvify.CommonPack.AzureStorage
         public async Task<BlobStorageResult> GetAllBlobs()
         {
 
-            var blobCnn = Configuration.GetConnectionString(StorageConfiguration.BlobConnectionName);
+            var blobCnn = Configuration.GetConnectionString(BlobConnectionName);
 
 
             var blobServiceClient = new BlobServiceClient(blobCnn);
-            var blobContainerClient = blobServiceClient.GetBlobContainerClient(StorageConfiguration.BlobContainerName);
+            var blobContainerClient = blobServiceClient.GetBlobContainerClient(BlobContainerName);
 
             var blobs = blobContainerClient.GetBlobs(BlobTraits.All, BlobStates.Version);
 
