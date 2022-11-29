@@ -16,6 +16,8 @@ namespace Nuuvify.CommonPack.StandardHttpClient
     /// </summary>
     public interface IStandardHttpClient
     {
+
+
         /// <summary>
         /// Essa propriedade retorna a url completa "absoluta" da sua chamada http,
         /// depois que a mesma ocorrer  
@@ -30,6 +32,13 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// <value></value>
         public string CorrelationId { get; }
 
+
+        /// <summary>
+        /// Se true, um log detalhado sera enviado para o console e seu sistema de logs, <br/>
+        /// esse parametro pode ser alterado durante o uso da classe.
+        /// </summary>
+        /// <value></value>
+        public bool LogRequest { get; set; }
         /// <summary>
         /// Retorna authorization incluido no header da request
         /// </summary>

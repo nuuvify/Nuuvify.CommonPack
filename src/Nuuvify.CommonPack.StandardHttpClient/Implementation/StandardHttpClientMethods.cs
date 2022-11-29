@@ -101,8 +101,8 @@ namespace Nuuvify.CommonPack.StandardHttpClient
                 response = await _httpClient.SendAsync(message, cancellationToken);
             }
 
-
-            LogRequestMessage(message);
+            if (LogRequest)
+                LogRequestMessage(message);
 
 
             HttpStandardReturn httpStandardReturn = await HandleResponseMessage(response);
@@ -165,8 +165,8 @@ namespace Nuuvify.CommonPack.StandardHttpClient
                 response = await _httpClient.SendAsync(message, cancellationToken);
             }
 
-
-            LogRequestMessage(message);
+            if (LogRequest)
+                LogRequestMessage(message);
 
 
             HttpStandardStreamReturn httpStandardStreamReturn = await HandleResponseMessageStream(response);
