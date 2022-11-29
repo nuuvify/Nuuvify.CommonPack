@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Moq;
-using Nuuvify.CommonPack.AzureStorage.Abstraction;
 using Nuuvify.CommonPack.Extensions;
 using Xunit;
 
@@ -19,23 +18,22 @@ namespace Nuuvify.CommonPack.AzureStorage.xTest
         // [Fact]
         public async Task DeveGravar_e_RecuperarArquivosNoBlobStorage()
         {
-            var storageConfiguration = new StorageConfiguration
-            {
-                BlobContainerName = "sgkqas",
-                BlobConnectionName = "StorageKey"
-            };
 
 
             const string cnnBlob = "MinhaApp_4e1f0c64-f02e-435a-baa7-c78923ad371a";
-
+            const string blobCnn = "StorageKey";
 
 
             mockIConfigurationCustom = new Mock<IConfiguration>();
-            mockIConfigurationCustom.Setup(x => x.GetConnectionString(storageConfiguration.BlobConnectionName))
+            mockIConfigurationCustom.Setup(x => x.GetConnectionString(blobCnn))
                 .Returns(cnnBlob);
 
 
-            var storage = new StorageService(mockIConfigurationCustom.Object, storageConfiguration);
+            var storage = new StorageService(mockIConfigurationCustom.Object)
+            {
+                BlobConnectionName = blobCnn,
+                BlobContainerName = "sgkqas"
+            };
 
             var byteFiles = new Dictionary<string, byte[]>();
             var fileData = new FileData();
