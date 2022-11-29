@@ -12,6 +12,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
     public partial class StandardHttpClient : IStandardHttpClient
     {
 
+
         private readonly IHttpClientFactory _httpClientFactory;
         private HttpClient _httpClient;
         private HttpCompletionOption CompletionOption;
@@ -19,6 +20,8 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         private readonly Dictionary<string, object> _headerStandard;
         private readonly Dictionary<string, object> _headerAuthorization;
         private QueryBuilder _queryString;
+
+        public bool LogRequest { get; set; }
         public string AuthorizationLog { get; private set; }
 
 
