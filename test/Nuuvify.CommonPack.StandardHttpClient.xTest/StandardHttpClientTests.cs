@@ -374,6 +374,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
             var standardClient = new StandardHttpClient(mockFactory.Object, new NullLogger<StandardHttpClient>());
             standardClient.CreateClient();
             standardClient.ResetStandardHttpClient();
+            standardClient.LogRequest = true;
 
             var result = standardClient
                 .WithHeader("Accept-Language", "pt-BR")
@@ -425,6 +426,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
             var standardClient = new StandardHttpClient(mockFactory.Object, new NullLogger<StandardHttpClient>());
             standardClient.CreateClient();
             standardClient.ResetStandardHttpClient();
+            standardClient.LogRequest = true;
 
             var result = standardClient
                 .WithHeader("Accept-Language", "pt-BR")
