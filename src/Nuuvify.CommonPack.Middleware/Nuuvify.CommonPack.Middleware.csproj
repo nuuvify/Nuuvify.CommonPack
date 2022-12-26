@@ -5,7 +5,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Description>
       Middlewares e filtros customizados, deve ser baixado no projeto IoC
-      HandlingHeadersMiddleware - Inclui a versão da aplicação e do assembly no header da request, também loga o conteudo da request
+      HandlingHeadersMiddleware - Inclui a versão da aplicação e do assembly no header da request,
+      também loga o conteudo da request
       GlobalHandleException - Captura e loga as exceptions de forma global
       ValidateModelAttribute - Retorna os erros da ModelState de forma padronizada
     </Description>
@@ -14,12 +15,14 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.31" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.32" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Nuuvify.CommonPack.Middleware.Abstraction\Nuuvify.CommonPack.Middleware.Abstraction.csproj" />
-    <ProjectReference Include="..\Nuuvify.CommonPack.Extensions\Nuuvify.CommonPack.Extensions.csproj" />
+    <ProjectReference
+      Include="..\Nuuvify.CommonPack.Middleware.Abstraction\Nuuvify.CommonPack.Middleware.Abstraction.csproj" />
+    <ProjectReference
+      Include="..\Nuuvify.CommonPack.Extensions\Nuuvify.CommonPack.Extensions.csproj" />
   </ItemGroup>
 
 </Project>
