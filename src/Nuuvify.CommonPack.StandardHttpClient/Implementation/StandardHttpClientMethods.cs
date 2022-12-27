@@ -82,7 +82,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
                 }
             }
 
-            _logger.LogDebug($"Url and message after config: {message} client url: {message?.RequestUri?.AbsolutePath}");
+            _logger.LogDebug($"Url and message after config: {message} client url: {message?.RequestUri}");
 
 
             HttpResponseMessage response;
@@ -146,7 +146,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
                 }
             }
 
-            _logger.LogDebug($"Url and message after config: {message} client url: {message?.RequestUri?.AbsolutePath}");
+            _logger.LogDebug($"Url and message after config: {message} client url: {message?.RequestUri}");
 
 
             HttpResponseMessage response;
