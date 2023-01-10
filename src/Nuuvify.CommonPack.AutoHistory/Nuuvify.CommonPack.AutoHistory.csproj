@@ -5,18 +5,19 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Description>
       Essa biblioteca é uma extensão do EntityFrameworkCore para ser utilizado junto com UnitOfWork
-      a fim de incluir na tabela AutoHistory, todas as alterações feitas em um registro em qualquer 
-      entidade da aplicação. 
+      a fim de incluir na tabela AutoHistory, todas as alterações feitas em um registro em qualquer
+      entidade da aplicação.
       Essa bilioteca deve ser instalada no seu projeto Infra.Data
     </Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.31" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.32" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Nuuvify.CommonPack.UnitOfWork.Abstraction\Nuuvify.CommonPack.UnitOfWork.Abstraction.csproj" />
+    <ProjectReference
+      Include="..\Nuuvify.CommonPack.UnitOfWork.Abstraction\Nuuvify.CommonPack.UnitOfWork.Abstraction.csproj" />
   </ItemGroup>
 
   <ItemGroup Label="Packaging">
