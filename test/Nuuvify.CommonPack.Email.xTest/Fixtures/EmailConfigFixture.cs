@@ -11,8 +11,8 @@ namespace Nuuvify.CommonPack.Email.xTest.Fixtures
         public (string emailAccount, string emailPassword) GetEmailCredential(IConfiguration config)
         {
 
-            var envEmailUsername = Environment.GetEnvironmentVariable("EmailAccount".ToUpper());
-            var envEmailPassword = Environment.GetEnvironmentVariable("EmailPassword".ToUpper());
+            var envEmailUsername = Environment.GetEnvironmentVariable("EmailAccountUserName".ToUpper());
+            var envEmailPassword = Environment.GetEnvironmentVariable("EmailAccountPassword".ToUpper());
 
             envEmailUsername = string.IsNullOrWhiteSpace(envEmailUsername)
                 ? config.GetSection("EmailConfig:EmailServerConfiguration:AccountUserName")?.Value
