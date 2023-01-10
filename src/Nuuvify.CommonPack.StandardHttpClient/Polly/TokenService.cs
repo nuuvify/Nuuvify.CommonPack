@@ -71,7 +71,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
 
         public async Task<bool> GetNewToken(string urlToken, string login, string password, string userClaim = null)
         {
-            var messageLog = $"{nameof(GetNewToken)}";
+            var messageLog = $"{nameof(TokenService.GetNewToken)}";
 
             var messageBody = new
             {
@@ -80,32 +80,30 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
             };
 
             var userName = _accessor?.HttpContext?.User.GetLogin();
-            if (userClaim == null)
-                userClaim = userName;
-
-
+            userClaim ??= userName;
 
             _standardHttpClient.CreateClient(GetHttpClientTokenName ?? HttpClientTokenName());
+            _standardHttpClient.ResetStandardHttpClient();
 
             if (!string.IsNullOrWhiteSpace(userClaim))
                 _standardHttpClient.WithHeader(Constants.UserClaimHeader, userClaim);
 
 
 
-            _logger.LogDebug(messageLog + " - _standardHttpClient.GetNewToken()");
+            _logger.LogDebug($"{messageLog} - User Claim: {userClaim}");
 
 
-            var response = await _standardHttpClient.Post(urlToken, messageBody: messageBody);
+            var response = await _standardHttpClient.Post(urlRoute: urlToken, messageBody: messageBody);
 
             _credentialToken = ReturnClass<CredentialToken>(response);
 
 
-            if (string.IsNullOrWhiteSpace(_credentialToken?.Token))
+            if (_credentialToken is null || string.IsNullOrWhiteSpace(_credentialToken?.Token))
             {
-                if (_credentialToken is null) _credentialToken = new CredentialToken();
+                _credentialToken = new CredentialToken();
                 _credentialToken.Warnings.Add("ResponseMessage", response.ReturnMessage);
 
-                _logger.LogWarning(messageLog + " - Response message invalid: {response}", response?.ReturnMessage);
+                _logger.LogWarning($"{messageLog} - Response message invalid: {response?.ReturnCode} {response?.ReturnMessage}");
 
                 return false;
             }
@@ -128,7 +126,9 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
         public async Task<CredentialToken> GetToken(string login = null, string password = null, string userClaim = null)
         {
 
-            var messageLog = $"{nameof(GetToken)}";
+            Notifications.Clear();
+
+            var messageLog = $"{nameof(TokenService.GetToken)}";
             _logger.LogDebug($"{messageLog} - Inicio");
 
             if (string.IsNullOrWhiteSpace(login))
@@ -143,7 +143,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
             var urlLogin = _configuration.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value;
             var urlToken = $"{urlLogin}{_configuration.GetSection("AppConfig:AppURLs:UrlLoginApiToken")?.Value}";
 
-            _logger.LogDebug(messageLog + " - urlToken: {url}", urlToken);
+            _logger.LogDebug($"{messageLog} - urlToken: {urlToken}");
 
 
 
@@ -164,13 +164,13 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
             await GetNewToken(urlToken, login, password, userClaim);
 
 
-            if (!(_credentialToken is null) && !string.IsNullOrWhiteSpace(_credentialToken?.Token))
+            if (_credentialToken != null && !string.IsNullOrWhiteSpace(_credentialToken?.Token))
             {
                 _logger.LogDebug($"{messageLog} - Token obtido para o usuario: {_credentialToken.LoginId} - Final");
             }
             else
             {
-                _logger.LogDebug(messageLog + " - Final");
+                _logger.LogDebug($"{messageLog} - Final");
             }
 
 
@@ -182,18 +182,18 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
         ///<inheritdoc/>
         public string GetTokenAcessor()
         {
-            var messageLog = $"{nameof(GetTokenAcessor)}";
-            _logger.LogDebug(messageLog + " - Inicio");
+            var messageLog = $"{nameof(TokenService.GetTokenAcessor)}";
+            _logger.LogDebug($"{messageLog} - Inicio");
 
 
             if (!IsAuthenticated(out string token))
             {
-                _logger.LogWarning(messageLog + " - Não foi encontrado Authorization no HttpContextAccessor, usuario não esta logado com um token");
+                _logger.LogWarning($"{messageLog} - Não foi encontrado Authorization no HttpContextAccessor, usuario não esta logado com um token");
                 return string.Empty;
             }
 
 
-            _logger.LogDebug(messageLog + " - Final");
+            _logger.LogDebug($"{messageLog} - Final");
 
             return token;
         }
@@ -216,6 +216,8 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
 
         private T ReturnClass<T>(HttpStandardReturn returnResult) where T : class
         {
+            Notifications.Clear();
+
             if (returnResult.Success)
             {
                 if (!string.IsNullOrWhiteSpace(returnResult.ReturnMessage))

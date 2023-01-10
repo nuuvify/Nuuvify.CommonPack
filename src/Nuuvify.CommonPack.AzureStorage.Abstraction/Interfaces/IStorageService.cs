@@ -20,7 +20,8 @@ namespace Nuuvify.CommonPack.AzureStorage.Abstraction
         ///   }
         /// </code>
         /// </summary>
-        StorageConfiguration StorageConfiguration { get; set; }
+        public string BlobConnectionName { get; set; }
+        public string BlobContainerName { get; set; }
 
 
         /// <summary>

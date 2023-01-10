@@ -64,20 +64,15 @@ namespace Nuuvify.CommonPack.StandardHttpClient
             {
                 var auth = header.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x.Key));
 
-                if (auth.Key.Equals("Authorization", StringComparison.InvariantCultureIgnoreCase))
+
+                if (auth.Key.ToString().StartsWith("bearer", StringComparison.InvariantCultureIgnoreCase) ||
+                    auth.Key.ToString().StartsWith("basic", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    if (auth.Value.ToString().StartsWith("bearer", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        return AddAuthorizationHeader(request, "bearer", auth.Value.ToString());
-                    }
-                    else if (auth.Value.ToString().StartsWith("basic", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        return AddAuthorizationHeader(request, "basic", auth.Value.ToString());
-                    }
-                    else
-                    {
-                        throw new HttpRequestException("This lib is prepared only for Bearer or Basic scheme");
-                    }
+                    return AddAuthorizationHeader(request, auth.Key, auth.Value.ToString());
+                }
+                else
+                {
+                    throw new HttpRequestException("This lib is prepared only for Bearer or Basic scheme");
                 }
             }
 
@@ -97,9 +92,8 @@ namespace Nuuvify.CommonPack.StandardHttpClient
                 }
 
                 request.Headers.Authorization =
-                    new AuthenticationHeaderValue(scheme, tokenOrPassword?
-                        .Replace("bearer", "")
-                        .TrimStart());
+                    new AuthenticationHeaderValue(scheme, tokenOrPassword);
+
             }
             else if (scheme.Equals("basic", StringComparison.InvariantCultureIgnoreCase))
             {
@@ -108,17 +102,12 @@ namespace Nuuvify.CommonPack.StandardHttpClient
                     request.Headers.Remove("Authorization");
                 }
 
-                var token = tokenOrPassword?
-                    .Replace("basic", "")
-                    .Replace("Basic", "")
-                    .Replace("BASIC", "")
-                    .TrimStart();
-
-                var userPassword = Encoding.ASCII.GetBytes(token);
+                var userPassword = Encoding.ASCII.GetBytes(tokenOrPassword);
                 var base64 = Convert.ToBase64String(userPassword);
 
                 request.Headers.Authorization =
                     new AuthenticationHeaderValue(scheme, base64);
+
             }
 
 
