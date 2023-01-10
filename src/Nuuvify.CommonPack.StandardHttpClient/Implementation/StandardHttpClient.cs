@@ -12,6 +12,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
     public partial class StandardHttpClient : IStandardHttpClient
     {
 
+
         private readonly IHttpClientFactory _httpClientFactory;
         private HttpClient _httpClient;
         private HttpCompletionOption CompletionOption;
@@ -19,6 +20,9 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         private readonly Dictionary<string, object> _headerStandard;
         private readonly Dictionary<string, object> _headerAuthorization;
         private QueryBuilder _queryString;
+
+        public bool LogRequest { get; set; }
+        public string AuthorizationLog { get; private set; }
 
 
 
@@ -101,11 +105,11 @@ namespace Nuuvify.CommonPack.StandardHttpClient
                 !string.IsNullOrWhiteSpace(token))
             {
 
-                if (_headerAuthorization.TryGetValue("Authorization", out object valueObject))
+                if (_headerAuthorization.TryGetValue(schema, out object valueObject))
                 {
-                    _headerAuthorization.Remove("Authorization");
+                    _headerAuthorization.Remove(schema);
                 }
-                _headerAuthorization.Add("Authorization", $"{schema.ToLowerInvariantNotNull()} {token}");
+                _headerAuthorization.Add(schema, token);
 
             }
 
