@@ -3,7 +3,7 @@ resources:
     - repository: templates
       type: git
       name: SharedKernel/pipelines-store
-      endpoint: SharedKernel-Repos
+      endpoint: SharedProjects-Repos
 
 trigger:
   branches:
