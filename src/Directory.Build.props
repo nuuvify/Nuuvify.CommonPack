@@ -8,7 +8,7 @@
     <IsPackable>true</IsPackable>
     <Authors>Lincoln Zocateli</Authors>
     <Company>Lincoln Zocateli</Company>
-    <Copyright>Copyright ©2022 $(Company)</Copyright>
+    <Copyright>Copyright ©2023 $(Company)</Copyright>
     <Product>Libraries with common implementations, with separation of responsibilities between their projects using Abstractions.</Product>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/lzocateli/Nuuvify.CommonPack</PackageProjectUrl>
