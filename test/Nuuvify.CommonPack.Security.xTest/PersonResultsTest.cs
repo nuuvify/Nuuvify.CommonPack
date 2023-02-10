@@ -17,7 +17,7 @@ namespace Nuuvify.CommonPack.Security.xTest
             {
                 Email = Email
             };
-            
+
 
             Assert.Equal(personResult.Email, Email);
 
@@ -33,12 +33,12 @@ namespace Nuuvify.CommonPack.Security.xTest
                 Login = "lalalala",
                 Name = "Giropopis"
             };
-            
+
 
             Assert.Null(personResult.Email);
 
         }
-    
+
     }
 
 }
