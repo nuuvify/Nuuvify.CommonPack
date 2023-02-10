@@ -17,20 +17,16 @@ namespace Nuuvify.CommonPack.Middleware.xTest
     public class ApiKeyAttributeTests
     {
 
-        [Fact]
-        public void OnResourceExecuting_ShoultAddASingleLogIfExecuted()
+        private ActionContext _actionContext;
+        private ActionExecutingContext _actionExecutingContext;
+        private ResourceExecutingContext _resourceExecutingContext;
+        private DefaultHttpContext _defaultHttpContext;
+
+
+        private void ArrangeResourceExecutingContextTests()
         {
 
-            string keyNameTest = "MyKeyXyz";
-            var loggerMock = new Mock<ILogger<ApiKeyFilter>>();
-
-            var mockIConfiguration = new Mock<IConfiguration>();
-
-            mockIConfiguration.Setup(s => s.GetSection(keyNameTest).Value)
-                .Returns("xxx1234");
-
-
-            var actionContext = new ActionContext()
+            _actionContext = new ActionContext()
             {
                 HttpContext = new DefaultHttpContext(),
                 RouteData = new RouteData(),
@@ -38,11 +34,50 @@ namespace Nuuvify.CommonPack.Middleware.xTest
             };
 
 
-            var resourceExecutingContext = new ResourceExecutingContext(
-                actionContext,
+            _resourceExecutingContext = new ResourceExecutingContext(
+                _actionContext,
                 new List<IFilterMetadata>(),
                 new List<IValueProviderFactory>()
                 );
+
+        }
+
+        private void ArrangeActionExecutingContextTests(DefaultHttpContext defaultHttpContext)
+        {
+
+            _defaultHttpContext = defaultHttpContext ?? new DefaultHttpContext();
+
+
+            _actionContext = new ActionContext()
+            {
+                HttpContext = _defaultHttpContext,
+                RouteData = new RouteData(),
+                ActionDescriptor = new ActionDescriptor()
+            };
+
+            _actionExecutingContext = new ActionExecutingContext(
+                _actionContext,
+                new List<IFilterMetadata>(),
+                new Dictionary<string, object>(),
+                new object()
+                );
+
+        }
+
+
+        [Fact]
+        public void OnResourceExecuting_ShoultAddASingleLogIfExecuted()
+        {
+
+            string[] keyNameTest = new[] { "MyKeyXyz" };
+            var loggerMock = new Mock<ILogger<ApiKeyFilter>>();
+
+            var mockIConfiguration = new Mock<IConfiguration>();
+
+            mockIConfiguration.Setup(s => s.GetSection(keyNameTest[0]).Value)
+                .Returns("xxx1234");
+
+            ArrangeResourceExecutingContextTests();
 
 
             var apiKeyFilter = new ApiKeyFilter(
@@ -50,7 +85,7 @@ namespace Nuuvify.CommonPack.Middleware.xTest
                 mockIConfiguration.Object,
                 keyNameTest);
 
-            apiKeyFilter.OnResourceExecuting(resourceExecutingContext);
+            apiKeyFilter.OnResourceExecuting(_resourceExecutingContext);
 
 
             loggerMock.Verify(
@@ -67,35 +102,20 @@ namespace Nuuvify.CommonPack.Middleware.xTest
         }
 
         [Fact]
-        public void OnActionExecuting_ShoultReturn401IfKeyValueNotMatchInHttpHeader()
+        public void OnActionExecuting_ShoultReturn401IfKeyValueNotFoundInHttpHeader()
         {
 
-            string keyNameTest = "MyKeyXyz";
+            string[] keyNameTest = new[] { "MyKeyXyz" };
             string keyValueTest = "xxx1234";
             var loggerMock = new Mock<ILogger<ApiKeyFilter>>();
 
             var mockIConfiguration = new Mock<IConfiguration>();
 
-            mockIConfiguration.Setup(s => s.GetSection(keyNameTest).Value)
+            mockIConfiguration.Setup(s => s.GetSection(keyNameTest[0]).Value)
                 .Returns(keyValueTest);
 
-            var httpContext = new DefaultHttpContext();
-            httpContext.Request.Headers.Add("TesteHeader", "1234567");
-            httpContext.Request.Headers.Add(keyNameTest, "outrovalor");
 
-            var actionContext = new ActionContext()
-            {
-                HttpContext = httpContext,
-                RouteData = new RouteData(),
-                ActionDescriptor = new ActionDescriptor()
-            };
-
-            var actionExecutingContext = new ActionExecutingContext(
-                actionContext,
-                new List<IFilterMetadata>(),
-                new Dictionary<string, object>(),
-                new object()
-                );
+            ArrangeActionExecutingContextTests(new DefaultHttpContext());
 
 
             var apiKeyFilter = new ApiKeyFilter(
@@ -103,9 +123,44 @@ namespace Nuuvify.CommonPack.Middleware.xTest
                 mockIConfiguration.Object,
                 keyNameTest);
 
-            apiKeyFilter.OnActionExecuting(actionExecutingContext);
+            apiKeyFilter.OnActionExecuting(_actionExecutingContext);
 
-            var contentResult = (ContentResult)actionExecutingContext.Result;
+            var contentResult = (ContentResult)_actionExecutingContext.Result;
+
+
+            Assert.Equal(expected: 401, actual: contentResult.StatusCode);
+
+
+        }
+
+        [Fact]
+        public void OnActionExecuting_ShoultReturn401IfKeyValueNotMatchInHttpHeader()
+        {
+
+            string[] keyNameTest = new[] { "MyKeyXyz" };
+            string keyValueTest = "xxx1234";
+            var loggerMock = new Mock<ILogger<ApiKeyFilter>>();
+
+            var mockIConfiguration = new Mock<IConfiguration>();
+
+            mockIConfiguration.Setup(s => s.GetSection(keyNameTest[0]).Value)
+                .Returns(keyValueTest);
+
+            var httpContext = new DefaultHttpContext();
+            httpContext.Request.Headers.Add("TesteHeader", "1234567");
+            httpContext.Request.Headers.Add(keyNameTest[0], "outrovalor");
+
+            ArrangeActionExecutingContextTests(httpContext);
+
+
+            var apiKeyFilter = new ApiKeyFilter(
+                loggerMock.Object,
+                mockIConfiguration.Object,
+                keyNameTest);
+
+            apiKeyFilter.OnActionExecuting(_actionExecutingContext);
+
+            var contentResult = (ContentResult)_actionExecutingContext.Result;
 
 
             Assert.Equal(expected: 401, actual: contentResult.StatusCode);
@@ -118,32 +173,21 @@ namespace Nuuvify.CommonPack.Middleware.xTest
         public void OnActionExecuting_ShoultReturn200IfKeyValueMatchInHttpHeader()
         {
 
-            string keyNameTest = "MyKeyXyz";
+            string[] keyNameTest = new[] { "MyKeyXyz" };
             string keyValueTest = "xxx1234";
             var loggerMock = new Mock<ILogger<ApiKeyFilter>>();
 
             var mockIConfiguration = new Mock<IConfiguration>();
 
-            mockIConfiguration.Setup(s => s.GetSection(keyNameTest).Value)
+            mockIConfiguration.Setup(s => s.GetSection(keyNameTest[0]).Value)
                 .Returns(keyValueTest);
 
             var httpContext = new DefaultHttpContext();
             httpContext.Request.Headers.Add("TesteHeader", "1234567");
-            httpContext.Request.Headers.Add(keyNameTest, keyValueTest);
+            httpContext.Request.Headers.Add(keyNameTest[0], keyValueTest);
 
-            var actionContext = new ActionContext()
-            {
-                HttpContext = httpContext,
-                RouteData = new RouteData(),
-                ActionDescriptor = new ActionDescriptor()
-            };
+            ArrangeActionExecutingContextTests(httpContext);
 
-            var actionExecutingContext = new ActionExecutingContext(
-                actionContext,
-                new List<IFilterMetadata>(),
-                new Dictionary<string, object>(),
-                new object()
-                );
 
 
             var apiKeyFilter = new ApiKeyFilter(
@@ -151,12 +195,56 @@ namespace Nuuvify.CommonPack.Middleware.xTest
                 mockIConfiguration.Object,
                 keyNameTest);
 
-            apiKeyFilter.OnActionExecuting(actionExecutingContext);
+            apiKeyFilter.OnActionExecuting(_actionExecutingContext);
 
-            var contentResult = (ContentResult)actionExecutingContext.Result;
+            var contentResult = (ContentResult)_actionExecutingContext.Result;
 
 
             Assert.Null(contentResult);
+
+
+        }
+
+        [Fact]
+        public void OnActionExecuting_ShoultReturn200IfKeyValueMatchInClaim()
+        {
+
+            string[] keyNameTest = new[] { "MyKeyXyz", "OtherKeyWXZ" };
+            string keyValueTest = "xxx1234";
+            string keyValueTest1 = "98765abc";
+
+            var loggerMock = new Mock<ILogger<ApiKeyFilter>>();
+
+            var mockIConfiguration = new Mock<IConfiguration>();
+
+            mockIConfiguration.Setup(s => s.GetSection(keyNameTest[0]).Value)
+                .Returns(keyValueTest);
+            mockIConfiguration.Setup(s => s.GetSection(keyNameTest[1]).Value)
+                .Returns(keyValueTest1);
+
+            var httpContext = new DefaultHttpContext();
+            httpContext.Request.Headers.Add("TesteHeader", "1234567");
+            httpContext.Request.Headers.Add(keyNameTest[1], keyValueTest1);
+
+            ArrangeActionExecutingContextTests(httpContext);
+
+
+
+            var apiKeyFilter = new ApiKeyFilter(
+                loggerMock.Object,
+                mockIConfiguration.Object,
+                keyNameTest);
+
+            apiKeyFilter.OnActionExecuting(_actionExecutingContext);
+
+            var contentResult = (ContentResult)_actionExecutingContext.Result;
+
+
+
+            Assert.Null(contentResult);
+            Assert.True(_actionExecutingContext.HttpContext.User.HasClaim(x =>
+                x.Type == ApiKeyFilterConstants.ApiKeyInfo &&
+                x.Value == $"{keyNameTest[1]}={keyValueTest1}"));
 
 
         }
