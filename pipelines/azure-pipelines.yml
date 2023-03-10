@@ -31,7 +31,7 @@ stages:
     displayName: 'Build & package artifacts'
 
     pool:
-      vmimage: $(vmImageName)
+      vmImage: $(vmImageName)
     
     steps:
     
