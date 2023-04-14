@@ -31,7 +31,7 @@ stages:
     displayName: 'Build & package artifacts'
 
     pool:
-      vmimage: $(vmImageName)
+      vmImage: $(vmImageName)
     
     steps:
     
@@ -39,5 +39,6 @@ stages:
       parameters:
         solution: '**/*.sln'
         buildConfiguration: 'Release'
+        reposytoryWork: 'Nuuvify.CommonPack'
 
 - template: pipeline-templates/deploy-common-dotnetcore-nuget.yml@templates
