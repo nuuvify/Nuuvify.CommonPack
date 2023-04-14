@@ -39,6 +39,6 @@ stages:
       parameters:
         solution: '**/*.sln'
         buildConfiguration: 'Release'
-        repositoryName: 'Nuuvify.CommonPack'
+        reposytoryWork: 'Nuuvify.CommonPack'
 
 - template: pipeline-templates/deploy-common-dotnetcore-nuget.yml@templates
