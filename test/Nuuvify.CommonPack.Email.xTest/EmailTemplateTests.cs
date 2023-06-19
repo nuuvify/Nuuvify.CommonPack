@@ -175,6 +175,71 @@ namespace Nuuvify.CommonPack.Email.xTest
         }
 
 
+        [Fact]
+        [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
+        public async Task EnviaEmailComTemplateStreamComAnexoReal()
+        {
+            const string assunto = "Teste automatizado da classe de envio de email";
+
+            var config = AppSettingsConfig.GetConfig();
+
+
+            configEmailServer = new ConfigureFromConfigurationOptions<EmailServerConfiguration>(
+                    config.GetSection("EmailConfig:EmailServerConfiguration"));
+
+            configEmailServer.Configure(emailServerConfiguration);
+
+            var (envEmailUsername, envEmailPassword) = _emailConfigFixture.GetEmailCredential(config);
+
+            var destinatarios = new Dictionary<string, string>
+            {
+                { "lzoca00@gmail.com", "Zoca00" }
+            };
+
+            var remetentes = new Dictionary<string, string>
+            {
+                { envEmailUsername, "dotnet teste" }
+            };
+
+
+
+
+            emailServerConfiguration.ServerHost = config.GetSection("EmailConfig:EmailServerConfiguration:ServerHost")?.Value;
+            emailServerConfiguration.AccountUserName = string.IsNullOrWhiteSpace(emailServerConfiguration.AccountUserName)
+                ? envEmailUsername
+                : emailServerConfiguration.AccountUserName;
+            emailServerConfiguration.AccountPassword = string.IsNullOrWhiteSpace(emailServerConfiguration.AccountPassword)
+                ? envEmailPassword
+                : emailServerConfiguration.AccountPassword;
+
+            var testarEnvio = new Email(emailServerConfiguration);
+
+
+            var variables = new Dictionary<string, string>
+            {
+                { "@numeroAl", $"Number AL: 123456" },
+                { "@emissionDate", $"Emission Date: {DateTimeOffset.Now}" },
+                { "@fornecedor", $"Supplier Code: G666M1" }
+            };
+            var message = testarEnvio.GetEmailTemplate(variables, Path.Combine(AppSettingsConfig.TemplatePath, "template-email.html"));
+
+
+            var file1Stream = new FileStream(Path.Combine(AppSettingsConfig.TemplatePath, "BB - Layout - CNAB240.pdf"), FileMode.OpenOrCreate);
+            var file2Stream = new FileStream(Path.Combine(AppSettingsConfig.TemplatePath, "SOLID.jpeg"), FileMode.OpenOrCreate);
+
+            testarEnvio.WithAttachment(file1Stream, EmailMidiaType.Application, EmailMidiaSubType.Pdf)
+                       .WithAttachment(file2Stream, EmailMidiaType.Image, EmailMidiaSubType.Jpg);
+
+            var emailEnviado = await testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, message);
+
+
+
+            Assert.True(emailEnviado.Equals(true));
+            Assert.True(testarEnvio.IsValid());
+
+        }
+
+
     }
 
 }
