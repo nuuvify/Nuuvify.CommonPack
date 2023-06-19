@@ -148,6 +148,56 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
 
         }
 
+        [Fact, Order(4)]
+        public void PatchApiRealDeveRetornarMensagemComSucesso()
+        {
+            var resultDefault = new HttpStandardReturn
+            {
+                ReturnCode = "200",
+                ReturnMessage = "Alterado com sucesso",
+                Success = true
+            };
+
+            var jsonConverted = JsonSerializer.Serialize(resultDefault);
+
+            var clientHandlerStub = new DelegatingHandlerStub(new HttpResponseMessage()
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(jsonConverted, Encoding.UTF8, "application/json")
+            });
+
+            var client = new HttpClient(clientHandlerStub, true)
+            {
+                BaseAddress = new Uri("https://meuteste/")
+            };
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+
+
+            mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(client);
+
+            var url = "api/cliente";
+
+            var standardClient = new StandardHttpClient(mockFactory.Object, new NullLogger<StandardHttpClient>());
+            standardClient.CreateClient();
+            standardClient.ResetStandardHttpClient();
+            var fakeClass = new FakeClasseRetorno
+            {
+                Codigo = 123456,
+                DataCadastro = DateTime.Now,
+                Descricao = "Isso é um teste"
+            };
+
+            var result = standardClient
+                .WithHeader("Accept-Language", "pt-BR")
+                .WithCurrelationHeader("zxzxzxzxzxzxzxzxzxz")
+                .WithAuthorization("bearer", "xyz")
+                .Patch(url, fakeClass).Result;
+
+
+            Assert.Equal(resultDefault.ReturnCode, result.ReturnCode);
+
+        }
+
         [Fact]
         public void RecebeLoginDiferente_DeveSubstituirDados()
         {
