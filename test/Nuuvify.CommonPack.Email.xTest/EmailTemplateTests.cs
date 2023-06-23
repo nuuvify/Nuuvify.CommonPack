@@ -227,8 +227,8 @@ namespace Nuuvify.CommonPack.Email.xTest
             var file1Stream = new FileStream(Path.Combine(AppSettingsConfig.TemplatePath, "BB - Layout - CNAB240.pdf"), FileMode.OpenOrCreate);
             var file2Stream = new FileStream(Path.Combine(AppSettingsConfig.TemplatePath, "SOLID.jpeg"), FileMode.OpenOrCreate);
 
-            testarEnvio.WithAttachment(file1Stream, EmailMidiaType.Application, EmailMidiaSubType.Pdf)
-                       .WithAttachment(file2Stream, EmailMidiaType.Image, EmailMidiaSubType.Jpg);
+            testarEnvio.WithAttachment(file1Stream, EmailMidiaType.Application, EmailMidiaSubType.Pdf, "BB - Layout - CNAB240.pdf")
+                       .WithAttachment(file2Stream, EmailMidiaType.Image, EmailMidiaSubType.Jpg, "SOLID.jpeg");
 
             var emailEnviado = await testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, message);
 
