@@ -1,25 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using MailKit.Net.Smtp;
+using Nuuvify.CommonPack.Email.Abstraction;
+using Nuuvify.CommonPack.Extensions.Notificator;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using MailKit.Net.Smtp;
-using Nuuvify.CommonPack.Email.Abstraction;
-using Nuuvify.CommonPack.Extensions.Notificator;
 
 namespace Nuuvify.CommonPack.Email
 {
-
     public partial class Email : IEmail
     {
-
         ///<inheritdoc/>
         public List<NotificationR> Notifications { get; set; }
 
         ///<inheritdoc/>
         public List<NotificationR> LogMessage { get; set; }
-
-
 
         /// <summary>
         /// Caso estiver configurando um servidor Smpt externamente, utilize USING
@@ -31,15 +27,10 @@ namespace Nuuvify.CommonPack.Email
         ///<inheritdoc/>
         public EmailServerConfiguration EmailServerConfiguration
         {
-            get
-            {
-                return _emailServerConfiguration;
-            }
+            get => _emailServerConfiguration;
             set
             {
                 Notifications.RemoveAll(x => x.Property == nameof(EmailServerConfiguration));
-
-
 
                 if (string.IsNullOrWhiteSpace(value.ServerHost))
                 {
@@ -47,18 +38,14 @@ namespace Nuuvify.CommonPack.Email
                         $"Host de email não informado"));
                 }
                 else
-                {
                     _emailServerConfiguration = value;
-                }
-
             }
         }
 
         private EmailServerConfiguration _emailServerConfiguration;
+
         public Email(EmailServerConfiguration emailServerConfiguration)
         {
-
-
             Notifications = new List<NotificationR>();
             LogMessage = new List<NotificationR>();
 
@@ -67,8 +54,6 @@ namespace Nuuvify.CommonPack.Email
             EmailServerConfiguration = _emailServerConfiguration;
         }
 
-
-
         ///<inheritdoc/>
         public IEmail WithAttachment(
             string pathFileFullName,
@@ -76,7 +61,6 @@ namespace Nuuvify.CommonPack.Email
             EmailMidiaSubType midiaSubType)
         {
             EmailAttachments ??= new Dictionary<string, EmailMidia>();
-
             EmailAttachments.Add(pathFileFullName, new EmailMidia(midiaType, midiaSubType));
 
             return this;
@@ -86,11 +70,11 @@ namespace Nuuvify.CommonPack.Email
         public IEmail WithAttachment(
             Stream fileStream,
             EmailMidiaType midiaType,
-            EmailMidiaSubType midiaSubType)
+            EmailMidiaSubType midiaSubType,
+            string fullFileName)
         {
-            EmailStreamAttachments ??= new Dictionary<Stream, EmailMidia>();
-
-            EmailStreamAttachments.Add(fileStream, new EmailMidia(midiaType, midiaSubType));
+            EmailStreamAttachments ??= new Dictionary<Stream, EmailAttachment>();
+            EmailStreamAttachments.Add(fileStream, new EmailAttachment(new EmailMidia(midiaType, midiaSubType), fullFileName));
 
             return this;
         }
@@ -99,6 +83,7 @@ namespace Nuuvify.CommonPack.Email
         public IEmail RemoveAllAttachments()
         {
             EmailAttachments?.Clear();
+            EmailStreamAttachments?.Clear();
 
             return this;
         }
@@ -130,7 +115,7 @@ namespace Nuuvify.CommonPack.Email
         ///<inheritdoc/>
         public int CountAttachments()
         {
-            var count = EmailAttachments?.Count ?? 0;
+            var count = EmailAttachments?.Count ?? 0 + EmailStreamAttachments?.Count ?? 0;
             return count;
         }
 
@@ -151,29 +136,21 @@ namespace Nuuvify.CommonPack.Email
                 return false;
             }
 
-
             return await EmailHandler(
                 SetAddressEmailList(PessoasEmail.To, recipients),
                 SetAddressEmailList(PessoasEmail.From, senders),
                 CreateEmailMessage(subject),
                 message,
                 cancellationToken);
-
         }
 
-
-        public bool IsValid()
-        {
-            return Notifications?.Count == 0;
-        }
-
+        public bool IsValid() => Notifications?.Count == 0;
 
         ///<inheritdoc/>
         public string GetEmailTemplate(
             Dictionary<string, string> variables,
             string templateFullName)
         {
-
             if (!File.Exists(templateFullName))
             {
                 Notifications.Add(new NotificationR(nameof(GetEmailTemplate), $"Nome do template ou caminho informado não existe: {templateFullName}"));
@@ -186,28 +163,17 @@ namespace Nuuvify.CommonPack.Email
                 return string.Empty;
             }
 
-
             StringBuilder newHtml;
 
             using (var fs = File.OpenRead(templateFullName))
-            {
                 newHtml = ReadTemplate(fs);
-            }
-
 
             var newTemplate = newHtml.ToString();
 
             foreach (var variable in variables)
-            {
                 newTemplate = newTemplate.Replace(variable.Key.ToString(), variable.Value.ToString());
 
-            }
-
-
             return newTemplate;
-
         }
-
-
     }
 }
