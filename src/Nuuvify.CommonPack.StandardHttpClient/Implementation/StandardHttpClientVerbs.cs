@@ -126,9 +126,20 @@ namespace Nuuvify.CommonPack.StandardHttpClient
 
         public async Task<HttpStandardReturn> Patch(string urlRoute, object messageBody, CancellationToken cancellationToken = default)
         {
+            var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
-            var patch = await Put(urlRoute, messageBody);
-            return patch;
+
+            var message = new HttpRequestMessage(HttpMethod.Patch, url)
+            {
+                Content = new StringContent(
+                    JsonSerializer.Serialize(messageBody),
+                    Encoding.UTF8, "application/json"
+                )
+            }
+            .CustomRequestHeader(_headerStandard)
+            .AddAuthorizationHeader(_headerAuthorization);
+
+            return await StandardSendAsync(url, message, cancellationToken);
 
         }
 
