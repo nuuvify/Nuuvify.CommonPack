@@ -97,6 +97,7 @@ namespace Nuuvify.CommonPack.Email
             else
             {
 
+                var logText = string.Empty;
                 var multipart = new Multipart("mixed");
 
                 foreach (var attachment in attachments)
@@ -105,6 +106,9 @@ namespace Nuuvify.CommonPack.Email
                     {
                         return await Task.FromCanceled<bool>(cancellationToken);
                     }
+
+                    logText = $"Anexando: {attachment.Key}";
+
 
                     if (!File.Exists(attachment.Key))
                     {
@@ -117,6 +121,8 @@ namespace Nuuvify.CommonPack.Email
 
                     if (attachment.Value.EmailMidiaFile.Key == EmailMidiaType.Image)
                     {
+                        logText += $" EmailMidiaType: {EmailMidiaType.Image}";
+
                         var attachmentMime = new MimePart(EmailMidiaType.Image.ToString().ToLower(), attachment.Value.EmailMidiaFile.Value.ToString().ToLower())
                         {
                             Content = new MimeContent(File.OpenRead(attachment.Key), ContentEncoding.Default),
@@ -133,6 +139,8 @@ namespace Nuuvify.CommonPack.Email
                     else if (attachment.Value.EmailMidiaFile.Key == EmailMidiaType.Text)
                     {
 
+                        logText += $" EmailMidiaType: {EmailMidiaType.Text}";
+
                         var attachmentMime = new MimePart(EmailMidiaType.Text.ToString().ToLower(), attachment.Value.EmailMidiaFile.Value.ToString().ToLower())
                         {
                             Content = new MimeContent(File.OpenRead(attachment.Key), ContentEncoding.Default),
@@ -147,6 +155,8 @@ namespace Nuuvify.CommonPack.Email
                     }
                     else if (attachment.Value.EmailMidiaFile.Key == EmailMidiaType.Application)
                     {
+                        logText += $" EmailMidiaType: {EmailMidiaType.Application}";
+
                         var attachmentMime = new MimePart(EmailMidiaType.Application.ToString().ToLower(), attachment.Value.EmailMidiaFile.Value.ToString().ToLower())
                         {
                             Content = new MimeContent(File.OpenRead(attachment.Key), ContentEncoding.Default),
@@ -159,7 +169,11 @@ namespace Nuuvify.CommonPack.Email
                         multipart.Add(attachmentMime);
 
                         emailMessage.Body = multipart;
+
                     }
+
+                    LogMessage.Add(new NotificationR(nameof(AddAttachmentsInMessage), logText));
+
                 }
             }
 
