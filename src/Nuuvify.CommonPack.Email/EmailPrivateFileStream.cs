@@ -17,7 +17,7 @@ namespace Nuuvify.CommonPack.Email
             IDictionary<Stream, EmailAttachment> attachments,
             CancellationToken cancellationToken = default)
         {
-            if (attachments is not null && attachments?.Count > 0)
+            if (!(attachments is null) && attachments?.Count > 0)
             {
                 var logText = string.Empty;
                 MultipartMessage = MultipartMessage is null ? new Multipart("mixed") : MultipartMessage;
