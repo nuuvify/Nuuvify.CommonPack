@@ -13,17 +13,14 @@ namespace Nuuvify.CommonPack.Email
         private Dictionary<Stream, EmailAttachment> EmailStreamAttachments { get; set; }
 
         private async Task<bool> AddAttachmentsInMessage(
-            MimeMessage emailMessage,
             TextPart message,
             IDictionary<Stream, EmailAttachment> attachments,
             CancellationToken cancellationToken = default)
         {
-            if (attachments is null || attachments?.Count == 0)
-                emailMessage.Body = message;
-            else
+            if (attachments is not null && attachments?.Count > 0)
             {
                 var logText = string.Empty;
-                var multipart = new Multipart("mixed");
+                MultipartMessage = MultipartMessage is null ? new Multipart("mixed") : MultipartMessage;
 
                 foreach (var attachment in attachments)
                 {
@@ -45,10 +42,9 @@ namespace Nuuvify.CommonPack.Email
                             FileName = attachment.Value.FullFileName
                         };
 
-                        multipart.Add(message);
-                        multipart.Add(attachmentMime);
+                        MultipartMessage.Add(message);
+                        MultipartMessage.Add(attachmentMime);
 
-                        emailMessage.Body = multipart;
                     }
                     else if (attachment.Value.EmailMidia.EmailMidiaFile.Key == EmailMidiaType.Text)
                     {
@@ -62,10 +58,9 @@ namespace Nuuvify.CommonPack.Email
                             FileName = attachment.Value.FullFileName
                         };
 
-                        multipart.Add(message);
-                        multipart.Add(attachmentMime);
+                        MultipartMessage.Add(message);
+                        MultipartMessage.Add(attachmentMime);
 
-                        emailMessage.Body = multipart;
                     }
                     else if (attachment.Value.EmailMidia.EmailMidiaFile.Key == EmailMidiaType.Application)
                     {
@@ -79,10 +74,14 @@ namespace Nuuvify.CommonPack.Email
                             FileName = attachment.Value.FullFileName
                         };
 
-                        multipart.Add(message);
-                        multipart.Add(attachmentMime);
+                        MultipartMessage.Add(message);
+                        MultipartMessage.Add(attachmentMime);
 
-                        emailMessage.Body = multipart;
+                    }
+                    else
+                    {
+                        logText += $" . Não foi possivel anexar, EmailMidiaType não esperado: {attachment.Value.EmailMidia.EmailMidiaFile.Key}";
+
                     }
 
                     LogMessage.Add(new NotificationR(nameof(AddAttachmentsInMessage), logText));
