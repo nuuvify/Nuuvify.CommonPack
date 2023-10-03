@@ -28,13 +28,14 @@
 	"mounts": [
 		"source=/${localEnv:HOME}/.nuget/NuGet/NuGet.Config,target=/root/.nuget/NuGet/NuGet.Config,type=bind,consistency=cached",
 		"source=/${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,consistency=cached",
+		// "source=/${containerWorkspaceFolder}/.devcontainer/zshrc,target=/root/.zshrc,type=bind,consistency=cached",
 		"source=/${localEnv:HOME}/projs/atomic.omp.json,target=/root/atomic.omp.json,type=bind,consistency=cached"
 		// "source=${localEnv:APPDATA}\\NuGet\\linux\\NuGet.Config,target=/root/.nuget/NuGet/NuGet.Config,type=bind,consistency=cached",
 		// "source=${localEnv:APPDATA}\\Microsoft\\UserSecrets,target=/root/.microsoft/usersecrets,type=bind,consistency=cached"
 	],
 
 	"containerEnv": {
-		"teste": "${containerWorkspaceFolder}"
+		"TESTE": "${containerWorkspaceFolder}"
 	},
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
