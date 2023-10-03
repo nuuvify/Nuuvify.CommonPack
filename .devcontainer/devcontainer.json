@@ -1,0 +1,77 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/dotnet
+{
+	"name": ".NET",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	//"image": "cat-docker.artifacts.cat.com/cat_brazil-jfrog/dotnetcore/sdk-3.1.426-focal:1.0.0",
+	"build": {
+		"context": ".",
+		"dockerfile": "Dockerfile",
+		"args": { 
+			"PathApp": "${containerWorkspaceFolder}"
+		}
+	},
+	
+	"features": {
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"installZsh": true,
+			"installOhMyZsh": true,
+			"upgradePackages": true
+		},
+		"ghcr.io/devcontainers-contrib/features/zsh-plugins:0": {},
+		"ghcr.io/stuartleeks/dev-container-features/shell-history:0": {}
+	},
+
+	"mounts": [
+		"source=/home/${localEnv:HOME}/.nuget//NuGet/NuGet.Config,target=/root/.nuget/NuGet/NuGet.Config,type=bind,consistency=cached"
+		// "source=${localEnv:APPDATA}\\NuGet\\linux\\NuGet.Config,target=/root/.nuget/NuGet/NuGet.Config,type=bind,consistency=cached",
+		// "source=${localEnv:APPDATA}\\Microsoft\\UserSecrets,target=/root/.microsoft/usersecrets,type=bind,consistency=cached"
+	],
+
+	"containerEnv": {
+		"teste": "${containerWorkspaceFolder}"
+	},
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [5000, 5001],
+	// "portsAttributes": {
+	//		"5001": {
+	//			"protocol": "https"
+	//		}
+	// }
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "dotnet restore",
+
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-azuretools.vscode-docker",
+				"ms-dotnettools.vscodeintellicode-csharp",
+				"ms-vscode.powershell",
+				"ms-vsliveshare.vsliveshare",
+				"ms-dotnettools.csdevkit",
+				"ms-dotnettools.csharp",
+				"adrianwilczynski.asp-net-core-snippet-pack",
+				"k--kato.docomment",
+				"EditorConfig.EditorConfig",
+				"yzhang.markdown-all-in-one",
+				"VisualStudioExptTeam.intellicode-api-usage-examples",
+				"christian-kohler.path-intellisense",
+				"Gruntfuggly.todo-tree",
+				"quicktype.quicktype",
+				"eamodio.gitlens"
+			]
+		}
+	}
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+
+	// "workspaceFolder": "/home/nonroot/app"
+
+}
