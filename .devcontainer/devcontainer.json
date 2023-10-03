@@ -23,7 +23,8 @@
 	},
 
 	"mounts": [
-		"source=/${localEnv:HOME}/.nuget//NuGet/NuGet.Config,target=/root/.nuget/NuGet/NuGet.Config,type=bind,consistency=cached"
+		"source=/${localEnv:HOME}/.nuget/NuGet/NuGet.Config,target=/root/.nuget/NuGet/NuGet.Config,type=bind,consistency=cached",
+		"source=/${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,consistency=cached"
 		// "source=${localEnv:APPDATA}\\NuGet\\linux\\NuGet.Config,target=/root/.nuget/NuGet/NuGet.Config,type=bind,consistency=cached",
 		// "source=${localEnv:APPDATA}\\Microsoft\\UserSecrets,target=/root/.microsoft/usersecrets,type=bind,consistency=cached"
 	],
