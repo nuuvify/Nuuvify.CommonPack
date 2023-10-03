@@ -21,10 +21,8 @@
 		"ghcr.io/devcontainers-contrib/features/zsh-plugins:0": {
 			"omzPlugins": "https://github.com/zsh-users/zsh-autosuggestions"
 		},
-		"ghcr.io/stuartleeks/dev-container-features/shell-history:0": {},
-		"overrideFeatureInstallOrder": [
-			"./.devcontainer/custom-install.sh"
-		]
+		"ghcr.io/stuartleeks/dev-container-features/shell-history:0": {}
+
 	},
 
 	"mounts": [
@@ -52,6 +50,7 @@
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "dotnet restore",
+	"postCreateCommand": "./.devcontainer/custom-install.sh",
 
 	// Configure tool-specific properties.
 	"customizations": {
