@@ -18,13 +18,19 @@
 			"installOhMyZsh": true,
 			"upgradePackages": true
 		},
-		"ghcr.io/devcontainers-contrib/features/zsh-plugins:0": {},
-		"ghcr.io/stuartleeks/dev-container-features/shell-history:0": {}
+		"ghcr.io/devcontainers-contrib/features/zsh-plugins:0": {
+			"omzPlugins": "https://github.com/zsh-users/zsh-autosuggestions"
+		},
+		"ghcr.io/stuartleeks/dev-container-features/shell-history:0": {},
+		"overrideFeatureInstallOrder": [
+			"./.devcontainer/custom-install.sh"
+		]
 	},
 
 	"mounts": [
 		"source=/${localEnv:HOME}/.nuget/NuGet/NuGet.Config,target=/root/.nuget/NuGet/NuGet.Config,type=bind,consistency=cached",
-		"source=/${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,consistency=cached"
+		"source=/${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,consistency=cached",
+		"source=/${localEnv:HOME}/projs/atomic.omp.json,target=/root/atomic.omp.json,type=bind,consistency=cached"
 		// "source=${localEnv:APPDATA}\\NuGet\\linux\\NuGet.Config,target=/root/.nuget/NuGet/NuGet.Config,type=bind,consistency=cached",
 		// "source=${localEnv:APPDATA}\\Microsoft\\UserSecrets,target=/root/.microsoft/usersecrets,type=bind,consistency=cached"
 	],
