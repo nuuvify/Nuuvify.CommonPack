@@ -56,6 +56,7 @@
 				"ms-vsliveshare.vsliveshare",
 				"ms-dotnettools.csdevkit",
 				"ms-dotnettools.csharp",
+				"ecmel.vscode-html-css",
 				"adrianwilczynski.asp-net-core-snippet-pack",
 				"k--kato.docomment",
 				"EditorConfig.EditorConfig",
