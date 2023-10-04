@@ -10,9 +10,9 @@
     <PackageReference Include="CountryData.Bogus" Version="3.61.0" />
     <PackageReference Include="Microsoft.CodeAnalysis" Version="4.7.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Compilers" Version="4.7.0" />
-    <PackageReference Include="Microsoft.Net.Compilers" Version="4.2.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    <PackageReference Include="Microsoft.Net.Compilers" Version="4.2.0" Condition="'$(os)' == 'Windows_NT'" >
+    <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
 
