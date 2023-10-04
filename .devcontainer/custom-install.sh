@@ -12,6 +12,7 @@ FILEPOSH=$(which oh-my-posh)
 if [ ! -f "$FILEPOSH" ]; then
     curl -s https://ohmyposh.dev/install.sh | bash -s
     mv ~/.zshrc ~/.zshrc-old
+    cp $WORKFOLDER/.devcontainer/atomic.omp.json ~/.config/atomic.omp.json
     cp $WORKFOLDER/.devcontainer/.zshrc ~/.zshrc
 fi
 
