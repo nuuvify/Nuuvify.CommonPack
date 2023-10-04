@@ -21,4 +21,4 @@ compinit
 
 source ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 
-eval "$(oh-my-posh init zsh --config ~/atomic.omp.json)"
+eval "$(oh-my-posh init zsh --config ~/.config/atomic.omp.json)"
