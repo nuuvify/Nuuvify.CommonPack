@@ -12,6 +12,6 @@ FILEPOSH=$(which oh-my-posh)
 if [ ! -f "$FILEPOSH" ]; then
     curl -s https://ohmyposh.dev/install.sh | bash -s
     mv ~/.zshrc ~/.zshrc-old
-    cp $TESTE/.devcontainer/.zshrc ~/.zshrc
+    cp $WORKFOLDER/.devcontainer/.zshrc ~/.zshrc
 fi
 

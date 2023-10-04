@@ -14,7 +14,7 @@ RUN apt update -y && apt upgrade -y
 
 # RUN useradd -ms /bin/bash $UserApp 
 
-ENV TZ=Brazil/East
+ARG TZ="Brazil/East"
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
 
 # WORKDIR $PathApp
