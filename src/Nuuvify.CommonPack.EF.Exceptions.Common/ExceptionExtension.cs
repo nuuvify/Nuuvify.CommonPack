@@ -42,7 +42,12 @@ namespace EntityFramework.Exceptions.Common
                         databaseValue = $"DataBaseValue: {columnName} = {databaseValues?[property]}";
                     }
 
-                    currentAndProposed.TryAdd(currentValue, databaseValue);
+                    //TODO: Quando atualizar para netstandard2.1 ou .net60, substituir esse codigo
+                    //por essa linha "TryAdd"
+                    //currentAndProposed.TryAdd(currentValue, databaseValue);
+                    if (!currentAndProposed.ContainsKey(currentValue))
+                        currentAndProposed.Add(currentValue, databaseValue);
+                        
                 }
 
             }
