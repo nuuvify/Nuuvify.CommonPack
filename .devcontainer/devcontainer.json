@@ -3,7 +3,6 @@
 {
 	"name": ".NET",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	//"image": "cat-docker.artifacts.cat.com/cat_brazil-jfrog/dotnetcore/sdk-3.1.426-focal:1.0.0",
 	"build": {
 		"context": ".",
 		"dockerfile": "Dockerfile",
@@ -28,16 +27,16 @@
 	"mounts": [
 		"source=/${localEnv:HOME}/.nuget/NuGet/NuGet.Config,target=/root/.nuget/NuGet/NuGet.Config,type=bind,consistency=cached",
 		"source=/${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,consistency=cached",
-		// "source=/${containerWorkspaceFolder}/.devcontainer/zshrc,target=/root/.zshrc,type=bind,consistency=cached",
-		"source=/${localEnv:HOME}/projs/atomic.omp.json,target=/root/atomic.omp.json,type=bind,consistency=cached"
+		"source=/${localEnv:HOME}/.config/atomic.omp.json,target=/root/.config/atomic.omp.json,type=bind,consistency=cached"
 		// "source=${localEnv:APPDATA}\\NuGet\\linux\\NuGet.Config,target=/root/.nuget/NuGet/NuGet.Config,type=bind,consistency=cached",
 		// "source=${localEnv:APPDATA}\\Microsoft\\UserSecrets,target=/root/.microsoft/usersecrets,type=bind,consistency=cached"
 	],
 
 	"containerEnv": {
-		"TESTE": "${containerWorkspaceFolder}"
+		"WORKFOLDER": "${containerWorkspaceFolder}"
 	},
 
+	
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
 
@@ -56,6 +55,10 @@
 	// Configure tool-specific properties.
 	"customizations": {
 		"vscode": {
+			"settings": {
+				"terminal.integrated.fontFamily": "MesloLGM NF",
+				"terminal.integrated.defaultProfile.linux": "zsh"
+			},
 			"extensions": [
 				"ms-azuretools.vscode-docker",
 				"ms-dotnettools.vscodeintellicode-csharp",
