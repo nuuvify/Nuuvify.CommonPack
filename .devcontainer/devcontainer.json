@@ -26,12 +26,12 @@
 
 	"mounts": [
 		// Se estiver utilizando Linux ou WSL2 desmarque essas linhas
-		"source=/${localEnv:HOME}/.nuget/NuGet/NuGet.Config,target=/root/.nuget/NuGet/NuGet.Config,type=bind,consistency=cached",
-		"source=/${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,consistency=cached",
+		// "source=/${localEnv:HOME}/.nuget/NuGet/NuGet.Config,target=/root/.nuget/NuGet/NuGet.Config,type=bind,consistency=cached",
+		// "source=/${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,consistency=cached"
 		
 		// Se estiver usando Windows ou Docker Desktop, desmarque essas linhas
-		// "source=${localEnv:APPDATA}/NuGet/linux/NuGet.Config,target=/root/.nuget/NuGet/NuGet.Config,type=bind,consistency=cached",
-		// "source=${localEnv:USERPROFILE}/.ssh,target=/root/.ssh,type=bind,consistency=cached"
+		"source=${localEnv:APPDATA}/NuGet/linux/NuGet.Config,target=/root/.nuget/NuGet/NuGet.Config,type=bind,consistency=cached",
+		"source=${localEnv:USERPROFILE}/.ssh,target=/root/.ssh,type=bind,consistency=cached"
 		
 		// "source=${localEnv:APPDATA}\\Microsoft\\UserSecrets,target=/root/.microsoft/usersecrets,type=bind,consistency=cached"
 	],
@@ -60,7 +60,7 @@
 	"customizations": {
 		"vscode": {
 			"settings": {
-				"terminal.integrated.fontFamily": "MesloLGM NF",
+				"terminal.integrated.fontFamily": "MesloLGM NF", // ou "MesloLGM Nerd Font"
 				"terminal.integrated.defaultProfile.linux": "zsh"
 			},
 			"extensions": [
