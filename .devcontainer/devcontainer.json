@@ -60,7 +60,7 @@
 	"customizations": {
 		"vscode": {
 			"settings": {
-				"terminal.integrated.fontFamily": "MesloLGM NF",
+				"terminal.integrated.fontFamily": "MesloLGM NF", // ou "MesloLGM Nerd Font"
 				"terminal.integrated.defaultProfile.linux": "zsh"
 			},
 			"extensions": [
