@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,10 +45,32 @@ namespace Nuuvify.CommonPack.AzureStorage.Abstraction
 
         /// <summary>
         /// Informe uma lista com Id do arquivo gravado no storage, geralmente "prefixo_NomeArquivo"
+        /// Esse metodo esta obsoleto, considere usar os metodos:
+        ///     • DownloadContentAsync – as a prefered way of downloading small blobs that can fit into memory
+        ///     • DownloadStreamingAsync – as a replacement to this API. Use it to access network stream directly for any advanced scenario.
         /// </summary>
         /// <param name="attachments"></param>
         /// <returns></returns>
+        [Obsolete("Esse metodo esta obsoleto e sera removido em futura versao.")]
         Task<BlobStorageResult> GetBlobById(IEnumerable<string> attachments);
+
+
+        /// <summary>
+        /// Retorna uma lista de arquivos no formato byte[], esse é o metodo preferencial para baixar arquivos do blob
+        /// </summary>
+        /// <param name="attachments"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<BlobStorageResult> DownloadStreamingAsync(IEnumerable<string> attachments, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Baixa a lista de ID's em formato string (Use esse metodo apenas para pequenos arquivos)
+        /// <para>Esse metodo popula a propriedade BlobStorageResult.StringBlobs</para>
+        /// </summary>
+        /// <param name="attachments">Lista de ID's para baixar</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<BlobStorageResult> DownloadContentAsync(IEnumerable<string> attachments, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Id do arquivo gravado no storage, geralmente "prefixo_NomeArquivo"
@@ -55,6 +78,14 @@ namespace Nuuvify.CommonPack.AzureStorage.Abstraction
         /// <param name="fileId"></param>
         /// <returns></returns>
         Task<bool> DeleteBlob(string fileId);
+
+        /// <summary>
+        /// Converte um byte[] para string, normalmente usado para converter o conteudo de BlobStorageResult.Blobs
+        /// <para>ATENÇÃO: Use esse metodo com responsabilidade, pois converter dados grandes pode causar exceções e problemas de performance</para>
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <returns></returns>
+        string ContentToString(byte[] bytes);
 
     }
 
