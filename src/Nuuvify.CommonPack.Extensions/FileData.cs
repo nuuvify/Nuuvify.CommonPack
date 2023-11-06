@@ -31,8 +31,8 @@ namespace Nuuvify.CommonPack.Extensions
         /// Name = Nome do arquivo que foi informado <br/>
         /// Content = Conteudo do arquivo no formato byte array <br/> 
         /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="fileLength"></param>
+        /// <param name="stream">Arquivo em stream</param>
+        /// <param name="fileLength">byte[].Length</param>
         /// <param name="fileName">Nome completo do arquivo ao qual pertence o conteudo, se informado sera populado a propriedade Name</param>
         public void StreamToByteArray(Stream stream, int fileLength = 0, string fileName = null)
         {
@@ -83,6 +83,24 @@ namespace Nuuvify.CommonPack.Extensions
 
             var content = Convert.ToBase64String(fileContent);
             return content;
+        }
+
+        /// <summary>
+        /// Faz download de byte[] para um arquivo `pathFileName`, criando a pasta caso não exista
+        /// Importante: Só use esse metodo se estiver usando um worker, em caso de front end ou api, use FileStreamResultCustom
+        /// </summary>
+        /// <param name="fileContent">Conteudo de um arquivo em byte[]</param>
+        /// <param name="pathFileName">Nome completo do arquivo ao qual pertence o conteudo, sera criado caso não exista</param>
+        /// <returns></returns>
+        public void Download(byte[] fileContent, string pathFileName)
+        {
+
+            Directory.CreateDirectory(Path.GetDirectoryName(pathFileName));
+            File.WriteAllBytes(pathFileName, fileContent);
+
+            Name = pathFileName;
+            Content = fileContent;
+
         }
 
 

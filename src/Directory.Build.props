@@ -19,11 +19,12 @@
       ou
       1.54.18 (para versão definitiva)
       -->
-    <Version>1.6.1-preview.1</Version>
+    <Version>1.7.0-preview.1</Version>
     <FileVersion>22.05.18.1520</FileVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1705;1591</NoWarn>
     <DocumentationFile>Docs\$(MSBuildProjectName).xml</DocumentationFile>
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(OsPlatform) == 'Linux'">
