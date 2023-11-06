@@ -19,6 +19,7 @@ namespace Nuuvify.CommonPack.Email
     {
 
         private Dictionary<string, EmailMidia> EmailAttachments { get; set; }
+        private Multipart MultipartMessage { get; set; }
 
 
         private bool EmailIsvalid(string email)
@@ -85,19 +86,14 @@ namespace Nuuvify.CommonPack.Email
         }
 
         private async Task<bool> AddAttachmentsInMessage(
-            MimeMessage emailMessage,
             TextPart message,
             IDictionary<string, EmailMidia> attachments,
             CancellationToken cancellationToken = default)
         {
-            if (attachments is null || attachments?.Count == 0)
+            if (!(attachments is null) && attachments?.Count > 0)
             {
-                emailMessage.Body = message;
-            }
-            else
-            {
-
-                var multipart = new Multipart("mixed");
+                var logText = string.Empty;
+                MultipartMessage = MultipartMessage is null ? new Multipart("mixed") : MultipartMessage;
 
                 foreach (var attachment in attachments)
                 {
@@ -105,6 +101,9 @@ namespace Nuuvify.CommonPack.Email
                     {
                         return await Task.FromCanceled<bool>(cancellationToken);
                     }
+
+                    logText = $"Anexando: {attachment.Key}";
+
 
                     if (!File.Exists(attachment.Key))
                     {
@@ -117,6 +116,8 @@ namespace Nuuvify.CommonPack.Email
 
                     if (attachment.Value.EmailMidiaFile.Key == EmailMidiaType.Image)
                     {
+                        logText += $" EmailMidiaType: {EmailMidiaType.Image}";
+
                         var attachmentMime = new MimePart(EmailMidiaType.Image.ToString().ToLower(), attachment.Value.EmailMidiaFile.Value.ToString().ToLower())
                         {
                             Content = new MimeContent(File.OpenRead(attachment.Key), ContentEncoding.Default),
@@ -125,13 +126,14 @@ namespace Nuuvify.CommonPack.Email
                             FileName = Path.GetFileName(attachment.Key)
                         };
 
-                        multipart.Add(message);
-                        multipart.Add(attachmentMime);
+                        MultipartMessage.Add(message);
+                        MultipartMessage.Add(attachmentMime);
 
-                        emailMessage.Body = multipart;
                     }
                     else if (attachment.Value.EmailMidiaFile.Key == EmailMidiaType.Text)
                     {
+
+                        logText += $" EmailMidiaType: {EmailMidiaType.Text}";
 
                         var attachmentMime = new MimePart(EmailMidiaType.Text.ToString().ToLower(), attachment.Value.EmailMidiaFile.Value.ToString().ToLower())
                         {
@@ -140,13 +142,14 @@ namespace Nuuvify.CommonPack.Email
                             FileName = Path.GetFileName(attachment.Key),
                         };
 
-                        multipart.Add(message);
-                        multipart.Add(attachmentMime);
+                        MultipartMessage.Add(message);
+                        MultipartMessage.Add(attachmentMime);
 
-                        emailMessage.Body = multipart;
                     }
                     else if (attachment.Value.EmailMidiaFile.Key == EmailMidiaType.Application)
                     {
+                        logText += $" EmailMidiaType: {EmailMidiaType.Application}";
+
                         var attachmentMime = new MimePart(EmailMidiaType.Application.ToString().ToLower(), attachment.Value.EmailMidiaFile.Value.ToString().ToLower())
                         {
                             Content = new MimeContent(File.OpenRead(attachment.Key), ContentEncoding.Default),
@@ -155,11 +158,17 @@ namespace Nuuvify.CommonPack.Email
                             FileName = Path.GetFileName(attachment.Key)
                         };
 
-                        multipart.Add(message);
-                        multipart.Add(attachmentMime);
+                        MultipartMessage.Add(message);
+                        MultipartMessage.Add(attachmentMime);
 
-                        emailMessage.Body = multipart;
                     }
+                    else
+                    {
+                        logText += $" . Não foi possivel anexar, EmailMidiaType não esperado: {attachment.Value.EmailMidiaFile.Key}";
+                    }
+
+                    LogMessage.Add(new NotificationR(nameof(AddAttachmentsInMessage), logText));
+
                 }
             }
 
@@ -189,8 +198,10 @@ namespace Nuuvify.CommonPack.Email
 
             emailMessage.From.AddRange(senders);
             emailMessage.To.AddRange(recipients);
-            await AddAttachmentsInMessage(emailMessage, body, EmailAttachments, cancellationToken);
-            await AddAttachmentsInMessage(emailMessage, body, EmailStreamAttachments, cancellationToken);
+            await AddAttachmentsInMessage(body, EmailAttachments, cancellationToken);
+            await AddAttachmentsInMessage(body, EmailStreamAttachments, cancellationToken);
+
+            emailMessage.Body = MultipartMessage;
 
 
             if (!IsValid()) return false;
