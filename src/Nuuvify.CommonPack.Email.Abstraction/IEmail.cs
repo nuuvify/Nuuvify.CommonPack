@@ -86,12 +86,14 @@ namespace Nuuvify.CommonPack.Email.Abstraction
         /// </summary>
         /// <param name="fileStream">Informe o arquivo como FileStream</param>
         /// <param name="midiaType">Conforme a classe EmailMidiaType</param>
-        /// <param name="midiaSubType">Conforme a classe  EmailMidiaSubType</param>
+        /// <param name="midiaSubType">Conforme a classe EmailMidiaSubType</param>
+        /// <param name="fullFileName">Informe o nome completo do arquivo (exemplo: texto_001.txt)</param>
         /// <returns></returns>
         IEmail WithAttachment(
             Stream fileStream,
             EmailMidiaType midiaType,
-            EmailMidiaSubType midiaSubType);
+            EmailMidiaSubType midiaSubType,
+            string fullFileName);
 
         /// <summary>
         /// Remove todos os arquivos anexados

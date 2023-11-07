@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
@@ -83,7 +84,7 @@ namespace Nuuvify.CommonPack.AzureStorage
         }
 
 
-        public async Task<BlobStorageResult> GetAllBlobs()
+        public virtual async Task<BlobStorageResult> GetAllBlobs()
         {
 
             var blobCnn = Configuration.GetConnectionString(BlobConnectionName);
@@ -107,7 +108,7 @@ namespace Nuuvify.CommonPack.AzureStorage
         }
 
         ///<inheritdoc/>
-        public async Task<string> AddOrUpdateBlob(IDictionary<string, byte[]> attachments, CancellationToken cancellationToken)
+        public virtual async Task<string> AddOrUpdateBlob(IDictionary<string, byte[]> attachments, CancellationToken cancellationToken)
         {
 
             if (attachments == null || attachments.Count == 0) return null;
@@ -131,7 +132,7 @@ namespace Nuuvify.CommonPack.AzureStorage
 
 
         ///<inheritdoc/>
-        public async Task<bool> DeleteBlob(string fileId)
+        public virtual async Task<bool> DeleteBlob(string fileId)
         {
             var _blobClient = BlobClientInstance(fileId);
 
@@ -141,7 +142,7 @@ namespace Nuuvify.CommonPack.AzureStorage
 
 
         ///<inheritdoc/>
-        public async Task<BlobStorageResult> GetBlobById(IEnumerable<string> attachments)
+        public virtual async Task<BlobStorageResult> GetBlobById(IEnumerable<string> attachments)
         {
             if (attachments == null || !attachments.Any()) return null;
 
@@ -163,7 +164,6 @@ namespace Nuuvify.CommonPack.AzureStorage
                     blobDownloadInfo = await _blobClient.DownloadAsync();
 
                     using var ms = new MemoryStream();
-
                     await blobDownloadInfo.Content.CopyToAsync(ms);
                     fileBytes = ms.ToArray();
                     ms.Close();
@@ -183,6 +183,94 @@ namespace Nuuvify.CommonPack.AzureStorage
 
         }
 
+
+        ///<inheritdoc/>
+        public virtual async Task<BlobStorageResult> DownloadStreamingAsync(IEnumerable<string> attachments, CancellationToken cancellationToken = default)
+        {
+            if (attachments == null || !attachments.Any()) return null;
+
+            BlobClient _blobClient;
+            BlobDownloadStreamingResult blobDownloadStreamingResult;
+            byte[] fileBytes;
+            var blobResult = new BlobStorageResult();
+            bool blobExists;
+
+
+            foreach (var item in attachments)
+            {
+
+                _blobClient = BlobClientInstance(item);
+
+                blobExists = await _blobClient.ExistsAsync();
+                if (blobExists)
+                {
+                    blobDownloadStreamingResult = await _blobClient.DownloadStreamingAsync(null, cancellationToken);
+
+                    using var ms = new MemoryStream();
+                    await blobDownloadStreamingResult.Content.CopyToAsync(ms);
+                    fileBytes = ms.ToArray();
+                    ms.Close();
+
+                    if (!blobResult.Blobs.TryGetValue(item, out byte[] value))
+                    {
+                        blobResult.Blobs.Add(item, fileBytes);
+                    }
+
+
+                }
+
+            }
+
+
+            return blobResult;
+
+        }
+
+        ///<inheritdoc/>
+        public virtual async Task<BlobStorageResult> DownloadContentAsync(IEnumerable<string> attachments, CancellationToken cancellationToken = default)
+        {
+
+            if (attachments == null || !attachments.Any()) return null;
+
+            BlobClient _blobClient;
+            BlobDownloadResult blobDownloadResult;
+            var blobResult = new BlobStorageResult();
+            bool blobExists;
+
+
+            foreach (var item in attachments)
+            {
+
+                _blobClient = BlobClientInstance(item);
+
+                blobExists = await _blobClient.ExistsAsync();
+                if (blobExists)
+                {
+                    blobDownloadResult = await _blobClient.DownloadContentAsync(cancellationToken);
+
+                    if (!blobResult.StringBlobs.TryGetValue(item, out string value))
+                    {
+                        blobResult.StringBlobs.Add(item, blobDownloadResult.Content.ToString());
+                    }
+
+                }
+
+            }
+
+
+            return blobResult;
+
+
+        }
+
+        ///<inheritdoc/>
+        public virtual string ContentToString(byte[] bytes)
+        {
+
+            var contentString = Encoding.UTF8.GetString(bytes);
+            return contentString;
+
+        }
     }
 
 
