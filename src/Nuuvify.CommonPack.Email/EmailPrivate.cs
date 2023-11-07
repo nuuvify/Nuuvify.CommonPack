@@ -198,8 +198,17 @@ namespace Nuuvify.CommonPack.Email
 
             emailMessage.From.AddRange(senders);
             emailMessage.To.AddRange(recipients);
+
             await AddAttachmentsInMessage(body, EmailAttachments, cancellationToken);
             await AddAttachmentsInMessage(body, EmailStreamAttachments, cancellationToken);
+
+            if ((EmailAttachments is null) || EmailAttachments?.Count == 0 &&
+                (EmailStreamAttachments is null) || EmailStreamAttachments?.Count == 0)
+            {
+                MultipartMessage = MultipartMessage is null ? new Multipart("mixed") : MultipartMessage;
+                MultipartMessage.Add(body);
+
+            }
 
             emailMessage.Body = MultipartMessage;
 
