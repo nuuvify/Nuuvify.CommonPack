@@ -25,7 +25,6 @@ namespace Nuuvify.CommonPack.Email.Abstraction
         public EmailMidia(EmailMidiaType midiaType, EmailMidiaSubType midiaSubType)
         {
             EmailMidiaFile = new KeyValuePair<EmailMidiaType, EmailMidiaSubType>(midiaType, midiaSubType);
-
         }
     }
 }
