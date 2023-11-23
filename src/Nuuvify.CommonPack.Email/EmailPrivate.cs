@@ -202,8 +202,8 @@ namespace Nuuvify.CommonPack.Email
             await AddAttachmentsInMessage(body, EmailAttachments, cancellationToken);
             await AddAttachmentsInMessage(body, EmailStreamAttachments, cancellationToken);
 
-            if ((EmailAttachments is null) || EmailAttachments?.Count == 0 &&
-                (EmailStreamAttachments is null) || EmailStreamAttachments?.Count == 0)
+            if ((EmailAttachments is null || EmailAttachments?.Count == 0) &&
+                (EmailStreamAttachments is null || EmailStreamAttachments?.Count == 0))
             {
                 MultipartMessage = MultipartMessage is null ? new Multipart("mixed") : MultipartMessage;
                 MultipartMessage.Add(body);
@@ -215,13 +215,12 @@ namespace Nuuvify.CommonPack.Email
 
             if (!IsValid()) return false;
 
-
-
             SmtpCustomClient ??= new SmtpClient();
 
             bool returnTask = await SendEmailCustom(SmtpCustomClient, emailMessage, cancellationToken);
 
-
+            MultipartMessage.Clear();
+            
             return returnTask;
         }
 
