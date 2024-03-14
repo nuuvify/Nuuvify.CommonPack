@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <PackageReadmeFile>README.txt</PackageReadmeFile>
         <PackageTags>EntityFramework EF Oracle EntityFrameworkCore ODP.NET entity-framework-core EFCore Data Database</PackageTags>
         <PackageReleaseNotes>Populate Entries property of the exceptions</PackageReleaseNotes>
@@ -10,7 +10,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="IBM.Data.DB2.Core" Version="3.1.0.500" Condition="'$(os)' == 'Windows_NT'" />
+        <PackageReference Include="IBM.Data.DB2.Core" Version="3.1.0.600" Condition="'$(os)' == 'Windows_NT'" />
         <PackageReference Include="IBM.Data.DB2.Core-lnx" Version="3.1.0.500" Condition="'$(os)' == 'UNIX'" />
     </ItemGroup>
 

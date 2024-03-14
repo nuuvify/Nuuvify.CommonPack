@@ -1,22 +1,9 @@
-FROM lzocateli/dotnet-sdk-3.1.426-focal-amd64:1.0.0
+FROM lzocateli/dotnet-sdk:8.0.202-jammy-amd64
 
 ARG PathApp=/workspaces
 
 RUN apt update -y && apt upgrade -y
 
-# RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history" \
-#     && mkdir /commandhistory \
-#     && touch /commandhistory/.bash_history \
-#     && chown -R $USERNAME /commandhistory \
-#     && echo "$SNIPPET" >> "/home/$USERNAME/.bashrc"
-
-# ARG UserApp=nonroot
-
-# RUN useradd -ms /bin/bash $UserApp 
-
-ARG TZ="Brazil/East"
+ARG TZ=America/Sao_Paulo
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
 
-# WORKDIR $PathApp
-
-# USER $UserApp

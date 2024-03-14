@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -239,8 +240,9 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
         {
             var JsonSettings = new JsonSerializerOptions
             {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 PropertyNameCaseInsensitive = true,
-                IgnoreNullValues = true
+
             };
 
 
