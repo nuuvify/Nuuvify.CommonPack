@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -15,8 +16,8 @@ namespace Nuuvify.CommonPack.HealthCheck
 
         public string SegmentSearch = "api/";
 
-        private const string ObjectCheckName = "CredentialApi";
-        private const string UrlHealthCheck = "hc-ui-api";
+        public string ObjectCheckName = "CredentialApi";
+        public string UrlHealthCheck = "hc-ui-api";
         private Uri UrlPrefix;
 
         private readonly JsonSerializerOptions jsonOptions;
@@ -29,7 +30,7 @@ namespace Nuuvify.CommonPack.HealthCheck
 
             jsonOptions = new JsonSerializerOptions
             {
-                IgnoreNullValues = true,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 PropertyNameCaseInsensitive = true,
             };
 

@@ -66,14 +66,15 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// </summary>
         /// <param name="services"></param>
         /// <param name="configuration"></param>
+        /// <param name="httpclientName"></param>
         public static IHttpClientBuilder AddServiceCredentialRegister(this IServiceCollection services,
-            IConfiguration configuration)
+            IConfiguration configuration, string httpclientName = "CredentialApi")
         {
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 
-            return services.AddHttpClient("CredentialApi", client =>
+            return services.AddHttpClient(httpclientName, client =>
             {
                 client.BaseAddress = new Uri(configuration.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value);
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
