@@ -48,7 +48,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
                 return pathSecret;
             }
 
-            pathSecret = pathSecret.Replace(".config", "");
+            pathSecret = pathSecret.Replace("/.config", "");
 
             if (DirectoryExists(pathSecret))
             {

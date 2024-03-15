@@ -49,7 +49,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.Oracle.xTest
                 return pathSecret;
             }
 
-            pathSecret = pathSecret.Replace(".config", "");
+            pathSecret = pathSecret.Replace("/.config", "");
 
             if (DirectoryExists(pathSecret))
             {
