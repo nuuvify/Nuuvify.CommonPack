@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -11,6 +12,7 @@ using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.Extensions.Notificator;
 using Nuuvify.CommonPack.Security.Abstraction;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
+
 
 namespace Nuuvify.CommonPack.StandardHttpClient.Polly
 {
@@ -43,6 +45,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
             _credentialToken = credentialToken.Value;
 
             Notifications = new List<NotificationR>();
+
         }
 
 
@@ -239,8 +242,9 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
         {
             var JsonSettings = new JsonSerializerOptions
             {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 PropertyNameCaseInsensitive = true,
-                IgnoreNullValues = true
+
             };
 
 
