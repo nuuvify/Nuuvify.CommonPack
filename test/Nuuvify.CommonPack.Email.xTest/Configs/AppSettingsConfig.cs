@@ -48,7 +48,7 @@ namespace Nuuvify.CommonPack.Email.xTest.Configs
                 return pathSecret;
             }
 
-            pathSecret = pathSecret.Replace(".config", "");
+            pathSecret = pathSecret.Replace("/.config", "");
 
             if (DirectoryExists(pathSecret))
             {
