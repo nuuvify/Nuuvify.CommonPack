@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Nuuvify.CommonPack.Extensions.Notificator;
 using Nuuvify.CommonPack.StandardHttpClient.Helpers;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
@@ -55,7 +56,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
                         new NotificationRConverter()
                     },
                     PropertyNameCaseInsensitive = true,
-                    IgnoreNullValues = true
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
 
                 };
 

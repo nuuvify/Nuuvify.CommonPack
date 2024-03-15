@@ -13,6 +13,7 @@ using Nuuvify.CommonPack.Extensions.Notificator;
 using Nuuvify.CommonPack.Security.Abstraction;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 
+
 namespace Nuuvify.CommonPack.StandardHttpClient.Polly
 {
     public class TokenService : ITokenService
@@ -44,6 +45,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
             _credentialToken = credentialToken.Value;
 
             Notifications = new List<NotificationR>();
+
         }
 
 

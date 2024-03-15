@@ -5,6 +5,7 @@ using Nuuvify.CommonPack.Security.Abstraction;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+
 namespace Nuuvify.CommonPack.Security.Helpers
 {
     internal class ResultConverter : JsonConverter
@@ -30,7 +31,7 @@ namespace Nuuvify.CommonPack.Security.Helpers
 
                 propertyInfo = myClass.GetProperties()
                     .FirstOrDefault(x => x.Name.ToUpperInvariant() == item.Key.ToUpperInvariant());
-                
+
                 if (propertyInfo != null)
                 {
                     itemValue = Convert.ChangeType(item.Value, propertyInfo.PropertyType);
