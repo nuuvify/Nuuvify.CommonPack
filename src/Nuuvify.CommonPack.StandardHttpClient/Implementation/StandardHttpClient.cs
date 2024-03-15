@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
 using Nuuvify.CommonPack.Extensions.Implementation;
 
@@ -19,7 +18,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         private readonly ILogger<StandardHttpClient> _logger;
         private readonly Dictionary<string, object> _headerStandard;
         private readonly Dictionary<string, object> _headerAuthorization;
-        private QueryBuilder _queryString;
+        private IDictionary<String, String> _queryString;
 
         public bool LogRequest { get; set; }
         public string AuthorizationLog { get; private set; }
@@ -40,7 +39,8 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         {
             _logger = logger;
             _httpClientFactory = httpClientFactory;
-            _queryString = new QueryBuilder();
+            _queryString = new Dictionary<String, String>();
+
 
             _headerAuthorization = new Dictionary<string, object>();
             _headerStandard = new Dictionary<string, object>();
@@ -50,7 +50,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         ///<inheritdoc/>
         public void ResetStandardHttpClient()
         {
-            _queryString = new QueryBuilder();
+            _queryString = new Dictionary<String, String>();
             _headerAuthorization.Clear();
             _httpClient.DefaultRequestHeaders.Authorization = null;
             CorrelationId = string.Empty;
