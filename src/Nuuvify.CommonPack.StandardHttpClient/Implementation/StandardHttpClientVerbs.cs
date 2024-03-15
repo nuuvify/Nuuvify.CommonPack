@@ -5,7 +5,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
-
+using Nuuvify.CommonPack.StandardHttpClient.Extensions;
 
 namespace Nuuvify.CommonPack.StandardHttpClient
 {
