@@ -104,7 +104,8 @@ namespace Nuuvify.CommonPack.AutoHistory
             {
                 options = new JsonSerializerOptions()
                 {
-                    IgnoreNullValues = true,
+
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                     PropertyNameCaseInsensitive = true,
                     WriteIndented = false
                 };
@@ -112,7 +113,7 @@ namespace Nuuvify.CommonPack.AutoHistory
             }
 
             return options;
-        } 
+        }
 
     }
 }

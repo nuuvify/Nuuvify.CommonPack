@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.Extensions.JsonConverter;
@@ -44,7 +45,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
                     new JsonObjectToInferredTypesConverter()
                 },
                 PropertyNameCaseInsensitive = true,
-                IgnoreNullValues = true
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
             _tokenService = tokenService;
 
