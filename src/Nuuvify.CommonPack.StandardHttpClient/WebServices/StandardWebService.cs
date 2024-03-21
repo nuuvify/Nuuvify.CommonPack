@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -13,10 +13,12 @@ using Nuuvify.CommonPack.StandardHttpClient.Results;
 namespace Nuuvify.CommonPack.StandardHttpClient.WebServices
 {
 
-    public class StandardWebService : IStandardWebService
+    public partial class StandardWebService : IStandardWebService
     {
 
-        private HttpWebRequest _httpWebRequest;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private HttpClient _httpClient;
+
         private readonly ILogger<StandardWebService> _logger;
         private readonly Dictionary<string, object> _headerStandard;
         private string _queryString;
@@ -27,9 +29,11 @@ namespace Nuuvify.CommonPack.StandardHttpClient.WebServices
 
 
         public StandardWebService(
+            IHttpClientFactory httpClientFactory,
             ILogger<StandardWebService> logger)
         {
             _logger = logger;
+            _httpClientFactory = httpClientFactory;
             _queryString = string.Empty;
 
             _headerStandard = new Dictionary<string, object>();
@@ -39,6 +43,9 @@ namespace Nuuvify.CommonPack.StandardHttpClient.WebServices
         ///<inheritdoc/>
         public void ResetStandardWebService()
         {
+            _httpClient.DefaultRequestHeaders.Authorization = null;
+            FullUrl = null;
+
             _queryString = string.Empty;
             _headerStandard.Clear();
             _returnMessage = new HttpStandardReturn();
@@ -52,137 +59,53 @@ namespace Nuuvify.CommonPack.StandardHttpClient.WebServices
             {
                 throw new ArgumentException("Url deve ser informada", url);
             }
+            var options = new UriCreationOptions();
 
-            _httpWebRequest = WebRequest.CreateHttp(url);
+            if (Uri.TryCreate(url, options, out Uri uri))
+            {
+                _httpClient = _httpClientFactory.CreateClient();
+                _httpClient.BaseAddress = uri;
+            }
+            else
+            {
+                throw new ArgumentException("Parametro informado não é uma url valida", url);
+            }
+
 
         }
+
         ///<inheritdoc/>
         public void CreateHttp(HttpWebRequest httpWebRequest)
         {
-            _httpWebRequest = httpWebRequest;
+            var httpClientHandler = new HttpClientHandler
+            {
+                AllowAutoRedirect = httpWebRequest.AllowAutoRedirect,
+                AutomaticDecompression = httpWebRequest.AutomaticDecompression,
+                Credentials = httpWebRequest.Credentials,
+                Proxy = httpWebRequest.Proxy,
+                MaxAutomaticRedirections = httpWebRequest.MaximumAutomaticRedirections,
+                MaxResponseHeadersLength = httpWebRequest.MaximumResponseHeadersLength,
+                UseDefaultCredentials = httpWebRequest.UseDefaultCredentials
+            };
+
+
+            _httpClient = new HttpClient(httpClientHandler, true)
+            {
+                BaseAddress = httpWebRequest.Address
+            };
+
+        }
+        public void CreateHttp(HttpClientHandler httpClientHandler, Uri uri)
+        {
+            _httpClient = new HttpClient(httpClientHandler, true)
+            {
+                BaseAddress = uri
+            };
         }
 
         public void Configure(int timeOut)
         {
-            _httpWebRequest.Timeout = timeOut;
-        }
-
-
-        private void GetStreamReader(Stream data)
-        {
-
-            using (var reader = new StreamReader(data))
-            {
-
-                var xmlResponseDocument = new XmlDocument();
-
-                xmlResponseDocument.LoadXml(reader.ReadToEnd());
-
-                if (!xmlResponseDocument.InnerText.Contains("synRetDownloadXmlNFe"))
-                {
-                    _returnMessage.Success = false;
-                    _returnMessage.ReturnCode = "422";
-                    _returnMessage.ReturnMessage = xmlResponseDocument.InnerText;
-
-                }
-                else
-                {
-                    _returnMessage.Success = true;
-                    _returnMessage.ReturnCode = "200";
-                    _returnMessage.ReturnMessage = xmlResponseDocument
-                        .GetElementsByTagName("ns1:synDOCeDownloadXmlReturn")[0].InnerText;
-                }
-
-            }
-        }
-
-        private void GetResponseStream(WebResponse webResponse)
-        {
-            using Stream data = webResponse.GetResponseStream();
-            GetStreamReader(data);
-
-        }
-
-
-        private async Task<HttpStandardReturn> HandleResponseMessage()
-        {
-            _returnMessage = new HttpStandardReturn();
-
-            if (_httpWebRequest is null) return _returnMessage;
-
-
-            IAsyncResult asyncResult = _httpWebRequest.BeginGetResponse(null, null);
-
-
-
-            using (WebResponse webResponse = _httpWebRequest.EndGetResponse(asyncResult))
-            {
-
-                GetResponseStream(webResponse);
-
-            }
-
-
-            return await Task.FromResult(_returnMessage);
-        }
-
-        private async Task<HttpStandardReturn> StandardGetRequestStreamAsync(string url, XmlDocument soapEnvelopeXml)
-        {
-            _logger.LogDebug("Url and message before config {0} {1}",
-                soapEnvelopeXml.InnerXml,
-                _httpWebRequest.RequestUri);
-
-            HttpStandardReturn HttpStandardReturn;
-
-
-
-            if (!string.IsNullOrWhiteSpace(_httpWebRequest?.RequestUri?.AbsoluteUri) &&
-                _httpWebRequest.RequestUri.IsAbsoluteUri)
-            {
-                var urlBase = new Uri(_httpWebRequest.RequestUri.AbsoluteUri, UriKind.Absolute);
-                if (Uri.TryCreate(urlBase, url, out Uri result))
-                {
-                    FullUrl = result;
-                }
-                else
-                {
-                    _logger.LogWarning("Url base e relativa informada esta invalido Base: {0} Relativa: {1}",
-                        _httpWebRequest?.RequestUri?.AbsoluteUri,
-                        url);
-
-                    return null;
-                }
-            }
-            else
-            {
-                if (Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out Uri result))
-                {
-                    FullUrl = result;
-                }
-                else
-                {
-                    _logger.LogWarning("Url informada é invalida {0}", url);
-                    return null;
-                }
-            }
-
-            _logger.LogDebug("Url and message after config {0}", FullUrl.ToString());
-
-
-
-            using (var stream = await _httpWebRequest.GetRequestStreamAsync())
-            {
-                soapEnvelopeXml.Save(stream);
-            }
-
-
-            HttpStandardReturn = await HandleResponseMessage();
-
-
-            _logger.LogDebug("HttpStandardReturn return: {0}", HttpStandardReturn.ReturnCode);
-
-
-            return HttpStandardReturn;
+            _httpClient.Timeout = new TimeSpan(0, 0, timeOut);
         }
 
 
@@ -242,19 +165,45 @@ namespace Nuuvify.CommonPack.StandardHttpClient.WebServices
 
 
 
-        ///<inheritdoc/>
-        public async Task<HttpStandardReturn> RequestSoap(string urlRoute,
+        public async Task<HttpStandardReturn> RequestSoap(
+            string urlRoute,
             StandardHttpMethods method,
             XmlDocument messageBody,
+            string mediaType = "application/xml")
+        {
+
+            return await Task.FromResult(new HttpStandardReturn()
+            {
+                Success = false,
+                ReturnCode = "400",
+                ReturnMessage = "Esse metodo foi descontinuado, use o novo metodo RequestSoap"
+            });
+        }
+
+
+        ///<inheritdoc/>
+        public async Task<HttpStandardReturn> RequestSoap(
+            string urlRoute,
+            XmlDocument messageBody,
+            string xmlDocumentmlResponseDocumentContains,
+            string xmlGetElementsByTagName,
             string mediaType = "application/xml")
         {
             var url = $"{urlRoute}{_queryString}";
 
 
-            _httpWebRequest.MediaType = mediaType;
-            _httpWebRequest.Accept = "text/xml";
-            _httpWebRequest.Method = method.ToString();
-            _httpWebRequest.CustomRequestHeader(_headerStandard);
+            if (string.IsNullOrWhiteSpace(xmlDocumentmlResponseDocumentContains) ||
+                string.IsNullOrWhiteSpace(xmlGetElementsByTagName))
+            {
+                throw new ArgumentException($"Os parametros {nameof(xmlDocumentmlResponseDocumentContains)} e {nameof(xmlGetElementsByTagName)} são obrigatorios");
+            }
+
+
+            WithHeader("Accept", new MediaTypeWithQualityHeaderValue("text/xml"));
+            WithHeader("Content-Type", mediaType);
+
+
+            _httpClient.CustomRequestHeader(_headerStandard);
 
 
             return await StandardGetRequestStreamAsync(url, messageBody);
