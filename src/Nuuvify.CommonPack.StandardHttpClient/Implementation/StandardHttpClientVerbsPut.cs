@@ -1,0 +1,61 @@
+﻿using System.Net.Http;
+using System.Text;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
+using Nuuvify.CommonPack.StandardHttpClient.Results;
+using Nuuvify.CommonPack.StandardHttpClient.Extensions;
+using System.Net.Http.Headers;
+
+namespace Nuuvify.CommonPack.StandardHttpClient
+{
+
+    public partial class StandardHttpClient
+    {
+
+
+        public async Task<HttpStandardReturn> Put(string urlRoute, object messageBody, CancellationToken cancellationToken = default)
+        {
+
+            var url = $"{urlRoute}{_queryString.ToQueryString()}";
+
+
+            var message = new HttpRequestMessage(HttpMethod.Put, url)
+            {
+                Content = new StringContent(
+                    JsonSerializer.Serialize(messageBody),
+                    Encoding.UTF8, "application/json"
+                )
+            }
+            .CustomRequestHeader(_headerStandard)
+            .AddAuthorizationHeader(_headerAuthorization);
+
+            return await StandardSendAsync(url, message, cancellationToken);
+
+        }
+
+        public async Task<HttpStandardStreamReturn> PutStream(
+            string urlRoute,
+            MultipartFormDataContent messageBody,
+            string mediaType = "multipart/form-data",
+            CancellationToken cancellationToken = default)
+        {
+            var url = $"{urlRoute}{_queryString.ToQueryString()}";
+
+
+            WithHeader("Accept", new MediaTypeWithQualityHeaderValue(mediaType));
+
+            var message = new HttpRequestMessage(HttpMethod.Put, url)
+            {
+                Content = messageBody
+            }
+            .CustomRequestHeader(_headerStandard)
+            .AddAuthorizationHeader(_headerAuthorization);
+
+
+            return await StandardStreamSendAsync(url, message, cancellationToken);
+        }
+
+
+    }
+}
