@@ -9,6 +9,19 @@ namespace Nuuvify.CommonPack.StandardHttpClient
 {
     public static class StandardHttpClientSetup
     {
+
+        /// <summary>
+        /// Numero de vezes de tentativas de acesso a um serviço
+        /// </summary>
+        /// <value></value>
+        public static int RetryTotal { get; set; } = 2;
+        /// <summary>
+        /// Tempo minimo para primeira tentativa, a partir da segunda sera feito uma escala
+        /// </summary>
+        /// <value></value>
+        public static int BreakDurationMilliSeconds { get; set; } = 2000;
+
+
         /// <summary>
         /// Inclua esse setup antes das demais configurações de HttpClient <br/>
         /// Você precisa incluir as tags no seu arquivo appsettings.json <br/>
@@ -82,7 +95,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
                 client.BaseAddress = new Uri(configuration.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value);
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
             })
-            .AddPolicyWithTokenHandlers(services, retryTotal: 2, breakDurationMilliSeconds: 2000);
+            .AddPolicyWithTokenHandlers(services, retryTotal: RetryTotal, breakDurationMilliSeconds: BreakDurationMilliSeconds);
 
         }
 
