@@ -32,7 +32,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Extensions
 
             for (int i = 0; i < dic.Count; i++)
             {
-                _query.Append($"{dic.ElementAtOrDefault(i).Key}={dic.ElementAtOrDefault(i).Value},");
+                _query.Append($"{dic.ElementAtOrDefault(i).Key}={dic.ElementAtOrDefault(i).Value}&");
 
             }
 
@@ -48,7 +48,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Extensions
                 throw new ArgumentException("The leading '?' must be included for a non-empty query.", nameof(value));
             }
 
-            if (value.EndsWith(','))
+            if (value.EndsWith('&'))
                 value = value[..^1];
 
             return value;

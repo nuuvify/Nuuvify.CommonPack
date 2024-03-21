@@ -98,16 +98,45 @@ namespace Nuuvify.CommonPack.StandardHttpClient
             string mediaType = "multipart/form-data",
             CancellationToken cancellationToken = default);
 
+        Task<HttpStandardStreamReturn> PostStream(
+            string urlRoute,
+            MultipartFormDataContent messageBody,
+            string mediaType = "multipart/form-data",
+            CancellationToken cancellationToken = default);
+
+
+
         Task<HttpStandardReturn> Put(
             string urlRoute,
             object messageBody,
             CancellationToken cancellationToken = default);
+
+        Task<HttpStandardStreamReturn> PutStream(
+            string urlRoute,
+            MultipartFormDataContent messageBody,
+            string mediaType = "multipart/form-data",
+            CancellationToken cancellationToken = default);
+
         Task<HttpStandardReturn> Patch(
             string urlRoute,
             object messageBody,
             CancellationToken cancellationToken = default);
+
+        Task<HttpStandardStreamReturn> PatchStream(
+            string urlRoute,
+            MultipartFormDataContent messageBody,
+            string mediaType = "multipart/form-data",
+            CancellationToken cancellationToken = default);
+
+
         Task<HttpStandardReturn> Delete(
             string urlRoute,
+            CancellationToken cancellationToken = default);
+
+        Task<HttpStandardStreamReturn> DeleteStream(
+            string urlRoute,
+            MultipartFormDataContent messageBody,
+            string mediaType = "multipart/form-data",
             CancellationToken cancellationToken = default);
 
 
