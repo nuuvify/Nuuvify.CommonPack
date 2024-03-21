@@ -68,7 +68,10 @@ namespace Nuuvify.CommonPack.StandardHttpClient
 
         }
 
-        public void Configure(TimeSpan timeOut, long maxResponseContentBufferSize = default, HttpCompletionOption httpCompletionOption = HttpCompletionOption.Defult)
+        public void Configure(
+            TimeSpan timeOut,
+            long maxResponseContentBufferSize = default,
+            HttpCompletionOption httpCompletionOption = HttpCompletionOption.Defult)
         {
             if (timeOut.TotalMilliseconds > 0)
                 _httpClient.Timeout = timeOut;

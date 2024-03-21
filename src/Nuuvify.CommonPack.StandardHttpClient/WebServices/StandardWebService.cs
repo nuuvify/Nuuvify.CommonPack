@@ -243,7 +243,8 @@ namespace Nuuvify.CommonPack.StandardHttpClient.WebServices
 
 
         ///<inheritdoc/>
-        public async Task<HttpStandardReturn> RequestSoap(string urlRoute,
+        public async Task<HttpStandardReturn> RequestSoap(
+            string urlRoute,
             StandardHttpMethods method,
             XmlDocument messageBody,
             string mediaType = "application/xml")
