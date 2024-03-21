@@ -11,6 +11,11 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Extensions
 
         private static StringBuilder _query;
 
+        /// <summary>
+        /// QueryString não pode exceder 128 caracteres
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
         public static string ToQueryString(this IDictionary<string, string> dic)
         {
             _query = new StringBuilder();

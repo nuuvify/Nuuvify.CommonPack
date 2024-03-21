@@ -63,6 +63,9 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// <summary>
         /// Registra CredentialApi e IHttpContextAccessor. <br/>
         /// Use .ConfigurePrimaryHttpMessageHandler para registro com proxy e demais parametros do HttpClient
+        /// Você precisa incluir as tags no seu arquivo appsettings.json <br/>
+        ///     "AppConfig:AppURLs:UrlLoginApi" <br/>
+        ///     "AppConfig:AppURLs:UrlLoginApiToken" 
         /// </summary>
         /// <param name="services"></param>
         /// <param name="configuration"></param>
