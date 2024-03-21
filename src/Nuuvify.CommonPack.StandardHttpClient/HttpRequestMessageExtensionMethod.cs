@@ -56,6 +56,50 @@ namespace Nuuvify.CommonPack.StandardHttpClient
             return request;
         }
 
+        public static HttpClient CustomRequestHeader(this HttpClient request,
+            IDictionary<string, object> header)
+        {
+
+            if (header is null || header.Count == 0)
+            {
+                header = new Dictionary<string, object>
+                {
+                    { Constants.CorrelationHeader, Guid.NewGuid() }
+                };
+            }
+            else
+            {
+                header.Remove("bearer");
+                header.Remove("Authorization");
+            }
+
+            var keyHeader = string.Empty;
+            try
+            {
+
+                foreach (var item in header)
+                {
+                    keyHeader = item.Key;
+
+                    if (!request.DefaultRequestHeaders.TryGetValues(item.Key, out IEnumerable<string> values))
+                    {
+                        request.DefaultRequestHeaders.TryAddWithoutValidation(item.Key, item.Value.ToString());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.Contains("An item with the same key has already been added"))
+                {
+                    Debug.WriteLine("Chave ja existe: {key}", keyHeader);
+                }
+            }
+
+
+
+            return request;
+        }
+
         public static HttpRequestMessage AddAuthorizationHeader(this HttpRequestMessage request,
             IDictionary<string, object> header)
         {
