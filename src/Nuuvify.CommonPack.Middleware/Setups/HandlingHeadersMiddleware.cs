@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
@@ -35,7 +36,10 @@ namespace Nuuvify.CommonPack.Middleware.Handle
         public async Task Invoke(HttpContext context)
         {
             requestConfiguration.AppName = Assembly.GetEntryAssembly().GetName().Name;
-            var correlationLocal = $"{requestConfiguration.AppName}_{Guid.NewGuid()}";
+            requestConfiguration.HostName ??= Dns.GetHostName();
+            var guidStr = Guid.NewGuid().ToString();
+            var guid12char = guidStr.Substring(guidStr.Length - 12);
+            var correlationLocal = $"{requestConfiguration.AppName}_{requestConfiguration.HostName}_{guid12char}";
 
 
             if (context.Request.Headers.TryGetValue(Constants.CorrelationHeader, out StringValues value))
@@ -118,7 +122,8 @@ namespace Nuuvify.CommonPack.Middleware.Handle
                 httpContext?.Connection?.RemoteIpAddress?.MapToIPv4().ToString(),
                 httpContext?.Connection?.RemotePort.ToString(),
                 httpContext?.Connection?.LocalIpAddress?.MapToIPv4().ToString(),
-                httpContext?.Connection?.LocalPort.ToString());
+                httpContext?.Connection?.LocalPort.ToString(),
+                hostName: Dns.GetHostName());
 
 
         }

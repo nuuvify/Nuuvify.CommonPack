@@ -10,7 +10,20 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Entities.StubDbContext
         {
 
 
-            DefaultConfig(builder, "faturas", "fatura", "_id");
+            // DefaultConfig(builder, "faturas", "fatura", "_id");
+            //DefaultConfig(builder, "faturas", "fatura");
+
+            builder.ToTable("faturas");
+
+            builder.HasKey(x => x.Id)
+                .HasName($"pk_fatura");
+
+            builder.Property(x => x.Id)
+                .HasColumnName($"FaturaId")
+                .IsUnicode(false)
+                .HasMaxLength(Fatura.MaxId)
+                .IsRequired();
+
 
             builder.Property(e => e.NumeroFatura)
                 .IsRequired()
@@ -21,6 +34,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Entities.StubDbContext
                 o => o.EnderecoEntrega,
                 pp =>
                 {
+
                     pp.Property(p => p.Cidade)
                         .HasColumnName("EntregaCidade")
                         .IsUnicode(false)
@@ -33,10 +47,13 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Entities.StubDbContext
 
                 });
 
+
+
             builder.OwnsOne(
                 o => o.EnderecoFatura,
                 pp =>
                 {
+
                     pp.Property(p => p.Cidade)
                         .HasColumnName("FaturaCidade")
                         .IsUnicode(false)

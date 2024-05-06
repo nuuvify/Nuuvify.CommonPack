@@ -41,12 +41,13 @@ function GenerateReportCoverage {
 
     Write-Host "********************* Report generated *********************"
 
-
-    if (Test-Path $dirTests\TestResults\Reports\index.html -PathType leaf) {
-        Start-Process -FilePath $dirTests\TestResults\Reports\index.html
-    }
-    else {
-        Start-Process -FilePath $dirTests\TestResults\Reports\index.htm
+    if ($env:OS -ilike "Windows*") {
+        if (Test-Path $dirTests\TestResults\Reports\index.html -PathType leaf) {
+            Start-Process -FilePath $dirTests\TestResults\Reports\index.html
+        }
+        else {
+            Start-Process -FilePath $dirTests\TestResults\Reports\index.htm
+        }
     }
     
 }
@@ -113,4 +114,3 @@ else {
 
 Set-Location $dirTests
 Write-Host "Concluido => $(Get-Date)"
-

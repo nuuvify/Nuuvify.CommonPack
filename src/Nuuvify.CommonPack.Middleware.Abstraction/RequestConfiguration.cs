@@ -44,6 +44,7 @@ namespace Nuuvify.CommonPack.Middleware.Abstraction
         public string LocalIp { get; set; }
         public string LocalPort { get; set; }
         public string BasePath { get; set; }
+        public string HostName { get; set; }
 
 
         public void SetAppVersion()
@@ -56,7 +57,13 @@ namespace Nuuvify.CommonPack.Middleware.Abstraction
 
         }
 
-        public void SetRequestData(string remoteIp, string remotePort, string localIp, string localPort, string basePath = "")
+        public void SetRequestData(
+            string remoteIp,
+            string remotePort,
+            string localIp,
+            string localPort,
+            string basePath = "",
+            string hostName = "none")
         {
             RemoteIp = remoteIp;
             RemotePort = remotePort;
@@ -66,6 +73,7 @@ namespace Nuuvify.CommonPack.Middleware.Abstraction
             {
                 BasePath = basePath;
             }
+            HostName ??= hostName;
 
         }
 
@@ -82,7 +90,8 @@ namespace Nuuvify.CommonPack.Middleware.Abstraction
                 {nameof(RemotePort), RemotePort},
                 {nameof(LocalIp), LocalIp},
                 {nameof(LocalPort), LocalPort},
-                {nameof(UserClaim), UserClaim}
+                {nameof(UserClaim), UserClaim},
+                {nameof(HostName), HostName}
             };
 
             return logHeader;
