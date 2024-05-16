@@ -10,8 +10,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="IBM.Data.DB2.Core" Version="3.1.0.600" Condition="'$(os)' == 'Windows_NT'" />
-        <PackageReference Include="IBM.Data.DB2.Core-lnx" Version="3.1.0.500" Condition="'$(os)' == 'UNIX'" />
+		<PackageReference Include="Net.IBM.Data.Db2" Version="8.0.0.200" Condition="'$(os)' == 'Windows_NT'" />
+		<PackageReference Include="Net.IBM.Data.Db2-lnx" Version="8.0.0.200" Condition="'$(os)' == 'UNIX'" />
     </ItemGroup>
 
     <ItemGroup>
