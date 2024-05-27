@@ -1,14 +1,12 @@
 ﻿using Asp.Versioning.ApiExplorer;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Nuuvify.CommonPack.OpenApi
 {
     public static class UseSwaggerSetup
     {
         /// <summary>
-        /// Se precisar indicar manualmente um caminho para swaggger inclua a seguinte entrada no appsettings <br/>
-        /// "VirtualPath": "api"
         /// Caso esteja recebendo erro, tente executar o endpoint da sua aplicação com o complemento: /swagger/v1/swagger.json
         /// <para>
         /// Exemplo: http://localhost:5000/swagger/v1/swagger.json
@@ -18,25 +16,26 @@ namespace Nuuvify.CommonPack.OpenApi
         /// </para>
         /// </summary>
         /// <param name="app"></param>
-        /// <param name="configuration"></param>
-        /// <param name="provider"></param>
-        public static void UseSwaggerConfiguration(this IApplicationBuilder app,
-            IConfiguration configuration,
-            IApiVersionDescriptionProvider provider)
+        public static void UseSwaggerConfiguration(this WebApplication app)
         {
 
-            var vpath = configuration.GetSection("VirtualPath")?.Value?.Trim() ?? string.Empty;
-            vpath = string.IsNullOrWhiteSpace(vpath) ? "/swagger/" : $"/{vpath}/swagger/";
-
             app.UseSwagger();
-            app.UseSwaggerUI(options =>
-            {
-                foreach (var description in provider.ApiVersionDescriptions)
+            app.MapWhen(
+                context => context.Request.Path.StartsWithSegments("/swagger"),
+                appBuilder => appBuilder.Use(next =>
                 {
-                    options.SwaggerEndpoint($"{vpath}{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
-                    options.RoutePrefix = "docs";
-                }
-            });
+                    var provider = appBuilder.ApplicationServices.GetRequiredService<IApiVersionDescriptionProvider>();
+                    return app.UseSwaggerUI(c =>
+                    {
+                        foreach (var description in provider.ApiVersionDescriptions)
+                        {
+                            c.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+                            c.RoutePrefix = "docs";
+                        }
+                    }).Build();
+                })
+            );
+
         }
     }
 }
