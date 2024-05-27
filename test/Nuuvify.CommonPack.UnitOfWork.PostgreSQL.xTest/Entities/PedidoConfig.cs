@@ -10,7 +10,22 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Entities.StubDbContext
         public override void Configure(EntityTypeBuilder<Pedido> builder)
         {
 
-            DefaultConfig(builder, "pedidos", "pedido", "_id");
+            // DefaultConfig(builder, "pedidos", "pedido", "_id");
+            // DefaultConfig(builder, "pedidos", "pedido");
+
+            builder.ToTable("pedidos");
+
+            builder.HasKey(x => x.Id)
+                .HasName($"pk_pedido");
+
+            builder.Property(x => x.Id)
+                .HasColumnName($"PedidoId")
+                .IsUnicode(false)
+                .HasMaxLength(Pedido.MaxId)
+                .IsRequired();
+
+
+
 
             builder.Property(e => e.CodigoCliente)
                 .IsRequired()

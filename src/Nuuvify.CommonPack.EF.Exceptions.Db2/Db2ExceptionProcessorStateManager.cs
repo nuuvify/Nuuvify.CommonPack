@@ -1,8 +1,8 @@
+using EntityFramework.Exceptions.Common;
+using IBM.Data.Db2;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using System.Collections.Generic;
 using System.Text;
-using EntityFramework.Exceptions.Common;
-using IBM.Data.DB2.Core;
-using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 
 namespace EntityFramework.Exceptions.Db2
 {
