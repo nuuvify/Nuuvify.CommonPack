@@ -62,9 +62,13 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         Task<HttpStandardStreamReturn> GetStream(
             string urlRoute,
             CancellationToken cancellationToken = default);
+        
         Task<HttpStandardReturn> Get(
             string urlRoute,
             CancellationToken cancellationToken = default);
+
+
+
         Task<HttpStandardReturn> Post(
             string urlRoute,
             object messageBody,
@@ -98,6 +102,16 @@ namespace Nuuvify.CommonPack.StandardHttpClient
             string mediaType = "multipart/form-data",
             CancellationToken cancellationToken = default);
 
+        /// <summary>
+        /// Para ser usado como o metodo .FormParameter
+        /// </summary>
+        /// <param name="urlRoute"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<HttpStandardReturn> Post(
+            string urlRoute,
+            CancellationToken cancellationToken = default);
+
         Task<HttpStandardStreamReturn> PostStream(
             string urlRoute,
             MultipartFormDataContent messageBody,
@@ -111,6 +125,16 @@ namespace Nuuvify.CommonPack.StandardHttpClient
             object messageBody,
             CancellationToken cancellationToken = default);
 
+        /// <summary>
+        /// Para ser usado como o metodo .FormParameter
+        /// </summary>
+        /// <param name="urlRoute"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<HttpStandardReturn> Put(
+            string urlRoute,
+            CancellationToken cancellationToken = default);
+
         Task<HttpStandardStreamReturn> PutStream(
             string urlRoute,
             MultipartFormDataContent messageBody,
@@ -120,6 +144,16 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         Task<HttpStandardReturn> Patch(
             string urlRoute,
             object messageBody,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Para ser usado como o metodo .FormParameter
+        /// </summary>
+        /// <param name="urlRoute"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<HttpStandardReturn> Patch(
+            string urlRoute,
             CancellationToken cancellationToken = default);
 
         Task<HttpStandardStreamReturn> PatchStream(
@@ -132,6 +166,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         Task<HttpStandardReturn> Delete(
             string urlRoute,
             CancellationToken cancellationToken = default);
+
 
         Task<HttpStandardStreamReturn> DeleteStream(
             string urlRoute,
