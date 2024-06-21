@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 using Nuuvify.CommonPack.StandardHttpClient.Extensions;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Nuuvify.CommonPack.StandardHttpClient
 {
@@ -82,6 +84,29 @@ namespace Nuuvify.CommonPack.StandardHttpClient
             }
             .CustomRequestHeader(_headerStandard)
             .AddAuthorizationHeader(_headerAuthorization);
+
+
+            return await StandardSendAsync(url, message, cancellationToken);
+
+        }
+
+        public async Task<HttpStandardReturn> Post(
+            string urlRoute,
+            CancellationToken cancellationToken = default)
+        {
+            var url = $"{urlRoute}{_queryString.ToQueryString()}";
+
+
+
+            var message = new HttpRequestMessage(HttpMethod.Post, url);
+
+            IEnumerable<KeyValuePair<string, string>> enumerable = _formParameter;
+
+            var content = new FormUrlEncodedContent(enumerable);
+
+            message.Content = content;
+            message.CustomRequestHeader(_headerStandard)
+                   .AddAuthorizationHeader(_headerAuthorization);
 
 
             return await StandardSendAsync(url, message, cancellationToken);
