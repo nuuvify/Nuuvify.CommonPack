@@ -16,6 +16,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         private HttpClient _httpClient;
         private HttpCompletionOption CompletionOption;
         private readonly ILogger<StandardHttpClient> _logger;
+        private readonly Dictionary<string, string> _formParameter;
         private readonly Dictionary<string, object> _headerStandard;
         private readonly Dictionary<string, object> _headerAuthorization;
         private IDictionary<String, String> _queryString;
@@ -44,6 +45,8 @@ namespace Nuuvify.CommonPack.StandardHttpClient
 
             _headerAuthorization = new Dictionary<string, object>();
             _headerStandard = new Dictionary<string, object>();
+            _formParameter = new Dictionary<string, string>();
+
         }
 
 
@@ -154,6 +157,26 @@ namespace Nuuvify.CommonPack.StandardHttpClient
             {
                 _headerStandard.Remove(key);
                 _headerStandard.Add(key, value);
+            }
+
+
+            return this;
+        }
+
+        public IStandardHttpClient WithFormParameter(string key, string value)
+        {
+            if (string.IsNullOrWhiteSpace(key)) return this;
+
+
+
+            if (!_formParameter.TryGetValue(key, out string valueString))
+            {
+                _formParameter.Add(key, value);
+            }
+            else if (Constants.UserClaimHeader.Equals(key, StringComparison.InvariantCultureIgnoreCase))
+            {
+                _formParameter.Remove(key);
+                _formParameter.Add(key, value);
             }
 
 
