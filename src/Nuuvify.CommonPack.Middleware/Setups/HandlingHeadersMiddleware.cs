@@ -63,13 +63,10 @@ namespace Nuuvify.CommonPack.Middleware.Handle
             SetRequestConfiguration(context);
 
 
-            using (_logger.BeginScope(requestConfiguration.MapLoggerContext()))
-            {
-                _logger.LogInformation("### LOG DE ENTRADA DA REQUEST ###");
-                await _next(context);
-                _logger.LogInformation("### LOG DE SAIDA DA REQUEST ###");
+            _logger.LogInformation("### LOG DE ENTRADA DA REQUEST ###");
+            await _next(context);
+            _logger.LogInformation("### LOG DE SAIDA DA REQUEST ###");
 
-            }
 
         }
 
