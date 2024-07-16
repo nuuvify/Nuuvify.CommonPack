@@ -1,4 +1,3 @@
-using System.Net.Http;
 using Polly;
 using Polly.Extensions.Http;
 
