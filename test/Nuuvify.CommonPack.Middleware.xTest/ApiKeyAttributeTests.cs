@@ -146,9 +146,10 @@ namespace Nuuvify.CommonPack.Middleware.xTest
             mockIConfiguration.Setup(s => s.GetSection(keyNameTest[0]).Value)
                 .Returns(keyValueTest);
 
+
             var httpContext = new DefaultHttpContext();
-            httpContext.Request.Headers.Add("TesteHeader", "1234567");
-            httpContext.Request.Headers.Add(keyNameTest[0], "outrovalor");
+            httpContext.Request.Headers.Append("TesteHeader", "1234567");
+            httpContext.Request.Headers.Append(keyNameTest[0], "outrovalor");
 
             ArrangeActionExecutingContextTests(httpContext);
 
@@ -183,8 +184,8 @@ namespace Nuuvify.CommonPack.Middleware.xTest
                 .Returns(keyValueTest);
 
             var httpContext = new DefaultHttpContext();
-            httpContext.Request.Headers.Add("TesteHeader", "1234567");
-            httpContext.Request.Headers.Add(keyNameTest[0], keyValueTest);
+            httpContext.Request.Headers.Append("TesteHeader", "1234567");
+            httpContext.Request.Headers.Append(keyNameTest[0], keyValueTest);
 
             ArrangeActionExecutingContextTests(httpContext);
 
@@ -223,8 +224,8 @@ namespace Nuuvify.CommonPack.Middleware.xTest
                 .Returns(keyValueTest1);
 
             var httpContext = new DefaultHttpContext();
-            httpContext.Request.Headers.Add("TesteHeader", "1234567");
-            httpContext.Request.Headers.Add(keyNameTest[1], keyValueTest1);
+            httpContext.Request.Headers.Append("TesteHeader", "1234567");
+            httpContext.Request.Headers.Append(keyNameTest[1], keyValueTest1);
 
             ArrangeActionExecutingContextTests(httpContext);
 

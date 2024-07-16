@@ -1,7 +1,4 @@
 using System.Net;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.CircuitBreaker;
@@ -33,7 +30,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
             context = request.GetPolicyExecutionContext();
             var serviceBreak = context.GetServiceName();
 
-            logger.LogWarning("###### OnFallbackAsync was triggered, service: {0} failed ######", serviceBreak);
+            logger.LogWarning("###### OnFallbackAsync was triggered, service: {serviceBreak} failed ######", serviceBreak);
 
             return Task.CompletedTask;
         }
@@ -43,7 +40,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
             context = request.GetPolicyExecutionContext();
             var serviceBreak = context.GetServiceName();
 
-            logger.LogWarning("###### FallbackAction was triggered, service: {0} failed, customized warning message is being returned. ######", serviceBreak);
+            logger.LogWarning("###### FallbackAction was triggered, service: {serviceBreak} failed, customized warning message is being returned. ######", serviceBreak);
 
             HttpResponseMessage httpResponseMessage;
 

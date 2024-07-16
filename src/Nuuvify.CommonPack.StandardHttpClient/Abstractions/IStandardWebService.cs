@@ -1,7 +1,4 @@
-using System;
 using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using System.Xml;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 
@@ -25,13 +22,6 @@ namespace Nuuvify.CommonPack.StandardHttpClient
 
 
         /// <summary>
-        /// Recebe uma instancia de WebRequest.CreateHttp(url) onde você pode incluir outras configurações
-        /// como Proxy e delegate para verificação de certificados.
-        /// </summary>
-        /// <param name="httpWebRequest"></param>
-        [Obsolete("WebRequest, HttpWebRequest, ServicePoint, and WebClient are obsolete. Use HttpClient instead.", DiagnosticId = "SYSLIB0014", UrlFormat = "https://aka.ms/dotnet-warnings/{0}")]
-        void CreateHttp(HttpWebRequest httpWebRequest);
-        /// <summary>
         /// Recebe uma instancia de HttpClientHandler onde você pode incluir outras configurações
         /// como Proxy e delegate para verificação de certificados.
         /// </summary>
@@ -39,37 +29,21 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// <param name="uri"></param>
         void CreateHttp(HttpClientHandler httpClientHandler, Uri uri);
 
-        /// <summary>
-        /// Executa o WebService, retornando o conteudo de forma padronizada
-        /// </summary>
-        /// <param name="urlRoute">Opcional: Complemento da url base</param>
-        /// <param name="method">Obrigatorio: POST, GET</param>
-        /// <param name="messageBody">Obrigatorio: XML contendo o SoapEnvelope</param>
-        /// <param name="mediaType">Opcional: Tipo do conteudo da mensagem EX: "application/xml"</param>
-        /// <returns></returns>
-        [Obsolete("Use o novo metodo RequestSoap")]
-        Task<HttpStandardReturn> RequestSoap(
-            string urlRoute,
-            StandardHttpMethods method,
-            XmlDocument messageBody,
-            string mediaType = "application/xml");
 
 
         /// <summary>
         /// Executa uma consulta SOAP
         /// </summary>
-        /// <param name="urlRoute"></param>
-        /// <param name="messageBody"></param>
-        /// <param name="xmlDocumentmlResponseDocumentContains">Exemplo: XmlResponseDocumentContains</param>
-        /// <param name="xmlGetElementsByTagName">Exemplo: ns1:synDOCeDownloadXmlReturn</param>
-        /// <param name="mediaType"></param>
+        /// <param name="urlRoute">Esse caminho sera concatenado a url principal caso ja tenha sido informado antes, deixe NULL caso não possuir</param>
+        /// <param name="soapEnvelopeXml">XML contendo soapenv:Envelope</param>
+        /// <param name="accept">"text/xml"</param>
+        /// <param name="contentType">"text/xml;charset=\"utf-8\""</param>
         /// <returns></returns>
-        Task<HttpStandardReturn> RequestSoap(
+        Task<HttpStandardXmlReturn> RequestSoap(
             string urlRoute,
-            XmlDocument messageBody,
-            string xmlDocumentmlResponseDocumentContains,
-            string xmlGetElementsByTagName,
-            string mediaType = "application/xml");
+            XmlDocument soapEnvelopeXml,
+            string accept = "text/xml",
+            string contentType = "text/xml;charset=\"utf-8\"");
 
 
         /// <summary>
@@ -107,7 +81,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         ///         .WithQueryString("campoProcura", "catloginid")
         ///         .WithQueryString("hrStatus", "Any")
         ///         .WithQueryString("empresaCodigo", empresa)
-        ///         .Get(url);
+        ///         .RequestSoap(url);
         /// </code>
         /// </example>
         /// <param name="key"></param>
