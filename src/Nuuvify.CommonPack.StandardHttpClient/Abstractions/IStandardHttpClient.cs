@@ -46,7 +46,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         public string AuthorizationLog { get; }
 
         /// <summary>
-        /// Cria uma nova instancia do HttpClient ou, se informado o nome de um lient já registrado
+        /// Cria uma nova instancia do HttpClient ou, se informado o nome de um client já registrado
         /// retonara sua instancia
         /// </summary>
         /// <param name="namedClient"></param>
@@ -62,7 +62,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         Task<HttpStandardStreamReturn> GetStream(
             string urlRoute,
             CancellationToken cancellationToken = default);
-        
+
         Task<HttpStandardReturn> Get(
             string urlRoute,
             CancellationToken cancellationToken = default);

@@ -44,53 +44,30 @@ namespace Nuuvify.CommonPack.StandardHttpClient.WebServices
 
             _queryString = string.Empty;
             _headerStandard.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+
             _returnMessage = new HttpStandardXmlReturn();
 
         }
 
-        ///<inheritdoc/>
-        public void CreateHttp(string url)
+        public void CreateClient(string namedClient = null)
         {
-            if (string.IsNullOrWhiteSpace(url))
-            {
-                throw new ArgumentException("Url deve ser informada", url);
-            }
-            var options = new UriCreationOptions();
-
-            if (Uri.TryCreate(url, options, out Uri uri))
-            {
+            if (string.IsNullOrWhiteSpace(namedClient))
                 _httpClient = _httpClientFactory.CreateClient();
-                _httpClient.BaseAddress = uri;
-            }
             else
-            {
-                throw new ArgumentException("Parametro informado não é uma url valida", url);
-            }
-
+                _httpClient = _httpClientFactory.CreateClient(namedClient);
 
         }
 
         ///<inheritdoc/>
-        public void CreateHttp(HttpWebRequest httpWebRequest)
+        public void CreateHttp(Uri url)
         {
-            var httpClientHandler = new HttpClientHandler
-            {
-                AllowAutoRedirect = httpWebRequest.AllowAutoRedirect,
-                AutomaticDecompression = httpWebRequest.AutomaticDecompression,
-                Credentials = httpWebRequest.Credentials,
-                Proxy = httpWebRequest.Proxy,
-                MaxAutomaticRedirections = httpWebRequest.MaximumAutomaticRedirections,
-                MaxResponseHeadersLength = httpWebRequest.MaximumResponseHeadersLength,
-                UseDefaultCredentials = httpWebRequest.UseDefaultCredentials
-            };
-
-
-            _httpClient = new HttpClient(httpClientHandler, true)
-            {
-                BaseAddress = httpWebRequest.Address
-            };
+            _httpClient = _httpClientFactory.CreateClient();
+            _httpClient.BaseAddress = url ?? throw new ArgumentException("Url deve ser informada", nameof(url));
 
         }
+
+
         public void CreateHttp(HttpClientHandler httpClientHandler, Uri uri)
         {
             _httpClient = new HttpClient(httpClientHandler, true)
@@ -177,14 +154,13 @@ namespace Nuuvify.CommonPack.StandardHttpClient.WebServices
             }
 
 
-            WithHeader("Accept", new MediaTypeWithQualityHeaderValue(accept));
             WithHeader("Content-Type", contentType);
 
-
             _httpClient.CustomRequestHeader(_headerStandard);
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(accept));
 
 
-            return await StandardGetRequestStreamAsync(url, soapEnvelopeXml);
+            return await StandardGetRequestStreamAsync(url, soapEnvelopeXml, accept);
 
         }
 
