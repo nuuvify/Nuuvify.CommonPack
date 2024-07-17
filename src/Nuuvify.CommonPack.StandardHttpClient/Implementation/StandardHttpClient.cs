@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Nuuvify.CommonPack.Extensions.Implementation;
 
 namespace Nuuvify.CommonPack.StandardHttpClient
@@ -56,6 +53,8 @@ namespace Nuuvify.CommonPack.StandardHttpClient
             _queryString = new Dictionary<String, String>();
             _headerAuthorization.Clear();
             _httpClient.DefaultRequestHeaders.Authorization = null;
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+
             CorrelationId = string.Empty;
             FullUrl = null;
             _headerStandard.Clear();

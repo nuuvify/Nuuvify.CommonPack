@@ -1,8 +1,4 @@
-﻿using System;
-using System.Net.Http;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Text;
 using Microsoft.Extensions.Logging;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
@@ -51,7 +47,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
 
         private async Task<HttpStandardReturn> StandardSendAsync(string url, HttpRequestMessage message, CancellationToken cancellationToken = default)
         {
-            _logger.LogDebug($"Url and message before config: {message} url: {url}");
+            _logger.LogDebug("Url and message before config: {message} url: {url}", message, url);
 
 
 
@@ -65,7 +61,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
                 }
                 else
                 {
-                    _logger.LogWarning($"Url base e relativa informada esta invalido Base: {_httpClient?.BaseAddress?.AbsoluteUri} Relativa: {url}");
+                    _logger.LogWarning("Url base e relativa informada esta invalido Base: {AbsoluteUri} Relativa: {url}", _httpClient?.BaseAddress?.AbsoluteUri, url);
                     return null;
                 }
             }
@@ -77,12 +73,12 @@ namespace Nuuvify.CommonPack.StandardHttpClient
                 }
                 else
                 {
-                    _logger.LogWarning($"Url informada é invalida: {url}");
+                    _logger.LogWarning("Url informada é invalida: {url}", url);
                     return null;
                 }
             }
 
-            _logger.LogDebug($"Url and message after config: {message} client url: {message?.RequestUri}");
+            _logger.LogDebug("Url and message after config: {message} client url: {RequestUri}", message, message?.RequestUri);
 
 
             HttpResponseMessage response;
@@ -108,7 +104,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
             HttpStandardReturn httpStandardReturn = await HandleResponseMessage(response);
 
 
-            _logger.LogDebug($"HttpStandardReturn return: {httpStandardReturn.ReturnCode}");
+            _logger.LogDebug("HttpStandardReturn return: {ReturnCode}", httpStandardReturn.ReturnCode);
 
 
             return httpStandardReturn;
@@ -116,7 +112,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
 
         private async Task<HttpStandardStreamReturn> StandardStreamSendAsync(string url, HttpRequestMessage message, CancellationToken cancellationToken = default)
         {
-            _logger.LogDebug($"Url and message before config: {message} url: {url}");
+            _logger.LogDebug("Url and message before config: {message} url: {url}", message, url);
 
 
             if (!string.IsNullOrWhiteSpace(_httpClient?.BaseAddress?.AbsoluteUri) &&
@@ -129,7 +125,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
                 }
                 else
                 {
-                    _logger.LogWarning($"Url base e relativa informada esta invalido Base: {_httpClient?.BaseAddress?.AbsoluteUri} Relativa: {url}");
+                    _logger.LogWarning("Url base e relativa informada esta invalido Base: {AbsoluteUri} Relativa: {url}", _httpClient?.BaseAddress?.AbsoluteUri, url);
                     return null;
                 }
             }
@@ -141,12 +137,12 @@ namespace Nuuvify.CommonPack.StandardHttpClient
                 }
                 else
                 {
-                    _logger.LogWarning($"Url informada é invalida: {url}");
+                    _logger.LogWarning("Url informada é invalida: {url}", url);
                     return null;
                 }
             }
 
-            _logger.LogDebug($"Url and message after config: {message} client url: {message?.RequestUri}");
+            _logger.LogDebug("Url and message after config: {message} client url: {RequestUri}", message, message?.RequestUri);
 
 
             HttpResponseMessage response;
@@ -172,7 +168,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
             HttpStandardStreamReturn httpStandardStreamReturn = await HandleResponseMessageStream(response);
 
 
-            _logger.LogDebug($"HttpStandardReturn return: {httpStandardStreamReturn?.ReturnCode}");
+            _logger.LogDebug("HttpStandardReturn return: {ReturnCode}", httpStandardStreamReturn?.ReturnCode);
 
 
             return httpStandardStreamReturn;
