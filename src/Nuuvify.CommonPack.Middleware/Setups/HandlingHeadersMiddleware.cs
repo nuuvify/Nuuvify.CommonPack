@@ -1,10 +1,6 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Net;
 using System.Reflection;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -22,7 +18,8 @@ namespace Nuuvify.CommonPack.Middleware.Handle
         private readonly ILogger<HandlingHeadersMiddleware> _logger;
         private readonly RequestConfiguration requestConfiguration;
 
-        public HandlingHeadersMiddleware(RequestDelegate next,
+        public HandlingHeadersMiddleware(
+            RequestDelegate next,
             ILogger<HandlingHeadersMiddleware> logger,
             IOptions<RequestConfiguration> options)
         {
@@ -54,10 +51,10 @@ namespace Nuuvify.CommonPack.Middleware.Handle
 
             context.Items["X-AssemblyVersion"] = requestConfiguration.ApplicationVersion;
             context.Items["X-BuildNumber"] = requestConfiguration.BuildNumber;
-            context.Response.Headers.Add("X-EnvironmentName", requestConfiguration.Environment);
-            context.Response.Headers.Add("X-AssemblyVersion", requestConfiguration.ApplicationVersion);
-            context.Response.Headers.Add("X-BuildNumber", requestConfiguration.BuildNumber);
-            context.Response.Headers.Add(Constants.CorrelationHeader, requestConfiguration.CorrelationId);
+            context.Response.Headers.Append("X-EnvironmentName", requestConfiguration.Environment);
+            context.Response.Headers.Append("X-AssemblyVersion", requestConfiguration.ApplicationVersion);
+            context.Response.Headers.Append("X-BuildNumber", requestConfiguration.BuildNumber);
+            context.Response.Headers.Append(Constants.CorrelationHeader, requestConfiguration.CorrelationId);
 
 
             SetRequestConfiguration(context);
@@ -91,7 +88,7 @@ namespace Nuuvify.CommonPack.Middleware.Handle
         {
 
 
-            var executablePath = Process.GetCurrentProcess().MainModule.FileName;
+            var executablePath = Environment.ProcessPath;
             var executable = Path.GetFileNameWithoutExtension(executablePath);
             string basePath;
 
