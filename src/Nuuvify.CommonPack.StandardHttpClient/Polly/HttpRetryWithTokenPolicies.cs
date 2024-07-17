@@ -1,7 +1,4 @@
-using System;
 using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
@@ -29,13 +26,13 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
         }
 
         private static async Task OnHttpRetryWithToken(
-            DelegateResult<HttpResponseMessage> message, 
-            HttpRequestMessage request, 
-            ITokenService tokenService, 
-            TimeSpan retrySleep, 
-            int retryNum, 
-            int retryTotal, 
-            Context context, 
+            DelegateResult<HttpResponseMessage> message,
+            HttpRequestMessage request,
+            ITokenService tokenService,
+            TimeSpan retrySleep,
+            int retryNum,
+            int retryTotal,
+            Context context,
             ILogger logger)
         {
 
@@ -48,7 +45,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
 
             if (message?.Result?.StatusCode == HttpStatusCode.Unauthorized)
             {
-                logger.LogWarning(messageLog + " - Before ITokenService.GetToken");
+                logger.LogWarning("{messageLog} - Before ITokenService.GetToken", messageLog);
 
                 if (retryNum == 1)
                 {
@@ -62,16 +59,16 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
 
                 request.AddAuthorizationHeader("bearer", tokenService.GetActualToken()?.Token);
 
-                logger.LogWarning(messageLog + " - After ITokenService.GetToken");
+                logger.LogWarning("{messageLog} - After ITokenService.GetToken", messageLog);
             }
             else if (message?.Exception?.Message != null)
             {
 
-                logger.LogWarning(messageLog + " - Request with token failed because network failure: {0}", message?.Exception?.Message);
+                logger.LogWarning("{messageLog} - Request with token failed because network failure: {messageEx}", messageLog, message?.Exception?.Message);
             }
             else
             {
-                logger.LogInformation(messageLog);
+                logger.LogInformation("{messageLog}", messageLog);
             }
 
             await Task.CompletedTask;

@@ -25,6 +25,8 @@
     <NoWarn>1701;1702;1705;1591</NoWarn>
     <DocumentationFile>Docs\$(MSBuildProjectName).xml</DocumentationFile>
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(OsPlatform) == 'Linux'">

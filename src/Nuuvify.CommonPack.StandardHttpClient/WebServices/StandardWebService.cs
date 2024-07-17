@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.Extensions.Logging;
 using Nuuvify.CommonPack.Extensions.Implementation;
@@ -22,7 +18,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.WebServices
         private readonly ILogger<StandardWebService> _logger;
         private readonly Dictionary<string, object> _headerStandard;
         private string _queryString;
-        private HttpStandardReturn _returnMessage;
+        private HttpStandardXmlReturn _returnMessage;
 
         ///<inheritdoc/>
         public Uri FullUrl { get; private set; }
@@ -48,7 +44,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.WebServices
 
             _queryString = string.Empty;
             _headerStandard.Clear();
-            _returnMessage = new HttpStandardReturn();
+            _returnMessage = new HttpStandardXmlReturn();
 
         }
 
@@ -165,48 +161,30 @@ namespace Nuuvify.CommonPack.StandardHttpClient.WebServices
 
 
 
-        public async Task<HttpStandardReturn> RequestSoap(
-            string urlRoute,
-            StandardHttpMethods method,
-            XmlDocument messageBody,
-            string mediaType = "application/xml")
-        {
-
-            return await Task.FromResult(new HttpStandardReturn()
-            {
-                Success = false,
-                ReturnCode = "400",
-                ReturnMessage = "Esse metodo foi descontinuado, use o novo metodo RequestSoap"
-            });
-        }
-
-
         ///<inheritdoc/>
-        public async Task<HttpStandardReturn> RequestSoap(
+        public async Task<HttpStandardXmlReturn> RequestSoap(
             string urlRoute,
-            XmlDocument messageBody,
-            string xmlDocumentmlResponseDocumentContains,
-            string xmlGetElementsByTagName,
-            string mediaType = "application/xml")
+            XmlDocument soapEnvelopeXml,
+            string accept = "text/xml",
+            string contentType = "text/xml;charset=\"utf-8\"")
         {
             var url = $"{urlRoute}{_queryString}";
 
 
-            if (string.IsNullOrWhiteSpace(xmlDocumentmlResponseDocumentContains) ||
-                string.IsNullOrWhiteSpace(xmlGetElementsByTagName))
+            if (soapEnvelopeXml == null || soapEnvelopeXml.InnerXml.Length == 0)
             {
-                throw new ArgumentException($"Os parametros {nameof(xmlDocumentmlResponseDocumentContains)} e {nameof(xmlGetElementsByTagName)} são obrigatorios");
+                throw new ArgumentException("O xml do envelope soap não pode ser vazio", nameof(soapEnvelopeXml));
             }
 
 
-            WithHeader("Accept", new MediaTypeWithQualityHeaderValue("text/xml"));
-            WithHeader("Content-Type", mediaType);
+            WithHeader("Accept", new MediaTypeWithQualityHeaderValue(accept));
+            WithHeader("Content-Type", contentType);
 
 
             _httpClient.CustomRequestHeader(_headerStandard);
 
 
-            return await StandardGetRequestStreamAsync(url, messageBody);
+            return await StandardGetRequestStreamAsync(url, soapEnvelopeXml);
 
         }
 
