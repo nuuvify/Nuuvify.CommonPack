@@ -1,13 +1,8 @@
-﻿using System.Net.Http;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 using Nuuvify.CommonPack.StandardHttpClient.Extensions;
-using System.Linq;
-using System.Collections.Generic;
 
 namespace Nuuvify.CommonPack.StandardHttpClient
 {
@@ -76,7 +71,6 @@ namespace Nuuvify.CommonPack.StandardHttpClient
             var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
 
-            WithHeader("Accept", new MediaTypeWithQualityHeaderValue(mediaType));
 
             var message = new HttpRequestMessage(HttpMethod.Post, url)
             {
@@ -84,6 +78,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
             }
             .CustomRequestHeader(_headerStandard)
             .AddAuthorizationHeader(_headerAuthorization);
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType));
 
 
             return await StandardSendAsync(url, message, cancellationToken);
@@ -122,14 +117,14 @@ namespace Nuuvify.CommonPack.StandardHttpClient
             var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
 
-            WithHeader("Accept", new MediaTypeWithQualityHeaderValue(mediaType));
-
             var message = new HttpRequestMessage(HttpMethod.Post, url)
             {
                 Content = messageBody
             }
             .CustomRequestHeader(_headerStandard)
             .AddAuthorizationHeader(_headerAuthorization);
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType));
+
 
 
             return await StandardStreamSendAsync(url, message, cancellationToken);

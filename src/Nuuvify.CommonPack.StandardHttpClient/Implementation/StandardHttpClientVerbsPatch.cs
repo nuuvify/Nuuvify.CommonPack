@@ -1,12 +1,8 @@
-﻿using System.Net.Http;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 using Nuuvify.CommonPack.StandardHttpClient.Extensions;
 using System.Net.Http.Headers;
-using System.Collections.Generic;
 
 namespace Nuuvify.CommonPack.StandardHttpClient
 {
@@ -69,14 +65,14 @@ namespace Nuuvify.CommonPack.StandardHttpClient
             var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
 
-            WithHeader("Accept", new MediaTypeWithQualityHeaderValue(mediaType));
-
             var message = new HttpRequestMessage(HttpMethod.Patch, url)
             {
                 Content = messageBody
             }
             .CustomRequestHeader(_headerStandard)
             .AddAuthorizationHeader(_headerAuthorization);
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType));
+
 
 
             return await StandardStreamSendAsync(url, message, cancellationToken);
