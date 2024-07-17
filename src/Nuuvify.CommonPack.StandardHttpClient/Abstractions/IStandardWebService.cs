@@ -1,4 +1,3 @@
-using System.Net;
 using System.Xml;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 
@@ -14,11 +13,19 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// <value></value>
         Uri FullUrl { get; }
 
+
+        /// <summary>
+        /// Cria uma nova instancia do HttpClient ou, se informado o nome de um client já registrado
+        /// retonara sua instancia
+        /// </summary>
+        /// <param name="namedClient"></param>
+        void CreateClient(string namedClient = null);
+
         /// <summary>
         /// Cria uma nova instancia do HttpClient
         /// </summary>
         /// <param name="url">A url é obrigatorio</param>
-        void CreateHttp(string url);
+        void CreateHttp(Uri url);
 
 
         /// <summary>
