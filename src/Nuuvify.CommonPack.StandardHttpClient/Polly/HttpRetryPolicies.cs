@@ -1,6 +1,3 @@
-using System;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
@@ -39,11 +36,11 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
             if (message?.Exception?.Message != null)
             {
 
-                logger.LogWarning(messageLog + " - Request failed because network failure: {0}", message?.Exception?.Message);
+                logger.LogWarning("{messageLog} - Request failed because network failure: {messageEx}", messageLog, message?.Exception?.Message);
             }
             else
             {
-                logger.LogWarning(messageLog);
+                logger.LogWarning("{messageLog}", messageLog);
             }
 
             await Task.CompletedTask;

@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -39,13 +35,12 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
         {
             _standardHttpClient = standardHttpClient;
             _configuration = configuration;
-            _accessor = accessor;
             _logger = logger;
+            _accessor = accessor;
 
             _credentialToken = credentialToken.Value;
 
             Notifications = new List<NotificationR>();
-
         }
 
 
@@ -93,7 +88,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
 
 
 
-            _logger.LogDebug($"{messageLog} - User Claim: {userClaim}");
+            _logger.LogDebug("{messageLog} - User Claim: {userClaim}", messageLog, userClaim);
 
 
             var response = await _standardHttpClient.Post(urlRoute: urlToken, messageBody: messageBody);
@@ -106,7 +101,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
                 _credentialToken = new CredentialToken();
                 _credentialToken.Warnings.Add("ResponseMessage", response.ReturnMessage);
 
-                _logger.LogWarning($"{messageLog} - Response message invalid: {response?.ReturnCode} {response?.ReturnMessage}");
+                _logger.LogWarning("{messageLog} - Response message invalid: {ReturnCode} {ReturnMessage}", messageLog, response?.ReturnCode, response?.ReturnMessage);
 
                 return false;
             }
@@ -146,7 +141,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
             var urlLogin = _configuration.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value;
             var urlToken = $"{urlLogin}{_configuration.GetSection("AppConfig:AppURLs:UrlLoginApiToken")?.Value}";
 
-            _logger.LogDebug($"{messageLog} - urlToken: {urlToken}");
+            _logger.LogDebug("{messageLog} - urlToken: {urlToken}", messageLog, urlToken);
 
 
 
@@ -158,7 +153,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
             {
                 Notifications.Add(new NotificationR(nameof(GetToken), "Algum dos dados a seguir não deveria estar branco: login ou password ou urlLogin ou urlToken"));
 
-                _logger.LogWarning(messageLog + " - Algum dos dados a seguir não deveria estar branco: login ou password ou urlLogin ou urlToken");
+                _logger.LogWarning("{messageLog} - Algum dos dados a seguir não deveria estar branco: login ou password ou urlLogin ou urlToken", messageLog);
 
                 return null;
             }
@@ -169,11 +164,11 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
 
             if (_credentialToken != null && !string.IsNullOrWhiteSpace(_credentialToken?.Token))
             {
-                _logger.LogDebug($"{messageLog} - Token obtido para o usuario: {_credentialToken.LoginId} - Final");
+                _logger.LogDebug("{messageLog} - Token obtido para o usuario: {LoginId} - Final", messageLog, _credentialToken.LoginId);
             }
             else
             {
-                _logger.LogDebug($"{messageLog} - Final");
+                _logger.LogDebug("{messageLog} - Final", messageLog);
             }
 
 
@@ -191,12 +186,12 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
 
             if (!IsAuthenticated(out string token))
             {
-                _logger.LogWarning($"{messageLog} - Não foi encontrado Authorization no HttpContextAccessor, usuario não esta logado com um token");
+                _logger.LogWarning("{messageLog} - Não foi encontrado Authorization no HttpContextAccessor, usuario não esta logado com um token", messageLog);
                 return string.Empty;
             }
 
 
-            _logger.LogDebug($"{messageLog} - Final");
+            _logger.LogDebug("{messageLog} - Final", messageLog);
 
             return token;
         }
