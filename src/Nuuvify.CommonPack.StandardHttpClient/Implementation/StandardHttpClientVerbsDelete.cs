@@ -1,7 +1,4 @@
-﻿using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using Nuuvify.CommonPack.StandardHttpClient.Results;
+﻿using Nuuvify.CommonPack.StandardHttpClient.Results;
 using Nuuvify.CommonPack.StandardHttpClient.Extensions;
 using System.Net.Http.Headers;
 
@@ -37,14 +34,14 @@ namespace Nuuvify.CommonPack.StandardHttpClient
             var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
 
-            WithHeader("Accept", new MediaTypeWithQualityHeaderValue(mediaType));
-
             var message = new HttpRequestMessage(HttpMethod.Delete, url)
             {
                 Content = messageBody
             }
             .CustomRequestHeader(_headerStandard)
             .AddAuthorizationHeader(_headerAuthorization);
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType));
+
 
 
             return await StandardStreamSendAsync(url, message, cancellationToken);
