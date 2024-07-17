@@ -1,3 +1,4 @@
+using System.Text;
 using System.Xml;
 using Microsoft.Extensions.Logging;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
@@ -45,7 +46,8 @@ namespace Nuuvify.CommonPack.StandardHttpClient.WebServices
 
         private async Task<HttpStandardXmlReturn> StandardGetRequestStreamAsync(
             string url,
-            XmlDocument soapEnvelopeXml)
+            XmlDocument soapEnvelopeXml,
+            string mediaType)
         {
             _logger.LogDebug("Url and message before config {InnerXml} {AbsoluteUri}",
                 soapEnvelopeXml.InnerXml,
@@ -88,14 +90,38 @@ namespace Nuuvify.CommonPack.StandardHttpClient.WebServices
 
 
 
-            using (var stream = await _httpClient.GetStreamAsync(FullUrl))
+            var content = new StringContent(
+                soapEnvelopeXml.OuterXml,
+                Encoding.UTF8,
+                mediaType);
+
+            HttpResponseMessage response = await _httpClient.PostAsync(FullUrl, content);
+
+            if (!response.IsSuccessStatusCode)
             {
-                soapEnvelopeXml.Save(stream);
-                httpStandardReturn = GetStreamReader(stream);
+                _logger.LogError("Erro ao tentar enviar a mensagem para o servidor {StatusCode} {ReasonPhrase}",
+                    response.StatusCode,
+                    response.ReasonPhrase);
+
+                httpStandardReturn = new HttpStandardXmlReturn
+                {
+                    Success = false,
+                    ReturnCode = response.StatusCode.ToString(),
+                    ReturnMessage = null
+                };
+
             }
+            else
+            {
+                _logger.LogDebug("Mensagem enviada com sucesso {StatusCode} {ReasonPhrase}",
+                    response.StatusCode,
+                    response.ReasonPhrase);
 
-
-            _logger.LogDebug("HttpStandardReturn return: {ReturnCode}", httpStandardReturn.ReturnCode);
+                using (var stream = await response.Content.ReadAsStreamAsync())
+                {
+                    httpStandardReturn = GetStreamReader(stream);
+                }
+            }
 
 
             return httpStandardReturn;
