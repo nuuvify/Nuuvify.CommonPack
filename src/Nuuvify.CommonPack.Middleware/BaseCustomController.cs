@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections;
 using System.Reflection;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using Microsoft.AspNetCore.Mvc;
@@ -49,7 +46,7 @@ namespace Nuuvify.CommonPack.Middleware
                 }
             }
 
-            throw new TypeAccessException(message: 
+            throw new TypeAccessException(message:
                 $@"ProducesResponseType retorno com tipo informado e
                 com status code {statusCodeResult.StatusCode} é obrigatorio na
                 Controller {ControllerContext.ActionDescriptor.ControllerName}
@@ -62,7 +59,7 @@ namespace Nuuvify.CommonPack.Middleware
 
             if (IsNull(tipoResponseObject))
             {
-                throw new TypeAccessException(message: 
+                throw new TypeAccessException(message:
                 $@"ProducesResponseType retorno com o tipo informado é obrigatorio na
                 Controller {ControllerContext.ActionDescriptor.ControllerName} \r
                 ActionResult {ControllerContext.ActionDescriptor.ActionName}");
