@@ -37,7 +37,7 @@ public static class ConfigurationBuilderExtensions
             return builder;
 
         if (logger != null)
-            logger.LogDebug($"Variaveis de ambiente {nameof(AddEnvironmentVariablesToMemoryCollection)} com prefixo {prefix} encontradas: {environmentVariables.Count}");
+            logger.LogDebug("Variaveis de ambiente {className} com prefixo {prefix} encontradas: {environmentVariables}", nameof(AddEnvironmentVariablesToMemoryCollection), prefix, environmentVariables.Count);
 
         var environmentVariablesDictionary = new Dictionary<string, string>();
 
@@ -62,8 +62,8 @@ public static class ConfigurationBuilderExtensions
     /// Obtem a lista de variaveis de ambiente com o prefixo informado, depois cria um arquivo temporario, para adicionar esse arquivo como KeyPerFile, entao remove as variaveis de ambiente
     /// </summary>
     /// <param name="builder"></param>
-    /// <param name="prefix"></param>
-    /// <param name="removeVariavel"></param>
+    /// <param name="prefix">Prefixo da lista de variaveis</param>
+    /// <param name="removeVariavel">Depois de incluido em KeyPerFile, remove as variaveis de ambiente</param>
     /// <param name="logger"></param>
     /// <returns></returns>
     public static IConfigurationBuilder AddEnvironmentVariablesToKeyPerFile(
@@ -88,19 +88,23 @@ public static class ConfigurationBuilderExtensions
 
 
         if (logger != null)
-            logger.LogDebug($"Variaveis de ambiente {nameof(AddEnvironmentVariablesToKeyPerFile)} com prefixo {prefix} encontradas: {environmentVariables.Count}");
+            logger.LogDebug("Variaveis de ambiente {className} com prefixo {prefix} encontradas: {environmentVariables}", nameof(AddEnvironmentVariablesToKeyPerFile), prefix, environmentVariables.Count);
 
-        var pathSecrets = Path.Combine(Directory.GetCurrentDirectory(), "secrets");
+        var tempPathAndFile = Path.Combine(
+            Path.GetTempPath(),
+            Path.GetRandomFileName(),
+            "secrets");
+
         string pathSecretFile = string.Empty;
 
-        if (Directory.Exists(pathSecrets))
-            Directory.Delete(pathSecrets, true);
+        if (Directory.Exists(tempPathAndFile))
+            Directory.Delete(tempPathAndFile, true);
 
-        Directory.CreateDirectory(pathSecrets);
+        Directory.CreateDirectory(tempPathAndFile);
 
         foreach (var kpf in environmentVariables)
         {
-            pathSecretFile = Path.Combine(pathSecrets, kpf.Key);
+            pathSecretFile = Path.Combine(tempPathAndFile, kpf.Key);
             File.WriteAllText(pathSecretFile, kpf.Value);
 
             if (removeVariavel)
@@ -108,8 +112,8 @@ public static class ConfigurationBuilderExtensions
 
         }
 
-        builder.AddKeyPerFile(pathSecrets, optional: true);
-        Directory.Delete(pathSecrets, true);
+        builder.AddKeyPerFile(tempPathAndFile, optional: true);
+        Directory.Delete(tempPathAndFile, true);
 
         return builder;
 
