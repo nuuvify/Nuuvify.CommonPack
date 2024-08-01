@@ -19,7 +19,7 @@ public static class HostApplicationBuilderExtensions
     /// <param name="customPathWindows"></param>
     /// <param name="customPathLinux"></param>
     /// <param name="logger"></param>
-    public static string SetPathSecretsToOSPlatform(this HostApplicationBuilder builder,
+    public static string SetPathSecretsToOSPlatform(this IHostApplicationBuilder builder,
         string customPathWindows = null,
         string customPathLinux = null,
         ILogger logger = null)
@@ -91,7 +91,7 @@ public static class HostApplicationBuilderExtensions
     /// <param name="builder"></param>
     /// <param name="logger"></param>
     /// <returns></returns>
-    public static string GetPathSecretsToOSPlatform(this HostApplicationBuilder builder, ILogger logger = null)
+    public static string GetPathSecretsToOSPlatform(this IHostApplicationBuilder builder, ILogger logger = null)
     {
         if (string.IsNullOrWhiteSpace(PathSecrets))
             builder.SetPathSecretsToOSPlatform(logger: logger);
