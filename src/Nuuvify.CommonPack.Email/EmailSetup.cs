@@ -35,6 +35,20 @@ namespace Nuuvify.CommonPack.Email
 
         }
 
+        /// <summary>
+        /// Injeta AddTransient{IEmail, Email} e tambem uma instancia de EmailServerConfiguration
+        /// conforme as configurações incluidas em seu appsettings.json "EmailConfig:EmailServerConfiguration"
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="configuration"></param>
+        public static void AddEmailSetupAddTransient(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddTransient<IEmail, Email>();
+
+            AddEmailServerConfiguration(services, configuration);
+
+        }
+
         private static void AddEmailServerConfiguration(IServiceCollection services, IConfiguration configuration)
         {
             var emailServerConfiguration = new EmailServerConfiguration();
@@ -46,6 +60,6 @@ namespace Nuuvify.CommonPack.Email
             services.AddSingleton(emailServerConfiguration);
 
         }
-        
+
     }
 }

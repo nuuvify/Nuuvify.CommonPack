@@ -28,6 +28,17 @@ namespace Nuuvify.CommonPack.StandardHttpClient.WebServices
             services.AddSingleton<IStandardWebService, StandardWebService>();
         }
 
+        /// <summary>
+        /// Inclua esse setup no seu Startup, ele injetara IStandardWebService para ser usado
+        /// quando consumir WebServices Soap
+        /// </summary>
+        /// <param name="services"></param>
+        public static void AddStandardWebServiceSetupTransient(this IServiceCollection services)
+        {
+
+            services.AddTransient<IStandardWebService, StandardWebService>();
+        }
+
 
     }
 }
