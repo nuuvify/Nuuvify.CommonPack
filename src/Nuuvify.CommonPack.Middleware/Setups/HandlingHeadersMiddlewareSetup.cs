@@ -14,6 +14,10 @@ namespace Nuuvify.CommonPack.Middleware
         {
             services.AddSingleton<RequestConfiguration>();
         }
+        public static void AddHandlingHeadersMiddlewareTransientSetup(this IServiceCollection services)
+        {
+            services.AddTransient<RequestConfiguration>();
+        }
 
     }
 }
