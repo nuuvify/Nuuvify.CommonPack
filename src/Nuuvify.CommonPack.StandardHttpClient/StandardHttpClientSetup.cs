@@ -47,19 +47,7 @@ public static class StandardHttpClientSetup
 
     }
 
-    /// <summary>
-    /// Inclua esse setup antes das demais configurações de HttpClient <br/>
-    /// Você precisa incluir as tags no seu arquivo appsettings.json <br/>
-    ///     "AppConfig:AppURLs:UrlLoginApi" <br/>
-    ///     "AppConfig:AppURLs:UrlLoginApiToken"
-    /// </summary>
-    /// <remarks>
-    ///  Esse metodo tambem registra: IStandardHttpClient, ITokenService e CredentialToken
-    /// </remarks>
-    /// <param name="services"></param>
-    /// <param name="configuration"></param>
-    /// <param name="registerCredential">True = Registra CredentialApi ou False = Use AddServiceCredentialRegister</param>
-    /// <returns></returns>
+    ///<inheritdoc cref="AddStandardHttpClientSetup"/>
     public static void AddStandardHttpClientSetupSingleton(this IServiceCollection services,
         IConfiguration configuration, bool registerCredential = true)
     {
@@ -67,6 +55,20 @@ public static class StandardHttpClientSetup
         services.AddSingleton<IStandardHttpClient, StandardHttpClient>();
         services.AddSingleton<ITokenService, TokenService>();
         services.AddSingleton<CredentialToken>();
+
+        if (registerCredential)
+            AddServiceCredentialRegister(services, configuration);
+
+    }
+
+    ///<inheritdoc cref="AddStandardHttpClientSetup"/>
+    public static void AddStandardHttpClientSetupAddTransient(this IServiceCollection services,
+        IConfiguration configuration, bool registerCredential = true)
+    {
+
+        services.AddTransient<IStandardHttpClient, StandardHttpClient>();
+        services.AddTransient<ITokenService, TokenService>();
+        services.AddTransient<CredentialToken>();
 
         if (registerCredential)
             AddServiceCredentialRegister(services, configuration);
