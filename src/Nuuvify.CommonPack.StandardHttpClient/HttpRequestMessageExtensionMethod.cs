@@ -3,155 +3,158 @@ using System.Net.Http.Headers;
 using System.Text;
 using Nuuvify.CommonPack.Extensions.Implementation;
 
-namespace Nuuvify.CommonPack.StandardHttpClient
+namespace Nuuvify.CommonPack.StandardHttpClient;
+
+public static class HttpRequestMessageExtensionMethod
 {
-    public static class HttpRequestMessageExtensionMethod
+
+    public static HttpRequestMessage CustomRequestHeader(this HttpRequestMessage request,
+        IDictionary<string, object> header)
     {
 
-        public static HttpRequestMessage CustomRequestHeader(this HttpRequestMessage request,
-            IDictionary<string, object> header)
+        if (header is null || header.Count == 0)
         {
-
-            if (header is null || header.Count == 0)
-            {
-                header = new Dictionary<string, object>
+            header = new Dictionary<string, object>
                 {
                     { Constants.CorrelationHeader, Guid.NewGuid() }
                 };
-            }
-            else
-            {
-                header.Remove("bearer");
-                header.Remove("Authorization");
-            }
-
-            var keyHeader = string.Empty;
-            try
-            {
-
-                foreach (var item in header)
-                {
-                    keyHeader = item.Key;
-
-                    if (!request.Headers.TryGetValues(item.Key, out IEnumerable<string> values))
-                    {
-                        request.Headers.TryAddWithoutValidation(item.Key, item.Value.ToString());
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message.Contains("An item with the same key has already been added"))
-                {
-                    Debug.WriteLine("Chave ja existe: {key}", keyHeader);
-                }
-            }
-
-
-
-            return request;
+        }
+        else
+        {
+            header.Remove("bearer");
+            header.Remove("Authorization");
         }
 
-        public static HttpClient CustomRequestHeader(this HttpClient request,
-            IDictionary<string, object> header)
+        var keyHeader = string.Empty;
+        try
         {
 
-            if (header is null || header.Count == 0)
+            foreach (var item in header)
             {
-                header = new Dictionary<string, object>
+                keyHeader = item.Key;
+
+                if (!request.Headers.TryGetValues(item.Key, out IEnumerable<string> values))
+                {
+                    request.Headers.TryAddWithoutValidation(item.Key, item.Value.ToString());
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message.Contains("An item with the same key has already been added"))
+            {
+                Debug.WriteLine("Chave ja existe: {key}", keyHeader);
+            }
+        }
+
+
+
+        return request;
+    }
+
+    public static HttpClient CustomRequestHeader(this HttpClient request,
+        IDictionary<string, object> header)
+    {
+
+        if (header is null || header.Count == 0)
+        {
+            header = new Dictionary<string, object>
                 {
                     { Constants.CorrelationHeader, Guid.NewGuid() }
                 };
+        }
+        else
+        {
+            header.Remove("bearer");
+            header.Remove("Authorization");
+        }
+
+        var keyHeader = string.Empty;
+        try
+        {
+
+            foreach (var item in header)
+            {
+                keyHeader = item.Key;
+
+                if (!request.DefaultRequestHeaders.TryGetValues(item.Key, out IEnumerable<string> values))
+                {
+                    request.DefaultRequestHeaders.TryAddWithoutValidation(item.Key, item.Value.ToString());
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message.Contains("An item with the same key has already been added"))
+            {
+                Debug.WriteLine("Chave ja existe: {key}", keyHeader);
+            }
+        }
+
+
+
+        return request;
+    }
+
+    public static HttpRequestMessage AddAuthorizationHeader(this HttpRequestMessage request,
+        IDictionary<string, object> header)
+    {
+
+        if (header.NotNullOrZero())
+        {
+            var auth = header.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x.Key));
+
+
+            if (auth.Key.ToString().StartsWith("bearer", StringComparison.InvariantCultureIgnoreCase) ||
+                auth.Key.ToString().StartsWith("basic", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return AddAuthorizationHeader(request, auth.Key, auth.Value.ToString());
             }
             else
             {
-                header.Remove("bearer");
-                header.Remove("Authorization");
+                throw new HttpRequestException("This lib is prepared only for Bearer or Basic scheme");
             }
-
-            var keyHeader = string.Empty;
-            try
-            {
-
-                foreach (var item in header)
-                {
-                    keyHeader = item.Key;
-
-                    if (!request.DefaultRequestHeaders.TryGetValues(item.Key, out IEnumerable<string> values))
-                    {
-                        request.DefaultRequestHeaders.TryAddWithoutValidation(item.Key, item.Value.ToString());
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message.Contains("An item with the same key has already been added"))
-                {
-                    Debug.WriteLine("Chave ja existe: {key}", keyHeader);
-                }
-            }
-
-
-
-            return request;
         }
 
-        public static HttpRequestMessage AddAuthorizationHeader(this HttpRequestMessage request,
-            IDictionary<string, object> header)
+        return request;
+    }
+
+    public static HttpRequestMessage AddAuthorizationHeader(this HttpRequestMessage request,
+        string scheme = null,
+        string tokenOrPassword = null)
+    {
+
+        if (string.IsNullOrWhiteSpace(scheme)) return request;
+
+
+        if (scheme.Equals("bearer", StringComparison.InvariantCultureIgnoreCase))
         {
-
-            if (header.NotNullOrZero())
+            if (request.Headers.Authorization != null)
             {
-                var auth = header.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x.Key));
-
-
-                if (auth.Key.ToString().StartsWith("bearer", StringComparison.InvariantCultureIgnoreCase) ||
-                    auth.Key.ToString().StartsWith("basic", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    return AddAuthorizationHeader(request, auth.Key, auth.Value.ToString());
-                }
-                else
-                {
-                    throw new HttpRequestException("This lib is prepared only for Bearer or Basic scheme");
-                }
+                request.Headers.Remove("Authorization");
             }
 
-            return request;
-        }
+            request.Headers.Authorization =
+                new AuthenticationHeaderValue(scheme, tokenOrPassword);
 
-        public static HttpRequestMessage AddAuthorizationHeader(this HttpRequestMessage request,
-            string scheme = "bearer",
-            string tokenOrPassword = null)
+        }
+        else if (scheme.Equals("basic", StringComparison.InvariantCultureIgnoreCase))
         {
-
-            if (scheme.Equals("bearer", StringComparison.InvariantCultureIgnoreCase))
+            if (request.Headers.Authorization != null)
             {
-                if (request.Headers.Authorization != null)
-                {
-                    request.Headers.Remove("Authorization");
-                }
-
-                request.Headers.Authorization =
-                    new AuthenticationHeaderValue(scheme, tokenOrPassword);
-
-            }
-            else if (scheme.Equals("basic", StringComparison.InvariantCultureIgnoreCase))
-            {
-                if (request.Headers.Authorization != null)
-                {
-                    request.Headers.Remove("Authorization");
-                }
-
-                var userPassword = Encoding.ASCII.GetBytes(tokenOrPassword);
-                var base64 = Convert.ToBase64String(userPassword);
-
-                request.Headers.Authorization =
-                    new AuthenticationHeaderValue(scheme, base64);
-
+                request.Headers.Remove("Authorization");
             }
 
+            var userPassword = Encoding.ASCII.GetBytes(tokenOrPassword);
+            var base64 = Convert.ToBase64String(userPassword);
 
-            return request;
+            request.Headers.Authorization =
+                new AuthenticationHeaderValue(scheme, base64);
+
         }
+
+
+        return request;
     }
 }
+
