@@ -124,9 +124,12 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         }
 
         public static HttpRequestMessage AddAuthorizationHeader(this HttpRequestMessage request,
-            string scheme = "bearer",
+            string scheme = null,
             string tokenOrPassword = null)
         {
+
+            if (string.IsNullOrWhiteSpace(scheme)) return request;
+
 
             if (scheme.Equals("bearer", StringComparison.InvariantCultureIgnoreCase))
             {
