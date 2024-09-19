@@ -220,7 +220,7 @@ public interface IStandardHttpClient
     /// </param>
     /// <returns></returns>
     IStandardHttpClient WithAuthorization(
-        string schema = "Bearer",
+        string schema = null,
         string token = null,
         string userClaim = null);
 
