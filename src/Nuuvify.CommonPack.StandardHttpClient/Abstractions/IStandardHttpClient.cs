@@ -54,7 +54,7 @@ public interface IStandardHttpClient
     void CreateClient(string namedClient = null);
 
     /// <summary>
-    /// Cira uma nova instancia do HttpClient, com um HttpMessageHandler customizado
+    /// Cira uma nova instancia do HttpClient, com um HttpClientHandler customizado
     /// </summary>
     /// <param name="httpClientHandler"></param>
     void CreateClient(HttpClientHandler httpClientHandler);
