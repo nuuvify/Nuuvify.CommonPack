@@ -101,7 +101,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
 
         ///<inheritdoc/>
         public IStandardHttpClient WithAuthorization(
-            string schema = "bearer",
+            string schema = null,
             string token = null,
             string userClaim = null)
         {
