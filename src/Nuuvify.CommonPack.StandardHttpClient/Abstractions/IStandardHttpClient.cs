@@ -17,6 +17,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
     public interface IStandardHttpClient
     {
 
+        HttpMessageHandler HttpMessageHandler { get; set; }
 
         /// <summary>
         /// Essa propriedade retorna a url completa "absoluta" da sua chamada http,
@@ -239,6 +240,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// <param name="response"></param>
         /// <returns></returns>
         Task<HttpStandardStreamReturn> HandleResponseMessageStream(HttpResponseMessage response);
+
     }
 
 }
