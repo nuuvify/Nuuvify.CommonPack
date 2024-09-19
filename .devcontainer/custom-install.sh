@@ -11,9 +11,11 @@ FILEPOSH=$(which oh-my-posh)
 
 if [ ! -f "$FILEPOSH" ]; then
     echo "Instalando oh-my-posh ..."
-    curl -s https://ohmyposh.dev/install.sh | bash -s
     mv ~/.zshrc ~/.zshrc-old
+    mkdir -p ~/.config
     cp $WORKFOLDER/.devcontainer/atomic.omp.json ~/.config/atomic.omp.json
     cp $WORKFOLDER/.devcontainer/.zshrc ~/.zshrc
+    curl -s https://ohmyposh.dev/install.sh | bash -s
 fi
+source ~/.zshrc
 
