@@ -5,6 +5,27 @@
    "version": "0.2.0",
    "configurations": [
       {
+         "name": "NugetManagement",
+         "type": "coreclr",
+         "request": "launch",
+         "preLaunchTask": "build",
+         "windows": {
+             "console": "externalTerminal",
+             "program": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/Nuget.CustomManagement.dll",
+             "args": [],
+             "cwd": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/",
+         },
+         "linux": {
+             "program": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/linux-x64/Nuget.CustomManagement.dll",
+             "args": [],
+             "cwd": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/linux-x64/",
+         },
+         "env": {
+           "DOTNET_ENVIRONMENT": "Development"
+         }
+       },
+
+      {
          "name": "PowerShell - Tests",
          "type": "PowerShell",
          "request": "launch",
