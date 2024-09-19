@@ -56,7 +56,6 @@ public partial class StandardHttpClient : IStandardHttpClient
         _headerAuthorization.Clear();
         _httpClient.DefaultRequestHeaders.Authorization = null;
         _httpClient.DefaultRequestHeaders.Accept.Clear();
-        _httpClient = null;
         CustomHttpResponseMessage = null;
 
         CorrelationId = string.Empty;
