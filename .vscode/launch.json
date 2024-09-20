@@ -9,8 +9,9 @@
          "type": "coreclr",
          "request": "launch",
          "preLaunchTask": "build",
+         "externalConsole": true,
+         "console": "externalTerminal",
          "windows": {
-             "console": "externalTerminal",
              "program": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/Nuget.CustomManagement.dll",
              "args": [],
              "cwd": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/",
