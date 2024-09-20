@@ -1,5 +1,3 @@
-using System.Threading;
-using System.Threading.Tasks;
 using Nuuvify.CommonPack.Security.Abstraction;
 using Nuuvify.CommonPack.Security.JwtCredentials.Interfaces;
 

@@ -1,7 +1,7 @@
-﻿USE Audicon
+﻿USE SeuBanco
 GO
 
-CREATE TABLE Audicon.CacheToken
+CREATE TABLE SeuSchema.CacheToken
 (
     Id nvarchar(449) COLLATE SQL_Latin1_General_CP1_CS_AS NOT NULL,
     Value varbinary(MAX) NOT NULL,
