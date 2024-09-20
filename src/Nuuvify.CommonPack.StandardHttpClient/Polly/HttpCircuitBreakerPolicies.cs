@@ -8,7 +8,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
     {
         public static AsyncCircuitBreakerPolicy<HttpResponseMessage> GetHttpCircuitBreakerPolicy(ILogger logger, ICircuitBreakerPolicyConfig circuitBreakerPolicyConfig)
         {
-            return HttpPolicyBuilders.GetBaseBuilder()
+            var httpResponseMessage = HttpPolicyBuilders.GetBaseBuilder()
                 .CircuitBreakerAsync(
                     handledEventsAllowedBeforeBreaking: circuitBreakerPolicyConfig.RetryCount + 1,
                     durationOfBreak: TimeSpan.FromMilliseconds(circuitBreakerPolicyConfig.BreakDurationMilliSeconds),
@@ -20,6 +20,8 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
                     {
                         OnHttpReset(context, logger);
                     });
+
+            return httpResponseMessage;
         }
 
         private static void OnHttpBreak(DelegateResult<HttpResponseMessage> responseMessage, TimeSpan breakDuration, int retryCount, Context context, ILogger logger)

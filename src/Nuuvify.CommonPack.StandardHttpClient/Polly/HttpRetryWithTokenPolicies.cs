@@ -11,7 +11,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
         {
             int retryNum = 0;
 
-            return HttpPolicyBuilders.GetBaseBuilder()
+            var httpReponseMessage = HttpPolicyBuilders.GetBaseBuilder()
                 .OrResult(msg => msg.StatusCode == HttpStatusCode.Unauthorized)
                 .WaitAndRetryAsync(
                     retryCount: retryPolicyConfig.RetryCount,
@@ -23,6 +23,12 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
 
                         if (retryNum > retryPolicyConfig.RetryCount) retryNum = 0;
                     });
+
+            if (request.Headers.Authorization?.Scheme == "bearer" &&
+                string.IsNullOrWhiteSpace(request.Headers.Authorization.Parameter))
+                request.Headers.Authorization = null;
+
+            return httpReponseMessage;
         }
 
         private static async Task OnHttpRetryWithToken(
