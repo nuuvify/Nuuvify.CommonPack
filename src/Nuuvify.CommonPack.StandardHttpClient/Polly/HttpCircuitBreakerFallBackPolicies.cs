@@ -11,7 +11,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
 
         public static AsyncFallbackPolicy<HttpResponseMessage> GetHttpFallBackPolicy(HttpRequestMessage request, ILogger logger)
         {
-            return HttpPolicyBuilders.GetBaseBuilder()
+            var httpResponseMessage = HttpPolicyBuilders.GetBaseBuilder()
                 .OrInner<BrokenCircuitException>()
                 .FallbackAsync(
                     fallbackAction: (responseToFailedRequest, context, cancellationToken) =>
@@ -23,6 +23,11 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
                         return OnFallbackAsync(responseToFailedRequest, context, logger, request);
                     });
 
+            if (request.Headers.Authorization?.Scheme == "bearer" &&
+                string.IsNullOrWhiteSpace(request.Headers.Authorization.Parameter))
+                request.Headers.Authorization = null;
+
+            return httpResponseMessage;
         }
 
         private static Task OnFallbackAsync(DelegateResult<HttpResponseMessage> response, Context context, ILogger logger, HttpRequestMessage request)
