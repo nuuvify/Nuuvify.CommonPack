@@ -10,7 +10,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
         {
             int retryNum = 0;
 
-            return HttpPolicyBuilders.GetBaseBuilder()
+            var httpResponseMessage = HttpPolicyBuilders.GetBaseBuilder()
                 .WaitAndRetryAsync(
                     retryCount: retryPolicyConfig.RetryCount,
                     sleepDurationProvider: attemp => PollyHelpers.ComputeDuration(attemp),
@@ -21,6 +21,12 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
 
                         if (retryNum > retryPolicyConfig.RetryCount) retryNum = 0;
                     });
+
+            if (request.Headers.Authorization?.Scheme == "bearer" &&
+                string.IsNullOrWhiteSpace(request.Headers.Authorization.Parameter))
+                request.Headers.Authorization = null;
+
+            return httpResponseMessage;
         }
 
         private static async Task OnHttpRetry(DelegateResult<HttpResponseMessage> message, HttpRequestMessage request, TimeSpan retrySleep, int retryNum, int retryTotal, Context context, ILogger logger)
