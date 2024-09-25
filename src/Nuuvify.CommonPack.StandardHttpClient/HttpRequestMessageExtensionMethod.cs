@@ -19,11 +19,7 @@ public static class HttpRequestMessageExtensionMethod
                     { Constants.CorrelationHeader, Guid.NewGuid() }
                 };
         }
-        else
-        {
-            header.Remove("bearer");
-            header.Remove("Authorization");
-        }
+
 
         var keyHeader = string.Empty;
         try
@@ -63,11 +59,7 @@ public static class HttpRequestMessageExtensionMethod
                     { Constants.CorrelationHeader, Guid.NewGuid() }
                 };
         }
-        else
-        {
-            header.Remove("bearer");
-            header.Remove("Authorization");
-        }
+
 
         var keyHeader = string.Empty;
         try
