@@ -1,4 +1,4 @@
-FROM lzocateli/dotnet-sdk:8.0.202-jammy-amd64
+FROM lzocateli/dotnet-sdk:8.0.303-jammy-amd64
 
 ARG PathApp=/workspaces
 
