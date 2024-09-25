@@ -87,7 +87,7 @@ namespace Nuuvify.CommonPack.Security.Jwt
 
             _jwtClaims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
             _jwtClaims.Add(new Claim(JwtRegisteredClaimNames.Nbf, ToUnixEpochDate(DateTime.Now).ToString()));
-            _jwtClaims.Add(new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(DateTime.Now.AddHours(_jwtTokenOptions.ValidityInHours)).ToString(), ClaimValueTypes.Integer64));
+            _jwtClaims.Add(new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(DateTime.Now.Add(_jwtTokenOptions.ValidFor)).ToString(), ClaimValueTypes.Integer64));
 
             _identityClaims.AddClaims(_jwtClaims);
 
