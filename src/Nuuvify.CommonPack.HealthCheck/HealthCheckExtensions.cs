@@ -56,11 +56,11 @@ public static class HealthCheckExtensions
     ///        });
     /// </code>
     /// </param>
-    public static IServiceCollection AddHealthCheckServiceBuilder(this WebApplicationBuilder builder, ILoggerFactory loggerFactory = null)
+    public static IHealthChecksBuilder AddHealthCheckServiceBuilder(this WebApplicationBuilder builder, ILoggerFactory loggerFactory = null)
     {
 
         var enableChecksStandard = builder.Configuration.GetValue<bool>("HealthCheckCustomConfiguration:EnableChecksStandard");
-        if (!enableChecksStandard) return builder.Services;
+        if (!enableChecksStandard) return builder.Services.AddHealthChecks();
 
 
         var uriHc = builder.Configuration.GetSection("HealthCheckCustomConfiguration:UrlHealthCheck")?.Value;
@@ -131,7 +131,7 @@ public static class HealthCheckExtensions
                 configureSqliteOptions.MigrationsHistoryTable(historyTable, historySchema);
             });
 
-            return builder.Services;
+            return healthChecksUIBuilder.Services.AddHealthChecks();
         }
 
 
@@ -150,7 +150,7 @@ public static class HealthCheckExtensions
         });
 
 
-        return builder.Services;
+        return healthChecksUIBuilder.Services.AddHealthChecks();
 
     }
 
@@ -159,11 +159,12 @@ public static class HealthCheckExtensions
     /// Adiciona um health check para a api de credenciais "CredentialApi"
     /// </summary>
     /// <param name="builder"></param>
+    /// <param name="configuration"></param>
     /// <returns></returns>
-    public static IServiceCollection AddHealthCheckCredentialApiBuilder(this WebApplicationBuilder builder)
+    public static IHealthChecksBuilder AddHealthCheckCredentialApiBuilder(this IHealthChecksBuilder builder, IConfiguration configuration)
     {
-        var enableChecksStandard = builder.Configuration.GetValue<bool>("HealthCheckCustomConfiguration:EnableChecksStandard");
-        if (!enableChecksStandard) return builder.Services;
+        var enableChecksStandard = configuration.GetValue<bool>("HealthCheckCustomConfiguration:EnableChecksStandard");
+        if (!enableChecksStandard) return builder;
 
         builder.Services.AddHealthChecks()
             .AddCheck<HttpCredentialApiHealthCheck>(
@@ -171,7 +172,7 @@ public static class HealthCheckExtensions
                 failureStatus: HealthStatus.Degraded,
                 tags: new string[] { "api-external" });
 
-        return builder.Services;
+        return builder;
     }
 
 
@@ -179,11 +180,12 @@ public static class HealthCheckExtensions
     /// Adiciona um health check para Memory e LocalStorage
     /// </summary>
     /// <param name="builder"></param>
+    /// <param name="configuration"></param>
     /// <returns></returns>
-    public static IServiceCollection AddHealthCheckMemoryAndStorageBuilder(this WebApplicationBuilder builder)
+    public static IHealthChecksBuilder AddHealthCheckMemoryAndStorageBuilder(this IHealthChecksBuilder builder, IConfiguration configuration)
     {
-        var enableChecksStandard = builder.Configuration.GetValue<bool>("HealthCheckCustomConfiguration:EnableChecksStandard");
-        if (!enableChecksStandard) return builder.Services;
+        var enableChecksStandard = configuration.GetValue<bool>("HealthCheckCustomConfiguration:EnableChecksStandard");
+        if (!enableChecksStandard) return builder;
 
         builder.Services.AddHealthChecks()
             .AddCheck<MemoryHealthCheck>(
@@ -193,7 +195,7 @@ public static class HealthCheckExtensions
                 name: "host-storage",
                 tags: new[] { "storage" });
 
-        return builder.Services;
+        return builder;
     }
 
 
