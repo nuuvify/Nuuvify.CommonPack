@@ -104,7 +104,6 @@ public class JwtTokenOptions
 
     public void NewInstance()
     {
-        ValidFor = TimeSpan.Zero;
         NotBefore = DateTimeOffset.Now;
     }
 
