@@ -1,9 +1,9 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 
-namespace Nuuvify.CommonPack.Security.JwtCredentials.Interfaces
+namespace Nuuvify.CommonPack.Security.JwtCredentials.Interfaces;
+
+public interface IJwkService
 {
-    public interface IJwkService
-    {
-        JsonWebKey Generate(Algorithm algorithm);
-    }
+    JsonWebKey Generate(Algorithm algorithm);
 }
+

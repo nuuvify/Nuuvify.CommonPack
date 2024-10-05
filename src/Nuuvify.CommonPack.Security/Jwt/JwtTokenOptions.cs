@@ -13,6 +13,7 @@ public class JwtTokenOptions
     public IList<string> Issuers { get; set; }
     public string Audience { get; set; }
     public IList<string> Audiences { get; set; }
+    public DateTime ValidatedAt { get; set; }
 
     /// <summary>
     /// Data da Criacao do token.
@@ -30,14 +31,13 @@ public class JwtTokenOptions
     {
         get
         {
-            if (_validFor.TotalSeconds <= 0)
-            {
-                _validFor = TimeSpan.FromHours(8);
-            }
             return _validFor;
         }
         set
         {
+            if (value.TotalSeconds <= 0)
+                value = new TimeSpan(ValidatedAt.Hour, ValidatedAt.Minute, ValidatedAt.Second);
+
             if (value.TotalSeconds <= 0)
             {
                 value = TimeSpan.FromHours(8);
