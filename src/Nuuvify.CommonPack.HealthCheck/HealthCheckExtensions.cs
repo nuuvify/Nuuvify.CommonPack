@@ -136,6 +136,10 @@ public static class HealthCheckExtensions
 
 
         var cnnHealthCheck = builder.Configuration.GetConnectionString("HealthCheck")!;
+        if (cnnHealthCheck is null)
+        {
+            throw new ArgumentException("appsettings or your Vault properties ConnectionString--HealthCheck is null");
+        }
 
         healthChecksUIBuilder.AddSqlServerStorage(cnnHealthCheck, options =>
         {
@@ -160,17 +164,33 @@ public static class HealthCheckExtensions
     /// </summary>
     /// <param name="builder"></param>
     /// <param name="configuration"></param>
+    /// <param name="uriCredential">new Uri(configuration.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value)</param>
+    /// <param name="httpClientHandler">new MyHttpClientHandler(WebRequest.DefaultWebProxy).MyClientHandler</param>
     /// <returns></returns>
-    public static IHealthChecksBuilder AddHealthCheckCredentialApiBuilder(this IHealthChecksBuilder builder, IConfiguration configuration)
+    public static IHealthChecksBuilder AddHealthCheckCredentialApiBuilder(
+        this IHealthChecksBuilder builder,
+        IConfiguration configuration,
+        Uri uriCredential = null,
+        HttpClientHandler httpClientHandler = null)
     {
         var enableChecksStandard = configuration.GetValue<bool>("HealthCheckCustomConfiguration:EnableChecksStandard");
         if (!enableChecksStandard) return builder;
 
+
+        uriCredential ??= new Uri(configuration.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value);
+
         builder.Services.AddHealthChecks()
-            .AddCheck<HttpCredentialApiHealthCheck>(
+            .AddTypeActivatedCheck<HttpCustomHealthCheck>(
                 name: "CredentialApi",
-                failureStatus: HealthStatus.Degraded,
-                tags: new string[] { "api-external" });
+                failureStatus: null,
+                tags: new[] { "api" },
+                args: new object[]
+                {
+                    uriCredential,
+                    "hc",
+                    HealthStatus.Unhealthy,
+                    httpClientHandler
+                });
 
         return builder;
     }
