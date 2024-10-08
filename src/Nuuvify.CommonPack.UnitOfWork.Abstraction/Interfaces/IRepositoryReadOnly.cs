@@ -22,7 +22,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces
     /// or
     ///     return await _repository.GetPagedListAsync(pageIndex: pageIndex, pageSize: pageSize);
     /// OrderBy:
-    ///     var order = _repository.GetFirstOrDefault(predicate: x => x.Title.Contains(term), orderBy: source => source.OrderByDescending(b => b.Id));
+    ///     var order = _repository.GetFirstOrDefault(predicate: x => x.Title.Contains(term), orderBy: source => source.OrderByDescending(b => b.Id).ThenBy(b => b.Name));
     /// </code>
     /// </example>
     /// </summary>

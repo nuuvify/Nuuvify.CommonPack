@@ -1,4 +1,6 @@
-﻿using Nuuvify.CommonPack.Security.JwtCredentials;
+﻿using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.SqlServer;
+using Nuuvify.CommonPack.Security.JwtCredentials;
 using Nuuvify.CommonPack.Security.JwtCredentials.Interfaces;
 using Nuuvify.CommonPack.Security.JwtCredentials.Jwk;
 using Nuuvify.CommonPack.Security.JwtCredentials.Jwks;
@@ -42,7 +44,7 @@ public static class JwkSetManagerDependencyInjection
     /// no banco conforme exemplo: 
     /// <example>
     /// <code>
-    /// CREATE TABLE SeuSchema.CacheToken
+    /// CREATE TABLE SeuSchema.Tokens
     /// (
     ///     Id nvarchar(449) COLLATE SQL_Latin1_General_CP1_CS_AS NOT NULL,
     ///     Value varbinary(MAX) NOT NULL,
@@ -56,21 +58,27 @@ public static class JwkSetManagerDependencyInjection
     /// </summary>
     /// <param name="builder"></param>
     /// <param name="connectionString">String para conexão no banco SqlServer</param>
-    /// <param name="schemaName">Nome do schema do banco onde ficara a tabela CacheToken, exemplo: Audicon.CacheToken</param>
+    /// <param name="schemaName">Nome do schema do banco onde ficara a tabela Tokens, exemplo: SeuSchema.Tokens</param>
     /// <param name="tableName">Nome da tabela usada para armazenar o token</param>
     public static IJwksBuilder CacheTokenSetup(this IJwksBuilder builder,
-        string connectionString, string schemaName, string tableName = "CacheTokens")
+        string connectionString,
+        string schemaName = "cache",
+        string tableName = "Tokens")
     {
 
         builder.Services.AddScoped<IJwtSetService, JwtSetService>();
 
-        builder.Services.AddDistributedSqlServerCache(options =>
+        builder.Services.AddKeyedScoped<IDistributedCache>("SqlServerCache", (serviceProvider, key) =>
         {
-            options.ConnectionString = connectionString;
-
-            options.SchemaName = schemaName;
-            options.TableName = tableName;
+            var options = new SqlServerCacheOptions
+            {
+                ConnectionString = connectionString,
+                SchemaName = schemaName,
+                TableName = tableName,
+            };
+            return new SqlServerCache(options);
         });
+
 
         return builder;
 
