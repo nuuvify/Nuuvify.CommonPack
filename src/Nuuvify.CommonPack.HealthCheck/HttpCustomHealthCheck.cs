@@ -16,8 +16,11 @@ public class HttpCustomHealthCheck : IHealthCheck
 {
 
     private readonly string _hcUrl;
-    private readonly HttpClient _httpClient;
     private readonly HealthStatus _failureStatus;
+
+
+    private readonly HttpClient _httpClient;
+    private readonly Func<HttpClient> _httpClientFactory;
 
 
     public HttpCustomHealthCheck(
@@ -29,11 +32,14 @@ public class HttpCustomHealthCheck : IHealthCheck
 
         _hcUrl = hcUrl;
         _failureStatus = failureStatus;
-        _httpClient = new HttpClient(httpClientHandler)
+
+
+        _httpClientFactory = () => new HttpClient(httpClientHandler)
         {
             BaseAddress = baseUri
         };
 
+        _httpClient = _httpClientFactory.Invoke();
 
     }
 
