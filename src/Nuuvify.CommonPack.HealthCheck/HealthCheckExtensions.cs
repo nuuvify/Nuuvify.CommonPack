@@ -1,5 +1,8 @@
 
 using System.Net;
+using Azure.Core;
+using Azure.Storage.Blobs;
+using HealthChecks.Azure.Storage.Blobs;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -65,6 +68,8 @@ public static class HealthCheckExtensions
 
         var uriHc = builder.Configuration.GetSection("HealthCheckCustomConfiguration:UrlHealthCheck")?.Value;
         var setEvaluationTimeInSeconds = builder.Configuration.GetValue<int>("HealthCheckCustomConfiguration:EvaluationTimeInSeconds");
+        var webPRoxy = builder.Services.BuildServiceProvider().GetService<IWebProxy>();
+
 
         var healthChecksUIBuilder = builder.Services.AddHealthChecksUI(s =>
         {
@@ -76,13 +81,16 @@ public static class HealthCheckExtensions
             s.SetEvaluationTimeInSeconds(setEvaluationTimeInSeconds);
             s.SetMinimumSecondsBetweenFailureNotifications(builder.Configuration.GetValue<int>("HealthCheckCustomConfiguration:MinimumSecondsBetweenFailureNotifications"));
             s.SetApiMaxActiveRequests(builder.Configuration.GetValue<int>("HealthCheckCustomConfiguration:SetApiMaxActiveRequests"));
-            s.UseApiEndpointHttpMessageHandler(sp =>
+            if (webPRoxy != null)
             {
-                return new HttpClientHandler
+                s.UseApiEndpointHttpMessageHandler(sp =>
                 {
-                    Proxy = WebRequest.DefaultWebProxy
-                };
-            });
+                    return new HttpClientHandler
+                    {
+                        Proxy = webPRoxy
+                    };
+                });
+            }
         });
 
 
@@ -161,38 +169,90 @@ public static class HealthCheckExtensions
 
     /// <summary>
     /// Adiciona um health check para a api de credenciais "CredentialApi"
+    /// <p>AzureKeyVault para AzureAdOpenID--cc--ClientSecret e ApisCredentials--Password</p>
+    /// <p>AzureBlobStorage para BlobDotnetDataProtection</p> 
     /// </summary>
     /// <param name="builder"></param>
     /// <param name="configuration"></param>
+    /// <param name="azureTokenCredential">sp => sp.GetRequiredService{TokenCredential}()</param>
     /// <param name="uriCredential">new Uri(configuration.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value)</param>
-    /// <param name="httpClientHandler">new MyHttpClientHandler(WebRequest.DefaultWebProxy).MyClientHandler</param>
+    /// <param name="urlHealthCheck">hc ou qualquer outro endpoint de healthcheck, ou null para cancelar</param>
+    /// <param name="httpClientHandler">new MyHttpClientHandler(builder.Services).MyClientHandler</param>
+    /// <param name="timeout">Default = 2 seconds</param>
     /// <returns></returns>
     public static IHealthChecksBuilder AddHealthCheckCredentialApiBuilder(
         this IHealthChecksBuilder builder,
         IConfiguration configuration,
+        Func<IServiceProvider, TokenCredential> azureTokenCredential,
         Uri uriCredential = null,
-        HttpClientHandler httpClientHandler = null)
+        string urlHealthCheck = "hc",
+        HttpClientHandler httpClientHandler = null,
+        TimeSpan? timeout = default)
     {
         var enableChecksStandard = configuration.GetValue<bool>("HealthCheckCustomConfiguration:EnableChecksStandard");
         if (!enableChecksStandard) return builder;
 
 
-        uriCredential ??= new Uri(configuration.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value);
+        var tokenCredential = azureTokenCredential.Invoke(builder.Services.BuildServiceProvider());
+        if (!timeout.HasValue)
+        {
+            timeout = TimeSpan.FromSeconds(2);
+        }
+
+        if (!string.IsNullOrWhiteSpace(urlHealthCheck))
+        {
+
+            uriCredential ??= new Uri(configuration.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value);
+
+            builder.Services.AddHealthChecks()
+                .AddTypeActivatedCheck<HttpCustomHealthCheck>(
+                    name: "CredentialApi",
+                    failureStatus: null,
+                    tags: new[] { "api" },
+                    timeout: timeout.Value,
+                    args: new object[]
+                    {
+                        uriCredential,
+                        urlHealthCheck,
+                        HealthStatus.Unhealthy,
+                        httpClientHandler ?? new HttpClientHandler()
+                    });
+        }
+
 
         builder.Services.AddHealthChecks()
-            .AddTypeActivatedCheck<HttpCustomHealthCheck>(
-                name: "CredentialApi",
-                failureStatus: null,
-                tags: new[] { "api" },
-                args: new object[]
+            .AddAzureKeyVault(
+                name: $"AzureKeyVault",
+                keyVaultServiceUri: new Uri(configuration.GetSection("AzureKeyVault:Dns")?.Value),
+                credential: tokenCredential,
+                setup: options =>
                 {
-                    uriCredential,
-                    "hc",
-                    HealthStatus.Unhealthy,
-                    httpClientHandler
-                });
+                    options.AddSecret("ApisCredentials--Password");
+                    options.AddSecret("AzureAdOpenID--cc--ClientSecret");
+                },
+                failureStatus: HealthStatus.Unhealthy,
+                tags: new[] { "azure", "keyvault" },
+                timeout: timeout.Value)
+            .AddAzureBlobStorage(
+                name: "BlobDotnetDataProtection",
+                clientFactory: (sp) =>
+                {
+                    return sp.GetRequiredKeyedService<BlobServiceClient>("BlobDotnetDataProtection");
+                },
+                optionsFactory: (sp) =>
+                {
+                    return new AzureBlobStorageHealthCheckOptions()
+                    {
+                        ContainerName = "dotnetdataprotection",
+                    };
+                },
+                failureStatus: HealthStatus.Degraded,
+                tags: new[] { "azure", "blob", "dotnetdataprotection" },
+                timeout: timeout.Value);
+
 
         return builder;
+
     }
 
 
