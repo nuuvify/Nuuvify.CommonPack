@@ -106,8 +106,8 @@ public static class HealthCheckExtensions
 
         if (loggerFactory is null)
         {
-            var healthCheckLogLevel = builder.Configuration.GetSection("Logging:LogLevel:HealthChecks")?.Value;
-            Enum.TryParse<LogLevel>(value: healthCheckLogLevel, ignoreCase: true, out var logLevel);
+            var logLevelSection = builder.Configuration.GetSection("Logging:LogLevel:HealthChecks")?.Value;
+            Enum.TryParse<LogLevel>(logLevelSection ?? "None", true, out var logLevel);
 
             loggerFactory = LoggerFactory.Create(opt =>
             {
