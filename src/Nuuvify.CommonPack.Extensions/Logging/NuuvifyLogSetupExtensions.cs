@@ -35,8 +35,12 @@ public static class NuuvifyLogSetupExtensions
 
     public static ILoggingBuilder AddCustomFormatter(
         this ILoggingBuilder builder,
-        Action<NuuvifyLogFormatterOptions> configureFormatter)
+        Action<NuuvifyLogFormatterOptions> configureFormatter,
+        Action<NuuvifyLogColorConfiguration> configureColor = default)
     {
+        if (configureColor != null)
+            builder.Services.Configure(configureColor);
+
         builder.AddConsole(options => options.FormatterName = nameof(NuuvifyLogFormatter))
                .AddConsoleFormatter<NuuvifyLogFormatter, NuuvifyLogFormatterOptions>(configureFormatter);
 
