@@ -10,19 +10,27 @@ public class NuuvifyLogFormatter : ConsoleFormatter, IDisposable
 
     private readonly IDisposable _optionsReloadToken;
     private NuuvifyLogFormatterOptions _nuuvifyLogOptions;
+    private NuuvifyLogColorConfiguration _nuuvifyLogColorConfiguration;
 
     public NuuvifyLogFormatter(
-        IOptionsMonitor<NuuvifyLogFormatterOptions> nuuvifyLogOptions)
+        IOptionsMonitor<NuuvifyLogFormatterOptions> nuuvifyLogOptions,
+        IOptionsMonitor<NuuvifyLogColorConfiguration> nuuvifyLogColorConfiguration)
         : base(nameof(NuuvifyLogFormatter))
     {
 
         _optionsReloadToken = nuuvifyLogOptions.OnChange(ReloadLoggerOptions);
         _nuuvifyLogOptions = nuuvifyLogOptions.CurrentValue;
 
+        _optionsReloadToken = nuuvifyLogColorConfiguration.OnChange(ReloadLoggerColorConfiguration);
+        _nuuvifyLogColorConfiguration = nuuvifyLogColorConfiguration.CurrentValue;
+
     }
 
     private void ReloadLoggerOptions(NuuvifyLogFormatterOptions options) =>
         _nuuvifyLogOptions = options;
+
+    private void ReloadLoggerColorConfiguration(NuuvifyLogColorConfiguration config) =>
+        _nuuvifyLogColorConfiguration = config;
 
 
 
@@ -40,12 +48,19 @@ public class NuuvifyLogFormatter : ConsoleFormatter, IDisposable
         if (string.IsNullOrWhiteSpace(message)) return;
 
 
+        Console.ResetColor();
+        Console.ForegroundColor = ConsoleColor.White;
+        textWriter = Console.Out;
         WritePrefix(textWriter);
 
         var messageLogLevel = $"[ {logLevel,-12} ]";
+        Console.ForegroundColor = _nuuvifyLogColorConfiguration.LogLevelToColorMap[logLevel];
+        textWriter = Console.Out;
         textWriter.WriteLine(messageLogLevel);
 
+        Console.ResetColor();
         Console.ForegroundColor = ConsoleColor.White;
+        textWriter = Console.Out;
         textWriter.WriteLine($"{name.PadLeft(name.Length + 5)}");
         textWriter.WriteLine($"{message.PadLeft(message.Length + 5)}");
 

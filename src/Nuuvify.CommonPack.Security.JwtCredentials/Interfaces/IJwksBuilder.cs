@@ -1,7 +1,7 @@
-﻿namespace Microsoft.Extensions.DependencyInjection
+﻿namespace Microsoft.Extensions.DependencyInjection;
+
+public interface IJwksBuilder
 {
-    public interface IJwksBuilder
-    {
-        IServiceCollection Services { get; }
-    }
+
+    IServiceCollection Services { get; }
 }
