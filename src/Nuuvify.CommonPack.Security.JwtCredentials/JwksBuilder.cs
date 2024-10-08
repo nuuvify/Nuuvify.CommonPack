@@ -1,15 +1,14 @@
-﻿using System;
+﻿
+namespace Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.Extensions.DependencyInjection
+public class JwksBuilder : IJwksBuilder
 {
-    public class JwksBuilder : IJwksBuilder
+
+    public JwksBuilder(IServiceCollection services)
     {
-
-        public JwksBuilder(IServiceCollection services)
-        {
-            Services = services ?? throw new ArgumentNullException(nameof(services));
-        }
-
-        public IServiceCollection Services { get; }
+        Services = services ?? throw new ArgumentNullException(nameof(services));
     }
+
+    public IServiceCollection Services { get; }
+
 }

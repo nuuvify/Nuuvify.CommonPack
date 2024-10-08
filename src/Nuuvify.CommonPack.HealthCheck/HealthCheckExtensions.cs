@@ -1,5 +1,8 @@
 
 using System.Net;
+using Azure.Core;
+using Azure.Storage.Blobs;
+using HealthChecks.Azure.Storage.Blobs;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -56,15 +59,17 @@ public static class HealthCheckExtensions
     ///        });
     /// </code>
     /// </param>
-    public static IServiceCollection AddHealthCheckServiceBuilder(this WebApplicationBuilder builder, ILoggerFactory loggerFactory = null)
+    public static IHealthChecksBuilder AddHealthCheckServiceBuilder(this WebApplicationBuilder builder, ILoggerFactory loggerFactory = null)
     {
 
         var enableChecksStandard = builder.Configuration.GetValue<bool>("HealthCheckCustomConfiguration:EnableChecksStandard");
-        if (!enableChecksStandard) return builder.Services;
+        if (!enableChecksStandard) return builder.Services.AddHealthChecks();
 
 
         var uriHc = builder.Configuration.GetSection("HealthCheckCustomConfiguration:UrlHealthCheck")?.Value;
         var setEvaluationTimeInSeconds = builder.Configuration.GetValue<int>("HealthCheckCustomConfiguration:EvaluationTimeInSeconds");
+        var webPRoxy = builder.Services.BuildServiceProvider().GetService<IWebProxy>();
+
 
         var healthChecksUIBuilder = builder.Services.AddHealthChecksUI(s =>
         {
@@ -76,13 +81,16 @@ public static class HealthCheckExtensions
             s.SetEvaluationTimeInSeconds(setEvaluationTimeInSeconds);
             s.SetMinimumSecondsBetweenFailureNotifications(builder.Configuration.GetValue<int>("HealthCheckCustomConfiguration:MinimumSecondsBetweenFailureNotifications"));
             s.SetApiMaxActiveRequests(builder.Configuration.GetValue<int>("HealthCheckCustomConfiguration:SetApiMaxActiveRequests"));
-            s.UseApiEndpointHttpMessageHandler(sp =>
+            if (webPRoxy != null)
             {
-                return new HttpClientHandler
+                s.UseApiEndpointHttpMessageHandler(sp =>
                 {
-                    Proxy = WebRequest.DefaultWebProxy
-                };
-            });
+                    return new HttpClientHandler
+                    {
+                        Proxy = webPRoxy
+                    };
+                });
+            }
         });
 
 
@@ -98,8 +106,8 @@ public static class HealthCheckExtensions
 
         if (loggerFactory is null)
         {
-            var healthCheckLogLevel = builder.Configuration.GetSection("Logging:LogLevel:HealthChecks")?.Value;
-            Enum.TryParse<LogLevel>(value: healthCheckLogLevel, ignoreCase: true, out var logLevel);
+            var logLevelSection = builder.Configuration.GetSection("Logging:LogLevel:HealthChecks")?.Value;
+            Enum.TryParse<LogLevel>(logLevelSection ?? "None", true, out var logLevel);
 
             loggerFactory = LoggerFactory.Create(opt =>
             {
@@ -131,11 +139,15 @@ public static class HealthCheckExtensions
                 configureSqliteOptions.MigrationsHistoryTable(historyTable, historySchema);
             });
 
-            return builder.Services;
+            return healthChecksUIBuilder.Services.AddHealthChecks();
         }
 
 
         var cnnHealthCheck = builder.Configuration.GetConnectionString("HealthCheck")!;
+        if (cnnHealthCheck is null)
+        {
+            throw new ArgumentException("appsettings or your Vault properties ConnectionString--HealthCheck is null");
+        }
 
         healthChecksUIBuilder.AddSqlServerStorage(cnnHealthCheck, options =>
         {
@@ -150,28 +162,97 @@ public static class HealthCheckExtensions
         });
 
 
-        return builder.Services;
+        return healthChecksUIBuilder.Services.AddHealthChecks();
 
     }
 
 
     /// <summary>
     /// Adiciona um health check para a api de credenciais "CredentialApi"
+    /// <p>AzureKeyVault para AzureAdOpenID--cc--ClientSecret e ApisCredentials--Password</p>
+    /// <p>AzureBlobStorage para BlobDotnetDataProtection</p> 
     /// </summary>
     /// <param name="builder"></param>
+    /// <param name="configuration"></param>
+    /// <param name="azureTokenCredential">sp => sp.GetRequiredService{TokenCredential}()</param>
+    /// <param name="uriCredential">new Uri(configuration.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value)</param>
+    /// <param name="urlHealthCheck">hc ou qualquer outro endpoint de healthcheck, ou null para cancelar</param>
+    /// <param name="httpClientHandler">new MyHttpClientHandler(builder.Services).MyClientHandler</param>
+    /// <param name="timeout">Default = 2 seconds</param>
     /// <returns></returns>
-    public static IServiceCollection AddHealthCheckCredentialApiBuilder(this WebApplicationBuilder builder)
+    public static IHealthChecksBuilder AddHealthCheckCredentialApiBuilder(
+        this IHealthChecksBuilder builder,
+        IConfiguration configuration,
+        Func<IServiceProvider, TokenCredential> azureTokenCredential,
+        Uri uriCredential = null,
+        string urlHealthCheck = "hc",
+        HttpClientHandler httpClientHandler = null,
+        TimeSpan? timeout = default)
     {
-        var enableChecksStandard = builder.Configuration.GetValue<bool>("HealthCheckCustomConfiguration:EnableChecksStandard");
-        if (!enableChecksStandard) return builder.Services;
+        var enableChecksStandard = configuration.GetValue<bool>("HealthCheckCustomConfiguration:EnableChecksStandard");
+        if (!enableChecksStandard) return builder;
+
+
+        var tokenCredential = azureTokenCredential.Invoke(builder.Services.BuildServiceProvider());
+        if (!timeout.HasValue)
+        {
+            timeout = TimeSpan.FromSeconds(2);
+        }
+
+        if (!string.IsNullOrWhiteSpace(urlHealthCheck))
+        {
+
+            uriCredential ??= new Uri(configuration.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value);
+
+            builder.Services.AddHealthChecks()
+                .AddTypeActivatedCheck<HttpCustomHealthCheck>(
+                    name: "CredentialApi",
+                    failureStatus: null,
+                    tags: new[] { "api" },
+                    timeout: timeout.Value,
+                    args: new object[]
+                    {
+                        uriCredential,
+                        urlHealthCheck,
+                        HealthStatus.Unhealthy,
+                        httpClientHandler ?? new HttpClientHandler()
+                    });
+        }
+
 
         builder.Services.AddHealthChecks()
-            .AddCheck<HttpCredentialApiHealthCheck>(
-                name: "CredentialApi",
+            .AddAzureKeyVault(
+                name: $"AzureKeyVault",
+                keyVaultServiceUri: new Uri(configuration.GetSection("AzureKeyVault:Dns")?.Value),
+                credential: tokenCredential,
+                setup: options =>
+                {
+                    options.AddSecret("ApisCredentials--Password");
+                    options.AddSecret("AzureAdOpenID--cc--ClientSecret");
+                },
+                failureStatus: HealthStatus.Unhealthy,
+                tags: new[] { "azure", "keyvault" },
+                timeout: timeout.Value)
+            .AddAzureBlobStorage(
+                name: "BlobDotnetDataProtection",
+                clientFactory: (sp) =>
+                {
+                    return sp.GetRequiredKeyedService<BlobServiceClient>("BlobDotnetDataProtection");
+                },
+                optionsFactory: (sp) =>
+                {
+                    return new AzureBlobStorageHealthCheckOptions()
+                    {
+                        ContainerName = "dotnetdataprotection",
+                    };
+                },
                 failureStatus: HealthStatus.Degraded,
-                tags: new string[] { "api-external" });
+                tags: new[] { "azure", "blob", "dotnetdataprotection" },
+                timeout: timeout.Value);
 
-        return builder.Services;
+
+        return builder;
+
     }
 
 
@@ -179,11 +260,12 @@ public static class HealthCheckExtensions
     /// Adiciona um health check para Memory e LocalStorage
     /// </summary>
     /// <param name="builder"></param>
+    /// <param name="configuration"></param>
     /// <returns></returns>
-    public static IServiceCollection AddHealthCheckMemoryAndStorageBuilder(this WebApplicationBuilder builder)
+    public static IHealthChecksBuilder AddHealthCheckMemoryAndStorageBuilder(this IHealthChecksBuilder builder, IConfiguration configuration)
     {
-        var enableChecksStandard = builder.Configuration.GetValue<bool>("HealthCheckCustomConfiguration:EnableChecksStandard");
-        if (!enableChecksStandard) return builder.Services;
+        var enableChecksStandard = configuration.GetValue<bool>("HealthCheckCustomConfiguration:EnableChecksStandard");
+        if (!enableChecksStandard) return builder;
 
         builder.Services.AddHealthChecks()
             .AddCheck<MemoryHealthCheck>(
@@ -193,7 +275,7 @@ public static class HealthCheckExtensions
                 name: "host-storage",
                 tags: new[] { "storage" });
 
-        return builder.Services;
+        return builder;
     }
 
 
