@@ -258,6 +258,14 @@ public interface IStandardHttpClient
     IStandardHttpClient WithQueryString(string key, object value);
 
     /// <summary>
+    /// Esse metodo cria uma instancia de FormUrlEncodedContent, para ser usado em requisições POST
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    IStandardHttpClient WithFormParameter(string key, string value);
+
+    /// <summary>
     /// Altera os parametros do HttpClient
     /// </summary>
     /// <param name="timeOut">Padrão é 00:01:40</param>
