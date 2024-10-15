@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Nuuvify.CommonPack.Extensions.Notificator;
 
 
 namespace Microsoft.AspNetCore.Builder;
@@ -62,14 +63,3 @@ public static class UseHttpRequestKeyVerifyExtensions
     }
 }
 
-public class NotificationR
-{
-    public string Property { get; set; }
-    public string Message { get; set; }
-
-    public NotificationR(string property, string message)
-    {
-        Property = property;
-        Message = message;
-    }
-}
