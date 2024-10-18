@@ -113,6 +113,7 @@ public class NugetCustomManagementPackage
         SourceRepository repository = Repository.Factory.GetCoreV3(nugetConfig);
         PackageUpdateResource resource = await repository.GetResourceAsync<PackageUpdateResource>();
 
+        string apiKey = "xxxxxxx";
 
         logger.LogInformation("===========> Start delete packages");
 
