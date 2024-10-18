@@ -31,7 +31,7 @@ public class UseHttpRequestKeyVerifyMiddleware
             context.Response.StatusCode = _failureStatusCode;
             _notificationsMiddleware =
             [
-                new NotificationR("Chave não informada no Header", $"Informa a chave '{_headerKey}' no header da request"),
+                new NotificationR("Chave não informada no Header", $"Informe a chave '{_headerKey}' no header da request"),
             ];
             await context.Response.WriteAsJsonAsync(_notificationsMiddleware);
             return;
