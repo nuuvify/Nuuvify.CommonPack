@@ -9,6 +9,7 @@ namespace Nuuvify.CommonPack.HealthCheck;
 /// <p>Forceça os seguintes parâmetros: </p>
 ///   <p>Uri baseUri = exemplo: new Uri(builder.Configuration.GetSection("AppConfig:AppURLs:SynchroApi")?.Value), </p>
 ///   <p>string hcUrl = exemplo: "hc", </p>
+///   <p>string youWantReturnEndpointContent = exemplo: "false", </p>
 ///   <p>HealthStatus failureStatus = exemplo: HealthStatus.Degraded, </p>
 ///   <p>HttpClientHandler httpClientHandler = exemplo: new MyHttpClientHandler(WebRequest.DefaultWebProxy).MyClientHandler </p>
 /// </summary>
@@ -17,6 +18,7 @@ public class HttpCustomHealthCheck : IHealthCheck
 
     private readonly string _hcUrl;
     private readonly HealthStatus _failureStatus;
+    private readonly bool _youWantReturnEndpointContent;
 
 
     private readonly HttpClient _httpClient;
@@ -26,10 +28,12 @@ public class HttpCustomHealthCheck : IHealthCheck
     public HttpCustomHealthCheck(
         Uri baseUri,
         string hcUrl,
+        bool youWantReturnEndpointContent,
         HealthStatus failureStatus,
         HttpClientHandler httpClientHandler)
     {
 
+        _youWantReturnEndpointContent = youWantReturnEndpointContent;
         _hcUrl = hcUrl;
         _failureStatus = failureStatus;
 
@@ -61,7 +65,8 @@ public class HttpCustomHealthCheck : IHealthCheck
             resultData = new Dictionary<string, object>
             {
                 ["Uri: "] = _httpClient.BaseAddress,
-                [$"Return Code: {returnCode} / {httpReturn.ReasonPhrase}"] = contentReturn,
+                [$"Return Code: {returnCode} / {httpReturn.ReasonPhrase}"] =
+                    _youWantReturnEndpointContent ? contentReturn : "Content received",
             };
 
 
