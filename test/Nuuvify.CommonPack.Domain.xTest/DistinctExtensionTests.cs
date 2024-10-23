@@ -21,17 +21,17 @@ namespace Nuuvify.CommonPack.Domain.xTest
                 new Customer() { Id = "XB1", Nome = "Giropopis", Codigo = 1 },
                 new Customer() { Id = "DDD", Nome = "Fritz", Codigo = 3 },
                 new Customer() { Id = "XC3", Nome = "Fulano", Codigo = 1 },
-            }; 
+            };
 
             const int DistinctExpected = 4;
 
-            var distinct = customers.Distinct((p1, p2) => 
+            var distinct = customers.Distinct((p1, p2) =>
                 p1.Codigo == p2.Codigo &&
-                p1.Nome == p2.Nome, 
+                p1.Nome == p2.Nome,
                 p1 => p1.GetHashCode()).ToList();
 
 
-            Assert.Equal(expected: DistinctExpected , distinct.Count());
+            Assert.Equal(expected: DistinctExpected, distinct.Count());
 
         }
     }
@@ -42,5 +42,6 @@ namespace Nuuvify.CommonPack.Domain.xTest
         public string Id { get; set; }
         public string Nome { get; set; }
         public int Codigo { get; set; }
+        public string Tipo { get; set; }
     }
 }
