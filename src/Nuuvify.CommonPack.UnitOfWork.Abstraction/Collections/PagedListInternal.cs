@@ -1,130 +1,124 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 
-namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Collections
+namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Collections;
+
+
+/// <summary>
+/// Provides the implementation of the <see cref="IPagedList{T}"/> and converter.
+/// </summary>
+/// <typeparam name="TSource">The type of the source.</typeparam>
+/// <typeparam name="TResult">The type of the result.</typeparam>
+internal class PagedList<TSource, TResult> : IPagedList<TResult>
 {
+    /// <summary>
+    /// Gets the index of the page.
+    /// </summary>
+    /// <value>10</value>
+    public int PageIndex { get; }
+    /// <summary>
+    /// Gets the size of the page.
+    /// </summary>
+    /// <value>20</value>
+    public int PageSize { get; }
+    /// <summary>
+    /// Gets the total count.
+    /// </summary>
+    /// <value>The total count.</value>
+    public int TotalCount { get; }
+    /// <summary>
+    /// Gets the total pages.
+    /// </summary>
+    /// <value>The total pages.</value>
+    public int TotalPages { get; }
+    /// <summary>
+    /// Gets the index from.
+    /// </summary>
+    /// <value>2</value>
+    public int IndexFrom { get; }
 
     /// <summary>
-    /// Provides the implementation of the <see cref="IPagedList{T}"/> and converter.
+    /// Gets the items.
     /// </summary>
-    /// <typeparam name="TSource">The type of the source.</typeparam>
-    /// <typeparam name="TResult">The type of the result.</typeparam>
-    internal class PagedList<TSource, TResult> : IPagedList<TResult>
+    /// <value>The items.</value>
+    public IList<TResult> Items { get; }
+
+    /// <summary>
+    /// Gets the has previous page.
+    /// </summary>
+    /// <value>The has previous page.</value>
+    public bool HasPreviousPage => PageIndex - IndexFrom > 0;
+
+    /// <summary>
+    /// Gets the has next page.
+    /// </summary>
+    /// <value>The has next page.</value>
+    public bool HasNextPage => PageIndex - IndexFrom + 1 < TotalPages;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PagedList{TSource, TResult}" /> class.
+    /// </summary>
+    /// <param name="source">The source</param>
+    /// <param name="converter">The converter</param>
+    /// <param name="pageIndex">The index of the page</param>
+    /// <param name="pageSize">The size of the page</param>
+    /// <param name="indexFrom">The start index value</param>
+    public PagedList(IEnumerable<TSource> source,
+        Func<IEnumerable<TSource>, IEnumerable<TResult>> converter,
+        int pageIndex,
+        int pageSize,
+        int indexFrom)
     {
-        /// <summary>
-        /// Gets the index of the page.
-        /// </summary>
-        /// <value>10</value>
-        public int PageIndex { get; }
-        /// <summary>
-        /// Gets the size of the page.
-        /// </summary>
-        /// <value>20</value>
-        public int PageSize { get; }
-        /// <summary>
-        /// Gets the total count.
-        /// </summary>
-        /// <value>The total count.</value>
-        public int TotalCount { get; }
-        /// <summary>
-        /// Gets the total pages.
-        /// </summary>
-        /// <value>The total pages.</value>
-        public int TotalPages { get; }
-        /// <summary>
-        /// Gets the index from.
-        /// </summary>
-        /// <value>2</value>
-        public int IndexFrom { get; }
 
-        /// <summary>
-        /// Gets the items.
-        /// </summary>
-        /// <value>The items.</value>
-        public IList<TResult> Items { get; }
-
-        /// <summary>
-        /// Gets the has previous page.
-        /// </summary>
-        /// <value>The has previous page.</value>
-        public bool HasPreviousPage => PageIndex - IndexFrom > 0;
-
-        /// <summary>
-        /// Gets the has next page.
-        /// </summary>
-        /// <value>The has next page.</value>
-        public bool HasNextPage => PageIndex - IndexFrom + 1 < TotalPages;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PagedList{TSource, TResult}" /> class.
-        /// </summary>
-        /// <param name="source">The source</param>
-        /// <param name="converter">The converter</param>
-        /// <param name="pageIndex">The index of the page</param>
-        /// <param name="pageSize">The size of the page</param>
-        /// <param name="indexFrom">The start index value</param>
-        public PagedList(IEnumerable<TSource> source,
-            Func<IEnumerable<TSource>, IEnumerable<TResult>> converter,
-            int pageIndex,
-            int pageSize,
-            int indexFrom)
+        if (indexFrom > pageIndex)
         {
-
-            if (indexFrom > pageIndex)
-            {
-                throw new ArgumentException($"indexFrom: {indexFrom} > pageIndex: {pageIndex}, must indexFrom <= pageIndex");
-            }
-
-            if (source is IQueryable<TSource> querable)
-            {
-                PageIndex = pageIndex;
-                PageSize = pageSize;
-                IndexFrom = indexFrom;
-                TotalCount = querable.Count();
-                TotalPages = (int)Math.Ceiling(TotalCount / (double)PageSize);
-
-                var items = querable.Skip((PageIndex - IndexFrom) * PageSize)
-                                    .Take(PageSize)
-                                    .ToArray();
-
-                Items = new List<TResult>(converter(items));
-            }
-            else
-            {
-                PageIndex = pageIndex;
-                PageSize = pageSize;
-                IndexFrom = indexFrom;
-                TotalCount = source.Count();
-                TotalPages = (int)Math.Ceiling(TotalCount / (double)PageSize);
-
-                var items = source.Skip((PageIndex - IndexFrom) * PageSize)
-                                  .Take(PageSize)
-                                  .ToArray();
-
-                Items = new List<TResult>(converter(items));
-            }
+            throw new ArgumentException($"indexFrom: {indexFrom} > pageIndex: {pageIndex}, must indexFrom <= pageIndex");
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PagedList{TSource, TResult}" /> class.
-        /// </summary>
-        /// <param name="source">The source.</param>
-        /// <param name="converter">The converter.</param>
-        public PagedList(IPagedList<TSource> source,
-            Func<IEnumerable<TSource>, IEnumerable<TResult>> converter)
+        if (source is IQueryable<TSource> querable)
         {
-            PageIndex = source.PageIndex;
-            PageSize = source.PageSize;
-            IndexFrom = source.IndexFrom;
-            TotalCount = source.TotalCount;
-            TotalPages = source.TotalPages;
+            PageIndex = pageIndex;
+            PageSize = pageSize;
+            IndexFrom = indexFrom;
+            TotalCount = querable.Count();
+            TotalPages = (int)Math.Ceiling(TotalCount / (double)PageSize);
 
-            Items = new List<TResult>(converter(source.Items));
+            var items = querable.Skip((PageIndex - IndexFrom) * PageSize)
+                                .Take(PageSize)
+                                .ToArray();
 
+            Items = new List<TResult>(converter(items));
         }
+        else
+        {
+            PageIndex = pageIndex;
+            PageSize = pageSize;
+            IndexFrom = indexFrom;
+            TotalCount = source.Count();
+            TotalPages = (int)Math.Ceiling(TotalCount / (double)PageSize);
 
+            var items = source.Skip((PageIndex - IndexFrom) * PageSize)
+                              .Take(PageSize)
+                              .ToArray();
+
+            Items = new List<TResult>(converter(items));
+        }
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PagedList{TSource, TResult}" /> class.
+    /// </summary>
+    /// <param name="source">The source.</param>
+    /// <param name="converter">The converter.</param>
+    public PagedList(IPagedList<TSource> source,
+        Func<IEnumerable<TSource>, IEnumerable<TResult>> converter)
+    {
+        PageIndex = source.PageIndex;
+        PageSize = source.PageSize;
+        IndexFrom = source.IndexFrom;
+        TotalCount = source.TotalCount;
+        TotalPages = source.TotalPages;
+
+        Items = new List<TResult>(converter(source.Items));
 
     }
 
