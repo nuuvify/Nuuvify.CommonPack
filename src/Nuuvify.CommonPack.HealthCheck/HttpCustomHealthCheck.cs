@@ -9,7 +9,7 @@ namespace Nuuvify.CommonPack.HealthCheck;
 /// <p>Forceça os seguintes parâmetros: </p>
 ///   <p>Uri baseUri = exemplo: new Uri(builder.Configuration.GetSection("AppConfig:AppURLs:SynchroApi")?.Value), </p>
 ///   <p>string hcUrl = exemplo: "hc", </p>
-///   <p>string youWantReturnEndpointContent = exemplo: "false", </p>
+///   <p>bool youWantReturnEndpointContent = exemplo: false, </p>
 ///   <p>HealthStatus failureStatus = exemplo: HealthStatus.Degraded, </p>
 ///   <p>HttpClientHandler httpClientHandler = exemplo: new MyHttpClientHandler(WebRequest.DefaultWebProxy).MyClientHandler </p>
 /// </summary>
