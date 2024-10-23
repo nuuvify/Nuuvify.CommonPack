@@ -177,6 +177,7 @@ public static class HealthCheckExtensions
     /// <param name="azureTokenCredential">sp => sp.GetRequiredService{TokenCredential}()</param>
     /// <param name="uriCredential">new Uri(configuration.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value)</param>
     /// <param name="urlHealthCheck">hc ou qualquer outro endpoint de healthcheck, ou null para cancelar</param>
+    /// <param name="youWantReturnEndpointContent">Deseja que o conteudo do endpoint de urlHealthCheck seja retornado?</param>
     /// <param name="httpClientHandler">new MyHttpClientHandler(builder.Services).MyClientHandler</param>
     /// <param name="timeout">Default = 2 seconds</param>
     /// <returns></returns>
@@ -186,6 +187,7 @@ public static class HealthCheckExtensions
         Func<IServiceProvider, TokenCredential> azureTokenCredential,
         Uri uriCredential = null,
         string urlHealthCheck = "hc",
+        bool youWantReturnEndpointContent = false,
         HttpClientHandler httpClientHandler = null,
         TimeSpan? timeout = default)
     {
@@ -214,6 +216,7 @@ public static class HealthCheckExtensions
                     {
                         uriCredential,
                         urlHealthCheck,
+                        youWantReturnEndpointContent,
                         HealthStatus.Unhealthy,
                         httpClientHandler ?? new HttpClientHandler()
                     });
