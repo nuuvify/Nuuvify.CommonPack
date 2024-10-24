@@ -78,27 +78,27 @@ public class NugetCustomManagementPackage
         Packages = new Dictionary<string, string>
         {
 
-            { "Nuuvify.CommonPack.AutoHistory", "2.0.0-preview.24101504" },
-            { "Nuuvify.CommonPack.AzureStorage", "2.0.0-preview.24101504" },
-            { "Nuuvify.CommonPack.AzureStorage.Abstraction", "2.0.0-preview.24101504" },
-            { "Nuuvify.CommonPack.Domain", "2.0.0-preview.24101504" },
-            { "Nuuvify.CommonPack.EF.Exceptions.Common", "2.0.0-preview.24101504" },
-            { "Nuuvify.CommonPack.EF.Exceptions.Db2", "2.0.0-preview.24101504" },
-            { "Nuuvify.CommonPack.EF.Exceptions.Oracle", "2.0.0-preview.24101504" },
-            { "Nuuvify.CommonPack.Email", "2.0.0-preview.24101504" },
-            { "Nuuvify.CommonPack.Email.Abstraction", "2.0.0-preview.24101504" },
-            { "Nuuvify.CommonPack.Extensions", "2.0.0-preview.24101504" },
-            { "Nuuvify.CommonPack.HealthCheck", "2.0.0-preview.24101504" },
-            { "Nuuvify.CommonPack.Middleware", "2.0.0-preview.24101504" },
-            { "Nuuvify.CommonPack.Middleware.Abstraction", "2.0.0-preview.24101504" },
-            { "Nuuvify.CommonPack.OpenApi", "2.0.0-preview.24101504" },
-            { "Nuuvify.CommonPack.Security", "2.0.0-preview.24101504" },
-            { "Nuuvify.CommonPack.Security.Abstraction", "2.0.0-preview.24101504" },
-            { "Nuuvify.CommonPack.Security.JwtCredentials", "2.0.0-preview.24101504" },
-            { "Nuuvify.CommonPack.Security.JwtStore.Ef", "2.0.0-preview.24101504" },
-            { "Nuuvify.CommonPack.UnitOfWork", "2.0.0-preview.24101504" },
-            { "Nuuvify.CommonPack.UnitOfWork.Abstraction", "2.0.0-preview.24101504" },
-            { "Nuuvify.CommonPack.StandardHttpClient", "2.0.0-preview.24101504" },
+            { "Nuuvify.CommonPack.AutoHistory", "2.0.0-preview.24102305" },
+            { "Nuuvify.CommonPack.AzureStorage", "2.0.0-preview.24102305" },
+            { "Nuuvify.CommonPack.AzureStorage.Abstraction", "2.0.0-preview.24102305" },
+            { "Nuuvify.CommonPack.Domain", "2.0.0-preview.24102305" },
+            { "Nuuvify.CommonPack.EF.Exceptions.Common", "2.0.0-preview.24102305" },
+            { "Nuuvify.CommonPack.EF.Exceptions.Db2", "2.0.0-preview.24102305" },
+            { "Nuuvify.CommonPack.EF.Exceptions.Oracle", "2.0.0-preview.24102305" },
+            { "Nuuvify.CommonPack.Email", "2.0.0-preview.24102305" },
+            { "Nuuvify.CommonPack.Email.Abstraction", "2.0.0-preview.24102305" },
+            { "Nuuvify.CommonPack.Extensions", "2.0.0-preview.24102305" },
+            { "Nuuvify.CommonPack.HealthCheck", "2.0.0-preview.24102305" },
+            { "Nuuvify.CommonPack.Middleware", "2.0.0-preview.24102305" },
+            { "Nuuvify.CommonPack.Middleware.Abstraction", "2.0.0-preview.24102305" },
+            { "Nuuvify.CommonPack.OpenApi", "2.0.0-preview.24102305" },
+            { "Nuuvify.CommonPack.Security", "2.0.0-preview.24102305" },
+            { "Nuuvify.CommonPack.Security.Abstraction", "2.0.0-preview.24102305" },
+            { "Nuuvify.CommonPack.Security.JwtCredentials", "2.0.0-preview.24102305" },
+            { "Nuuvify.CommonPack.Security.JwtStore.Ef", "2.0.0-preview.24102305" },
+            { "Nuuvify.CommonPack.UnitOfWork", "2.0.0-preview.24102305" },
+            { "Nuuvify.CommonPack.UnitOfWork.Abstraction", "2.0.0-preview.24102305" },
+            { "Nuuvify.CommonPack.StandardHttpClient", "2.0.0-preview.24102305" }
         };
 
     }
@@ -113,7 +113,7 @@ public class NugetCustomManagementPackage
         SourceRepository repository = Repository.Factory.GetCoreV3(nugetConfig);
         PackageUpdateResource resource = await repository.GetResourceAsync<PackageUpdateResource>();
 
-        string apiKey = "xxxxxxx";
+        string apiKey = "xxxxxxxxxxxx";
 
         logger.LogInformation("===========> Start delete packages");
 
@@ -130,7 +130,7 @@ public class NugetCustomManagementPackage
 
             result.GetResult();
 
-            logger.LogInformation("Package deleted: {Id} {Version} Result: {Result}",
+            logger.LogInformation("Package deleted = {Id} {Version} Result = {Result}",
                 item.Key,
                 item.Value,
                 result.IsCompleted);
