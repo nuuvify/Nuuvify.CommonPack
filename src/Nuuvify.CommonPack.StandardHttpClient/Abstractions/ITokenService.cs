@@ -23,6 +23,7 @@ public interface ITokenService
     /// <summary>
     /// Obtem um novo token para as credenciais informadas, se não informar as credenciais, 
     /// será usado a chave do appsettings ApisCredentials:Username e Password <br/>
+    /// ou a chave AzureAdOpenID:cc:ClientId e ClientSecret <br/>
     /// Esse metodo sempre ira obter um novo token a partir de CredentialApi ou <br/>
     /// informe um valor para HttpClientTokenName caso queira outro nome
     /// </summary>
