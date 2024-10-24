@@ -53,6 +53,9 @@ public partial class StandardHttpClient
         _logger.LogDebug("Url and message before config: {message} url: {url}", message, url);
 
 
+        if (url.EndsWith("&") || url.EndsWith("?"))
+            url = url[..^1];
+
 
         if (!string.IsNullOrWhiteSpace(_httpClient?.BaseAddress?.AbsoluteUri) &&
             _httpClient.BaseAddress.IsAbsoluteUri)
@@ -119,6 +122,10 @@ public partial class StandardHttpClient
         CancellationToken cancellationToken = default)
     {
         _logger.LogDebug("Url and message before config: {message} url: {url}", message, url);
+
+
+        if (url.EndsWith("&") || url.EndsWith("?"))
+            url = url[..^1];
 
 
         if (!string.IsNullOrWhiteSpace(_httpClient?.BaseAddress?.AbsoluteUri) &&
