@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Nuuvify.CommonPack.Extensions;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using Xunit;
 
@@ -37,6 +38,21 @@ public class ExpressionExtensionTests
         Assert.Equal(expected: 2, result.Count());
         Assert.Equal(expected: 1, result.Count(p => p.Tipo == "A"));
         Assert.Equal(expected: 1, result.Count(p => p.Tipo == "E"));
+
+    }
+
+
+    [Fact]
+    [Trait("CommonPack.Extensions", nameof(CacheTimeService))]
+    public void CacheTimeService_ComHoraComoString_DeveRetornarDateEHoraLocal()
+    {
+        const string time = "22:00:00";
+
+        var dateTimeLocal = CacheTimeService.ExpireAt(time);
+        var actual = dateTimeLocal.ToString("HH:mm:ss");
+
+
+        Assert.Equal(expected: time, actual: actual);
 
     }
 
