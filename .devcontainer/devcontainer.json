@@ -58,8 +58,11 @@
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "dotnet restore",
-	"initializeCommand": "bash .devcontainer/initialize.sh",
-	"postCreateCommand": "bash .devcontainer/post-create.sh",
+	// "initializeCommand": "bash .devcontainer/initialize.sh",
+	// "postCreateCommand": "bash -c cp $WORKFOLDER/.devcontainer/atomic.omp.json $HOME/.config/atomic.omp.json';'mv $HOME/.zshrc $HOME/.zshrc-old';'cp $WORKFOLDER/.devcontainer/.zshrc $HOME/.zshrc'",
+	"postStartCommand": "echo 'Container iniciado' && ./.devcontainer/post-create.sh",
+	"postAttachCommand": "echo 'VsCode anexado!' && source $HOME/.zshrc",
+	// ;mv $HOME/.zshrc $HOME/.zshrc-old;cp $WORKFOLDER/.devcontainer/.zshrc $HOME/.zshrc",
 
 	// Configure tool-specific properties.
 	"customizations": {
