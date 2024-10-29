@@ -7,7 +7,10 @@
 		"context": ".",
 		"dockerfile": "Dockerfile",
 		"args": { 
-			"PathApp": "${containerWorkspaceFolder}"
+			"PathApp": "${containerWorkspaceFolder}",
+			"HttpProxyEnv": "${localEnv:HTTP_PROXY}",
+			"HttpsProxyEnv": "${localEnv:HTTPS_PROXY}",
+			"NoProxyEnv": "${localEnv:NO_PROXY}"
 		}
 	},
 	
@@ -21,7 +24,6 @@
 			"omzPlugins": "https://github.com/zsh-users/zsh-autosuggestions"
 		},
 		"ghcr.io/stuartleeks/dev-container-features/shell-history:0": {}
-
 	},
 
 	"mounts": [
@@ -36,7 +38,10 @@
 	],
 
 	"containerEnv": {
-		"WORKFOLDER": "${containerWorkspaceFolder}"
+		"WORKFOLDER": "${containerWorkspaceFolder}",
+		"HTTP_PROXY": "${localEnv:HTTP_PROXY}",
+    	"HTTPS_PROXY": "${localEnv:HTTPS_PROXY}",
+		"NO_PROXY": "${localEnv:NO_PROXY}"
 	},
 
 
@@ -53,7 +58,8 @@
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "dotnet restore",
-	"postCreateCommand": "./.devcontainer/custom-install.sh",
+	"initializeCommand": "bash .devcontainer/initialize.sh",
+	"postCreateCommand": "bash .devcontainer/post-create.sh",
 
 	// Configure tool-specific properties.
 	"customizations": {
