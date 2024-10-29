@@ -14,6 +14,14 @@ if [ -x /usr/bin/dircolors ]; then
     alias egrep='egrep --color=auto'
 fi
 
+podman() {
+    if [ "$1" == "buildx" ] && [ "$2" == "version" ]; then
+        command podman version
+    else
+        command podman "$@"
+    fi
+}
+
 alias lh='ls -lha'
 alias la='ls -A'
 alias l='ls -CF'
