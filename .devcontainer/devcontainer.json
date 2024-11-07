@@ -6,13 +6,19 @@
         "args": { 
             "PathApp": "${containerWorkspaceFolder}",
             "NugetMode": "SKIP",
-            "UserApp": "devcontainer",
+            "UserApp": "${localEnv:USER}",
+            "UserUID": "1000",
+            "UserGID": "1000",
             "HttpProxyEnv": "${localEnv:HTTP_PROXY}",
             "HttpsProxyEnv": "${localEnv:HTTPS_PROXY}",
             "NoProxyEnv": "${localEnv:NO_PROXY}"
         }
     },
-    "containerUser": "devcontainer",
+    "remoteEnv": {
+        "HOST_USER": "${localEnv:USER}",
+        "APP_PATH": "${containerWorkspaceFolder}"
+    },
+    "containerUser": "${localEnv:USER}",
     "features": {
 		"ghcr.io/devcontainers/features/common-utils:2": {
 			"installZsh": true,
@@ -29,12 +35,12 @@
     },
 
     "mounts": [
-        "source=/${localEnv:HOME}/.nuget/NuGet/NuGet.Config,target=/home/devcontainer/.nuget/NuGet/NuGet.Config,type=bind,consistency=cached",
-        "source=/${localEnv:HOME}/.ssh,target=/home/devcontainer/.ssh,type=bind,consistency=cached",
-        "source=/${localEnv:HOME}/.microsoft/usersecrets,target=/home/devcontainer/.microsoft/usersecrets,type=bind,consistency=cached",
-        "source=${localWorkspaceFolder}/.devcontainer/atomic.omp.json,target=/home/devcontainer/.config/atomic.omp.json,type=bind,consistency=cached"
+        "source=/${localEnv:HOME}/.nuget/NuGet/NuGet.Config,target=/home/${localEnv:USER}/.nuget/NuGet/NuGet.Config,type=bind,consistency=cached",
+        "source=/${localEnv:HOME}/.ssh,target=/home/${localEnv:USER}/.ssh,type=bind,consistency=cached",
+        "source=/${localEnv:HOME}/.microsoft/usersecrets,target=/home/${localEnv:USER}/.microsoft/usersecrets,type=bind,consistency=cached",
+        "source=${localWorkspaceFolder}/.devcontainer/atomic.omp.json,target=/home/${localEnv:USER}/.config/atomic.omp.json,type=bind,consistency=cached"
     ],
-    "postStartCommand": "/bin/bash /home/devcontainer/change-owner.sh",
+    "postStartCommand": "/bin/bash ${containerWorkspaceFolder}/.devcontainer/change-owner.sh",
 
     "customizations": {
         "vscode": {
