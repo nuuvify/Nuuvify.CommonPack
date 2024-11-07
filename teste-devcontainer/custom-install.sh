@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 USERSHELL=$(getent passwd $USER | cut -d: -f7)
 FILEZSH=$(which zsh)
 
