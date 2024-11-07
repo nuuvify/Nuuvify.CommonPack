@@ -15,12 +15,12 @@
              "program": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/Nuget.CustomManagement.dll",
              "args": [],
              "cwd": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/",
-            },
-            "linux": {
-             "console": "externalTerminal",
-             "program": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/linux-x64/Nuget.CustomManagement.dll",
-             "args": [],
-             "cwd": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/linux-x64/",
+         },
+         "linux": {
+            "console": "externalTerminal",
+            "program": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/linux-x64/Nuget.CustomManagement.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/linux-x64/",
          },
          "env": {
            "DOTNET_ENVIRONMENT": "Development"
