@@ -9,24 +9,22 @@
          "type": "coreclr",
          "request": "launch",
          "preLaunchTask": "build",
-         "externalConsole": true,
-         "console": "externalTerminal",
+         "program": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/Nuget.CustomManagement.dll",
+         "args": [],
+         "cwd": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/",
+         "env": {
+            "DOTNET_ENVIRONMENT": "Development"
+         },
          "windows": {
-             "program": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/Nuget.CustomManagement.dll",
-             "args": [],
-             "cwd": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/",
+            "console": "externalTerminal",
+            "program": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/Nuget.CustomManagement.dll",
+            "cwd": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/"
          },
          "linux": {
-            "console": "externalTerminal",
-            "program": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/linux-x64/Nuget.CustomManagement.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/linux-x64/",
-         },
-         "env": {
-           "DOTNET_ENVIRONMENT": "Development"
+            "program": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/Nuget.CustomManagement.dll",
+            "cwd": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/"
          }
-       },
-
+      },
       {
          "name": "PowerShell - Tests",
          "type": "PowerShell",
