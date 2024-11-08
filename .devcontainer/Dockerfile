@@ -31,29 +31,36 @@ ENV DOTNET_ENVIRONMENT=$DOTNET_ENVIRONMENT
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
 
 
-RUN groupadd --gid $USER_GID $UserApp \
-    && useradd --uid $USER_UID --gid $USER_GID -m $UserApp \
-    && apt install -y sudo \
-    && echo $UserApp ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$UserApp \
-    && chmod 0440 /etc/sudoers.d/$UserApp
+# RUN groupadd --gid $USER_GID $UserApp \
+#     && useradd --uid $USER_UID --gid $USER_GID -m $UserApp \
+#     && apt install -y sudo \
+#     && echo $UserApp ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$UserApp \
+#     && chmod 0440 /etc/sudoers.d/$UserApp
 
 
-WORKDIR /home/$UserApp/$PathApp
+# WORKDIR /home/$UserApp/$PathApp
 
-USER ${UserApp}
+# USER ${UserApp}
 
 
 # Adicionando comandos para instalar oh-my-posh e configurar zsh
-RUN echo "Instalando oh-my-posh ..." \
-    && mkdir -p /home/$UserApp/.config /home/$UserApp/.local/bin \
-    # && cp $WORKFOLDER/.devcontainer/atomic.omp.json /home/$UserApp/.config/atomic.omp.json \
-    && curl -s https://ohmyposh.dev/install.sh | bash -s -- -d /home/$UserApp/.local/bin \
-    && echo 'source /home/$UserApp/.oh-my-zsh/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh' >> /home/$UserApp/.zshrc \
-    && echo 'eval "$(oh-my-posh init zsh --config /home/$UserApp/.config/atomic.omp.json)"' >> /home/$UserApp/.zshrc \
-    && chown -R $UserApp:$UserApp /home/$UserApp/.config /home/$UserApp/.zshrc
+# RUN echo "Instalando oh-my-posh ..." \
+#     && mkdir -p /home/$UserApp/.config /home/$UserApp/.local/bin \
+#     && curl -s https://ohmyposh.dev/install.sh | bash -s -- -d /home/$UserApp/.local/bin \
+#     && echo 'source /home/$UserApp/.oh-my-zsh/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh' >> /home/$UserApp/.zshrc \
+#     && echo 'eval "$(oh-my-posh init zsh --config /home/$UserApp/.config/atomic.omp.json)"' >> /home/$UserApp/.zshrc \
+#     && chown -R $UserApp:$UserApp /home/$UserApp/.config /home/$UserApp/.zshrc
 
-# Fonte do arquivo zshrc para aplicar as mudanças
-RUN echo "source /home/$UserApp/.zshrc" >> /home/$UserApp/.bashrc
+# # Fonte do arquivo zshrc para aplicar as mudanças
+# RUN echo "source /home/$UserApp/.zshrc" >> /home/$UserApp/.bashrc
+
+WORKDIR $PathApp
+
+RUN echo "Instalando oh-my-posh ..." \
+    && curl -s https://ohmyposh.dev/install.sh | bash -s
+
+RUN echo "source /root/.zshrc" >> /root/.bashrc
+
 
 
 
