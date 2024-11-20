@@ -91,8 +91,8 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
             var config = AppSettingsConfig.GetConfig();
             var tokenFactory = new TokenFactory(config);
             var tokenValido = tokenFactory.ObtemTokenValido(
-                loginId: config.GetSection("ApisCredentials:Username")?.Value,
-                password: config.GetSection("ApisCredentials:Password")?.Value
+                loginId: config.GetSection("AzureAdOpenID:cc:ClientId")?.Value,
+                password: config.GetSection("AzureAdOpenID:cc:ClientSecret")?.Value
             ).Result;
 
             var notification = tokenFactory?.Notifications.LastOrDefault();
@@ -330,9 +330,9 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
 
 
             var mockConfiguration = new Mock<IConfiguration>();
-            mockConfiguration.Setup(x => x.GetSection("ApisCredentials:Username").Value)
+            mockConfiguration.Setup(x => x.GetSection("AzureAdOpenID:cc:ClientId").Value)
                 .Returns(credentialToken.LoginId);
-            mockConfiguration.Setup(x => x.GetSection("ApisCredentials:Password").Value)
+            mockConfiguration.Setup(x => x.GetSection("AzureAdOpenID:cc:ClientSecret").Value)
                 .Returns(credentialToken.Password);
             mockConfiguration.Setup(x => x.GetSection("AppConfig:AppURLs:UrlLoginApiToken").Value)
                 .Returns(urlToken);

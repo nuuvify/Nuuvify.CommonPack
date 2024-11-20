@@ -40,9 +40,9 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest.Configs
             var urlToken = Config.GetSection("AppConfig:AppURLs:UrlLoginApiToken")?.Value;
 
 
-            mockConfiguration.Setup(x => x.GetSection("ApisCredentials:Username").Value)
+            mockConfiguration.Setup(x => x.GetSection("AzureAdOpenID:cc:ClientId").Value)
                 .Returns(loginId);
-            mockConfiguration.Setup(x => x.GetSection("ApisCredentials:Password").Value)
+            mockConfiguration.Setup(x => x.GetSection("AzureAdOpenID:cc:ClientSecret").Value)
                 .Returns(password);
             mockConfiguration.Setup(x => x.GetSection("AppConfig:AppURLs:UrlLoginApiToken").Value)
                 .Returns(urlToken);

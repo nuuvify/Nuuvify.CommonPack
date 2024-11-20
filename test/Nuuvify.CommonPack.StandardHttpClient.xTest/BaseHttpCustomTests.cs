@@ -58,15 +58,15 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
             var standardClient = new StandardHttpClient(mockFactory.Object, new NullLogger<StandardHttpClient>());
 
 
-            var username = Config.GetSection("ApisCredentials:Username")?.Value;
-            var password = Config.GetSection("ApisCredentials:Password")?.Value;
+            var username = Config.GetSection("AzureAdOpenID:cc:ClientId")?.Value;
+            var password = Config.GetSection("AzureAdOpenID:cc:ClientSecret")?.Value;
             var urlusername = Config.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value;
             var urlToken = "api/urlfake";
 
 
-            mockConfiguration.Setup(x => x.GetSection("ApisCredentials:Username").Value)
+            mockConfiguration.Setup(x => x.GetSection("AzureAdOpenID:cc:ClientId").Value)
                 .Returns(username);
-            mockConfiguration.Setup(x => x.GetSection("ApisCredentials:Password").Value)
+            mockConfiguration.Setup(x => x.GetSection("AzureAdOpenID:cc:ClientSecret").Value)
                 .Returns(password);
             mockConfiguration.Setup(x => x.GetSection("AppConfig:AppURLs:UrlLoginApiToken").Value)
                 .Returns(urlToken);
@@ -107,8 +107,8 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest
 
             var tokenFactory = new TokenFactory(config);
             var tokenValido = await tokenFactory.ObtemTokenValido(
-                loginId: config.GetSection("ApisCredentials:Username")?.Value,
-                password: config.GetSection("ApisCredentials:Password")?.Value
+                loginId: config.GetSection("AzureAdOpenID:cc:ClientId")?.Value,
+                password: config.GetSection("AzureAdOpenID:cc:ClientSecret")?.Value
             );
 
             var notification = tokenFactory?.Notifications.LastOrDefault();
