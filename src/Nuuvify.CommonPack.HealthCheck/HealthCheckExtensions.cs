@@ -169,7 +169,7 @@ public static class HealthCheckExtensions
 
     /// <summary>
     /// Adiciona um health check para a api de credenciais "CredentialApi"
-    /// <p>AzureKeyVault para AzureAdOpenID--cc--ClientSecret e ApisCredentials--Password</p>
+    /// <p>AzureKeyVault para AzureAdOpenID--cc--ClientSecret</p>
     /// <p>AzureBlobStorage para BlobDotnetDataProtection</p> 
     /// </summary>
     /// <param name="builder"></param>
@@ -230,7 +230,6 @@ public static class HealthCheckExtensions
                 credential: tokenCredential,
                 setup: options =>
                 {
-                    options.AddSecret("ApisCredentials--Password");
                     options.AddSecret("AzureAdOpenID--cc--ClientSecret");
                 },
                 failureStatus: HealthStatus.Unhealthy,

@@ -38,9 +38,11 @@
       "teste1@dominio.com": "Cicrano"
     }
   },
-  "ApisCredentials": {
-    "Username": "fulano",
-    "Password": "xyzqw9.$"
+  "AzureAdOpenID": {
+    "cc": {
+      "ClientId": "fulano",
+      "ClientSecret": "xyzqw9.$"
+    }
   },
   "AppConfig": {
     "OwnerDB": "vendas",
