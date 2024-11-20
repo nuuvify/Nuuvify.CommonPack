@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 USERSHELL=$(getent passwd $USER | cut -d: -f7)
 FILEZSH=$(which zsh)
 
@@ -11,11 +12,12 @@ FILEPOSH=$(which oh-my-posh)
 
 if [ ! -f "$FILEPOSH" ]; then
     echo "Instalando oh-my-posh ..."
-    mv ~/.zshrc ~/.zshrc-old
     mkdir -p ~/.config
     cp $WORKFOLDER/.devcontainer/atomic.omp.json ~/.config/atomic.omp.json
-    cp $WORKFOLDER/.devcontainer/.zshrc ~/.zshrc
     curl -s https://ohmyposh.dev/install.sh | bash -s
-fi
-source ~/.zshrc
 
+    echo 'source ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh' >> ~/.zshrc
+    echo 'eval "$(oh-my-posh init zsh --config ~/.config/atomic.omp.json)"' >> ~/.zshrc
+
+    source ~/.zshrc
+fi
