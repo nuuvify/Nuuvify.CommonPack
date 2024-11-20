@@ -37,7 +37,7 @@ namespace Nuuvify.CommonPack.Middleware.xTest
         {
 
             var configuration = new ConfigurationCustom(Config, null, null);
-            var sectionReturn = configuration.GetSectionValue("ApisCredentials:Username");
+            var sectionReturn = configuration.GetSectionValue("AzureAdOpenID:cc:ClientSecret");
 
             Assert.NotNull(sectionReturn);
 
