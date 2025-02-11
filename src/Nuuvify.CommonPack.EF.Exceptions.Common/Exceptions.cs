@@ -37,10 +37,10 @@ namespace EntityFramework.Exceptions.Common
         {
             CustomErrors = customErrors;
         }
-        public CustomDbUpdateException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
+        // public CustomDbUpdateException(SerializationInfo info, StreamingContext context)
+        //     : base(info, context)
+        // {
+        // }
 
         public IDictionary<string, string> CustomErrors { get; set; }
 
@@ -73,10 +73,10 @@ namespace EntityFramework.Exceptions.Common
             : base(message, errorCode)
         {
         }
-        public CustomDbException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
+        // public CustomDbException(SerializationInfo info, StreamingContext context)
+        //     : base(info, context)
+        // {
+        // }
 
         public IDictionary<string, string> CustomErrors { get; set; }
 
@@ -106,10 +106,10 @@ namespace EntityFramework.Exceptions.Common
         {
         }
 
-        public CustomException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
+        // public CustomException(SerializationInfo info, StreamingContext context)
+        //     : base(info, context)
+        // {
+        // }
 
         public IDictionary<string, string> CustomErrors { get; set; }
 

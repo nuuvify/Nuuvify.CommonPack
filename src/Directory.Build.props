@@ -8,7 +8,7 @@
     <IsPackable>true</IsPackable>
     <Authors>Lincoln Zocateli</Authors>
     <Company>Lincoln Zocateli</Company>
-    <Copyright>Copyright ©2023 $(Company)</Copyright>
+    <Copyright>Copyright ©2024 $(Company)</Copyright>
     <Product>Libraries with common implementations, with separation of responsibilities between their projects using Abstractions.</Product>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/lzocateli/Nuuvify.CommonPack</PackageProjectUrl>
@@ -19,12 +19,14 @@
       ou
       1.54.18 (para versão definitiva)
       -->
-    <Version>1.7.2-preview.1</Version>
+    <Version>2.0.0-preview.1</Version>
     <FileVersion>22.05.18.1520</FileVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1705;1591</NoWarn>
     <DocumentationFile>Docs\$(MSBuildProjectName).xml</DocumentationFile>
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(OsPlatform) == 'Linux'">

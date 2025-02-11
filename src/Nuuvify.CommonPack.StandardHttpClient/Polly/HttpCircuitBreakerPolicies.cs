@@ -1,5 +1,3 @@
-using System;
-using System.Net.Http;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.CircuitBreaker;
@@ -10,7 +8,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
     {
         public static AsyncCircuitBreakerPolicy<HttpResponseMessage> GetHttpCircuitBreakerPolicy(ILogger logger, ICircuitBreakerPolicyConfig circuitBreakerPolicyConfig)
         {
-            return HttpPolicyBuilders.GetBaseBuilder()
+            var httpResponseMessage = HttpPolicyBuilders.GetBaseBuilder()
                 .CircuitBreakerAsync(
                     handledEventsAllowedBeforeBreaking: circuitBreakerPolicyConfig.RetryCount + 1,
                     durationOfBreak: TimeSpan.FromMilliseconds(circuitBreakerPolicyConfig.BreakDurationMilliSeconds),
@@ -22,15 +20,17 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
                     {
                         OnHttpReset(context, logger);
                     });
+
+            return httpResponseMessage;
         }
 
         private static void OnHttpBreak(DelegateResult<HttpResponseMessage> responseMessage, TimeSpan breakDuration, int retryCount, Context context, ILogger logger)
         {
             var serviceBreak = context.GetServiceName() ?? responseMessage?.Result?.ReasonPhrase;
-            
+
 
             var messageLog = $"{nameof(GetHttpCircuitBreakerPolicy)}";
-            logger.LogWarning(messageLog + " Service: {0} shutdown during: {1} after: {2} failed retries.", serviceBreak, breakDuration, retryCount);
+            logger.LogWarning("{messageLog} Service: {serviceBreak} shutdown during: {breakDuration} after: {retryCount} failed retries.", messageLog, serviceBreak, breakDuration, retryCount);
 
         }
 
@@ -40,7 +40,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
             context.Remove(PollyCustomExtensions.ServiceNameKey);
 
             var messageLog = $"{nameof(GetHttpCircuitBreakerPolicy)}";
-            logger.LogInformation(messageLog + " Service restarted: {0} ", serviceBreak);
+            logger.LogInformation("{messageLog} Service restarted: {serviceBreak} ", messageLog, serviceBreak);
         }
 
     }

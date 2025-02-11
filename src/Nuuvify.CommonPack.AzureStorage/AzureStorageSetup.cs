@@ -34,6 +34,14 @@ namespace Nuuvify.CommonPack.AzureStorage
 
         }
 
+        ///<inheritdoc cref="AddAzureStorageSetup"/>
+        public static void AddAzureStorageSetupTransient(this IServiceCollection services)
+        {
+
+            services.AddTransient<IStorageService, StorageService>();
+
+        }
+
 
     }
 

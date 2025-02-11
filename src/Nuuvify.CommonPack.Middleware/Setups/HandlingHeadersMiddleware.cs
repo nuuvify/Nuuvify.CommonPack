@@ -1,9 +1,6 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
+﻿using System.Diagnostics;
+using System.Net;
 using System.Reflection;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -21,7 +18,8 @@ namespace Nuuvify.CommonPack.Middleware.Handle
         private readonly ILogger<HandlingHeadersMiddleware> _logger;
         private readonly RequestConfiguration requestConfiguration;
 
-        public HandlingHeadersMiddleware(RequestDelegate next,
+        public HandlingHeadersMiddleware(
+            RequestDelegate next,
             ILogger<HandlingHeadersMiddleware> logger,
             IOptions<RequestConfiguration> options)
         {
@@ -35,7 +33,10 @@ namespace Nuuvify.CommonPack.Middleware.Handle
         public async Task Invoke(HttpContext context)
         {
             requestConfiguration.AppName = Assembly.GetEntryAssembly().GetName().Name;
-            var correlationLocal = $"{requestConfiguration.AppName}_{Guid.NewGuid()}";
+            requestConfiguration.HostName ??= Dns.GetHostName();
+            var guidStr = Guid.NewGuid().ToString();
+            var guid12char = guidStr.Substring(guidStr.Length - 12);
+            var correlationLocal = $"{requestConfiguration.AppName}_{requestConfiguration.HostName}_{guid12char}";
 
 
             if (context.Request.Headers.TryGetValue(Constants.CorrelationHeader, out StringValues value))
@@ -50,22 +51,19 @@ namespace Nuuvify.CommonPack.Middleware.Handle
 
             context.Items["X-AssemblyVersion"] = requestConfiguration.ApplicationVersion;
             context.Items["X-BuildNumber"] = requestConfiguration.BuildNumber;
-            context.Response.Headers.Add("X-EnvironmentName", requestConfiguration.Environment);
-            context.Response.Headers.Add("X-AssemblyVersion", requestConfiguration.ApplicationVersion);
-            context.Response.Headers.Add("X-BuildNumber", requestConfiguration.BuildNumber);
-            context.Response.Headers.Add(Constants.CorrelationHeader, requestConfiguration.CorrelationId);
+            context.Response.Headers.Append("X-EnvironmentName", requestConfiguration.Environment);
+            context.Response.Headers.Append("X-AssemblyVersion", requestConfiguration.ApplicationVersion);
+            context.Response.Headers.Append("X-BuildNumber", requestConfiguration.BuildNumber);
+            context.Response.Headers.Append(Constants.CorrelationHeader, requestConfiguration.CorrelationId);
 
 
             SetRequestConfiguration(context);
 
 
-            using (_logger.BeginScope(requestConfiguration.MapLoggerContext()))
-            {
-                _logger.LogInformation("### LOG DE ENTRADA DA REQUEST ###");
-                await _next(context);
-                _logger.LogInformation("### LOG DE SAIDA DA REQUEST ###");
+            _logger.LogInformation("### LOG DE ENTRADA DA REQUEST ###");
+            await _next(context);
+            _logger.LogInformation("### LOG DE SAIDA DA REQUEST ###");
 
-            }
 
         }
 
@@ -90,7 +88,7 @@ namespace Nuuvify.CommonPack.Middleware.Handle
         {
 
 
-            var executablePath = Process.GetCurrentProcess().MainModule.FileName;
+            var executablePath = Environment.ProcessPath;
             var executable = Path.GetFileNameWithoutExtension(executablePath);
             string basePath;
 
@@ -118,7 +116,8 @@ namespace Nuuvify.CommonPack.Middleware.Handle
                 httpContext?.Connection?.RemoteIpAddress?.MapToIPv4().ToString(),
                 httpContext?.Connection?.RemotePort.ToString(),
                 httpContext?.Connection?.LocalIpAddress?.MapToIPv4().ToString(),
-                httpContext?.Connection?.LocalPort.ToString());
+                httpContext?.Connection?.LocalPort.ToString(),
+                hostName: Dns.GetHostName());
 
 
         }
