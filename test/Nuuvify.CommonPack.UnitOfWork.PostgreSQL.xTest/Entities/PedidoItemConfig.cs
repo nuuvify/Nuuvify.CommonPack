@@ -10,7 +10,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Entities.StubDbContext
         public override void Configure(EntityTypeBuilder<PedidoItem> builder)
         {
 
-            DefaultConfig(builder, "pedido_itens", "pedido_item", "_id");
+            DefaultConfig(builder, "pedido_itens", "pedido_item");
 
             builder.Property(e => e.CodigoMercadoria)
                 .IsRequired()

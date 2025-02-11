@@ -1,7 +1,4 @@
 using System.Net;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.CircuitBreaker;
@@ -14,7 +11,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
 
         public static AsyncFallbackPolicy<HttpResponseMessage> GetHttpFallBackPolicy(HttpRequestMessage request, ILogger logger)
         {
-            return HttpPolicyBuilders.GetBaseBuilder()
+            var httpResponseMessage = HttpPolicyBuilders.GetBaseBuilder()
                 .OrInner<BrokenCircuitException>()
                 .FallbackAsync(
                     fallbackAction: (responseToFailedRequest, context, cancellationToken) =>
@@ -26,6 +23,11 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
                         return OnFallbackAsync(responseToFailedRequest, context, logger, request);
                     });
 
+            if (request.Headers.Authorization?.Scheme == "bearer" &&
+                string.IsNullOrWhiteSpace(request.Headers.Authorization.Parameter))
+                request.Headers.Authorization = null;
+
+            return httpResponseMessage;
         }
 
         private static Task OnFallbackAsync(DelegateResult<HttpResponseMessage> response, Context context, ILogger logger, HttpRequestMessage request)
@@ -33,7 +35,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
             context = request.GetPolicyExecutionContext();
             var serviceBreak = context.GetServiceName();
 
-            logger.LogWarning("###### OnFallbackAsync was triggered, service: {0} failed ######", serviceBreak);
+            logger.LogWarning("###### OnFallbackAsync was triggered, service: {serviceBreak} failed ######", serviceBreak);
 
             return Task.CompletedTask;
         }
@@ -43,7 +45,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
             context = request.GetPolicyExecutionContext();
             var serviceBreak = context.GetServiceName();
 
-            logger.LogWarning("###### FallbackAction was triggered, service: {0} failed, customized warning message is being returned. ######", serviceBreak);
+            logger.LogWarning("###### FallbackAction was triggered, service: {serviceBreak} failed, customized warning message is being returned. ######", serviceBreak);
 
             HttpResponseMessage httpResponseMessage;
 

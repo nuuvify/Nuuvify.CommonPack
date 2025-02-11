@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Nuuvify.CommonPack.StandardHttpClient.Results
+﻿namespace Nuuvify.CommonPack.StandardHttpClient.Results
 {
     internal class DeserializeListSuccess<ClasseCommandResult> where ClasseCommandResult : class
     {

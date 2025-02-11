@@ -44,13 +44,25 @@ namespace Nuuvify.CommonPack.UnitOfWork.Oracle.xTest
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 userSecret);
 
-            if (Directory.Exists(pathSecret))
+            if (DirectoryExists(pathSecret))
+            {
+                return pathSecret;
+            }
+
+            pathSecret = pathSecret.Replace("/.config", "");
+
+            if (DirectoryExists(pathSecret))
             {
                 return pathSecret;
             }
 
             return AppDomain.CurrentDomain.BaseDirectory;
 
+        }
+
+        private static bool DirectoryExists(string pathSecret)
+        {
+            return Directory.Exists(pathSecret);
         }
 
     }
