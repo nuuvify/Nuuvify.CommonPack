@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Description>
       Essa biblioteca tem objetivo de implementar UnitOfWork para qualquer banco de dados,
       implementando metodos de uso basico e comumente utilizado em projetos.

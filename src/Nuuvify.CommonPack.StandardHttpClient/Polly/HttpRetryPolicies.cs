@@ -1,6 +1,3 @@
-using System;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
@@ -13,7 +10,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
         {
             int retryNum = 0;
 
-            return HttpPolicyBuilders.GetBaseBuilder()
+            var httpResponseMessage = HttpPolicyBuilders.GetBaseBuilder()
                 .WaitAndRetryAsync(
                     retryCount: retryPolicyConfig.RetryCount,
                     sleepDurationProvider: attemp => PollyHelpers.ComputeDuration(attemp),
@@ -24,6 +21,12 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
 
                         if (retryNum > retryPolicyConfig.RetryCount) retryNum = 0;
                     });
+
+            if (request.Headers.Authorization?.Scheme == "bearer" &&
+                string.IsNullOrWhiteSpace(request.Headers.Authorization.Parameter))
+                request.Headers.Authorization = null;
+
+            return httpResponseMessage;
         }
 
         private static async Task OnHttpRetry(DelegateResult<HttpResponseMessage> message, HttpRequestMessage request, TimeSpan retrySleep, int retryNum, int retryTotal, Context context, ILogger logger)
@@ -39,11 +42,11 @@ namespace Nuuvify.CommonPack.StandardHttpClient.Polly
             if (message?.Exception?.Message != null)
             {
 
-                logger.LogWarning(messageLog + " - Request failed because network failure: {0}", message?.Exception?.Message);
+                logger.LogWarning("{messageLog} - Request failed because network failure: {messageEx}", messageLog, message?.Exception?.Message);
             }
             else
             {
-                logger.LogWarning(messageLog);
+                logger.LogWarning("{messageLog}", messageLog);
             }
 
             await Task.CompletedTask;

@@ -1,6 +1,3 @@
-using System;
-using System.Net;
-using System.Threading.Tasks;
 using System.Xml;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 
@@ -16,29 +13,44 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         /// <value></value>
         Uri FullUrl { get; }
 
+
         /// <summary>
-        /// Cria uma nova instancia do HttpWebRequest
+        /// Cria uma nova instancia do HttpClient ou, se informado o nome de um client já registrado
+        /// retonara sua instancia
+        /// </summary>
+        /// <param name="namedClient"></param>
+        void CreateClient(string namedClient = null);
+
+        /// <summary>
+        /// Cria uma nova instancia do HttpClient
         /// </summary>
         /// <param name="url">A url é obrigatorio</param>
-        void CreateHttp(string url);
+        void CreateHttp(Uri url);
 
 
         /// <summary>
-        /// Recebe uma instancia de WebRequest.CreateHttp(url) onde você pode incluir outras configurações
+        /// Recebe uma instancia de HttpClientHandler onde você pode incluir outras configurações
         /// como Proxy e delegate para verificação de certificados.
         /// </summary>
-        /// <param name="httpWebRequest"></param>
-        void CreateHttp(HttpWebRequest httpWebRequest);
+        /// <param name="httpClientHandler"></param>
+        /// <param name="uri"></param>
+        void CreateHttp(HttpClientHandler httpClientHandler, Uri uri);
+
+
 
         /// <summary>
-        /// Executa o WebService, retornando o conteudo de forma padronizada
+        /// Executa uma consulta SOAP
         /// </summary>
-        /// <param name="urlRoute">Opcional: Complemento da url base</param>
-        /// <param name="method">Obrigatorio: POST, GET</param>
-        /// <param name="messageBody">Obrigatorio: XML contendo o SoapEnvelope</param>
-        /// <param name="mediaType">Opcional: Tipo do conteudo da mensagem EX: "application/xml"</param>
+        /// <param name="urlRoute">Esse caminho sera concatenado a url principal caso ja tenha sido informado antes, deixe NULL caso não possuir</param>
+        /// <param name="soapEnvelopeXml">XML contendo soapenv:Envelope</param>
+        /// <param name="accept">"text/xml"</param>
+        /// <param name="contentType">"text/xml;charset=\"utf-8\""</param>
         /// <returns></returns>
-        Task<HttpStandardReturn> RequestSoap(string urlRoute, StandardHttpMethods method, XmlDocument messageBody, string mediaType = "application/xml");
+        Task<HttpStandardXmlReturn> RequestSoap(
+            string urlRoute,
+            XmlDocument soapEnvelopeXml,
+            string accept = "text/xml",
+            string contentType = "text/xml;charset=\"utf-8\"");
 
 
         /// <summary>
@@ -76,7 +88,7 @@ namespace Nuuvify.CommonPack.StandardHttpClient
         ///         .WithQueryString("campoProcura", "catloginid")
         ///         .WithQueryString("hrStatus", "Any")
         ///         .WithQueryString("empresaCodigo", empresa)
-        ///         .Get(url);
+        ///         .RequestSoap(url);
         /// </code>
         /// </example>
         /// <param name="key"></param>
