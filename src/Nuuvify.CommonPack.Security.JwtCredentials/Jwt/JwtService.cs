@@ -1,8 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Nuuvify.CommonPack.Security.JwtCredentials.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 using Nuuvify.CommonPack.Security.Abstraction;
+using Nuuvify.CommonPack.Security.JwtCredentials.Interfaces;
 
 namespace Nuuvify.CommonPack.Security.JwtCredentials.Jwt;
 
@@ -27,13 +27,10 @@ public class JwtService
     private ClaimsIdentity _identityClaims;
     private readonly IJwkSetService _jwksService;
 
-
     public JwtService(IJwkSetService jwksService)
     {
         _jwksService = jwksService;
     }
-
-
 
     private static long ToUnixEpochDate(DateTime date)
         => (long)Math.Round((date.ToUniversalTime() - new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero))
@@ -45,19 +42,15 @@ public class JwtService
         if (jwksOptions is null)
             throw new ArgumentNullException(nameof(jwksOptions), "Objeto não pode ser null");
 
-
         if (jwksOptions.ValidFor.TotalMinutes <= 0)
             throw new NotSupportedException($"O período deve ser maior que zero {nameof(jwksOptions.ValidFor)}");
-
 
         if (jwksOptions.JtiGenerator is null)
             throw new ArgumentNullException(nameof(jwksOptions), "JtiGenerator - Propriedade não pode ser nulo");
 
-
         _jwksOptions = jwksOptions;
 
     }
-
 
     /// <summary>
     /// Use esse metodo primeiro, após receber IOptions{JwksOptions} em seu metodo de chamada
@@ -79,10 +72,7 @@ public class JwtService
     /// <returns></returns>
     public JwtService WithJwtClaims()
     {
-        if (_jwtClaims is null)
-        {
-            _jwtClaims = new List<Claim>();
-        }
+        _jwtClaims ??= new List<Claim>();
 
         _jwtClaims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
         _jwtClaims.Add(new Claim(JwtRegisteredClaimNames.Nbf,
@@ -119,13 +109,11 @@ public class JwtService
             };
         _identityClaims.AddClaims(userClaims);
 
-
         var grupos = personRoles?.Groups.ToList();
         for (int i = 0; i < grupos.Count; i++)
         {
             _identityClaims.AddClaim(new Claim(grupos[i].Group, i.ToString()));
         }
-
 
         return this;
     }
@@ -197,7 +185,6 @@ public class JwtService
             RequireExpirationTime = true
         };
 
-
         try
         {
             var _tokenHandler = new JwtSecurityTokenHandler();
@@ -214,7 +201,6 @@ public class JwtService
         }
 
     }
-
 
 }
 

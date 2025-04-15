@@ -5,14 +5,12 @@ using Nuuvify.CommonPack.Security.Abstraction;
 
 namespace Nuuvify.CommonPack.Security.Jwt;
 
-
-
 /// <summary>
 /// Para gerar um token, após validar as credenciais do seu usuario, execute essa classe da seguinte forma:
 /// <example>
 /// <code>
 ///     private readonly IOptions{JwtTokenOptions} jwtTokenOptions;
-/// 
+///
 ///     var token = new JwtBuilder()
 ///         .WithJwtOptions(jwtTokenOptions.Value)
 ///         .WithJwtUserClaims(usuarioGrupo)
@@ -27,34 +25,27 @@ public class JwtBuilder : IJwtBuilder
     public ICollection<Claim> _jwtClaims;
     public ClaimsIdentity _identityClaims;
 
-
-
     private void ThrowIfInvalidOptions(JwtTokenOptions jwtTokenOptions)
     {
 
         if (jwtTokenOptions is null)
             throw new ArgumentNullException(nameof(jwtTokenOptions), "Objeto não pode ser null");
 
-
         jwtTokenOptions.NewInstance();
 
         if (jwtTokenOptions.ValidFor.TotalMinutes <= 0)
             throw new NotSupportedException($"O período deve ser maior que zero {nameof(jwtTokenOptions.ValidFor)}");
 
-
         if (jwtTokenOptions.JtiGenerator is null)
             throw new ArgumentNullException(nameof(jwtTokenOptions), "JtiGenerator - Propriedade não pode ser nulo");
-
 
         _jwtTokenOptions = jwtTokenOptions;
 
     }
 
-    public virtual long ToUnixEpochDate(DateTime date)
-        => (long)Math.Round((date.ToUniversalTime() - new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero))
+    public virtual long ToUnixEpochDate(DateTime dateTime)
+        => (long)Math.Round((dateTime.ToUniversalTime() - new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero))
             .TotalSeconds);
-
-
 
     /// <summary>
     /// Use esse metodo primeiro, após receber IOptions{JwtTokenOptions} em seu metodo de chamada
@@ -77,10 +68,7 @@ public class JwtBuilder : IJwtBuilder
     /// <returns></returns>
     public virtual IJwtBuilder WithJwtClaims()
     {
-        if (_jwtClaims is null)
-        {
-            _jwtClaims = new List<Claim>();
-        }
+        _jwtClaims ??= new List<Claim>();
 
         _jwtClaims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
         _jwtClaims.Add(new Claim(JwtRegisteredClaimNames.Nbf, ToUnixEpochDate(DateTime.Now).ToString()));
@@ -115,13 +103,11 @@ public class JwtBuilder : IJwtBuilder
             };
         _identityClaims.AddClaims(userClaims);
 
-
         var grupos = personGroups?.Groups.ToList();
         for (int i = 0; i < grupos.Count; i++)
         {
             _identityClaims.AddClaim(new Claim(grupos[i].Group, i.ToString()));
         }
-
 
         return this;
     }
@@ -189,7 +175,6 @@ public class JwtBuilder : IJwtBuilder
             RequireExpirationTime = true
         };
 
-
         try
         {
             var _tokenHandler = new JwtSecurityTokenHandler();
@@ -204,7 +189,6 @@ public class JwtBuilder : IJwtBuilder
         }
 
     }
-
 
 }
 

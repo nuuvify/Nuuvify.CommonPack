@@ -1,9 +1,8 @@
-﻿using System.Linq.Expressions;
-using Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 
 namespace Nuuvify.CommonPack.UnitOfWork;
-
 
 public partial class RepositoryReadOnly<TEntity> : IRepositoryReadOnly<TEntity> where TEntity : class
 {
@@ -124,9 +123,9 @@ public partial class RepositoryReadOnly<TEntity> : IRepositoryReadOnly<TEntity> 
         CancellationToken cancellationToken = default)
     {
         if (predicate == null)
-            return await _dbSet.AverageAsync(selector);
+            return await _dbSet.AverageAsync(selector, cancellationToken: cancellationToken);
         else
-            return await _dbSet.Where(predicate).AverageAsync(selector);
+            return await _dbSet.Where(predicate).AverageAsync(selector, cancellationToken: cancellationToken);
     }
 
     ///<inheritdoc/>
@@ -175,7 +174,6 @@ public partial class RepositoryReadOnly<TEntity> : IRepositoryReadOnly<TEntity> 
             return await _dbSet.AnyAsync(predicate, cancellationToken);
         }
     }
-
 
 }
 

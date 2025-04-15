@@ -1,45 +1,41 @@
-﻿using Nuuvify.CommonPack.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Nuuvify.CommonPack.Domain;
 
-namespace Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest.Entities.StubDbContext
+namespace Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest.Entities.StubDbContext;
+
+public class PedidoConfig : EntityConfiguration<Pedido>
 {
-    public class PedidoConfig : EntityConfiguration<Pedido>
+
+    public override void Configure(EntityTypeBuilder<Pedido> builder)
     {
 
-        public override void Configure(EntityTypeBuilder<Pedido> builder)
-        {
+        DefaultConfig(builder, "PEDIDOS", "PEDIDO");
 
-            DefaultConfig(builder, "PEDIDOS", "PEDIDO");
+        _ = builder.Property(e => e.CodigoCliente)
+            .IsRequired()
+            .HasColumnType("varchar(10)");
 
-            builder.Property(e => e.CodigoCliente)
-                .IsRequired()
-                .HasColumnType("varchar(10)");
+        _ = builder.Property(e => e.NumeroPedido)
+            .IsRequired()
+            .HasColumnType("numeric(8)");
 
-            builder.Property(e => e.NumeroPedido)
-                .IsRequired()
-                .HasColumnType("numeric(8)");
+        _ = builder.Property(e => e.DataPedido)
+            .IsRequired();
 
-            builder.Property(e => e.DataPedido)
-                .IsRequired();
+        AuditConfig(builder);
+        AuditUserIdConfig(builder);
 
-            AuditConfig(builder);
-            AuditUserIdConfig(builder);
+        _ = builder.Property(e => e.FaturaId)
+            .IsRequired()
+            .HasColumnName($"FaturaId")
+            .HasColumnType($"varchar({DomainEntity.MaxId})");
 
+        _ = builder.HasOne(d => d.FaturaPedido)
+            .WithMany(p => p.Pedidos)
+            .HasForeignKey(f => f.FaturaId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .HasConstraintName("FK_Pedido_Fatura");
 
-            builder.Property(e => e.FaturaId)
-                .IsRequired()
-                .HasColumnName($"FaturaId")
-                .HasColumnType($"varchar({DomainEntity.MaxId})");
-
-
-            builder.HasOne(d => d.FaturaPedido)
-                .WithMany(p => p.Pedidos)
-                .HasForeignKey(f => f.FaturaId)
-                .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("FK_Pedido_Fatura");
-
-
-        }
     }
 }

@@ -3,7 +3,6 @@ using Microsoft.Extensions.Configuration;
 
 namespace Nuuvify.CommonPack.Extensions;
 
-
 public static class CacheTimeService
 {
 
@@ -23,7 +22,7 @@ public static class CacheTimeService
     /// <inheritdoc cref="ExpireAt(IConfiguration, string)"/>
     public static DateTimeOffset ExpireAt(string exactTime = "17:00:00")
     {
-        DateTimeOffset.TryParse(exactTime, out DateTimeOffset expireTime);
+        _ = DateTimeOffset.TryParse(exactTime, out DateTimeOffset expireTime);
         TimeSpan expireDiff = expireTime - DateTimeOffset.Now;
         if (expireDiff <= TimeSpan.Zero)
             expireTime = expireTime.AddDays(1);

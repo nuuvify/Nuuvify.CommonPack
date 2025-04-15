@@ -1,33 +1,30 @@
-﻿using System.Collections.Generic;
+namespace Nuuvify.CommonPack.StandardHttpClient.Results;
 
-namespace Nuuvify.CommonPack.StandardHttpClient.Results
+internal class ReturnStandardErrorsModelState
 {
-    internal class ReturnStandardErrorsModelState
+    public bool Sucesso
     {
-        public bool Sucesso
+        get
         {
-            get
-            {
-                return Success;
-            }
-            set
-            {
-                Success = value;
-            }
+            return Success;
         }
-        public IEnumerable<ModelStateError> Erros
+        set
         {
-            get
-            {
-                return Errors;
-            }
-            set
-            {
-                Errors = value;
-            }
+            Success = value;
         }
-
-        public bool Success { get; set; }
-        public IEnumerable<ModelStateError> Errors { get; set; }
     }
+    public IEnumerable<ModelStateError> Erros
+    {
+        get
+        {
+            return Errors;
+        }
+        set
+        {
+            Errors = value;
+        }
+    }
+
+    public bool Success { get; set; }
+    public IEnumerable<ModelStateError> Errors { get; set; }
 }
