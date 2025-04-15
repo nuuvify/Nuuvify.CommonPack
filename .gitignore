@@ -33,7 +33,6 @@ bld/
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
-coverage.*.xml
 
 # NUNIT
 *.VisualState.xml
@@ -113,6 +112,8 @@ _TeamCity*
 
 # DotCover is a Code Coverage Tool
 *.dotCover
+coverage.*.xml
+.env
 
 # NCrunch
 _NCrunch_*
@@ -156,7 +157,7 @@ publish/
 *.nupkg
 # The packages folder can be ignored because of Package Restore
 **/packages/*
-# except build/, which is used as an MSBuild target.
+# exComicst build/, which is used as an MSBuild target.
 !**/packages/build/
 # Uncomment if necessary however generally it will be regenerated when needed
 #!**/packages/repositories.config
@@ -193,6 +194,7 @@ ClientBin/
 *.publishsettings
 node_modules/
 orleans.codegen.cs
+healthchecks.db
 
 # RIA/Silverlight projects
 Generated_Code/
