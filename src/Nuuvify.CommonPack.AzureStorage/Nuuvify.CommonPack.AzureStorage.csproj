@@ -4,8 +4,15 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Description>Abstração para Azure Blobs Storage - Instalar no projeto IoC</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
+    <PackageTags>EntityFramework;EF;EFCore;Database;IBM;DB2</PackageTags>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Azure.Storage.Blobs" Version="12.20.0" />
@@ -14,8 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference
-      Include="..\Nuuvify.CommonPack.AzureStorage.Abstraction\Nuuvify.CommonPack.AzureStorage.Abstraction.csproj" />
+    <ProjectReference Include="..\Nuuvify.CommonPack.AzureStorage.Abstraction\Nuuvify.CommonPack.AzureStorage.Abstraction.csproj" />
   </ItemGroup>
 
 </Project>

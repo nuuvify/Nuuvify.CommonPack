@@ -1,7 +1,7 @@
-﻿using System.Reflection;
+using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 using Nuuvify.CommonPack.UnitOfWork.Abstraction.ValueObjects;
-using Microsoft.EntityFrameworkCore;
 
 namespace Nuuvify.CommonPack.UnitOfWork;
 
@@ -25,10 +25,6 @@ public class Repository<TEntity> : RepositoryReadOnly<TEntity>, IRepository<TEnt
         _unitOfWork = unitOfWork;
     }
 
-
-
-
-
     ///<inheritdoc/>
     public virtual async Task<object> Add(TEntity entity, CancellationToken cancellationToken = default)
     {
@@ -46,9 +42,8 @@ public class Repository<TEntity> : RepositoryReadOnly<TEntity>, IRepository<TEnt
     ///<inheritdoc/>
     public virtual void Update(TEntity entity)
     {
-        _dbSet.Update(entity);
+        _ = _dbSet.Update(entity);
     }
-
 
     ///<inheritdoc/>
     public virtual void Update(IEnumerable<TEntity> entities)
@@ -59,7 +54,7 @@ public class Repository<TEntity> : RepositoryReadOnly<TEntity>, IRepository<TEnt
     ///<inheritdoc/>
     public virtual void Remove(TEntity entity)
     {
-        _dbSet.Remove(entity);
+        _ = _dbSet.Remove(entity);
     }
 
     ///<inheritdoc/>
@@ -119,7 +114,6 @@ public class Repository<TEntity> : RepositoryReadOnly<TEntity>, IRepository<TEnt
     {
         _dbContext.Entry(entity).State = (EntityState)state;
     }
-
 
 }
 

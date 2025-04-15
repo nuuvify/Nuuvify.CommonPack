@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Nuuvify.CommonPack.Extensions.Notificator;
 
-
 namespace Microsoft.AspNetCore.Builder;
-
 
 public class UseHttpRequestKeyVerifyMiddleware
 {
@@ -11,8 +9,6 @@ public class UseHttpRequestKeyVerifyMiddleware
     private readonly string _headerKey;
     private readonly int _failureStatusCode;
     private List<NotificationR> _notificationsMiddleware;
-
-
 
     public UseHttpRequestKeyVerifyMiddleware(
         RequestDelegate next,
@@ -43,7 +39,6 @@ public class UseHttpRequestKeyVerifyMiddleware
 
 public static class UseHttpRequestKeyVerifyExtensions
 {
-
 
     /// <summary>
     /// Esse middleware verifica se foi enviado uma determinada chave no header da request, 

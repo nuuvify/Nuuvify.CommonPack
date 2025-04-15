@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nuuvify.CommonPack.Security.Abstraction;
@@ -20,7 +20,6 @@ public static class StandardHttpClientSetup
     /// <value></value>
     public static int BreakDurationMilliSeconds { get; set; } = 2000;
 
-
     /// <summary>
     /// Inclua esse setup antes das demais configurações de HttpClient <br/>
     /// Você precisa incluir as tags no seu arquivo appsettings.json <br/>
@@ -37,12 +36,12 @@ public static class StandardHttpClientSetup
     public static void AddStandardHttpClientSetup(this IServiceCollection services,
         IConfiguration configuration, bool registerCredential = true)
     {
-        services.AddScoped<IStandardHttpClient, StandardHttpClient>();
-        services.AddScoped<ITokenService, TokenService>();
-        services.AddTransient<CredentialToken>();
+        _ = services.AddScoped<IStandardHttpClient, StandardHttpClient>();
+        _ = services.AddScoped<ITokenService, TokenService>();
+        _ = services.AddTransient<CredentialToken>();
 
         if (registerCredential)
-            AddServiceCredentialRegister(services, configuration);
+            _ = AddServiceCredentialRegister(services, configuration);
 
     }
 
@@ -51,12 +50,12 @@ public static class StandardHttpClientSetup
         IConfiguration configuration, bool registerCredential = true)
     {
 
-        services.AddSingleton<IStandardHttpClient, StandardHttpClient>();
-        services.AddSingleton<ITokenService, TokenService>();
-        services.AddSingleton<CredentialToken>();
+        _ = services.AddSingleton<IStandardHttpClient, StandardHttpClient>();
+        _ = services.AddSingleton<ITokenService, TokenService>();
+        _ = services.AddSingleton<CredentialToken>();
 
         if (registerCredential)
-            AddServiceCredentialRegister(services, configuration);
+            _ = AddServiceCredentialRegister(services, configuration);
 
     }
 
@@ -65,12 +64,12 @@ public static class StandardHttpClientSetup
         IConfiguration configuration, bool registerCredential = true)
     {
 
-        services.AddTransient<IStandardHttpClient, StandardHttpClient>();
-        services.AddTransient<ITokenService, TokenService>();
-        services.AddTransient<CredentialToken>();
+        _ = services.AddTransient<IStandardHttpClient, StandardHttpClient>();
+        _ = services.AddTransient<ITokenService, TokenService>();
+        _ = services.AddTransient<CredentialToken>();
 
         if (registerCredential)
-            AddServiceCredentialRegister(services, configuration);
+            _ = AddServiceCredentialRegister(services, configuration);
 
     }
 
@@ -88,8 +87,7 @@ public static class StandardHttpClientSetup
         IConfiguration configuration, string httpclientName = "CredentialApi")
     {
 
-        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
+        _ = services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
         return services.AddHttpClient(httpclientName, client =>
         {
@@ -99,6 +97,5 @@ public static class StandardHttpClientSetup
         .AddPolicyWithTokenHandlers(services, retryTotal: RetryTotal, breakDurationMilliSeconds: BreakDurationMilliSeconds);
 
     }
-
 
 }

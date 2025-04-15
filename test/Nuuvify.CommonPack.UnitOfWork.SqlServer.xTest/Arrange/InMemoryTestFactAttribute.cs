@@ -1,24 +1,22 @@
-﻿using System;
 using Xunit;
 
-namespace Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest
+namespace Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest;
+
+public sealed class InMemoryTestFactAttribute : FactAttribute
 {
-    public sealed class InMemoryTestFactAttribute : FactAttribute
+    public InMemoryTestFactAttribute()
     {
-        public InMemoryTestFactAttribute()
+        if (!IsInMemoryContext())
         {
-            if (!IsInMemoryContext())
-            {
-                Skip = "Ignore test Database InMemory";
-            }
+            Skip = "Ignore test Database InMemory";
         }
+    }
 
-        private static bool IsInMemoryContext()
-        {
-            var config = AppSettingsConfig.GetConfig();
-            var inMemory = config.GetSection("TestOptions:DataBaseTesteInMemory")?.Value;
+    private static bool IsInMemoryContext()
+    {
+        var config = AppSettingsConfig.GetConfig();
+        var inMemory = config.GetSection("TestOptions:DataBaseTesteInMemory")?.Value;
 
-            return inMemory.Equals("true", StringComparison.OrdinalIgnoreCase);
-        }
+        return inMemory.Equals("true", StringComparison.OrdinalIgnoreCase);
     }
 }

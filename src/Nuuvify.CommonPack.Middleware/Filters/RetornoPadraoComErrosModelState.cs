@@ -1,32 +1,29 @@
-﻿using System.Collections.Generic;
+namespace Nuuvify.CommonPack.Middleware.Filters;
 
-namespace Nuuvify.CommonPack.Middleware.Filters
+public class RetornoPadraoComErrosModelState
 {
-    public class RetornoPadraoComErrosModelState
+    public bool Sucesso
     {
-        public bool Sucesso 
-        { 
-            get
-            {
-                return Success;
-            } 
-            set 
-            {
-                Success = value;
-            } 
-        }
-        public IEnumerable<ModelStateErro> Erros
+        get
         {
-            get
-            {
-                return Errors;
-            }
-            set
-            {
-                Errors = value;
-            }
+            return Success;
         }
-        public bool Success { get; set; }
-        public IEnumerable<ModelStateErro> Errors { get; set; }
+        set
+        {
+            Success = value;
+        }
     }
+    public IEnumerable<ModelStateErro> Erros
+    {
+        get
+        {
+            return Errors;
+        }
+        set
+        {
+            Errors = value;
+        }
+    }
+    public bool Success { get; set; }
+    public IEnumerable<ModelStateErro> Errors { get; set; }
 }

@@ -1,38 +1,32 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using System.Text.Json;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
-namespace Nuuvify.CommonPack.Middleware.Handle
+namespace Nuuvify.CommonPack.Middleware.Handle;
+
+public class GlobalHandleException : IGlobalHandleException
 {
-    public class GlobalHandleException : IGlobalHandleException
+    private readonly ILogger<GlobalHandleException> _logger;
+    public GlobalHandleException(
+        ILogger<GlobalHandleException> logger)
     {
-        private readonly ILogger<GlobalHandleException> _logger;
-        public GlobalHandleException(
-            ILogger<GlobalHandleException> logger)
-        {
-            _logger = logger;
+        _logger = logger;
 
-        }
-
-
-
-
-        public async Task HandleException(Exception ex, HttpContext context)
-        {
-
-            var mensagemRetorno = new ReturnStandardErrors
-            {
-                Success = false,
-                Errors = new List<NotificationR> { new NotificationR { Message = " :( Ooops !! Houve uma exceção. There was an exception." } }
-            };
-            context.Response.ContentType = "application/json";
-
-
-            await context.Response.WriteAsync(JsonSerializer.Serialize(mensagemRetorno));
-
-            _logger.LogError(ex, " Global Exception");
-
-        }
     }
 
+    public async Task HandleException(Exception ex, HttpContext context)
+    {
+
+        var mensagemRetorno = new ReturnStandardErrors
+        {
+            Success = false,
+            Errors = new List<NotificationR> { new NotificationR { Message = " :( Ooops !! Houve uma exceção. There was an exception." } }
+        };
+        context.Response.ContentType = "application/json";
+
+        await context.Response.WriteAsync(JsonSerializer.Serialize(mensagemRetorno));
+
+        _logger.LogError(ex, " Global Exception");
+
+    }
 }

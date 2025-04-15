@@ -1,16 +1,15 @@
 using Nuuvify.CommonPack.Domain;
 
-namespace Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest
+namespace Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest;
+
+public class FaturaUpdatedEvent : DomainEvent<Fatura>
 {
-    public class FaturaUpdatedEvent : DomainEvent<Fatura>
+    public FaturaUpdatedEvent(Fatura sourceId, string version, Fatura newFatura)
+        : base(sourceId, version)
     {
-        public FaturaUpdatedEvent(Fatura sourceId, string version, Fatura newFatura) 
-            : base(sourceId, version)
-        {
-            NewFatura = newFatura;
-        }
-
-        public Fatura NewFatura { get; set; }
-
+        NewFatura = newFatura;
     }
+
+    public Fatura NewFatura { get; set; }
+
 }
