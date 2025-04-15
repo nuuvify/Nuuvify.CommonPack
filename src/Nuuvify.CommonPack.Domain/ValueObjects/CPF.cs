@@ -1,128 +1,111 @@
-﻿using Nuuvify.CommonPack.Extensions.Implementation;
+using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.Extensions.Notificator;
-using System;
 
-namespace Nuuvify.CommonPack.Domain.ValueObjects
+namespace Nuuvify.CommonPack.Domain.ValueObjects;
+
+public class Cpf : NotifiableR
 {
-    public class Cpf : NotifiableR
+
+    protected Cpf() { }
+
+    public Cpf(string numero)
+    {
+        Validar(numero);
+    }
+
+    public string Codigo { get; private set; }
+
+    private void Validar(string numero)
     {
 
-        protected Cpf() { }
-
-        public Cpf(string numero)
+        if (!ValidarCodigo(numero))
         {
-            Validar(numero);
+            AddNotification(nameof(Cpf), "Codigo invalido");
         }
 
+        _ = new ValidationConcernR<Cpf>(this)
+            .AssertFixedLength(x => x.Codigo, maxCPF);
 
-        public string Codigo { get; private set; }
+        if (!IsValid())
+            Codigo = null;
 
+    }
 
-        private void Validar(string numero)
+    private bool ValidarCodigo(string cpf)
+    {
+
+        if (string.IsNullOrWhiteSpace(cpf))
         {
-
-            if (!ValidarCodigo(numero))
-            {
-                AddNotification(nameof(Cpf), "Codigo invalido");
-            }
-
-
-
-            new ValidationConcernR<Cpf>(this)
-                .AssertFixedLength(x => x.Codigo, maxCPF);
-
-
-
-            if (!IsValid())
-                Codigo = null;
-
+            Codigo = null;
+            return false;
         }
 
+        var multiplicador1 = new int[9] { 10, 9, 8, 7, 6, 5, 4, 3, 2 };
+        var multiplicador2 = new int[10] { 11, 10, 9, 8, 7, 6, 5, 4, 3, 2 };
 
-        private bool ValidarCodigo(string cpf)
+        string tempCpf;
+        string digito;
+
+        int soma;
+        int resto;
+
+        cpf = cpf.GetNumbers();
+
+        if (cpf.Length != maxCPF)
         {
-
-            if (string.IsNullOrWhiteSpace(cpf))
-            {
-                Codigo = null;
-                return false;
-            }
-
-
-            var multiplicador1 = new int[9] { 10, 9, 8, 7, 6, 5, 4, 3, 2 };
-            var multiplicador2 = new int[10] { 11, 10, 9, 8, 7, 6, 5, 4, 3, 2 };
-
-            string tempCpf;
-            string digito;
-
-            int soma;
-            int resto;
-
-            cpf = cpf.GetNumbers();
-
-            if (cpf.Length != maxCPF)
-            {
-                Codigo = null;
-                return false;
-            }
-
-
-            if (cpf.Substring(0, 1).Equals(cpf.Substring(1, 1)) && cpf.Substring(1, 1).Equals(cpf.Substring(2, 1)) &&
-               cpf.Substring(2, 1).Equals(cpf.Substring(3, 1)) && cpf.Substring(3, 1).Equals(cpf.Substring(4, 1)) &&
-               cpf.Substring(3, 1).Equals(cpf.Substring(5, 1)) && cpf.Substring(5, 1).Equals(cpf.Substring(6, 1)) &&
-               cpf.Substring(6, 1).Equals(cpf.Substring(7, 1)) && cpf.Substring(7, 1).Equals(cpf.Substring(8, 1)) &&
-               cpf.Substring(8, 1).Equals(cpf.Substring(9, 1)) && cpf.Substring(9, 1).Equals(cpf.Substring(10, 1)))
-            {
-                return false;
-            }
-
-
-            tempCpf = cpf.Substring(0, 9);
-            soma = 0;
-
-            for (int i = 0; i < 9; i++)
-                soma += int.Parse(tempCpf[i].ToString()) * multiplicador1[i];
-            resto = soma % 11;
-            resto = resto < 2 ? 0 : 11 - resto;
-            digito = resto.ToString();
-            tempCpf += digito;
-            soma = 0;
-            for (int i = 0; i < 10; i++)
-                soma += int.Parse(tempCpf[i].ToString()) * multiplicador2[i];
-            resto = soma % 11;
-            resto = resto < 2 ? 0 : 11 - resto;
-            digito += resto.ToString();
-
-
-            var valido = cpf.EndsWith(digito);
-
-
-            if (valido)
-                Codigo = cpf;
-
-
-            return valido;
+            Codigo = null;
+            return false;
         }
 
-        public const int maxCPF = 11;
-
-
-
-        /// <summary>
-        /// Formatar uma string CPF
-        /// </summary>
-        /// <returns>string CPF formatada</returns>
-        /// <example>Recebe '99999999999' Devolve '999.999.999-99'</example>
-        public string Mascara()
+        if (cpf.Substring(0, 1).Equals(cpf.Substring(1, 1)) && cpf.Substring(1, 1).Equals(cpf.Substring(2, 1)) &&
+           cpf.Substring(2, 1).Equals(cpf.Substring(3, 1)) && cpf.Substring(3, 1).Equals(cpf.Substring(4, 1)) &&
+           cpf.Substring(3, 1).Equals(cpf.Substring(5, 1)) && cpf.Substring(5, 1).Equals(cpf.Substring(6, 1)) &&
+           cpf.Substring(6, 1).Equals(cpf.Substring(7, 1)) && cpf.Substring(7, 1).Equals(cpf.Substring(8, 1)) &&
+           cpf.Substring(8, 1).Equals(cpf.Substring(9, 1)) && cpf.Substring(9, 1).Equals(cpf.Substring(10, 1)))
         {
-            return Codigo == null 
-                ? null 
-                : Convert.ToUInt64(Codigo).ToString(@"000\.000\.000\-00");
+            return false;
         }
 
-        public override string ToString()
-        {
-            return Codigo?.ToString();
-        }
+        tempCpf = cpf.Substring(0, 9);
+        soma = 0;
+
+        for (int i = 0; i < 9; i++)
+            soma += int.Parse(tempCpf[i].ToString()) * multiplicador1[i];
+        resto = soma % 11;
+        resto = resto < 2 ? 0 : 11 - resto;
+        digito = resto.ToString();
+        tempCpf += digito;
+        soma = 0;
+        for (int i = 0; i < 10; i++)
+            soma += int.Parse(tempCpf[i].ToString()) * multiplicador2[i];
+        resto = soma % 11;
+        resto = resto < 2 ? 0 : 11 - resto;
+        digito += resto.ToString();
+
+        var valido = cpf.EndsWith(digito);
+
+        if (valido)
+            Codigo = cpf;
+
+        return valido;
+    }
+
+    public const int maxCPF = 11;
+
+    /// <summary>
+    /// Formatar uma string CPF
+    /// </summary>
+    /// <returns>string CPF formatada</returns>
+    /// <example>Recebe '99999999999' Devolve '999.999.999-99'</example>
+    public string Mascara()
+    {
+        return Codigo == null
+            ? null
+            : Convert.ToUInt64(Codigo).ToString(@"000\.000\.000\-00");
+    }
+
+    public override string ToString()
+    {
+        return Codigo?.ToString();
     }
 }

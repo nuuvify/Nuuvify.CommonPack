@@ -1,335 +1,327 @@
-﻿using Nuuvify.CommonPack.Extensions.Implementation;
+using Nuuvify.CommonPack.Extensions.Implementation;
 using Xunit;
 
-namespace Nuuvify.CommonPack.Domain.xTest
+namespace Nuuvify.CommonPack.Domain.xTest;
+
+public class TextoHelperTests
 {
-    public class TextoHelperTests
+    [Theory]
+    [Trait("CommonPack.Extensions", nameof(StringExtensionMethods))]
+    [InlineData(null, null)]
+    [InlineData("", null)]
+    [InlineData("LINCOLN ZOCATELI", "Lincoln Zocateli")]
+    [InlineData("SOENERGY  SISTEMAS INTERNACIONAIS DE ENERGIA SA", "Soenergy  Sistemas Internacionais De Energia Sa")]
+    public void ToTitleCase(string texto, string retorno)
     {
-        [Theory]
-        [Trait("CommonPack.Extensions", nameof(StringExtensionMethods))]
-        [InlineData(null, null)]
-        [InlineData("", null)]
-        [InlineData("LINCOLN ZOCATELI", "Lincoln Zocateli")]
-        [InlineData("SOENERGY  SISTEMAS INTERNACIONAIS DE ENERGIA SA", "Soenergy  Sistemas Internacionais De Energia Sa")]
-        public void ToTitleCase(string texto, string retorno)
-        {
 
-            var textoRetorno = texto.ToTitleCase();
+        var textoRetorno = texto.ToTitleCase();
 
+        Assert.Equal(retorno, textoRetorno);
 
-            Assert.Equal(retorno, textoRetorno);
+    }
 
-        }
+    [Theory]
+    [InlineData("Texto maiúsculo com char especial #$%", "TEXTO MAIÚSCULO COM CHAR ESPECIAL #$%")]
+    [InlineData(null, null)]
+    public void TextoComToUpperInvariant_Nulo_ou_NaoNulo(string textActual, string textExpected)
+    {
 
+        var newText = textActual.ToUpperInvariantNotNull();
 
-        [Theory]
-        [InlineData("Texto maiúsculo com char especial #$%", "TEXTO MAIÚSCULO COM CHAR ESPECIAL #$%")]
-        [InlineData(null, null)]
-        public void TextoComToUpperInvariant_Nulo_ou_NaoNulo(string textActual, string textExpected)
-        {
+        Assert.Equal(textExpected, newText);
+    }
 
-            var newText = textActual.ToUpperInvariantNotNull();
+    [Fact]
+    public void TextoComToUpperInvariant_Retorna_Nulo_Caso_Entrada_For_Nulo()
+    {
+        var textExpected = "TEXTO MAIÚSCULO COM CHAR ESPECIAL #$%";
+        string textActual = null;
 
+        var newText = textActual.ToUpperInvariantNotNull();
 
-            Assert.Equal(textExpected, newText);
-        }
+        Assert.Null(newText);
+        Assert.NotEqual(textExpected, newText);
+    }
 
-        [Fact]
-        public void TextoComToUpperInvariant_Retorna_Nulo_Caso_Entrada_For_Nulo()
-        {
-            var textExpected = "TEXTO MAIÚSCULO COM CHAR ESPECIAL #$%";
-            string textActual = null;
+    [Fact]
+    public void TextoSemCharEspecialDeveRetornarTextoSemDriatico()
+    {
 
+        var text = "Isso é um teste, sem chars especiais !?#";
 
-            var newText = textActual.ToUpperInvariantNotNull();
+        var newText = text.RemoveSpecialChars();
 
-            Assert.Null(newText);
-            Assert.NotEqual(textExpected, newText);
-        }
+        var textExpected = "Isso  um teste, sem chars especiais !?#";
 
-        [Fact]
-        public void TextoSemCharEspecialDeveRetornarTextoSemDriatico()
-        {
+        Assert.Equal(textExpected, newText);
 
-            var text = "Isso é um teste, sem chars especiais !?#";
+    }
 
-            var newText = text.RemoveSpecialChars();
+    [Fact]
+    public void TextoComCharsEspeciaisDeveRetornarTabelaAscii_entre_H20_a_7E_SemDriaticos()
+    {
+        var text = "França-Brasil!?!#@$%^&*()_+\\|}{○<>??/ €$¥£¢ \\^$.|?*+()[{ 0123456789";
 
-            var textExpected = "Isso  um teste, sem chars especiais !?#";
+        var newText = text.RemoveSpecialChars();
 
-            Assert.Equal(textExpected, newText);
+        var textExpected = "Frana-Brasil!?!#@$%^&*()_+\\|}{<>??/ $ \\^$.|?*+()[{ 0123456789";
 
-        }
+        Assert.Equal(textExpected, newText);
 
-        [Fact]
-        public void TextoComCharsEspeciaisDeveRetornarTabelaAscii_entre_H20_a_7E_SemDriaticos()
-        {
-            var text = "França-Brasil!?!#@$%^&*()_+\\|}{○<>??/ €$¥£¢ \\^$.|?*+()[{ 0123456789";
+    }
 
-            var newText = text.RemoveSpecialChars();
+    [Fact]
+    public void TextoComCharsEspeciaisTabelaAscii_entre_H0_a_H1F_DeveRemoverEssesCaracteres()
+    {
+        var charNull = char.ConvertFromUtf32(0);
+        var charEndOfText = char.ConvertFromUtf32(3);
+        var charVerticalTab = char.ConvertFromUtf32(9);
+        var charEnter = char.ConvertFromUtf32(13);
 
-            var textExpected = "Frana-Brasil!?!#@$%^&*()_+\\|}{<>??/ $ \\^$.|?*+()[{ 0123456789";
+        var text = "França-Brasil!?!#@$%^&*()_+\\|}{○<>??/ €$¥£¢ \\^$.|?*+()[{ 0123456789"
+            + charNull
+            + charEndOfText
+            + charVerticalTab
+            + charEnter;
 
-            Assert.Equal(textExpected, newText);
+        var newText = text.RemoveSpecialChars();
 
-        }
+        var textExpected = "Frana-Brasil!?!#@$%^&*()_+\\|}{<>??/ $ \\^$.|?*+()[{ 0123456789";
 
-        [Fact]
-        public void TextoComCharsEspeciaisTabelaAscii_entre_H0_a_H1F_DeveRemoverEssesCaracteres()
-        {
-            var charNull = char.ConvertFromUtf32(0);
-            var charEndOfText = char.ConvertFromUtf32(3);
-            var charVerticalTab = char.ConvertFromUtf32(9);
-            var charEnter = char.ConvertFromUtf32(13);
+        Assert.Equal(textExpected, newText);
 
-            var text = "França-Brasil!?!#@$%^&*()_+\\|}{○<>??/ €$¥£¢ \\^$.|?*+()[{ 0123456789"
-                + charNull
-                + charEndOfText
-                + charVerticalTab
-                + charEnter;
+    }
+    [Fact]
+    public void TextoComCharsEspeciaisTabelaAscii_entre_H0_a_H1F_DeveRemoverEssesCaracteres_e_ManterDriaticos()
+    {
+        var charNull = char.ConvertFromUtf32(0);
+        var charEndOfText = char.ConvertFromUtf32(3);
+        var charVerticalTab = char.ConvertFromUtf32(9);
+        var charEnter = char.ConvertFromUtf32(13);
 
-            var newText = text.RemoveSpecialChars();
+        var text = "ÄÅÁÂÀÃäáâàãÉÊËÈéêëèÍÎÏÌíîïìÖÓÔÒÕöóôòõÜÚÛüúûùÇçFrança-Brasil!?!#@$%^&*()_+\\|}{○<>??/ €$¥£¢ \\^$.|?*+()[{ 0123456789"
+            + charNull
+            + charEndOfText
+            + charVerticalTab
+            + charEnter;
 
-            var textExpected = "Frana-Brasil!?!#@$%^&*()_+\\|}{<>??/ $ \\^$.|?*+()[{ 0123456789";
+        var newText = text.RemoveCharsKeepDiacritics();
 
-            Assert.Equal(textExpected, newText);
+        var textExpected = "ÄÅÁÂÀÃäáâàãÉÊËÈéêëèÍÎÏÌíîïìÖÓÔÒÕöóôòõÜÚÛüúûùÇçFrançaBrasil0123456789";
 
-        }
-        [Fact]
-        public void TextoComCharsEspeciaisTabelaAscii_entre_H0_a_H1F_DeveRemoverEssesCaracteres_e_ManterDriaticos()
-        {
-            var charNull = char.ConvertFromUtf32(0);
-            var charEndOfText = char.ConvertFromUtf32(3);
-            var charVerticalTab = char.ConvertFromUtf32(9);
-            var charEnter = char.ConvertFromUtf32(13);
+        Assert.Equal(textExpected, newText);
 
-            var text = "ÄÅÁÂÀÃäáâàãÉÊËÈéêëèÍÎÏÌíîïìÖÓÔÒÕöóôòõÜÚÛüúûùÇçFrança-Brasil!?!#@$%^&*()_+\\|}{○<>??/ €$¥£¢ \\^$.|?*+()[{ 0123456789"
-                + charNull
-                + charEndOfText
-                + charVerticalTab
-                + charEnter;
+    }
 
-            var newText = text.RemoveCharsKeepDiacritics();
+    [Fact]
+    public void RemoveCharEspeciaisMantemDriaticos_TabelaAsciiExtendida()
+    {
+        var text = "ÄÅÁÂÀÃäáâàãÉÊËÈéêëèÍÎÏÌíîïìÖÓÔÒÕöóôòõÜÚÛüúûùÇçFrança-Brasil-Isso é um teste ação avô avó!?!#@$%^&*()_+\\|}{○<>??/ €$¥£¢ \\^$.|?*+()[{ 0123456789";
 
-            var textExpected = "ÄÅÁÂÀÃäáâàãÉÊËÈéêëèÍÎÏÌíîïìÖÓÔÒÕöóôòõÜÚÛüúûùÇçFrançaBrasil0123456789";
+        var newText = text.RemoveCharsKeepDiacritics();
 
-            Assert.Equal(textExpected, newText);
+        var textExpected = "ÄÅÁÂÀÃäáâàãÉÊËÈéêëèÍÎÏÌíîïìÖÓÔÒÕöóôòõÜÚÛüúûùÇçFrançaBrasilIssoéumtesteaçãoavôavó0123456789";
 
-        }
+        Assert.Equal(textExpected, newText);
 
-        [Fact]
-        public void RemoveCharEspeciaisMantemDriaticos_TabelaAsciiExtendida()
-        {
-            var text = "ÄÅÁÂÀÃäáâàãÉÊËÈéêëèÍÎÏÌíîïìÖÓÔÒÕöóôòõÜÚÛüúûùÇçFrança-Brasil-Isso é um teste ação avô avó!?!#@$%^&*()_+\\|}{○<>??/ €$¥£¢ \\^$.|?*+()[{ 0123456789";
+    }
+    [Fact]
+    public void RemoveCharEspeciaisInclusiveDriaticos()
+    {
+        var text = "ÄÅÁÂÀÃäáâàãÉÊËÈéêëèÍÎÏÌíîïìÖÓÔÒÕöóôòõÜÚÛüúûùÇçFrança-Brasil-Isso é um teste ação avô avó!?!#@$%^&*()_+\\|}{○<>??/ €$¥£¢ \\^$.|?*+()[{ 0123456789";
 
-            var newText = text.RemoveCharsKeepDiacritics();
+        var newText = text.RemoveSpecialChars();
 
-            var textExpected = "ÄÅÁÂÀÃäáâàãÉÊËÈéêëèÍÎÏÌíîïìÖÓÔÒÕöóôòõÜÚÛüúûùÇçFrançaBrasilIssoéumtesteaçãoavôavó0123456789";
+        var textExpected = "Frana-Brasil-Isso  um teste ao av av!?!#@$%^&*()_+\\|}{<>??/ $ \\^$.|?*+()[{ 0123456789";
 
-            Assert.Equal(textExpected, newText);
+        Assert.Equal(textExpected, newText);
 
-        }
-        [Fact]
-        public void RemoveCharEspeciaisInclusiveDriaticos()
-        {
-            var text = "ÄÅÁÂÀÃäáâàãÉÊËÈéêëèÍÎÏÌíîïìÖÓÔÒÕöóôòõÜÚÛüúûùÇçFrança-Brasil-Isso é um teste ação avô avó!?!#@$%^&*()_+\\|}{○<>??/ €$¥£¢ \\^$.|?*+()[{ 0123456789";
+    }
 
-            var newText = text.RemoveSpecialChars();
+    [Fact]
+    public void RemoveCharEspeciaisMantemCharsEspecificadosForaCharAdicao()
+    {
+        var text = "França-Brasil-Isso é um teste ação avô avó!?!#@$%^&*()_+\\|}{○<>??/ €$¥£¢ \\^$.|?*+()[{ 0123456789";
 
-            var textExpected = "Frana-Brasil-Isso  um teste ao av av!?!#@$%^&*()_+\\|}{<>??/ $ \\^$.|?*+()[{ 0123456789";
+        var newText = text.RemoveCharsKeepChars("(", ")", "¥", "-", "+");
 
-            Assert.Equal(textExpected, newText);
+        var textExpected = "França-Brasil-Issoéumtesteaçãoavôavó()¥()0123456789";
 
-        }
+        Assert.Equal(textExpected, newText);
 
-        [Fact]
-        public void RemoveCharEspeciaisMantemCharsEspecificadosForaCharAdicao()
-        {
-            var text = "França-Brasil-Isso é um teste ação avô avó!?!#@$%^&*()_+\\|}{○<>??/ €$¥£¢ \\^$.|?*+()[{ 0123456789";
+    }
 
+    [Fact]
+    public void RemoveQualquerCharQueNaoForLetra_e_Numero()
+    {
+        var charNull = char.ConvertFromUtf32(0);
+        var charEndOfText = char.ConvertFromUtf32(3);
+        var charVerticalTab = char.ConvertFromUtf32(9);
+        var charEnter = char.ConvertFromUtf32(13);
 
-            var newText = text.RemoveCharsKeepChars("(", ")", "¥", "-", "+");
+        var text = "França-Brasil-Isso é um teste ação avô avó!?!#@$%^&*()_+\\|}{○<>??/ €$¥£¢ \\^$.|?*+()[{ 0123456789"
+            + charNull
+            + charEndOfText
+            + charVerticalTab
+            + charEnter;
 
-            var textExpected = "França-Brasil-Issoéumtesteaçãoavôavó()¥()0123456789";
+        var newText = text.GetLettersAndNumbersOnly();
 
-            Assert.Equal(textExpected, newText);
+        var textExpected = "FranaBrasilIssoumtesteaoavav0123456789";
 
-        }
+        Assert.Equal(textExpected, newText);
+    }
 
-        [Fact]
-        public void RemoveQualquerCharQueNaoForLetra_e_Numero()
-        {
-            var charNull = char.ConvertFromUtf32(0);
-            var charEndOfText = char.ConvertFromUtf32(3);
-            var charVerticalTab = char.ConvertFromUtf32(9);
-            var charEnter = char.ConvertFromUtf32(13);
+    [Fact]
+    public void RemoveUnicode()
+    {
+        var charNull = char.ConvertFromUtf32(0);
+        var charEndOfText = char.ConvertFromUtf32(3);
+        var charVerticalTab = char.ConvertFromUtf32(9);
+        var charEnter = char.ConvertFromUtf32(13);
 
-            var text = "França-Brasil-Isso é um teste ação avô avó!?!#@$%^&*()_+\\|}{○<>??/ €$¥£¢ \\^$.|?*+()[{ 0123456789"
-                + charNull
-                + charEndOfText
-                + charVerticalTab
-                + charEnter;
+        var text = "França-Brasil-Isso é um teste ação avô avó!?!#@$%^&*()_+\\|}{○<>??/ €$¥£¢ \\^$.|?*+()[{ 0123456789"
+            + charNull
+            + charEndOfText
+            + charVerticalTab
+            + charEnter;
 
-            var newText = text.GetLettersAndNumbersOnly();
+        var newText = text.GetUnicodeChars();
 
-            var textExpected = "FranaBrasilIssoumtesteaoavav0123456789";
+        var textExpected = "FranaBrasilIssoumtesteaoavav0123456789";
 
-            Assert.Equal(textExpected, newText);
-        }
+        Assert.Equal(textExpected, newText);
 
-        [Fact]
-        public void RemoveUnicode()
-        {
-            var charNull = char.ConvertFromUtf32(0);
-            var charEndOfText = char.ConvertFromUtf32(3);
-            var charVerticalTab = char.ConvertFromUtf32(9);
-            var charEnter = char.ConvertFromUtf32(13);
+    }
 
+    [Fact]
+    public void SubstringNotNull_Texto_Menor_retorna_mesmo_texto()
+    {
 
-            var text = "França-Brasil-Isso é um teste ação avô avó!?!#@$%^&*()_+\\|}{○<>??/ €$¥£¢ \\^$.|?*+()[{ 0123456789"
-                + charNull
-                + charEndOfText
-                + charVerticalTab
-                + charEnter;
+        var text = "Lincoln";
 
+        var newText = text.SubstringNotNull(0, 10);
 
-            var newText = text.GetUnicodeChars();
+        var textExpected = "Lincoln";
 
-            var textExpected = "FranaBrasilIssoumtesteaoavav0123456789";
+        Assert.Equal(textExpected, newText);
 
-            Assert.Equal(textExpected, newText);
+    }
+    [Fact]
+    public void SubstringNotNull_Texto_Menor_com_start_e_length_igual_retorna_empty()
+    {
 
-        }
+        var text = "Lincoln";
 
-        [Fact]
-        public void SubstringNotNull_Texto_Menor_retorna_mesmo_texto()
-        {
+        var newText = text.SubstringNotNull(10, 10);
 
-            var text = "Lincoln";
+        var textExpected = string.Empty;
 
-            var newText = text.SubstringNotNull(0, 10);
+        Assert.Equal(textExpected, newText);
 
-            var textExpected = "Lincoln";
+    }
+    [Fact]
+    public void SubstringNotNull_Texto_Maior_com_start_e_length_igual_retorna_empty()
+    {
 
-            Assert.Equal(textExpected, newText);
+        var text = "Lincoln Zocateli";
 
-        }
-        [Fact]
-        public void SubstringNotNull_Texto_Menor_com_start_e_length_igual_retorna_empty()
-        {
+        var newText = text.SubstringNotNull(10, 10);
 
-            var text = "Lincoln";
+        var textExpected = "cateli";
 
-            var newText = text.SubstringNotNull(10, 10);
+        Assert.Equal(textExpected, newText);
 
-            var textExpected = string.Empty;
+    }
+    [Fact]
+    public void SubstringNotNull_Texto_com_mesmo_tamanho_do_corte_deve_retornar_empty()
+    {
 
-            Assert.Equal(textExpected, newText);
+        var text = "Lincoln";
 
-        }
-        [Fact]
-        public void SubstringNotNull_Texto_Maior_com_start_e_length_igual_retorna_empty()
-        {
+        var newText = text.SubstringNotNull(7, 10);
 
-            var text = "Lincoln Zocateli";
+        var textExpected = string.Empty;
 
-            var newText = text.SubstringNotNull(10, 10);
+        Assert.Equal(textExpected, newText);
 
-            var textExpected = "cateli";
+    }
+    [Fact]
+    public void SubstringNotNull_Texto_com_tamanho_menor_deve_retornar_o_resto_do_texto()
+    {
 
-            Assert.Equal(textExpected, newText);
+        var text = "Lincoln";
 
-        }
-        [Fact]
-        public void SubstringNotNull_Texto_com_mesmo_tamanho_do_corte_deve_retornar_empty()
-        {
+        var newText = text.SubstringNotNull(6, 10);
 
-            var text = "Lincoln";
+        var textExpected = "n";
 
-            var newText = text.SubstringNotNull(7, 10);
+        Assert.Equal(textExpected, newText);
 
-            var textExpected = string.Empty;
+    }
+    [Fact]
+    public void SubstringNotNull_Texto_com_tamanho_inicio_maior_que_final_retorna_Empty()
+    {
 
-            Assert.Equal(textExpected, newText);
+        var text = "Lincoln";
 
-        }
-        [Fact]
-        public void SubstringNotNull_Texto_com_tamanho_menor_deve_retornar_o_resto_do_texto()
-        {
+        var newText = text.SubstringNotNull(12, 10);
 
-            var text = "Lincoln";
+        var textExpected = string.Empty;
 
-            var newText = text.SubstringNotNull(6, 10);
+        Assert.Equal(textExpected, newText);
 
-            var textExpected = "n";
+    }
+    [Fact]
+    public void SubstringNotNull_Texto_maior_que_final_com_inicio_maior_que_final_retorna_retante_do_texto()
+    {
 
-            Assert.Equal(textExpected, newText);
+        var text = "Lincoln Zocateli";
 
-        }
-        [Fact]
-        public void SubstringNotNull_Texto_com_tamanho_inicio_maior_que_final_retorna_Empty()
-        {
+        var newText = text.SubstringNotNull(12, 10);
 
-            var text = "Lincoln";
+        var textExpected = "teli";
 
-            var newText = text.SubstringNotNull(12, 10);
+        Assert.Equal(textExpected, newText);
 
-            var textExpected = string.Empty;
+    }
+    [Fact]
+    public void SubstringNotNull_Texto_maior_que_final_com_Retorna_texto_cortado()
+    {
 
-            Assert.Equal(textExpected, newText);
+        var text = "Lincoln Zocateli";
 
-        }
-        [Fact]
-        public void SubstringNotNull_Texto_maior_que_final_com_inicio_maior_que_final_retorna_retante_do_texto()
-        {
+        var newText = text.SubstringNotNull(12, 3);
 
-            var text = "Lincoln Zocateli";
+        var textExpected = "tel";
 
-            var newText = text.SubstringNotNull(12, 10);
+        Assert.Equal(textExpected, newText);
 
-            var textExpected = "teli";
+    }
+    [Fact]
+    public void SubstringNotNull_ComTextoMaiorDeveRetornarComCorte()
+    {
 
-            Assert.Equal(textExpected, newText);
+        var text = "Lincoln Zocateli";
 
-        }
-        [Fact]
-        public void SubstringNotNull_Texto_maior_que_final_com_Retorna_texto_cortado()
-        {
+        var newText = text.SubstringNotNull(0, 10);
 
-            var text = "Lincoln Zocateli";
+        var textExpected = "Lincoln Zo";
 
-            var newText = text.SubstringNotNull(12, 3);
+        Assert.Equal(textExpected, newText);
 
-            var textExpected = "tel";
+    }
+    [Fact]
+    public void SubstringNotNull_ComTextoNuloNaoDeveRetornarErro()
+    {
 
-            Assert.Equal(textExpected, newText);
+        var text = string.Empty;
 
-        }
-        [Fact]
-        public void SubstringNotNull_ComTextoMaiorDeveRetornarComCorte()
-        {
+        var newText = text.SubstringNotNull(0, 10);
 
-            var text = "Lincoln Zocateli";
+        var textExpected = string.Empty;
 
-            var newText = text.SubstringNotNull(0, 10);
+        Assert.Equal(textExpected, newText);
 
-            var textExpected = "Lincoln Zo";
-
-            Assert.Equal(textExpected, newText);
-
-        }
-        [Fact]
-        public void SubstringNotNull_ComTextoNuloNaoDeveRetornarErro()
-        {
-
-            var text = string.Empty;
-
-            var newText = text.SubstringNotNull(0, 10);
-
-            var textExpected = string.Empty;
-
-            Assert.Equal(textExpected, newText);
-
-        }
     }
 }

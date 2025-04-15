@@ -1,24 +1,22 @@
-﻿using System;
 using Xunit;
 
-namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest
+namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest;
+
+public sealed class PostgreSQLTestFactAttribute : FactAttribute
 {
-    public sealed class PostgreSQLTestFactAttribute : FactAttribute
+    public PostgreSQLTestFactAttribute()
     {
-        public PostgreSQLTestFactAttribute()
+        if (!IsPostgreSQLContext())
         {
-            if (!IsPostgreSQLContext())
-            {
-                Skip = "Ignore test Database PostgreSQL";
-            }
+            Skip = "Ignore test Database PostgreSQL";
         }
+    }
 
-        private static bool IsPostgreSQLContext()
-        {
-            var config = AppSettingsConfig.GetConfig();
-            var database = config.GetSection("TestOptions:DataBaseTestePostgreSQL")?.Value;
+    private static bool IsPostgreSQLContext()
+    {
+        var config = AppSettingsConfig.GetConfig();
+        var database = config.GetSection("TestOptions:DataBaseTestePostgreSQL")?.Value;
 
-            return database.Equals("true", StringComparison.OrdinalIgnoreCase);
-        }
+        return database.Equals("true", StringComparison.OrdinalIgnoreCase);
     }
 }

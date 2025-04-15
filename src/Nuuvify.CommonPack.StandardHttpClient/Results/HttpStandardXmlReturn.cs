@@ -1,16 +1,12 @@
-﻿using System.Xml;
+using System.Xml;
 
-namespace Nuuvify.CommonPack.StandardHttpClient.Results
+namespace Nuuvify.CommonPack.StandardHttpClient.Results;
+
+
+public class HttpStandardXmlReturn
 {
-
-    public class HttpStandardXmlReturn
-    {
-        public bool Success { get; set; }
-        public string ReturnCode { get; set; }
-        public XmlDocument ReturnMessage { get; set; }
-
-
-    }
-
+    public bool Success { get; set; }
+    public string ReturnCode { get; set; }
+    public XmlDocument ReturnMessage { get; set; }
 
 }

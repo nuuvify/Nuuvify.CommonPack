@@ -1,7 +1,6 @@
-namespace Nuuvify.CommonPack.StandardHttpClient.xTest.Configs
+namespace Nuuvify.CommonPack.StandardHttpClient.xTest.Configs;
+
+internal interface ICommandResultR
 {
-    internal interface ICommandResultR
-    {
-        
-    }
+
 }

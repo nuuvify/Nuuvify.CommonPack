@@ -1,13 +1,11 @@
-﻿using System.Net;
+using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Nuuvify.CommonPack.Extensions.Notificator;
 using Nuuvify.CommonPack.StandardHttpClient.Helpers;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 
-
 namespace Nuuvify.CommonPack.StandardHttpClient;
-
 
 public abstract partial class BaseStandardHttpClient
 {
@@ -23,7 +21,6 @@ public abstract partial class BaseStandardHttpClient
             return returnList;
         }
 
-
         return new List<T>();
     }
 
@@ -36,7 +33,6 @@ public abstract partial class BaseStandardHttpClient
             var returnData = jsonData.Data;
             return returnData;
         }
-
 
         return (T)Convert.ChangeType(null, typeof(T));
     }
@@ -57,14 +53,10 @@ public abstract partial class BaseStandardHttpClient
 
             };
 
-
-            int.TryParse(standardReturn.ReturnCode, out int codigoRetorno);
+            _ = int.TryParse(standardReturn.ReturnCode, out int codigoRetorno);
             var returnMessage = standardReturn?.ReturnMessage;
 
             var propertyNotification = $"Codigo Retorno: {codigoRetorno}";
-
-
-
 
             if (codigoRetorno.Equals(HttpStatusCode.ExpectationFailed.GetHashCode()))
             {
@@ -148,8 +140,6 @@ public abstract partial class BaseStandardHttpClient
 
         }
     }
-
-
 
 }
 

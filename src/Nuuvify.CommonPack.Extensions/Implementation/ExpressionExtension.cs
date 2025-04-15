@@ -1,11 +1,7 @@
-using System.Collections.Generic;
-
 namespace System.Linq.Expressions;
 
 public static class ExpressionExtension
 {
-
-
 
     /// <summary>
     /// CombineExpressions deve ser utilizado para gerar WHERE dinamicamente para o Entity Framework,

@@ -1,20 +1,19 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
-namespace Nuuvify.CommonPack.Domain.ValueObjects
+namespace Nuuvify.CommonPack.Domain.ValueObjects;
+
+public enum EnumControleInstrucao
 {
-    public enum EnumControleInstrucao
-    {
-        [Description("I")]
-        Inclui = 0,
+    [Description("I")]
+    Inclui = 0,
 
-        [Description("A")]
-        Altera = 1,
+    [Description("A")]
+    Altera = 1,
 
-        [Description("E")]
-        Exclui = 2,
+    [Description("E")]
+    Exclui = 2,
 
-        [Description("M")]
-        IncluiAltera = 3,
+    [Description("M")]
+    IncluiAltera = 3,
 
-    }
 }

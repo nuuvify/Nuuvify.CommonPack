@@ -27,7 +27,6 @@ public static partial class ModelBuilderExtensions
     {
         ProviderNameException(modelBuilder.GetDatabaseProviderName());
 
-
         var entities = modelBuilder.Model.GetEntityTypes()
             .Where(e => !(typeof(INotPersistingAsTable).IsAssignableFrom(e.ClrType) && !e.IsOwned()))
             .ToList();
@@ -65,7 +64,6 @@ public static partial class ModelBuilderExtensions
         }
 
     }
-
 
 }
 

@@ -10,8 +10,16 @@
       GlobalHandleException - Captura e loga as exceptions de forma global
       ValidateModelAttribute - Retorna os erros da ModelState de forma padronizada
     </Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
+    <PackageTags>Nuuvify</PackageTags>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+  
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />

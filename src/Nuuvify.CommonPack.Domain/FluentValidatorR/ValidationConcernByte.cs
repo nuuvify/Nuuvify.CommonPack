@@ -1,218 +1,214 @@
-﻿using System;
 using System.Linq.Expressions;
 using Nuuvify.CommonPack.Extensions.Notificator;
 
-namespace Nuuvify.CommonPack.Domain
+namespace Nuuvify.CommonPack.Domain;
+
+public partial class ValidationConcernR<T> where T : NotifiableR
 {
-    public partial class ValidationConcernR<T> where T : NotifiableR
+    private void ConfigConcern(Expression<Func<T, byte>> selector)
     {
-        private void ConfigConcern(Expression<Func<T, byte>> selector)
+        ResetVariables();
+
+        var isnull = AssertNotIsNull(_validatable);
+        if (isnull.Errors.Count > 0) return;
+
+        try
         {
-            ResetVariables();
+            SelectorNull = null;
+            DataByte = selector.Compile().Invoke(_validatable);
+        }
+        catch (Exception)
+        {
+            SelectorNull = "IsNull";
+            DataByte = default;
+        }
 
-            var isnull = AssertNotIsNull(_validatable);
-            if (isnull.Errors.Count > 0) return;
+        NameT = _validatable?.GetType()?.Name;
 
-            try
+        if (selector.Body is MemberExpression memberExpression)
+        {
+            var memberName = string.Empty;
+
+            if (memberExpression.Member is null)
             {
-                SelectorNull = null;
-                DataByte = selector.Compile().Invoke(_validatable);
-            }
-            catch (Exception)
-            {
-                SelectorNull = "IsNull";
-                DataByte = default;
-            }
-
-            NameT = _validatable?.GetType()?.Name;
-
-            if (selector.Body is MemberExpression memberExpression)
-            {
-                var memberName = string.Empty;
-
-                if (memberExpression.Member is null)
-                {
-                    memberName = memberExpression.ToString();
-                    SelectorNull = memberName;
-                }
-                else
-                {
-                    memberName = memberExpression?.Member?.Name;
-                    SelectorNull = SelectorNull == "IsNull" ? memberExpression?.Expression?.Type?.Name ?? memberExpression?.Type.Name : "";
-                }
-
-                Name = memberName;
-            }
-            else if (selector.Body is BinaryExpression binaryExpression)
-            {
-                if (!string.IsNullOrWhiteSpace(SelectorNull) && SelectorNull == "IsNull" &&
-                    binaryExpression.Left is Expression leftExpression &&
-                    leftExpression is MemberExpression member)
-                {
-
-                    SelectorNull = member.Member?.ReflectedType?.Name;
-                }
-
-                var methodName = binaryExpression.Method is null
-                    ? binaryExpression.ToString()
-                    : binaryExpression?.Method.Name;
-
-                Name = methodName;
-            }
-            else if (selector.Body is ConstantExpression contantExpression)
-            {
-                Name = contantExpression?.Value?.ToString();
+                memberName = memberExpression.ToString();
+                SelectorNull = memberName;
             }
             else
             {
-                Name = "";
+                memberName = memberExpression?.Member?.Name;
+                SelectorNull = SelectorNull == "IsNull" ? memberExpression?.Expression?.Type?.Name ?? memberExpression?.Type.Name : "";
             }
-        }
 
-        public ValidationConcernR<T> AssertAreEquals(Expression<Func<T, byte>> selector, byte val, string message = "", string aggregateId = null)
+            Name = memberName;
+        }
+        else if (selector.Body is BinaryExpression binaryExpression)
         {
-            ConfigConcern(selector);
+            if (!string.IsNullOrWhiteSpace(SelectorNull) && SelectorNull == "IsNull" &&
+                binaryExpression.Left is Expression leftExpression &&
+                leftExpression is MemberExpression member)
+            {
 
-
-            if (!string.IsNullOrWhiteSpace(SelectorNull))
-            {
-                ConfigConcernMenssage("SelectorNull", typeof(T), aggregateId: aggregateId);
-            }
-            else if(DataByte != val)
-            {
-                Field = val.ToString();
-                ConfigConcernMenssage(nameof(AssertAreEquals), typeof(T), message: message, aggregateId: aggregateId);
-            }
-            else 
-            {
-                AssertValid = true;
+                SelectorNull = member.Member?.ReflectedType?.Name;
             }
 
+            var methodName = binaryExpression.Method is null
+                ? binaryExpression.ToString()
+                : binaryExpression?.Method.Name;
 
-            return this;
+            Name = methodName;
         }
-
-        public ValidationConcernR<T> AssertIsBetween(Expression<Func<T, byte>> selector, byte a, byte b, string message = "", string aggregateId = null)
+        else if (selector.Body is ConstantExpression contantExpression)
         {
-            ConfigConcern(selector);
-
-            if (!string.IsNullOrWhiteSpace(SelectorNull))
-            {
-                ConfigConcernMenssage("SelectorNull", typeof(T), aggregateId: aggregateId);
-            }
-            else if(DataByte < a || DataByte > b)
-            {
-                FieldA = a.ToString();
-                FieldB = b.ToString();
-
-                ConfigConcernMenssage(nameof(AssertIsBetween), typeof(T), message: message, aggregateId: aggregateId);
-            }
-            else 
-            {
-                AssertValid = true;
-            }
-
-            return this;
+            Name = contantExpression?.Value?.ToString();
         }
-
-        public ValidationConcernR<T> AssertIsGreaterOrEqualsThan(Expression<Func<T, byte>> selector, byte number, string message = "", string aggregateId = null)
+        else
         {
-            ConfigConcern(selector);
-
-            if (!string.IsNullOrWhiteSpace(SelectorNull))
-            {
-                ConfigConcernMenssage("SelectorNull", typeof(T), aggregateId: aggregateId);
-            }
-            else if(DataByte != number && DataByte < number)
-            {
-                Field = number.ToString();
-                ConfigConcernMenssage(nameof(AssertIsGreaterOrEqualsThan), typeof(T), message: message, aggregateId: aggregateId);
-            }
-            else 
-            {
-                AssertValid = true;
-            }
-
-            return this;
+            Name = "";
         }
-        public ValidationConcernR<T> AssertIsGreaterThan(Expression<Func<T, byte>> selector, byte number, string message = "", string aggregateId = null)
+    }
+
+    public ValidationConcernR<T> AssertAreEquals(Expression<Func<T, byte>> selector, byte val, string message = "", string aggregateId = null)
+    {
+        ConfigConcern(selector);
+
+        if (!string.IsNullOrWhiteSpace(SelectorNull))
         {
-            ConfigConcern(selector);
-
-            if (!string.IsNullOrWhiteSpace(SelectorNull))
-            {
-                ConfigConcernMenssage("SelectorNull", typeof(T), aggregateId: aggregateId);
-            }
-            else if(DataByte <= number)
-            {
-                Field = number.ToString();
-                ConfigConcernMenssage(nameof(AssertIsGreaterThan), typeof(T), message: message, aggregateId: aggregateId);
-            }
-            else 
-            {
-                AssertValid = true;
-            }
-
-            return this;
+            ConfigConcernMenssage("SelectorNull", typeof(T), aggregateId: aggregateId);
         }
-        public ValidationConcernR<T> AssertIsLowerOrEqualsThan(Expression<Func<T, byte>> selector, byte number, string message = "", string aggregateId = null)
+        else if (DataByte != val)
         {
-            ConfigConcern(selector);
-
-            if (!string.IsNullOrWhiteSpace(SelectorNull))
-            {
-                ConfigConcernMenssage("SelectorNull", typeof(T), aggregateId: aggregateId);
-            }
-            else if(DataByte != number && DataByte > number)
-            {
-                Field = number.ToString();
-                ConfigConcernMenssage(nameof(AssertIsLowerOrEqualsThan), typeof(T), message: message, aggregateId: aggregateId);
-            }
-            else 
-            {
-                AssertValid = true;
-            }
-
-            return this;
+            Field = val.ToString();
+            ConfigConcernMenssage(nameof(AssertAreEquals), typeof(T), message: message, aggregateId: aggregateId);
         }
-        public ValidationConcernR<T> AssertIsLowerThan(Expression<Func<T, byte>> selector, byte number, string message = "", string aggregateId = null)
+        else
         {
-            ConfigConcern(selector);
-
-            if (!string.IsNullOrWhiteSpace(SelectorNull))
-            {
-                ConfigConcernMenssage("SelectorNull", typeof(T), aggregateId: aggregateId);
-            }
-            else if(DataByte >= number)
-            {
-                Field = number.ToString();
-                ConfigConcernMenssage(nameof(AssertIsLowerThan), typeof(T), message: message, aggregateId: aggregateId);
-            }
-            else 
-            {
-                AssertValid = true;
-            }
-
-            return this;
+            AssertValid = true;
         }
-        public ValidationConcernR<T> AssertNotAreEquals(Expression<Func<T, byte>> selector, byte val, string message = "", string aggregateId = null)
+
+        return this;
+    }
+
+    public ValidationConcernR<T> AssertIsBetween(Expression<Func<T, byte>> selector, byte a, byte b, string message = "", string aggregateId = null)
+    {
+        ConfigConcern(selector);
+
+        if (!string.IsNullOrWhiteSpace(SelectorNull))
         {
-            ConfigConcern(selector);
-
-            if (!string.IsNullOrWhiteSpace(SelectorNull))
-            {
-                ConfigConcernMenssage("SelectorNull", typeof(T), aggregateId: aggregateId);
-            }
-            else if(DataByte == val)
-            {
-                Field = val.ToString();
-                ConfigConcernMenssage(nameof(AssertNotAreEquals), typeof(T), message: message, aggregateId: aggregateId);
-            }
-            else 
-            {
-                AssertValid = true;
-            }
-            return this;
+            ConfigConcernMenssage("SelectorNull", typeof(T), aggregateId: aggregateId);
         }
+        else if (DataByte < a || DataByte > b)
+        {
+            FieldA = a.ToString();
+            FieldB = b.ToString();
+
+            ConfigConcernMenssage(nameof(AssertIsBetween), typeof(T), message: message, aggregateId: aggregateId);
+        }
+        else
+        {
+            AssertValid = true;
+        }
+
+        return this;
+    }
+
+    public ValidationConcernR<T> AssertIsGreaterOrEqualsThan(Expression<Func<T, byte>> selector, byte number, string message = "", string aggregateId = null)
+    {
+        ConfigConcern(selector);
+
+        if (!string.IsNullOrWhiteSpace(SelectorNull))
+        {
+            ConfigConcernMenssage("SelectorNull", typeof(T), aggregateId: aggregateId);
+        }
+        else if (DataByte != number && DataByte < number)
+        {
+            Field = number.ToString();
+            ConfigConcernMenssage(nameof(AssertIsGreaterOrEqualsThan), typeof(T), message: message, aggregateId: aggregateId);
+        }
+        else
+        {
+            AssertValid = true;
+        }
+
+        return this;
+    }
+    public ValidationConcernR<T> AssertIsGreaterThan(Expression<Func<T, byte>> selector, byte number, string message = "", string aggregateId = null)
+    {
+        ConfigConcern(selector);
+
+        if (!string.IsNullOrWhiteSpace(SelectorNull))
+        {
+            ConfigConcernMenssage("SelectorNull", typeof(T), aggregateId: aggregateId);
+        }
+        else if (DataByte <= number)
+        {
+            Field = number.ToString();
+            ConfigConcernMenssage(nameof(AssertIsGreaterThan), typeof(T), message: message, aggregateId: aggregateId);
+        }
+        else
+        {
+            AssertValid = true;
+        }
+
+        return this;
+    }
+    public ValidationConcernR<T> AssertIsLowerOrEqualsThan(Expression<Func<T, byte>> selector, byte number, string message = "", string aggregateId = null)
+    {
+        ConfigConcern(selector);
+
+        if (!string.IsNullOrWhiteSpace(SelectorNull))
+        {
+            ConfigConcernMenssage("SelectorNull", typeof(T), aggregateId: aggregateId);
+        }
+        else if (DataByte != number && DataByte > number)
+        {
+            Field = number.ToString();
+            ConfigConcernMenssage(nameof(AssertIsLowerOrEqualsThan), typeof(T), message: message, aggregateId: aggregateId);
+        }
+        else
+        {
+            AssertValid = true;
+        }
+
+        return this;
+    }
+    public ValidationConcernR<T> AssertIsLowerThan(Expression<Func<T, byte>> selector, byte number, string message = "", string aggregateId = null)
+    {
+        ConfigConcern(selector);
+
+        if (!string.IsNullOrWhiteSpace(SelectorNull))
+        {
+            ConfigConcernMenssage("SelectorNull", typeof(T), aggregateId: aggregateId);
+        }
+        else if (DataByte >= number)
+        {
+            Field = number.ToString();
+            ConfigConcernMenssage(nameof(AssertIsLowerThan), typeof(T), message: message, aggregateId: aggregateId);
+        }
+        else
+        {
+            AssertValid = true;
+        }
+
+        return this;
+    }
+    public ValidationConcernR<T> AssertNotAreEquals(Expression<Func<T, byte>> selector, byte val, string message = "", string aggregateId = null)
+    {
+        ConfigConcern(selector);
+
+        if (!string.IsNullOrWhiteSpace(SelectorNull))
+        {
+            ConfigConcernMenssage("SelectorNull", typeof(T), aggregateId: aggregateId);
+        }
+        else if (DataByte == val)
+        {
+            Field = val.ToString();
+            ConfigConcernMenssage(nameof(AssertNotAreEquals), typeof(T), message: message, aggregateId: aggregateId);
+        }
+        else
+        {
+            AssertValid = true;
+        }
+        return this;
     }
 }

@@ -1,4 +1,4 @@
-﻿// using System;
+// using System;
 // using System.Collections.Generic;
 // using System.Net;
 // using System.Net.Http;
@@ -26,8 +26,6 @@
 //             _context = new HealthCheckContext();
 
 //         }
-
-
 
 //         [Fact]
 //         [Trait("Nuuvify.CommonPack.HealthCheck", "HealthCheckTests")]
@@ -59,26 +57,19 @@
 //             });
 //             var client = new HttpClient(clientHandlerStub, true);
 
-
 //             client.DefaultRequestHeaders.Add("Accept", "application/json");
 
-
 //             mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(client);
-
 
 //             mockHcContext.Setup(x => x.CheckHealthAsync(It.IsAny<HealthCheckContext>(), default))
 //                 .Returns(Task.FromResult(HealthCheckResult.Unhealthy()));
 
-
-
 //             var hc = new HttpCredentialApiHealthCheck(mockFactory.Object);
 //             var hcResult = await hc.CheckHealthAsync(_context);
-
 
 //             Assert.Equal(HealthStatus.Unhealthy, hcResult.Status);
 
 //         }
-
 
 //         [Fact]
 //         [Trait("Nuuvify.CommonPack.HealthCheck", "HealthCheckTests")]
@@ -114,18 +105,13 @@
 //             };
 //             client.DefaultRequestHeaders.Add("Accept", "application/json");
 
-
 //             mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(client);
-
 
 //             mockHcContext.Setup(x => x.CheckHealthAsync(It.IsAny<HealthCheckContext>(), default))
 //                 .Returns(Task.FromResult(HealthCheckResult.Healthy()));
 
-
-
 //             var hc = new HttpCredentialApiHealthCheck(mockFactory.Object);
 //             var hcResult = await hc.CheckHealthAsync(_context);
-
 
 //             Assert.Equal(HealthStatus.Healthy, hcResult.Status);
 

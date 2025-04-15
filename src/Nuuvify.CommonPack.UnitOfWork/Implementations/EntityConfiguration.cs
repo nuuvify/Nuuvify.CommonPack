@@ -1,9 +1,7 @@
-﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Nuuvify.CommonPack.Domain;
 using Nuuvify.CommonPack.UnitOfWork.Abstraction;
-
 
 namespace Nuuvify.CommonPack.UnitOfWork;
 
@@ -28,7 +26,6 @@ public abstract class EntityConfiguration<TEntity> :
 {
 
     public abstract void Configure(EntityTypeBuilder<TEntity> builder);
-
 
     /// <summary>
     /// Sera mapeado a PK para o EF conforme o parametro informado, <br/>
@@ -59,17 +56,15 @@ public abstract class EntityConfiguration<TEntity> :
             return;
         }
 
-
-
         if (ProviderSelected.IsProviderOracle() ||
             ProviderSelected.IsProviderDb2())
         {
-            builder.ToTable(tableName.ToUpper());
+            _ = builder.ToTable(tableName.ToUpper());
 
-            builder.HasKey(x => x.Id)
+            _ = builder.HasKey(x => x.Id)
                 .HasName($"PK_{idColumnName.ToUpper()}");
 
-            builder.Property(x => x.Id)
+            _ = builder.Property(x => x.Id)
                 .HasColumnName($"{idColumnName.ToUpper()}{pkSufix}")
                 .IsUnicode(false)
                 .HasMaxLength(DomainEntity.MaxId)
@@ -79,12 +74,12 @@ public abstract class EntityConfiguration<TEntity> :
                  ProviderSelected.IsProviderSqLite())
         {
 
-            builder.ToTable(tableName);
+            _ = builder.ToTable(tableName);
 
-            builder.HasKey(x => x.Id)
+            _ = builder.HasKey(x => x.Id)
                 .HasName($"PK_{idColumnName}");
 
-            builder.Property(x => x.Id)
+            _ = builder.Property(x => x.Id)
                 .HasColumnName($"{idColumnName}{pkSufix}")
                 .IsUnicode(false)
                 .HasMaxLength(DomainEntity.MaxId)
@@ -93,12 +88,12 @@ public abstract class EntityConfiguration<TEntity> :
         else if (ProviderSelected.IsProviderPostgreSQL())
         {
 
-            builder.ToTable(tableName);
+            _ = builder.ToTable(tableName);
 
-            builder.HasKey(x => x.Id)
+            _ = builder.HasKey(x => x.Id)
                 .HasName($"pk_{idColumnName}");
 
-            builder.Property(x => x.Id)
+            _ = builder.Property(x => x.Id)
                 .HasColumnName($"{idColumnName}{pkSufix}")
                 .IsUnicode(false)
                 .HasMaxLength(DomainEntity.MaxId)
@@ -127,67 +122,66 @@ public abstract class EntityConfiguration<TEntity> :
         if (ProviderSelected.IsProviderOracle() ||
             ProviderSelected.IsProviderDb2())
         {
-            builder.Property(x => x.UsuarioCadastro)
+            _ = builder.Property(x => x.UsuarioCadastro)
                 .IsRequired()
                 .HasColumnName("USUARIO_INCLUSAO")
                 .IsUnicode(false)
                 .HasMaxLength(DomainEntity.MaxUsuarioCadastro);
 
-            builder.Property(x => x.UsuarioAlteracao)
+            _ = builder.Property(x => x.UsuarioAlteracao)
                 .HasColumnName("USUARIO_ALTERACAO")
                 .IsUnicode(false)
                 .HasMaxLength(DomainEntity.MaxUsuarioAlteracao);
 
-            builder.Property(x => x.DataCadastro)
+            _ = builder.Property(x => x.DataCadastro)
                 .IsRequired()
                 .HasColumnName("DATA_INCLUSAO");
 
-            builder.Property(x => x.DataAlteracao)
+            _ = builder.Property(x => x.DataAlteracao)
                 .HasColumnName("DATA_ALTERACAO");
 
         }
         else if (ProviderSelected.IsProviderSqlServer() ||
                  ProviderSelected.IsProviderSqLite())
         {
-            builder.Property(x => x.UsuarioCadastro)
+            _ = builder.Property(x => x.UsuarioCadastro)
                 .IsRequired()
                 .HasColumnName("USUARIO_INCLUSAO")
                 .IsUnicode(false)
                 .HasMaxLength(DomainEntity.MaxUsuarioCadastro);
 
-            builder.Property(x => x.UsuarioAlteracao)
+            _ = builder.Property(x => x.UsuarioAlteracao)
                 .HasColumnName("USUARIO_ALTERACAO")
                 .IsUnicode(false)
                 .HasMaxLength(DomainEntity.MaxUsuarioAlteracao);
 
-            builder.Property(x => x.DataCadastro)
+            _ = builder.Property(x => x.DataCadastro)
                 .IsRequired()
                 .HasColumnName("DATA_INCLUSAO");
 
-            builder.Property(x => x.DataAlteracao)
+            _ = builder.Property(x => x.DataAlteracao)
                 .HasColumnName("DATA_ALTERACAO");
         }
         else if (ProviderSelected.IsProviderPostgreSQL())
         {
-            builder.Property(x => x.UsuarioCadastro)
+            _ = builder.Property(x => x.UsuarioCadastro)
                 .IsRequired()
                 .IsUnicode(false)
                 .HasMaxLength(DomainEntity.MaxUsuarioCadastro);
 
-            builder.Property(x => x.UsuarioAlteracao)
+            _ = builder.Property(x => x.UsuarioAlteracao)
                 .IsUnicode(false)
                 .HasMaxLength(DomainEntity.MaxUsuarioAlteracao);
 
-            builder.Property(x => x.DataCadastro)
+            _ = builder.Property(x => x.DataCadastro)
                 .IsRequired();
 
-            builder.Property(x => x.DataAlteracao);
+            _ = builder.Property(x => x.DataAlteracao);
         }
         else
         {
             throw new ArgumentException(message: "Provider informado não é suportado", paramName: ProviderSelected.ProviderName);
         }
-
 
     }
 
@@ -199,16 +193,15 @@ public abstract class EntityConfiguration<TEntity> :
     protected virtual void AuditIgnore(EntityTypeBuilder<TEntity> builder)
     {
 
-        builder.Ignore(x => x.UsuarioCadastro);
+        _ = builder.Ignore(x => x.UsuarioCadastro);
 
-        builder.Ignore(x => x.DataCadastro);
+        _ = builder.Ignore(x => x.DataCadastro);
 
-        builder.Ignore(x => x.UsuarioAlteracao);
+        _ = builder.Ignore(x => x.UsuarioAlteracao);
 
-        builder.Ignore(x => x.DataAlteracao);
+        _ = builder.Ignore(x => x.DataAlteracao);
 
     }
-
 
     /// <summary>
     /// Extenção dos campos de auditoria, implementam o ID do usuario de inclusão/alteração <br/>
@@ -222,13 +215,13 @@ public abstract class EntityConfiguration<TEntity> :
         if (ProviderSelected.IsProviderOracle() ||
             ProviderSelected.IsProviderDb2())
         {
-            builder.Property(x => x.UsuarioIdCadastro)
+            _ = builder.Property(x => x.UsuarioIdCadastro)
                 .IsRequired()
                 .HasColumnName("USUARIO_ID_INCLUSAO")
                 .IsUnicode(false)
                 .HasMaxLength(DomainEntity.MaxUsuarioIdCadastro);
 
-            builder.Property(x => x.UsuarioIdAlteracao)
+            _ = builder.Property(x => x.UsuarioIdAlteracao)
                 .HasColumnName("USUARIO_ID_ALTERACAO")
                 .IsUnicode(false)
                 .HasMaxLength(DomainEntity.MaxUsuarioIdAlteracao);
@@ -236,25 +229,25 @@ public abstract class EntityConfiguration<TEntity> :
         else if (ProviderSelected.IsProviderSqlServer() ||
                  ProviderSelected.IsProviderSqLite())
         {
-            builder.Property(x => x.UsuarioIdCadastro)
+            _ = builder.Property(x => x.UsuarioIdCadastro)
                 .IsRequired()
                 .HasColumnName("USUARIO_ID_INCLUSAO")
                 .IsUnicode(false)
                 .HasMaxLength(DomainEntity.MaxUsuarioIdCadastro);
 
-            builder.Property(x => x.UsuarioIdAlteracao)
+            _ = builder.Property(x => x.UsuarioIdAlteracao)
                 .HasColumnName("USUARIO_ID_ALTERACAO")
                 .IsUnicode(false)
                 .HasMaxLength(DomainEntity.MaxUsuarioIdAlteracao);
         }
         else if (ProviderSelected.IsProviderPostgreSQL())
         {
-            builder.Property(x => x.UsuarioIdCadastro)
+            _ = builder.Property(x => x.UsuarioIdCadastro)
                 .IsRequired()
                 .IsUnicode(false)
                 .HasMaxLength(DomainEntity.MaxUsuarioIdCadastro);
 
-            builder.Property(x => x.UsuarioIdAlteracao)
+            _ = builder.Property(x => x.UsuarioIdAlteracao)
                 .IsUnicode(false)
                 .HasMaxLength(DomainEntity.MaxUsuarioIdAlteracao);
         }
@@ -262,7 +255,6 @@ public abstract class EntityConfiguration<TEntity> :
         {
             throw new ArgumentException(message: "Provider informado não é suportado", paramName: ProviderSelected.ProviderName);
         }
-
 
     }
 
@@ -274,9 +266,9 @@ public abstract class EntityConfiguration<TEntity> :
     protected virtual void AuditUserIdIgnore(EntityTypeBuilder<TEntity> builder)
     {
 
-        builder.Ignore(x => x.UsuarioIdCadastro);
+        _ = builder.Ignore(x => x.UsuarioIdCadastro);
 
-        builder.Ignore(x => x.UsuarioIdAlteracao);
+        _ = builder.Ignore(x => x.UsuarioIdAlteracao);
 
     }
 

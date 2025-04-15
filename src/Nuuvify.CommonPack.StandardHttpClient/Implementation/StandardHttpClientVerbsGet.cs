@@ -1,11 +1,9 @@
-﻿using Nuuvify.CommonPack.StandardHttpClient.Results;
+using Nuuvify.CommonPack.StandardHttpClient.Results;
 
 namespace Nuuvify.CommonPack.StandardHttpClient;
 
-
 public partial class StandardHttpClient
 {
-
 
     ///<inheritdoc/>
     public async Task<HttpStandardStreamReturn> GetStream(
@@ -13,8 +11,6 @@ public partial class StandardHttpClient
         CancellationToken cancellationToken = default)
     {
         var url = $"{urlRoute}{_queryString.ToQueryString()}";
-
-
 
         var message = new HttpRequestMessage(HttpMethod.Get, url)
             .CustomRequestHeader(_headerStandard)
@@ -29,17 +25,12 @@ public partial class StandardHttpClient
     {
         var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
-
-
         var message = new HttpRequestMessage(HttpMethod.Get, url)
             .CustomRequestHeader(_headerStandard)
             .AddAuthorizationHeader(_headerAuthorization);
 
         return await StandardSendAsync(url, message, cancellationToken);
     }
-
-
-
 
 }
 
