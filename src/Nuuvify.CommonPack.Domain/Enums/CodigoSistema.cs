@@ -1,18 +1,17 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
-namespace Nuuvify.CommonPack.Domain.ValueObjects
+namespace Nuuvify.CommonPack.Domain.ValueObjects;
+
+/// <summary>
+/// REINF
+/// SAP
+/// </summary>
+public enum CodigoSistema
 {
-    /// <summary>
-    /// REINF
-    /// SAP
-    /// </summary>
-    public enum CodigoSistema
-    {
-        [Description(nameof(REINF))]
-        REINF = 1,
+    [Description(nameof(REINF))]
+    REINF = 1,
 
-        [Description(nameof(SAP))]
-        SAP = 2,
+    [Description(nameof(SAP))]
+    SAP = 2,
 
-    }
 }

@@ -32,8 +32,6 @@ public class NuuvifyLogFormatter : ConsoleFormatter, IDisposable
     private void ReloadLoggerColorConfiguration(NuuvifyLogColorConfiguration config) =>
         _nuuvifyLogColorConfiguration = config;
 
-
-
     public virtual void Write<TState>(
         LogLevel logLevel,
         EventId eventId,
@@ -46,7 +44,6 @@ public class NuuvifyLogFormatter : ConsoleFormatter, IDisposable
     {
 
         if (string.IsNullOrWhiteSpace(message)) return;
-
 
         Console.ResetColor();
         Console.ForegroundColor = ConsoleColor.White;
@@ -64,7 +61,6 @@ public class NuuvifyLogFormatter : ConsoleFormatter, IDisposable
         textWriter.WriteLine($"{name.PadLeft(name.Length + 5)}");
         textWriter.WriteLine($"{message.PadLeft(message.Length + 5)}");
 
-
     }
 
     public override void Write<TState>(in
@@ -72,7 +68,6 @@ public class NuuvifyLogFormatter : ConsoleFormatter, IDisposable
         IExternalScopeProvider? scopeProvider,
         TextWriter textWriter)
     {
-
 
         Write<LogEntry<TState>>(
             logEntry.LogLevel,
@@ -83,7 +78,6 @@ public class NuuvifyLogFormatter : ConsoleFormatter, IDisposable
             scopeProvider,
             textWriter,
             logEntry.Category);
-
 
     }
 
@@ -98,7 +92,6 @@ public class NuuvifyLogFormatter : ConsoleFormatter, IDisposable
         textWriter.Write($"{_nuuvifyLogOptions.CustomPrefix} {nowMessage} ");
 
     }
-
 
     private bool disposed = false;
 
@@ -121,10 +114,6 @@ public class NuuvifyLogFormatter : ConsoleFormatter, IDisposable
         GC.SuppressFinalize(this);
     }
 
-
-
-
-
     // public override void Write<TState>(in
     //     LogEntry<TState> logEntry,
     //     IExternalScopeProvider scopeProvider,
@@ -134,11 +123,9 @@ public class NuuvifyLogFormatter : ConsoleFormatter, IDisposable
     //     var simpleConsoleFormatterOptions = new SimpleConsoleFormatterOptions();
     //     simpleConsoleFormatterOptions.TimestampFormat = DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss zzz");
 
-
     //     var timestamp = DateTimeOffset.Now.ToString(simpleConsoleFormatterOptions.TimestampFormat);
     //     var logLevel = logEntry.LogLevel.ToString();
     //     var message = logEntry.Formatter(logEntry.State, logEntry.Exception);
-
 
     //     var color = logEntry.LogLevel switch
     //     {
@@ -157,7 +144,6 @@ public class NuuvifyLogFormatter : ConsoleFormatter, IDisposable
     //     textWriter = System.Console.Out;
     //     textWriter.WriteLine(logMessage);
     //     System.Console.ResetColor();
-
 
     //}
 

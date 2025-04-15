@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,7 +15,6 @@ public static class DbContextExtensions
     public static string DbContextUserId { get; set; }
 
     public static int AggregatesChanges { get; set; }
-
 
     public static IDictionary<object, object> FindPrimaryKeyValues<T>(this DbContext dbContext, T entity)
     {

@@ -1,26 +1,25 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Nuuvify.CommonPack.Middleware.Handle
+namespace Nuuvify.CommonPack.Middleware.Handle;
+
+public static class GlobalHandlerExceptionSetup
 {
-    public static class GlobalHandlerExceptionSetup
+    public static void AddGlobalHandlerExceptionSetup(this IServiceCollection services)
     {
-        public static void AddGlobalHandlerExceptionSetup(this IServiceCollection services)
-        {
 
-            services.AddScoped<IGlobalHandleException, GlobalHandleException>();
+        _ = services.AddScoped<IGlobalHandleException, GlobalHandleException>();
 
-        }
-        public static void AddGlobalHandlerExceptionSetupTransient(this IServiceCollection services)
-        {
+    }
+    public static void AddGlobalHandlerExceptionSetupTransient(this IServiceCollection services)
+    {
 
-            services.AddTransient<IGlobalHandleException, GlobalHandleException>();
+        _ = services.AddTransient<IGlobalHandleException, GlobalHandleException>();
 
-        }
-        public static void AddGlobalHandlerExceptionSetupSingleton(this IServiceCollection services)
-        {
+    }
+    public static void AddGlobalHandlerExceptionSetupSingleton(this IServiceCollection services)
+    {
 
-            services.AddSingleton<IGlobalHandleException, GlobalHandleException>();
+        _ = services.AddSingleton<IGlobalHandleException, GlobalHandleException>();
 
-        }
     }
 }

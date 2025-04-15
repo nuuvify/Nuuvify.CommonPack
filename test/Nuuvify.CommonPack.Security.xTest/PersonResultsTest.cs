@@ -1,43 +1,38 @@
 using Nuuvify.CommonPack.Security.Abstraction;
 using Xunit;
 
-namespace Nuuvify.CommonPack.Security.xTest
+namespace Nuuvify.CommonPack.Security.xTest;
+
+public class PersonResultTest
 {
-    public class PersonResultTest
+
+    [Fact]
+    [Trait("Nuuvify.CommonPack.Extensions.Implementation", "PersonResult")]
+    public void PersonQueryResult_DeveRetornarEmailInformado()
+    {
+        const string Email = "teste@zzz.com";
+
+        var personResult = new PersonQueryResult()
+        {
+            Email = Email
+        };
+
+        Assert.Equal(personResult.Email, Email);
+
+    }
+
+    [Fact]
+    [Trait("Nuuvify.CommonPack.Extensions.Implementation", "PersonResult")]
+    public void PersonQueryResult_DeveRetornarEmailNullCasoNaoForInformado()
     {
 
-
-        [Fact]
-        [Trait("Nuuvify.CommonPack.Extensions.Implementation", "PersonResult")]
-        public void PersonQueryResult_DeveRetornarEmailInformado()
+        var personResult = new PersonQueryResult()
         {
-            const string Email = "teste@zzz.com";
+            Login = "lalalala",
+            Name = "Giropopis"
+        };
 
-            var personResult = new PersonQueryResult()
-            {
-                Email = Email
-            };
-
-
-            Assert.Equal(personResult.Email, Email);
-
-        }
-
-        [Fact]
-        [Trait("Nuuvify.CommonPack.Extensions.Implementation", "PersonResult")]
-        public void PersonQueryResult_DeveRetornarEmailNullCasoNaoForInformado()
-        {
-
-            var personResult = new PersonQueryResult()
-            {
-                Login = "lalalala",
-                Name = "Giropopis"
-            };
-
-
-            Assert.Null(personResult.Email);
-
-        }
+        Assert.Null(personResult.Email);
 
     }
 

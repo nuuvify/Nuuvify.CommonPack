@@ -1,16 +1,15 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
-namespace Nuuvify.CommonPack.Email.Abstraction
+namespace Nuuvify.CommonPack.Email.Abstraction;
+
+public enum PessoasEmail
 {
-    public enum PessoasEmail
-    {
-        [Description("Remetente")]
-        From = 0,
-        [Description("Destinatario")]
-        To = 1,
-        [Description("Destinatario Com Copia")]
-        Cc = 2,
-        [Description("Destinatario Com Copia Oculta")]
-        Bcc = 3
-    }
+    [Description("Remetente")]
+    From = 0,
+    [Description("Destinatario")]
+    To = 1,
+    [Description("Destinatario Com Copia")]
+    Cc = 2,
+    [Description("Destinatario Com Copia Oculta")]
+    Bcc = 3
 }

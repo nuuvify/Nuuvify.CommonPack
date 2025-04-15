@@ -1,9 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Nuuvify.CommonPack.UnitOfWork.Abstraction.Collections;
 using Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 
 namespace Nuuvify.CommonPack.UnitOfWork;
-
 
 internal static class IQueryableExtensions
 {
@@ -32,7 +31,6 @@ internal static class IQueryableExtensions
     {
 
         ValidateArguments(indexFrom, pageIndex);
-
 
         var count = await source.CountAsync(cancellationToken)
                                 .ConfigureAwait(false);

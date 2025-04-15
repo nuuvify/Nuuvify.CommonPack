@@ -1,12 +1,9 @@
-﻿using System;
+namespace Nuuvify.CommonPack.StandardHttpClient.xTest;
 
-namespace Nuuvify.CommonPack.StandardHttpClient.xTest
+public class FakeClasseRetorno
 {
-    public class FakeClasseRetorno 
-    {
 
-        public int Codigo { get; set; }
-        public string Descricao { get; set; }
-        public DateTimeOffset DataCadastro { get; set; }
-    }
+    public int Codigo { get; set; }
+    public string Descricao { get; set; }
+    public DateTimeOffset DataCadastro { get; set; }
 }

@@ -1,15 +1,12 @@
-﻿using System.Text;
+using System.Text;
 using Microsoft.Extensions.Logging;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 
 namespace Nuuvify.CommonPack.StandardHttpClient;
 
-
-
 public partial class StandardHttpClient
 {
-
 
     private void LogRequestMessage(HttpRequestMessage message)
     {
@@ -29,21 +26,19 @@ public partial class StandardHttpClient
             }
             recurseValue = recurseValue.SubstringNotNull(1, recurseValue.Length - 1);
 
-            logString.AppendLine($"{item.Key} : {recurseValue}");
+            _ = logString.AppendLine($"{item.Key} : {recurseValue}");
 
             if (item.Key.StartsWith("authorization", StringComparison.InvariantCultureIgnoreCase))
                 AuthorizationLog = recurseValue;
 
         }
 
-        logString.AppendLine($"Content: {message.Content}")
+        _ = logString.AppendLine($"Content: {message.Content}")
             .AppendLine($"=======================================================================");
-
 
         _logger.LogInformation(logString.ToString());
 
     }
-
 
     private async Task<HttpStandardReturn> StandardSendAsync(
         string url,
@@ -52,10 +47,8 @@ public partial class StandardHttpClient
     {
         _logger.LogDebug("Url and message before config: {message} url: {url}", message, url);
 
-
         if (url.EndsWith("&") || url.EndsWith("?"))
             url = url[..^1];
-
 
         if (!string.IsNullOrWhiteSpace(_httpClient?.BaseAddress?.AbsoluteUri) &&
             _httpClient.BaseAddress.IsAbsoluteUri)
@@ -86,9 +79,7 @@ public partial class StandardHttpClient
 
         _logger.LogDebug("Url and message after config: {message} client url: {RequestUri}", message, message?.RequestUri);
 
-
         HttpResponseMessage response;
-
 
         if (HttpCompletionOption.Defult != CompletionOption)
         {
@@ -106,12 +97,9 @@ public partial class StandardHttpClient
         if (LogRequest)
             LogRequestMessage(message);
 
-
         HttpStandardReturn httpStandardReturn = await HandleResponseMessage(response);
 
-
         _logger.LogDebug("HttpStandardReturn return: {ReturnCode}", httpStandardReturn.ReturnCode);
-
 
         return httpStandardReturn;
     }
@@ -123,10 +111,8 @@ public partial class StandardHttpClient
     {
         _logger.LogDebug("Url and message before config: {message} url: {url}", message, url);
 
-
         if (url.EndsWith("&") || url.EndsWith("?"))
             url = url[..^1];
-
 
         if (!string.IsNullOrWhiteSpace(_httpClient?.BaseAddress?.AbsoluteUri) &&
             _httpClient.BaseAddress.IsAbsoluteUri)
@@ -157,9 +143,7 @@ public partial class StandardHttpClient
 
         _logger.LogDebug("Url and message after config: {message} client url: {RequestUri}", message, message?.RequestUri);
 
-
         HttpResponseMessage response;
-
 
         if (HttpCompletionOption.Defult != CompletionOption)
         {
@@ -177,12 +161,9 @@ public partial class StandardHttpClient
         if (LogRequest)
             LogRequestMessage(message);
 
-
         HttpStandardStreamReturn httpStandardStreamReturn = await HandleResponseMessageStream(response);
 
-
         _logger.LogDebug("HttpStandardReturn return: {ReturnCode}", httpStandardStreamReturn?.ReturnCode);
-
 
         return httpStandardStreamReturn;
 
@@ -196,7 +177,6 @@ public partial class StandardHttpClient
 
         CustomHttpResponseMessage = response;
 
-
         var resultNumber = (int)response.StatusCode;
 
         returnMessage.ReturnCode = resultNumber.ToString();
@@ -204,9 +184,7 @@ public partial class StandardHttpClient
 
         var content = await response.Content.ReadAsStringAsync();
 
-
         returnMessage.ReturnMessage = content;
-
 
         return returnMessage;
     }
@@ -219,7 +197,6 @@ public partial class StandardHttpClient
 
         CustomHttpResponseMessage = response;
 
-
         var resultNumber = (int)response.StatusCode;
 
         returnMessage.ReturnCode = resultNumber.ToString();
@@ -227,14 +204,10 @@ public partial class StandardHttpClient
 
         var content = await response.Content.ReadAsStreamAsync();
 
-
         returnMessage.ReturnMessage = content;
-
 
         return returnMessage;
     }
-
-
 
 }
 
