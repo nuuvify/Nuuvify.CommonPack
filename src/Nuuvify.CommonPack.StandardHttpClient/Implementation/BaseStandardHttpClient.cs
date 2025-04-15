@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Nuuvify.CommonPack.Extensions.Implementation;
@@ -6,9 +6,7 @@ using Nuuvify.CommonPack.Extensions.JsonConverter;
 using Nuuvify.CommonPack.Extensions.Notificator;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 
-
 namespace Nuuvify.CommonPack.StandardHttpClient;
-
 
 public abstract partial class BaseStandardHttpClient
 {
@@ -22,9 +20,6 @@ public abstract partial class BaseStandardHttpClient
     protected JsonSerializerOptions JsonSettings { get; set; }
 
     protected List<NotificationR> Notifications { get; set; }
-
-
-
 
     protected BaseStandardHttpClient(
         IStandardHttpClient standardHttpClient,
@@ -48,9 +43,6 @@ public abstract partial class BaseStandardHttpClient
         _tokenService = tokenService;
 
     }
-
-
-
 
     ///<inheritdoc cref="ITokenService.GetTokenAcessor"/>
     public virtual string GetTokenAcessor()
@@ -115,7 +107,7 @@ public abstract partial class BaseStandardHttpClient
             {
                 return DeserealizeObject<T>(messageClean);
             }
-            else if (standardReturn.ReturnCode.Equals(HttpStatusCode.NoContent.GetHashCode().ToString()))
+            else if (standardReturn.ReturnCode.Equals(HttpStatusCode.NoContent.GetHashCode().ToString(), StringComparison.Ordinal))
             {
                 return (T)Convert.ChangeType(null, typeof(T));
             }
@@ -130,7 +122,6 @@ public abstract partial class BaseStandardHttpClient
                 aggregatorId: api,
                 type: "origin-message",
                 originNotification: null));
-
 
             return (T)Convert.ChangeType(null, typeof(T));
         }
@@ -149,7 +140,6 @@ public abstract partial class BaseStandardHttpClient
                     type: "origin-message",
                     originNotification: null));
         }
-
 
         ReturnNotificationApi(standardReturn, api);
         return (T)Convert.ChangeType(null, typeof(T));
@@ -170,7 +160,7 @@ public abstract partial class BaseStandardHttpClient
             {
                 return DeserealizeList<T>(messageClean);
             }
-            else if (standardReturn.ReturnCode.Equals(HttpStatusCode.NoContent.GetHashCode().ToString()))
+            else if (standardReturn.ReturnCode.Equals(HttpStatusCode.NoContent.GetHashCode().ToString(), StringComparison.Ordinal))
             {
                 return new List<T>();
             }
@@ -206,7 +196,6 @@ public abstract partial class BaseStandardHttpClient
         ReturnNotificationApi(standardReturn, api);
         return new List<T>();
     }
-
 
     public bool IsValid()
     {

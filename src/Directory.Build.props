@@ -9,7 +9,6 @@
     <Authors>Lincoln Zocateli</Authors>
     <Company>Lincoln Zocateli</Company>
     <Copyright>Copyright ©2024 $(Company)</Copyright>
-    <Product>Libraries with common implementations, with separation of responsibilities between their projects using Abstractions.</Product>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/lzocateli/Nuuvify.CommonPack</PackageProjectUrl>
     <PackageIcon>logonuuvify.jpg</PackageIcon>

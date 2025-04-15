@@ -1,75 +1,68 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Entities.StubDbContext
+namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Entities.StubDbContext;
+
+public class FaturaConfig : EntityConfiguration<Fatura>
 {
-    public class FaturaConfig : EntityConfiguration<Fatura>
+
+    public override void Configure(EntityTypeBuilder<Fatura> builder)
     {
 
-        public override void Configure(EntityTypeBuilder<Fatura> builder)
-        {
+        // DefaultConfig(builder, "faturas", "fatura", "_id");
+        //DefaultConfig(builder, "faturas", "fatura");
 
+        _ = builder.ToTable("faturas");
 
-            // DefaultConfig(builder, "faturas", "fatura", "_id");
-            //DefaultConfig(builder, "faturas", "fatura");
+        _ = builder.HasKey(x => x.Id)
+            .HasName($"pk_fatura");
 
-            builder.ToTable("faturas");
+        _ = builder.Property(x => x.Id)
+            .HasColumnName($"FaturaId")
+            .IsUnicode(false)
+            .HasMaxLength(Fatura.MaxId)
+            .IsRequired();
 
-            builder.HasKey(x => x.Id)
-                .HasName($"pk_fatura");
+        _ = builder.Property(e => e.NumeroFatura)
+            .IsRequired()
+            .HasColumnType("numeric(8)");
 
-            builder.Property(x => x.Id)
-                .HasColumnName($"FaturaId")
-                .IsUnicode(false)
-                .HasMaxLength(Fatura.MaxId)
-                .IsRequired();
+        _ = builder.OwnsOne(
+            o => o.EnderecoEntrega,
+            pp =>
+            {
 
+                _ = pp.Property(p => p.Cidade)
+                    .HasColumnName("EntregaCidade")
+                    .IsUnicode(false)
+                    .HasMaxLength(Endereco.MaxCidade);
 
-            builder.Property(e => e.NumeroFatura)
-                .IsRequired()
-                .HasColumnType("numeric(8)");
+                _ = pp.Property(p => p.Logradouro)
+                    .HasColumnName("EntregaLogradouro")
+                    .IsUnicode(false)
+                    .HasMaxLength(Endereco.MaxLogradouro);
 
+            });
 
-            builder.OwnsOne(
-                o => o.EnderecoEntrega,
-                pp =>
-                {
+        _ = builder.OwnsOne(
+            o => o.EnderecoFatura,
+            pp =>
+            {
 
-                    pp.Property(p => p.Cidade)
-                        .HasColumnName("EntregaCidade")
-                        .IsUnicode(false)
-                        .HasMaxLength(Endereco.MaxCidade);
+                _ = pp.Property(p => p.Cidade)
+                    .HasColumnName("FaturaCidade")
+                    .IsUnicode(false)
+                    .HasMaxLength(Endereco.MaxCidade);
 
-                    pp.Property(p => p.Logradouro)
-                        .HasColumnName("EntregaLogradouro")
-                        .IsUnicode(false)
-                        .HasMaxLength(Endereco.MaxLogradouro);
+                _ = pp.Property(p => p.Logradouro)
+                    .HasColumnName("FaturaLogradouro")
+                    .IsUnicode(false)
+                    .HasMaxLength(Endereco.MaxLogradouro);
 
-                });
+            });
 
+        AuditConfig(builder);
+        AuditUserIdIgnore(builder);
 
-
-            builder.OwnsOne(
-                o => o.EnderecoFatura,
-                pp =>
-                {
-
-                    pp.Property(p => p.Cidade)
-                        .HasColumnName("FaturaCidade")
-                        .IsUnicode(false)
-                        .HasMaxLength(Endereco.MaxCidade);
-
-                    pp.Property(p => p.Logradouro)
-                        .HasColumnName("FaturaLogradouro")
-                        .IsUnicode(false)
-                        .HasMaxLength(Endereco.MaxLogradouro);
-
-                });
-
-            AuditConfig(builder);
-            AuditUserIdIgnore(builder);
-
-
-        }
     }
 }

@@ -1,74 +1,72 @@
-﻿using Nuuvify.CommonPack.Security.JwtCredentials.Interfaces;
 using Microsoft.IdentityModel.Tokens;
-using System;
+using Nuuvify.CommonPack.Security.JwtCredentials.Interfaces;
 
-namespace Nuuvify.CommonPack.Security.JwtCredentials.Jwk
+namespace Nuuvify.CommonPack.Security.JwtCredentials.Jwk;
+
+public class JwkService : IJwkService
 {
-    public class JwkService : IJwkService
+    private JsonWebKey GenerateRsa()
     {
-        private JsonWebKey GenerateRsa()
+        var key = CryptoService.CreateRsaSecurityKey();
+        return JsonWebKeyConverter.ConvertFromRSASecurityKey(key);
+    }
+    private JsonWebKey GenerateECDsa(Algorithm algorithm)
+    {
+        var key = CryptoService.CreateECDsaSecurityKey(algorithm);
+        var parameters = key.ECDsa.ExportParameters(true);
+        return new JsonWebKey()
         {
-            var key = CryptoService.CreateRsaSecurityKey();
-            return JsonWebKeyConverter.ConvertFromRSASecurityKey(key);
-        }
-        private JsonWebKey GenerateECDsa(Algorithm algorithm)
-        {
-            var key = CryptoService.CreateECDsaSecurityKey(algorithm);
-            var parameters = key.ECDsa.ExportParameters(true);
-            return new JsonWebKey()
-            {
-                Kty = JsonWebAlgorithmsKeyTypes.EllipticCurve,
-                Use = "sig",
-                Kid = key.KeyId,
-                KeyId = key.KeyId,
-                X = Base64UrlEncoder.Encode(parameters.Q.X),
-                Y = Base64UrlEncoder.Encode(parameters.Q.Y),
-                D = Base64UrlEncoder.Encode(parameters.D),
-                Crv = CryptoService.GetCurveType(algorithm),
-                Alg = algorithm
-            };
-        }
-        private JsonWebKey GenerateHMAC(Algorithm algorithms)
-        {
-            var key = CryptoService.CreateHmacSecurityKey(algorithms);
-            var jwk = JsonWebKeyConverter.ConvertFromSymmetricSecurityKey(
-                new SymmetricSecurityKey(key.Key));
-            
-            jwk.KeyId = CryptoService.CreateUniqueId();
-            return jwk;
-        }
+            Kty = JsonWebAlgorithmsKeyTypes.EllipticCurve,
+            Use = "sig",
+            Kid = key.KeyId,
+            KeyId = key.KeyId,
+            X = Base64UrlEncoder.Encode(parameters.Q.X),
+            Y = Base64UrlEncoder.Encode(parameters.Q.Y),
+            D = Base64UrlEncoder.Encode(parameters.D),
+            Crv = CryptoService.GetCurveType(algorithm),
+            Alg = algorithm
+        };
+    }
+    private JsonWebKey GenerateHMAC(Algorithm algorithms)
+    {
+        var key = CryptoService.CreateHmacSecurityKey(algorithms);
+        var jwk = JsonWebKeyConverter.ConvertFromSymmetricSecurityKey(
+            new SymmetricSecurityKey(key.Key));
 
-        private JsonWebKey GenerateAES(Algorithm algorithms)
-        {
-            var key = CryptoService.CreateAESSecurityKey(algorithms);
-            return JsonWebKeyConverter.ConvertFromSymmetricSecurityKey(
-                new SymmetricSecurityKey(key.Key));
-        }
+        jwk.KeyId = CryptoService.CreateUniqueId();
+        return jwk;
+    }
 
-        public JsonWebKey Generate(Algorithm algorithm)
-        {
-            return algorithm.KeyType switch
-            {
-                KeyType.RSA => GenerateRsa(),
-                KeyType.ECDsa => GenerateECDsa(algorithm),
-                KeyType.HMAC => GenerateHMAC(algorithm),
-                KeyType.AES => GenerateAES(algorithm),
-                _ => throw new ArgumentOutOfRangeException(nameof(algorithm), algorithm, null)
-            };
-        }
+    private JsonWebKey GenerateAES(Algorithm algorithms)
+    {
+        var key = CryptoService.CreateAESSecurityKey(algorithms);
+        return JsonWebKeyConverter.ConvertFromSymmetricSecurityKey(
+            new SymmetricSecurityKey(key.Key));
+    }
 
-        public SigningCredentials GenerateSigningCredentials(Algorithm algorithm)
+    public JsonWebKey Generate(Algorithm algorithm)
+    {
+        return algorithm.KeyType switch
         {
-            var key = Generate(algorithm);
-            return new SigningCredentials(key, algorithm);
-        }
+            KeyType.RSA => GenerateRsa(),
+            KeyType.ECDsa => GenerateECDsa(algorithm),
+            KeyType.HMAC => GenerateHMAC(algorithm),
+            KeyType.AES => GenerateAES(algorithm),
+            _ => throw new ArgumentOutOfRangeException(nameof(algorithm), algorithm, null)
+        };
+    }
 
-        public SigningCredentials GenerateSigningCredentials(SecurityKey key, Algorithm algorithm)
-        {
-            if (key == null)
-                throw new ArgumentException($"{nameof(key)}");
-                
-            return new SigningCredentials(key, algorithm);
-        }
+    public SigningCredentials GenerateSigningCredentials(Algorithm algorithm)
+    {
+        var key = Generate(algorithm);
+        return new SigningCredentials(key, algorithm);
+    }
+
+    public SigningCredentials GenerateSigningCredentials(SecurityKey key, Algorithm algorithm)
+    {
+        if (key == null)
+            throw new ArgumentException($"{nameof(key)}");
+
+        return new SigningCredentials(key, algorithm);
     }
 }

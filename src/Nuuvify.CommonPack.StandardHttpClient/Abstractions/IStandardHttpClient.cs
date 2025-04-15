@@ -1,17 +1,15 @@
-﻿using Nuuvify.CommonPack.Extensions.Implementation;
+using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 
 namespace Nuuvify.CommonPack.StandardHttpClient;
 
-
 /// <summary>
 /// Voce deve registrar seus endpoints pelo services.AddHttpClient no projeto de Infra.IoC ou
-/// o projeto onde esta sua lib Http, utilize essa interface no seu projeto de Infra.Data ou 
+/// o projeto onde esta sua lib Http, utilize essa interface no seu projeto de Infra.Data ou
 /// Infra.ExternalServices, para executar suas comunicação http
 /// </summary>
 public interface IStandardHttpClient
 {
-
 
     /// <summary>
     /// Obtem a instancia do HttpResponseMessage do Aspnet, depois que a chamada http ocorrer
@@ -21,7 +19,7 @@ public interface IStandardHttpClient
 
     /// <summary>
     /// Essa propriedade retorna a url completa "absoluta" da sua chamada http,
-    /// depois que a mesma ocorrer  
+    /// depois que a mesma ocorrer
     /// </summary>
     /// <value></value>
     Uri FullUrl { get; }
@@ -32,7 +30,6 @@ public interface IStandardHttpClient
     /// </summary>
     /// <value></value>
     public string CorrelationId { get; }
-
 
     /// <summary>
     /// Se true, um log detalhado sera enviado para o console e seu sistema de logs, <br/>
@@ -59,7 +56,6 @@ public interface IStandardHttpClient
     /// <param name="httpClientHandler"></param>
     void CreateClient(HttpClientHandler httpClientHandler);
 
-
     /// <summary>
     /// Recebe arquivos (stream)
     /// </summary>
@@ -73,8 +69,6 @@ public interface IStandardHttpClient
     Task<HttpStandardReturn> Get(
         string urlRoute,
         CancellationToken cancellationToken = default);
-
-
 
     Task<HttpStandardReturn> Post(
         string urlRoute,
@@ -125,8 +119,6 @@ public interface IStandardHttpClient
         string mediaType = "multipart/form-data",
         CancellationToken cancellationToken = default);
 
-
-
     Task<HttpStandardReturn> Put(
         string urlRoute,
         object messageBody,
@@ -169,18 +161,15 @@ public interface IStandardHttpClient
         string mediaType = "multipart/form-data",
         CancellationToken cancellationToken = default);
 
-
     Task<HttpStandardReturn> Delete(
         string urlRoute,
         CancellationToken cancellationToken = default);
-
 
     Task<HttpStandardStreamReturn> DeleteStream(
         string urlRoute,
         MultipartFormDataContent messageBody,
         string mediaType = "multipart/form-data",
         CancellationToken cancellationToken = default);
-
 
     /// <summary>
     /// Limpa definições de Headers, QueryString e autorization
@@ -191,7 +180,7 @@ public interface IStandardHttpClient
     /// Utilize isso para rastreabilidade da sua chamada http, isso ira gerar um header
     /// com o parametro CorrelationId e o valor que for informado no parametro
     /// </summary>
-    /// <param name="correlationId">Qualquer valor informado nesse campo sera passado na 
+    /// <param name="correlationId">Qualquer valor informado nesse campo sera passado na
     /// request e devolvido no response, sendo incluido em todos os logs gerado
     /// </param>
     /// <returns></returns>
@@ -202,7 +191,7 @@ public interface IStandardHttpClient
     /// Para basic, o metodo ira transformar o parametro "token" (que sera usuario:senha) em base64
     /// <example>
     /// <code>
-    ///     
+    ///
     /// _standardHttpClient.WithAuthorization("Bearer", _tokenService.GetTokenAcessor());
     ///     ou
     /// _standardHttpClient.WithAuthorization("Bearer", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...");
@@ -223,7 +212,6 @@ public interface IStandardHttpClient
         string schema = null,
         string token = null,
         string userClaim = null);
-
 
     /// <summary>
     /// Incluir Headers para a instancia do HttpClient

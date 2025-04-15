@@ -3,7 +3,6 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Nuuvify.CommonPack.HealthCheck;
 
-
 /// <summary>
 /// Faz uma chamada http para um serviço e retorna o status da chamada.
 /// <p>Forceça os seguintes parâmetros: </p>
@@ -20,10 +19,8 @@ public class HttpCustomHealthCheck : IHealthCheck
     private readonly HealthStatus _failureStatus;
     private readonly bool _youWantReturnEndpointContent;
 
-
     private readonly HttpClient _httpClient;
     private readonly Func<HttpClient> _httpClientFactory;
-
 
     public HttpCustomHealthCheck(
         Uri baseUri,
@@ -32,11 +29,10 @@ public class HttpCustomHealthCheck : IHealthCheck
         HealthStatus failureStatus,
         HttpClientHandler httpClientHandler)
     {
-
+        ArgumentException.ThrowIfNullOrWhiteSpace(hcUrl);
         _youWantReturnEndpointContent = youWantReturnEndpointContent;
         _hcUrl = hcUrl;
         _failureStatus = failureStatus;
-
 
         _httpClientFactory = () => new HttpClient(httpClientHandler)
         {
@@ -47,7 +43,6 @@ public class HttpCustomHealthCheck : IHealthCheck
 
     }
 
-
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = new CancellationToken())
     {
 
@@ -56,11 +51,10 @@ public class HttpCustomHealthCheck : IHealthCheck
         try
         {
 
-
             HealthCheckResult checkResult;
             var httpReturn = await _httpClient.GetAsync(_hcUrl, cancellationToken);
-            var contentReturn = httpReturn.Content.ReadAsStringAsync().Result;
-            int.TryParse(httpReturn.StatusCode.ToString(), out int returnCode);
+            var contentReturn = httpReturn.Content.ReadAsStringAsync(cancellationToken).Result;
+            _ = int.TryParse(httpReturn.StatusCode.ToString(), out int returnCode);
 
             resultData = new Dictionary<string, object>
             {
@@ -68,8 +62,6 @@ public class HttpCustomHealthCheck : IHealthCheck
                 [$"Return Code: {returnCode} / {httpReturn.ReasonPhrase}"] =
                     _youWantReturnEndpointContent ? contentReturn : "Content received",
             };
-
-
 
             if (httpReturn.IsSuccessStatusCode)
             {
@@ -108,7 +100,6 @@ public class HttpCustomHealthCheck : IHealthCheck
 
             }
 
-
             return await Task.FromResult(checkResult);
 
         }
@@ -122,6 +113,5 @@ public class HttpCustomHealthCheck : IHealthCheck
         }
 
     }
-
 
 }

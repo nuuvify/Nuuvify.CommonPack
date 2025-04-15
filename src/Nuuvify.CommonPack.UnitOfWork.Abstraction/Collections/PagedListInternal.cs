@@ -2,7 +2,6 @@ using Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 
 namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Collections;
 
-
 /// <summary>
 /// Provides the implementation of the <see cref="IPagedList{T}"/> and converter.
 /// </summary>
@@ -121,6 +120,5 @@ internal class PagedList<TSource, TResult> : IPagedList<TResult>
         Items = new List<TResult>(converter(source.Items));
 
     }
-
 
 }

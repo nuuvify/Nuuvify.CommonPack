@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Text;
 using Nuuvify.CommonPack.Extensions.Implementation;
@@ -20,7 +20,6 @@ public static class HttpRequestMessageExtensionMethod
                 };
         }
 
-
         var keyHeader = string.Empty;
         try
         {
@@ -31,7 +30,7 @@ public static class HttpRequestMessageExtensionMethod
 
                 if (!request.Headers.TryGetValues(item.Key, out IEnumerable<string> values))
                 {
-                    request.Headers.TryAddWithoutValidation(item.Key, item.Value.ToString());
+                    _ = request.Headers.TryAddWithoutValidation(item.Key, item.Value.ToString());
                 }
             }
         }
@@ -42,8 +41,6 @@ public static class HttpRequestMessageExtensionMethod
                 Debug.WriteLine("Chave ja existe: {key}", keyHeader);
             }
         }
-
-
 
         return request;
     }
@@ -60,7 +57,6 @@ public static class HttpRequestMessageExtensionMethod
                 };
         }
 
-
         var keyHeader = string.Empty;
         try
         {
@@ -71,7 +67,7 @@ public static class HttpRequestMessageExtensionMethod
 
                 if (!request.DefaultRequestHeaders.TryGetValues(item.Key, out IEnumerable<string> values))
                 {
-                    request.DefaultRequestHeaders.TryAddWithoutValidation(item.Key, item.Value.ToString());
+                    _ = request.DefaultRequestHeaders.TryAddWithoutValidation(item.Key, item.Value.ToString());
                 }
             }
         }
@@ -83,8 +79,6 @@ public static class HttpRequestMessageExtensionMethod
             }
         }
 
-
-
         return request;
     }
 
@@ -95,7 +89,6 @@ public static class HttpRequestMessageExtensionMethod
         if (header.NotNullOrZero())
         {
             var auth = header.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x.Key));
-
 
             if (auth.Key.ToString().StartsWith("bearer", StringComparison.InvariantCultureIgnoreCase) ||
                 auth.Key.ToString().StartsWith("basic", StringComparison.InvariantCultureIgnoreCase))
@@ -118,23 +111,22 @@ public static class HttpRequestMessageExtensionMethod
 
         if (string.IsNullOrWhiteSpace(scheme)) return request;
 
-
-        if (scheme.Equals("bearer", StringComparison.InvariantCultureIgnoreCase))
+        if (scheme.Equals("bearer", StringComparison.OrdinalIgnoreCase))
         {
             if (request.Headers.Authorization != null)
             {
-                request.Headers.Remove("Authorization");
+                _ = request.Headers.Remove("Authorization");
             }
 
             request.Headers.Authorization =
                 new AuthenticationHeaderValue(scheme, tokenOrPassword);
 
         }
-        else if (scheme.Equals("basic", StringComparison.InvariantCultureIgnoreCase))
+        else if (scheme.Equals("basic", StringComparison.OrdinalIgnoreCase))
         {
             if (request.Headers.Authorization != null)
             {
-                request.Headers.Remove("Authorization");
+                _ = request.Headers.Remove("Authorization");
             }
 
             var userPassword = Encoding.ASCII.GetBytes(tokenOrPassword);
@@ -144,7 +136,6 @@ public static class HttpRequestMessageExtensionMethod
                 new AuthenticationHeaderValue(scheme, base64);
 
         }
-
 
         return request;
     }

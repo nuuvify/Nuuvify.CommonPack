@@ -12,10 +12,6 @@ public class JwtSetService : IJwtSetService
         _store = store;
     }
 
-
-
-
-
     public async Task Clear(string username, string cacheType, CancellationToken cancellationToken = default)
     {
 
@@ -39,8 +35,6 @@ public class JwtSetService : IJwtSetService
 
         _store.Set(username, tokenResult, cacheType);
     }
-
-
 
 }
 
