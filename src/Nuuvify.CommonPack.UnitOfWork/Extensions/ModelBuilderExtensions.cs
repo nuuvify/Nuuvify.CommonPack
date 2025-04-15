@@ -1,7 +1,7 @@
-﻿using Nuuvify.CommonPack.Extensions.Interfaces;
-using Nuuvify.CommonPack.UnitOfWork.Abstraction;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Nuuvify.CommonPack.Extensions.Interfaces;
+using Nuuvify.CommonPack.UnitOfWork.Abstraction;
 
 namespace Nuuvify.CommonPack.UnitOfWork;
 
@@ -37,7 +37,6 @@ public static partial class ModelBuilderExtensions
     public static void IgnoreValueObject(this ModelBuilder modelBuilder, Type classIgnore = null, EIsOwner isOwned = EIsOwner.False)
     {
         IEnumerable<IMutableEntityType> entityTypes;
-
 
         if (classIgnore is null)
         {
@@ -81,12 +80,12 @@ public static partial class ModelBuilderExtensions
                     {
                         entityTypes = modelBuilder.Model.GetEntityTypes()?
                             .Where(e =>
-                            (
+                            
                                 (typeof(INotPersistingAsTable)
                                 .IsAssignableFrom(e.ClrType) && !e.IsOwned()) ||
                                 (classIgnore
                                 .IsAssignableFrom(e.ClrType) && !e.IsOwned())
-                            ))?
+                            )?
                             .ToList();
                         break;
                     }
@@ -94,12 +93,12 @@ public static partial class ModelBuilderExtensions
                     {
                         entityTypes = modelBuilder.Model.GetEntityTypes()?
                             .Where(e =>
-                            (
+                            
                                 (typeof(INotPersistingAsTable)
                                 .IsAssignableFrom(e.ClrType) && e.IsOwned()) ||
                                 (classIgnore
                                 .IsAssignableFrom(e.ClrType) && e.IsOwned())
-                            ))?
+                            )?
                             .ToList();
                         break;
                     }
@@ -107,19 +106,17 @@ public static partial class ModelBuilderExtensions
                     {
                         entityTypes = modelBuilder.Model.GetEntityTypes()?
                             .Where(e =>
-                            (
-                                (typeof(INotPersistingAsTable)
-                                .IsAssignableFrom(e.ClrType)) ||
-                                (classIgnore
-                                .IsAssignableFrom(e.ClrType))
-                            ))?
+                            
+                                typeof(INotPersistingAsTable)
+                                .IsAssignableFrom(e.ClrType) ||
+                                classIgnore
+                                .IsAssignableFrom(e.ClrType)
+                            )?
                             .ToList();
                         break;
                     }
             }
         }
-
-
 
         if (entityTypes != null)
         {
@@ -127,12 +124,11 @@ public static partial class ModelBuilderExtensions
             {
                 if (entityType.ClrType.BaseType.Name == entityType.ClrType.Name ||
                     entityType.ClrType.BaseType.Name == "Object")
-                    modelBuilder.Ignore(entityType.ClrType);
+                    _ = modelBuilder.Ignore(entityType.ClrType);
             }
         }
 
     }
-
 
 }
 

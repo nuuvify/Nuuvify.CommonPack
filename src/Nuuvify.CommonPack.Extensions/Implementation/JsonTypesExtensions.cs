@@ -1,17 +1,14 @@
 
-
 namespace System.Text.Json.Serialization;
 
 public static class JsonTypesExtensions
 {
 
-
     public static object ConvertJsonTypeCustom(this ref Utf8JsonReader reader, Type propertyType)
     {
         object itemValue;
 
-
-        reader.Read();
+        _ = reader.Read();
         if (reader.TokenType == JsonTokenType.PropertyName)
         {
             throw new JsonException($"Nao era esperado uma propriedade, e sim um valor do tipo: {propertyType.Name}");
@@ -38,7 +35,6 @@ public static class JsonTypesExtensions
         return itemValue;
 
     }
-
 
 }
 

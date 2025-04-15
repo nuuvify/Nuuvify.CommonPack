@@ -1,49 +1,43 @@
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Xunit.Abstractions;
 
-namespace Nuuvify.CommonPack.UnitOfWork.Oracle.xTest.Fixtures
+namespace Nuuvify.CommonPack.UnitOfWork.Oracle.xTest.Fixtures;
+
+
+public class SeedDbFixture
 {
+    public Fatura Fatura { get; private set; }
 
-    public class SeedDbFixture
+    public void CreateData(ITestOutputHelper outputHelper,
+        BaseAppDbContextFixture dbContextFixture,
+        DataFixture dataFixture,
+        string usertest, int pedidos, int itens, bool saveDb = false)
     {
-        public Fatura Fatura { get; private set; }
 
+        Fatura = dataFixture.GerarFaturaFake().First();
 
+        var pedido = dataFixture.GerarPedidoFake(pedidos, itens);
 
-        public void CreateData(ITestOutputHelper outputHelper,
-            BaseAppDbContextFixture dbContextFixture,
-            DataFixture dataFixture,
-            string usertest, int pedidos, int itens, bool saveDb = false)
+        for (int p = 0; p < pedido.Count; p++)
         {
-
-            Fatura = dataFixture.GerarFaturaFake().First();
-
-            var pedido = dataFixture.GerarPedidoFake(pedidos, itens);
-
-            for (int p = 0; p < pedido.Count; p++)
-            {
-                Fatura.AdicionarPedido(pedido[p]);
-            }
-
-
-
-            dbContextFixture.Db.SetDbContextUsername(usertest);
-
-            dbContextFixture.Db.Add(Fatura);
-
-            var registries = 0;
-            if (saveDb)
-            {
-                var uow = new UnitOfWork<DbContext>(dbContextFixture.Db)
-                {
-                    UsernameContext = usertest
-                };
-                registries = uow.SaveChangesAsync().Result;
-            }
-
-            outputHelper.WriteLine("Registros incluidos para teste {0}", registries);
-
+            Fatura.AdicionarPedido(pedido[p]);
         }
+
+        dbContextFixture.Db.SetDbContextUsername(usertest);
+
+        _ = dbContextFixture.Db.Add(Fatura);
+
+        var registries = 0;
+        if (saveDb)
+        {
+            var uow = new UnitOfWork<DbContext>(dbContextFixture.Db)
+            {
+                UsernameContext = usertest
+            };
+            registries = uow.SaveChangesAsync().Result;
+        }
+
+        outputHelper.WriteLine("Registros incluidos para teste {0}", registries);
+
     }
 }

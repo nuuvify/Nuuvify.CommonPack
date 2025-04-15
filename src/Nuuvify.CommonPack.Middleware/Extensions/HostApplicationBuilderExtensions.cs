@@ -9,7 +9,6 @@ public static class HostApplicationBuilderExtensions
 
     public static string PathSecrets { get; private set; }
 
-
     /// <summary>
     /// Define qual o caminho de secrets para o sistema operacional atual, o defult para cada ambiente é:
     /// <para>Linux: "/run/secrets/"</para>
@@ -25,12 +24,10 @@ public static class HostApplicationBuilderExtensions
         ILogger logger = null)
     {
 
-
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
 
-            if (logger != null)
-                logger.LogDebug("Plataforma: Windows");
+            logger?.LogDebug("Plataforma: Windows");
 
             if (string.IsNullOrWhiteSpace(customPathWindows))
             {
@@ -47,13 +44,11 @@ public static class HostApplicationBuilderExtensions
                 PathSecrets = customPathWindows;
             }
 
-
         }
         else
         {
 
-            if (logger != null)
-                logger.LogDebug("Plataforma: Linux");
+            logger?.LogDebug("Plataforma: Linux");
 
             if (string.IsNullOrWhiteSpace(customPathLinux))
             {
@@ -83,7 +78,6 @@ public static class HostApplicationBuilderExtensions
 
     }
 
-
     /// <summary>
     /// Obtem a pasta contendo Docker secrets para o sistema operacional atual.
     /// <para>Caso a propriedade <see cref="PathSecrets"/> esteja null, o metodo <see cref="SetPathSecretsToOSPlatform"/> sera chamado</para> 
@@ -94,7 +88,7 @@ public static class HostApplicationBuilderExtensions
     public static string GetPathSecretsToOSPlatform(this IHostApplicationBuilder builder, ILogger logger = null)
     {
         if (string.IsNullOrWhiteSpace(PathSecrets))
-            builder.SetPathSecretsToOSPlatform(logger: logger);
+            _ = builder.SetPathSecretsToOSPlatform(logger: logger);
 
         return PathSecrets;
     }

@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
@@ -7,7 +8,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Security.Claims;
 
 namespace Nuuvify.CommonPack.Security.JwtOpenId;
 
@@ -18,7 +18,7 @@ public static class KeyCloakExtensions
     {
         if (options.SameSite == SameSiteMode.None)
         {
-            var userAgent = httpContext.Request.Headers["User-Agent"].ToString();
+            _ = httpContext.Request.Headers["User-Agent"].ToString();
             // TODO: Use your User Agent library of choice here. 
             //if (/* UserAgent doesn’t support new behavior */)
             {
@@ -29,13 +29,13 @@ public static class KeyCloakExtensions
 
     public static IServiceCollection AddKeyCloak(this IServiceCollection services, IConfiguration configuration)
     {
-        services.Configure<CookiePolicyOptions>(options =>
+        _ = services.Configure<CookiePolicyOptions>(options =>
         {
             options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
             options.OnAppendCookie = cookieContext => KeyCloakExtensions.CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
             options.OnDeleteCookie = cookieContext => KeyCloakExtensions.CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
         });
-        services.AddAuthentication(options =>
+        _ = services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = OpenIdConnectDefaults.AuthenticationScheme;
             options.DefaultSignInScheme = OpenIdConnectDefaults.AuthenticationScheme;
@@ -116,10 +116,7 @@ public static class KeyCloakExtensions
                OnTokenValidated = ConvertKeycloakRolesInAspNetRoles,
            };
 
-
-
        });
-
 
         return services;
     }
@@ -143,7 +140,6 @@ public static class KeyCloakExtensions
         }
         return Task.CompletedTask;
     }
-
 
     public static void AddProfilePolicy(this AuthorizationOptions options)
     {

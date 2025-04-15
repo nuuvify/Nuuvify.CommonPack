@@ -5,7 +5,6 @@ using Xunit;
 
 namespace Nuuvify.CommonPack.Domain.xTest;
 
-
 public class ExpressionExtensionTests
 {
 
@@ -34,13 +33,11 @@ public class ExpressionExtensionTests
 
         var result = query.ToList();
 
-
-        Assert.Equal(expected: 2, result.Count());
+        Assert.Equal(expected: 2, result.Count);
         Assert.Equal(expected: 1, result.Count(p => p.Tipo == "A"));
         Assert.Equal(expected: 1, result.Count(p => p.Tipo == "E"));
 
     }
-
 
     [Fact]
     [Trait("CommonPack.Extensions", nameof(CacheTimeService))]
@@ -51,12 +48,9 @@ public class ExpressionExtensionTests
         var dateTimeLocal = CacheTimeService.ExpireAt(time);
         var actual = dateTimeLocal.ToString("HH:mm:ss");
 
-
         Assert.Equal(expected: time, actual: actual);
 
     }
-
-
 
     public string Id { get; set; }
     public int[] Codigos { get; set; }
@@ -67,9 +61,7 @@ public class ExpressionExtensionTests
     {
         Expression<Func<Customer, bool>> filter = p => true;
 
-
         filter = p => p.Id != null;
-
 
         if (Codigos.NotNullOrZero())
         {
@@ -82,7 +74,6 @@ public class ExpressionExtensionTests
             filter = filter.CombineExpressions<Customer>(
                 p => Tipos.Contains(p.Tipo));
         }
-
 
         return filter;
     }
