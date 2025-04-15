@@ -6,8 +6,16 @@
     <Description>
       HealthChecks - Setup e configuracao do endpoint /hc-ui e /hc
     </Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
+    <PackageTags>Nuuvify</PackageTags>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+  
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.UI" Version="8.0.1" />
 		<PackageReference Include="AspnetCore.HealthChecks.UI.Client" Version="8.0.1" />
