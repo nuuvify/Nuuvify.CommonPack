@@ -3,19 +3,29 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <Description> This library is an abstraction for emailing. <br /> Add to an INFRA project, and
-      use the IEmail interface of the EMAIL.ABSTRACTION project <br /> to consume the service in
-      other layers. </Description>
-  </PropertyGroup>
+    <Description> This library is an abstraction for emailing. <br />
+ Add to an INFRA project, and
+      use the IEmail interface of the EMAIL.ABSTRACTION project <br />
+ to consume the service in
+      other layers. 
+  </Description>
+  <PackageReadmeFile>README.md</PackageReadmeFile>
+  <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
+  <PackageTags>Nuuvify</PackageTags>
+</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="MailKit" Version="4.7.1.1" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
-  </ItemGroup>
+<ItemGroup>
+  <None Include="README.md" Pack="true" PackagePath="\" />
+  <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
+</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference
-      Include="..\Nuuvify.CommonPack.Email.Abstraction\Nuuvify.CommonPack.Email.Abstraction.csproj" />
-  </ItemGroup>
+<ItemGroup>
+  <PackageReference Include="MailKit" Version="4.7.1.1" />
+  <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
+</ItemGroup>
+
+<ItemGroup>
+  <ProjectReference Include="..\Nuuvify.CommonPack.Email.Abstraction\Nuuvify.CommonPack.Email.Abstraction.csproj" />
+</ItemGroup>
 
 </Project>
