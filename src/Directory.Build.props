@@ -9,16 +9,17 @@
     <Authors>Lincoln Zocateli</Authors>
     <Company>Lincoln Zocateli</Company>
     <Copyright>Copyright ©2024 $(Company)</Copyright>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <!-- <PackageLicenseFile>LICENSE</PackageLicenseFile> -->
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/lzocateli/Nuuvify.CommonPack</PackageProjectUrl>
     <PackageIcon>logonuuvify.jpg</PackageIcon>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <!-- Utilise esse padrão para versionamento: 
+    <!-- Utilise esse padrão para versionamento:
       1.54.18-preview.123
       ou
       1.54.18 (para versão definitiva)
       -->
-    <Version>2.0.0-preview.1</Version>
+    <Version>3.0.0-preview.1</Version>
     <FileVersion>22.05.18.1520</FileVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1705;1591</NoWarn>
