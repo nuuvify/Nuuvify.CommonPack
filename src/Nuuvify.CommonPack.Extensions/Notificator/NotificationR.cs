@@ -44,7 +44,7 @@ public class NotificationR : INotPersistingAsTable
     }
     private void DefineType(string type)
     {
-        Type = type;
+        Type = type ?? GetType().Name;;
 
     }
     private void DefineAggregatorId(string aggregatorId)
