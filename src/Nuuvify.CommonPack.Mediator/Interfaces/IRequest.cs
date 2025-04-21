@@ -1,4 +1,4 @@
 namespace Nuuvify.CommonPack.MediatoR.Interfaces;
 
-    public interface IRequest<TResponse> { }
+public interface IRequest<TResponse> { }
 

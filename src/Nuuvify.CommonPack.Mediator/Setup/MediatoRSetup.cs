@@ -1,10 +1,9 @@
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Linq;
 using System.Reflection;
+using Nuuvify.CommonPack.MediatoR.Interfaces;
+using Nuuvify.CommonPack.MediatoR.Implementation;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Nuuvify.CommonPack.MediatoR.Setup;
-
 
 public static class ServiceCollectionExtensions
 {
@@ -52,7 +51,6 @@ public static class ServiceCollectionExtensions
 
         throw new ArgumentException("Invalid parameters for AddMediatoR(). Use: no arguments, Assembly[], or prefix strings.");
     }
-
 
     private static void RegisterHandlers(IServiceCollection services, Assembly[] assemblies, Type handlerInterface)
     {

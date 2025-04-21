@@ -19,4 +19,22 @@
     <ItemGroup>
     </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Comum\ValueObjects\MsgValueObjects.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>MsgValueObjects.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Comum\ValueObjects\MsgValueObjects.pt-BR.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Comum\ValueObjects\MsgValueObjects.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>MsgValueObjects.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>

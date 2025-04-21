@@ -80,7 +80,6 @@ public static partial class ModelBuilderExtensions
                     {
                         entityTypes = modelBuilder.Model.GetEntityTypes()?
                             .Where(e =>
-                            
                                 (typeof(INotPersistingAsTable)
                                 .IsAssignableFrom(e.ClrType) && !e.IsOwned()) ||
                                 (classIgnore
@@ -93,7 +92,6 @@ public static partial class ModelBuilderExtensions
                     {
                         entityTypes = modelBuilder.Model.GetEntityTypes()?
                             .Where(e =>
-                            
                                 (typeof(INotPersistingAsTable)
                                 .IsAssignableFrom(e.ClrType) && e.IsOwned()) ||
                                 (classIgnore
@@ -106,7 +104,6 @@ public static partial class ModelBuilderExtensions
                     {
                         entityTypes = modelBuilder.Model.GetEntityTypes()?
                             .Where(e =>
-                            
                                 typeof(INotPersistingAsTable)
                                 .IsAssignableFrom(e.ClrType) ||
                                 classIgnore
