@@ -4,7 +4,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <Description>Biblioteca com implementaçôes comuns para projetos DOMAIN</Description>
-    <PackageTags>Mediator;FluentValidator;BrazilClass;ValueObjects</PackageTags>
+    <PackageTags>FluentValidator</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
   </PropertyGroup>
@@ -15,8 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="12.0.1" />
-    <PackageReference Include="MediatR" Version="12.2.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,11 +26,6 @@
       <DependentUpon>MsgFluentValidator.resx</DependentUpon>
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-    </Compile>
-    <Compile Update="Comum\ValueObjects\MsgValueObjects.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>MsgValueObjects.resx</DependentUpon>
     </Compile>
     <Compile Update="FluentValidatorR\MsgFluentValidator.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -48,13 +41,6 @@
     <EmbeddedResource Update="Comum\FluentValidatorR\MsgFluentValidator.resx">
       <LastGenOutput>MsgFluentValidator.Designer.cs</LastGenOutput>
       <Generator>PublicResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Comum\ValueObjects\MsgValueObjects.pt-BR.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Comum\ValueObjects\MsgValueObjects.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>MsgValueObjects.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="FluentValidatorR\MsgFluentValidator.pt-BR.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>

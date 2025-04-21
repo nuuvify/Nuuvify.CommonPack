@@ -1,4 +1,3 @@
-using MediatR;
 
 namespace Nuuvify.CommonPack.Domain;
 
