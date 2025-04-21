@@ -1,13 +1,13 @@
-# Veja aqui caso precise gerar outra imagem localmente: 
+# Veja aqui caso precise gerar outra imagem localmente:
 # https://github.com/lzocateli/containers/blob/main/dotnet-sdk-devcontainer/readme.md
 
 ARG BUILDPLATFORM=linux/amd64
 
 FROM --platform=$BUILDPLATFORM lzocateli/dotnet-sdk:8.0.303-jammy-amd64
 
-ENV HTTP_PROXY=http://proxy.cat.com:80
-ENV HTTPS_PROXY=http://proxy.cat.com:80
-ENV NO_PROXY=cat.com
+ENV HTTP_PROXY=
+ENV HTTPS_PROXY=
+ENV NO_PROXY=
 
 ARG PathApp=/workspaces
 
