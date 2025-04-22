@@ -1,3 +1,5 @@
+using Nuuvify.CommonPack.Mediator.Implementation;
+
 namespace Nuuvify.CommonPack.Extensions.Brazil;
 
 public class EmailPessoa : NotifiableR
@@ -17,7 +19,7 @@ public class EmailPessoa : NotifiableR
 
         _ = new ValidationConcernR<EmailPessoa>(this)
             .AssertIsEmail(x => endereco)
-            .AssertHasMaxLength(x => endereco, maxEndereco);
+            .AssertHasMaxLength(x => endereco, MaxEndereco);
 
         if (!IsValid())
         {
@@ -27,7 +29,7 @@ public class EmailPessoa : NotifiableR
         Endereco = endereco;
     }
 
-    public const int maxEndereco = 256;
+    public const int MaxEndereco = 256;
 
     public override string ToString()
     {

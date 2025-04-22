@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using Nuuvify.CommonPack.Extensions.Implementation;
-using Nuuvify.CommonPack.MediatoR.Implementation;
+using Nuuvify.CommonPack.Mediator.Implementation;
 
 namespace Nuuvify.CommonPack.Domain;
 

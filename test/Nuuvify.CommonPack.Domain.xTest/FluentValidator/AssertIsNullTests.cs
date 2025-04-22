@@ -1,4 +1,4 @@
-using Nuuvify.CommonPack.MediatoR.Implementation;
+using Nuuvify.CommonPack.Mediator.Implementation;
 using Xunit;
 using Xunit.Extensions.Ordering;
 

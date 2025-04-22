@@ -1,3 +1,5 @@
+using Nuuvify.CommonPack.Mediator.Implementation;
+
 namespace Nuuvify.CommonPack.Extensions.Brazil;
 
 public class DocumentoPessoaEstrangeiro : NotifiableR
@@ -74,13 +76,11 @@ public class DocumentoPessoaEstrangeiro : NotifiableR
             AddNotifications(nacionalidade.Notifications);
     }
 
-    public const int minCodigoInfBeneficiarioRendimento = 0;
-    public const int maxCodigoInfBeneficiarioRendimento = 3;
-
-    public const int minNumeroIdentificacaoFiscal = 0;
-    public const int maxNumeroIdentificacaoFiscal = 20;
-
-    public const int minProvincia = 0;
-    public const int maxProvincia = 40;
+    public const int MinCodigoInfBeneficiarioRendimento = 0;
+    public const int MaxCodigoInfBeneficiarioRendimento = 3;
+    public const int MinNumeroIdentificacaoFiscal = 0;
+    public const int MaxNumeroIdentificacaoFiscal = 20;
+    public const int MinProvincia = 0;
+    public const int MaxProvincia = 40;
 
 }

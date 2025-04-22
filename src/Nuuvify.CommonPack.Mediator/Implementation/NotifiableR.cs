@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 
-namespace Nuuvify.CommonPack.MediatoR.Implementation;
+namespace Nuuvify.CommonPack.Mediator.Implementation;
 
 public abstract class NotifiableR
 {
@@ -31,13 +31,13 @@ public abstract class NotifiableR
 
             _notifications.ForEach(delegate (NotificationR notification)
             {
-                logger.LogWarning("Validação em: {0} {1} {2} {3} {4} {5}",
-                        logDescription,
-                        notification.Property,
-                        notification.Message,
-                        notification.Type,
-                        notification.AggregatorId,
-                        notification.DateOccurrence);
+                logger.LogWarning("Validação em: {LogDescription} {Property} {Message} {Type} {AggregatorId} {DateOccurrence}",
+                    logDescription,
+                    notification.Property,
+                    notification.Message,
+                    notification.Type,
+                    notification.AggregatorId,
+                    notification.DateOccurrence);
             });
         }
 

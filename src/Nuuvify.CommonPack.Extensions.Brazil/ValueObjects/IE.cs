@@ -1,4 +1,5 @@
 using System.Globalization;
+using Nuuvify.CommonPack.Mediator.Implementation;
 
 namespace Nuuvify.CommonPack.Extensions.Brazil;
 

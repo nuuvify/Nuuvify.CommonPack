@@ -1,3 +1,5 @@
+using Nuuvify.CommonPack.Mediator.Implementation;
+
 namespace Nuuvify.CommonPack.StandardHttpClient.Results;
 
 internal class ReturnStandardErrors

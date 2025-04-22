@@ -1,7 +1,7 @@
 using System.Globalization;
+using Nuuvify.CommonPack.Mediator.Implementation;
 
 namespace Nuuvify.CommonPack.Extensions.Brazil;
-
 
 public class NacionalidadeFiscal : NotifiableR
 {
@@ -10,7 +10,8 @@ public class NacionalidadeFiscal : NotifiableR
 
     public NacionalidadeFiscal(string situacao)
     {
-        if (!ValidarDescricao(situacao) && !ValidarLiteral(situacao))
+        if (!ValidarDescricao(situacao) &&
+            !ValidarLiteral(situacao))
         {
             Codigo = null;
 
@@ -55,7 +56,7 @@ public class NacionalidadeFiscal : NotifiableR
         return ehValido;
     }
 
-    public const int maxCodigo = 1;
+    public const int MaxCodigo = 1;
 
     public override string ToString()
     {

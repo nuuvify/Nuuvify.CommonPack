@@ -1,4 +1,5 @@
 using System.Globalization;
+using Nuuvify.CommonPack.Mediator.Implementation;
 
 namespace Nuuvify.CommonPack.Extensions.Brazil;
 
@@ -53,7 +54,7 @@ public class TipoPessoa : NotifiableR
         return false;
     }
 
-    public const int maxCodigo = 1;
+    public const int MaxCodigo = 1;
 
     public override string ToString()
     {
