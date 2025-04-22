@@ -1,6 +1,6 @@
 
-using Nuuvify.CommonPack.MediatoR.Implementation;
-using Nuuvify.CommonPack.MediatoR.Interfaces;
+using Nuuvify.CommonPack.Mediator.Implementation;
+using Nuuvify.CommonPack.Mediator.Interfaces;
 
 namespace Nuuvify.CommonPack.Domain;
 

@@ -1,8 +1,8 @@
 using System.Reflection;
-using Nuuvify.CommonPack.MediatoR.Interfaces;
+using Nuuvify.CommonPack.Mediator.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Nuuvify.CommonPack.MediatoR.Setup;
+namespace Nuuvify.CommonPack.Mediator.Setup;
 
 public static class ServiceCollectionExtensions
 {
@@ -13,7 +13,7 @@ public static class ServiceCollectionExtensions
     {
         var assemblies = ResolveAssemblies(args);
 
-        services.AddSingleton<IMediatoR, MediatoR>();
+        services.AddSingleton<IMediatoR, Nuuvify.CommonPack.Mediator.Implementation.MediatoR>();
 
         RegisterHandlers(services, assemblies, typeof(INotificationHandler<>));
         RegisterHandlers(services, assemblies, typeof(IRequestHandler<,>));

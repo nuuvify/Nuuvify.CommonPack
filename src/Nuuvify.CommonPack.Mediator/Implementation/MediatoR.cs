@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
-using Nuuvify.CommonPack.MediatoR.Interfaces;
+using Nuuvify.CommonPack.Mediator.Interfaces;
 
-namespace Nuuvify.CommonPack.MediatoR.Implementation;
+namespace Nuuvify.CommonPack.Mediator.Implementation;
 
 
 public class MediatoR : IMediatoR

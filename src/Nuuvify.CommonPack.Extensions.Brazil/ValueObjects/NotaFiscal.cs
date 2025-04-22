@@ -1,3 +1,5 @@
+using Nuuvify.CommonPack.Mediator.Implementation;
+
 namespace Nuuvify.CommonPack.Extensions.Brazil;
 
 public class NotaFiscal : NotifiableR
@@ -5,7 +7,11 @@ public class NotaFiscal : NotifiableR
 
     protected NotaFiscal() { }
 
-    public NotaFiscal(string numero, string serie, DateTime emissao, EnumSimNao eletronica)
+    public NotaFiscal(
+        string numero,
+        string serie,
+        DateTime emissao,
+        EnumSimNao eletronica)
     {
         DefinirNumero(numero);
         DefinirSerie(serie);
@@ -74,10 +80,10 @@ public class NotaFiscal : NotifiableR
 
     }
 
-    public const int minNumero = 1;
-    public const int maxNumero = 12;
+    public const int MinNumero = 1;
+    public const int MaxNumero = 12;
 
-    public const int minSerie = 1;
-    public const int maxSerie = 5;
+    public const int MinSerie = 1;
+    public const int MaxSerie = 5;
 
 }

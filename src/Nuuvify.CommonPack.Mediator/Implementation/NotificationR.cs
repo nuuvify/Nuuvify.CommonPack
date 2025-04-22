@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Nuuvify.CommonPack.Extensions;
 
-namespace Nuuvify.CommonPack.MediatoR.Implementation;
+namespace Nuuvify.CommonPack.Mediator.Implementation;
 
 
 public class NotificationR : INotPersistingAsTable

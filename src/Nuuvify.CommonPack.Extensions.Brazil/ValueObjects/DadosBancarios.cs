@@ -1,3 +1,5 @@
+using Nuuvify.CommonPack.Mediator.Implementation;
+
 namespace Nuuvify.CommonPack.Extensions.Brazil;
 
 public class DadosBancarios : NotifiableR

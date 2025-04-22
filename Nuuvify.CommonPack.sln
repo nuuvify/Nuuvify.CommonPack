@@ -32,7 +32,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nuuvify.CommonPack.Extensio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nuuvify.CommonPack.HealthCheck", "src\Nuuvify.CommonPack.HealthCheck\Nuuvify.CommonPack.HealthCheck.csproj", "{28C040C6-06F0-E7FC-C67D-E927E3EAFD3A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nuuvify.CommonPack.MediatoR", "src\Nuuvify.CommonPack.MediatoR\Nuuvify.CommonPack.MediatoR.csproj", "{EDD61C62-2B5A-F076-5B00-A095A9420467}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nuuvify.CommonPack.Mediator", "src\Nuuvify.CommonPack.Mediator\Nuuvify.CommonPack.Mediator.csproj", "{EDD61C62-2B5A-F076-5B00-A095A9420467}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nuuvify.CommonPack.Middleware", "src\Nuuvify.CommonPack.Middleware\Nuuvify.CommonPack.Middleware.csproj", "{78537FB3-558C-77E0-AEC1-9A18AE5478BA}"
 EndProject
