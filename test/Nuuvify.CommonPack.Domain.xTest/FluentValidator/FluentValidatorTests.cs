@@ -1,5 +1,5 @@
 using System.Globalization;
-using Nuuvify.CommonPack.MediatoR.Implementation;
+using Nuuvify.CommonPack.Mediator.Implementation;
 using Xunit;
 using Xunit.Extensions.Ordering;
 using Nuuvify.CommonPack.Domain;

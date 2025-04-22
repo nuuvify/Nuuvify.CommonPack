@@ -30,7 +30,7 @@ public class ControleSituacaoDof : NotifiableR
         Codigo = situacao;
     }
 
-    public const int maxCodigo = 1;
+    public const int MaxCodigo = 1;
 
     public override string ToString()
     {

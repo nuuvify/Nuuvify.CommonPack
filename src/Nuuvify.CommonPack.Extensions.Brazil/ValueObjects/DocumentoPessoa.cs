@@ -1,3 +1,5 @@
+using Nuuvify.CommonPack.Mediator.Implementation;
+
 namespace Nuuvify.CommonPack.Extensions.Brazil;
 
 
@@ -74,6 +76,6 @@ public class DocumentoPessoa : NotifiableR
 
     }
 
-    public const int maxCodigo = 14;
+    public const int MaxCodigo = 14;
 
 }

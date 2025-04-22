@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using Nuuvify.CommonPack.Extensions;
-using Nuuvify.CommonPack.MediatoR.Implementation;
+using Nuuvify.CommonPack.Mediator.Implementation;
 
-namespace Nuuvify.CommonPack.MediatoR.Extensions;
+namespace Nuuvify.CommonPack.Mediator.Extensions;
 
 public static class DataAnnotationExtension
 {

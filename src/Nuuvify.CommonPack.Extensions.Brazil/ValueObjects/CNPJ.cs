@@ -1,4 +1,6 @@
 
+using Nuuvify.CommonPack.Mediator.Implementation;
+
 namespace Nuuvify.CommonPack.Extensions.Brazil;
 
 
@@ -27,7 +29,7 @@ public class Cnpj : NotifiableR
         }
 
         _ = new ValidationConcernR<Cnpj>(this)
-            .AssertFixedLength(x => x.Codigo, maxCNPJ);
+            .AssertFixedLength(x => x.Codigo, MaxCnpj);
 
         if (!IsValid())
             Codigo = null;
@@ -51,7 +53,7 @@ public class Cnpj : NotifiableR
 
         cnpj = cnpj.Trim();
         cnpj = cnpj.GetNumbers();
-        if (cnpj.Length != maxCNPJ)
+        if (cnpj.Length != MaxCnpj)
         {
             this.Codigo = null;
             return false;
@@ -87,7 +89,7 @@ public class Cnpj : NotifiableR
         return valido;
     }
 
-    public const int maxCNPJ = 14;
+    public const int MaxCnpj = 14;
 
     /// <summary>
     /// Formatar uma string Cnpj

@@ -1,6 +1,7 @@
 
-namespace Nuuvify.CommonPack.Extensions.Brazil;
+using Nuuvify.CommonPack.Mediator.Implementation;
 
+namespace Nuuvify.CommonPack.Extensions.Brazil;
 
 public class AliquotaIssEspecial : NotifiableR
 {
@@ -29,7 +30,7 @@ public class AliquotaIssEspecial : NotifiableR
             TemAliquotaIssEspecialParaContribuinteOptantePeloSimples = EnumSimNao.Sim.GetDescription();
 
             _ = new ValidationConcernR<AliquotaIssEspecial>(this)
-                .AssertIsBetween(x => aliquota, minAliquota, maxAliquota, $"Aliquota deve estar entre {minAliquota} e {maxAliquota}");
+                .AssertIsBetween(x => aliquota, MinAliquota, MaxAliquota, $"Aliquota deve estar entre {MinAliquota} e {MaxAliquota}");
 
             var valido = IsValid();
 
@@ -41,7 +42,7 @@ public class AliquotaIssEspecial : NotifiableR
 
     }
 
-    public const int minAliquota = 0;
-    public const int maxAliquota = 99;
+    public const int MinAliquota = 0;
+    public const int MaxAliquota = 99;
 
 }

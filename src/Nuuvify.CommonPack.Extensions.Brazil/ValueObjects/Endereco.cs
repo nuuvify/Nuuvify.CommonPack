@@ -1,3 +1,5 @@
+using Nuuvify.CommonPack.Mediator.Implementation;
+
 namespace Nuuvify.CommonPack.Extensions.Brazil;
 
 
@@ -6,9 +8,17 @@ public class Endereco : NotifiableR
 
     protected Endereco() { }
 
-    public Endereco(string tipoLogradouro, string logradouro, string codigoMunicipio,
-        string nomeMunicipio, string uf, string bairro,
-        string cep, string numero, string complemento, string siglaPais)
+    public Endereco(
+        string tipoLogradouro,
+        string logradouro,
+        string codigoMunicipio,
+        string nomeMunicipio,
+        string uf,
+        string bairro,
+        string cep,
+        string numero,
+        string complemento,
+        string siglaPais)
     {
 
         DefinirTipoLogradouro(tipoLogradouro);

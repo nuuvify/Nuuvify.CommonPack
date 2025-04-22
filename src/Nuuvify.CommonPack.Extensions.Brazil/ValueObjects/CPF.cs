@@ -1,3 +1,5 @@
+using Nuuvify.CommonPack.Mediator.Implementation;
+
 namespace Nuuvify.CommonPack.Extensions.Brazil;
 
 public class Cpf : NotifiableR
@@ -21,7 +23,7 @@ public class Cpf : NotifiableR
         }
 
         _ = new ValidationConcernR<Cpf>(this)
-            .AssertFixedLength(x => x.Codigo, maxCPF);
+            .AssertFixedLength(x => x.Codigo, MaxCpf);
 
         if (!IsValid())
             Codigo = null;
@@ -48,7 +50,7 @@ public class Cpf : NotifiableR
 
         cpf = cpf.GetNumbers();
 
-        if (cpf.Length != maxCPF)
+        if (cpf.Length != MaxCpf)
         {
             Codigo = null;
             return false;
@@ -87,7 +89,7 @@ public class Cpf : NotifiableR
         return valido;
     }
 
-    public const int maxCPF = 11;
+    public const int MaxCpf = 11;
 
     /// <summary>
     /// Formatar uma string CPF

@@ -1,7 +1,7 @@
 using System.Globalization;
+using Nuuvify.CommonPack.Mediator.Implementation;
 
 namespace Nuuvify.CommonPack.Extensions.Brazil;
-
 
 public class AtivoInativo : NotifiableR
 {
@@ -60,7 +60,7 @@ public class AtivoInativo : NotifiableR
         return ehValido;
     }
 
-    public const int maxCodigo = 1;
+    public const int MaxCodigo = 1;
 
     public override string ToString()
     {

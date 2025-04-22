@@ -1,3 +1,5 @@
+using Nuuvify.CommonPack.Mediator.Implementation;
+
 namespace Nuuvify.CommonPack.Extensions.Brazil;
 
 public class NomeCompleto : NotifiableR
@@ -31,10 +33,10 @@ public class NomeCompleto : NotifiableR
     public string Nome { get; private set; }
     public string SobreNome { get; private set; }
 
-    public const int minNome = 3;
-    public const int maxNome = 60;
-    public const int minSobreNome = 3;
-    public const int maxSobreNome = 60;
+    public const int MinNome = 3;
+    public const int MaxNome = 60;
+    public const int MinSobreNome = 3;
+    public const int MaxSobreNome = 60;
 
     public override string ToString()
     {

@@ -6,7 +6,7 @@
         <Description>
         Essa lib implementa o Mediator para Send e Publish, com Handlers e Notification Pattern
         </Description>
-        <RootNamespace>Nuuvify.CommonPack.MediatoR</RootNamespace>
+        <RootNamespace>Nuuvify.CommonPack.Mediator</RootNamespace>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
         <PackageTags>Nuuvify</PackageTags>
@@ -22,7 +22,6 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
-        <!-- <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" /> -->
     </ItemGroup>
 
 </Project>
