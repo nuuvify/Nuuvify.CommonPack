@@ -1,8 +1,5 @@
 using System.Diagnostics;
 using System.Text;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Moq;
 using Nuuvify.CommonPack.Middleware.Abstraction;
 using Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest.Arrange;
 

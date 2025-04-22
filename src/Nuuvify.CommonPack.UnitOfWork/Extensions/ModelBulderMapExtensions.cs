@@ -2,7 +2,6 @@ using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Nuuvify.CommonPack.Extensions.Implementation;
-using Nuuvify.CommonPack.Extensions.Interfaces;
 
 namespace Nuuvify.CommonPack.UnitOfWork;
 

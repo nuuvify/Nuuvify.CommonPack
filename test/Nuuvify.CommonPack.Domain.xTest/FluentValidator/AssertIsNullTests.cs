@@ -1,4 +1,4 @@
-using Nuuvify.CommonPack.Extensions.Notificator;
+using Nuuvify.CommonPack.MediatoR.Implementation;
 using Xunit;
 using Xunit.Extensions.Ordering;
 

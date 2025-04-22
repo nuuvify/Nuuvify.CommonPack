@@ -1,54 +1,53 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <Description>Biblioteca com implementaçôes comuns para projetos DOMAIN</Description>
-    <PackageTags>FluentValidator</PackageTags>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <Description>Biblioteca com implementaçôes comuns para projetos DOMAIN</Description>
+        <RootNamespace>Nuuvify.CommonPack.Domain</RootNamespace>
+        <PackageTags>FluentValidator</PackageTags>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <None Include="README.md" Pack="true" PackagePath="\" />
-    <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
-  </ItemGroup>
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\" />
+        <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
 
-  <ItemGroup>
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Nuuvify.CommonPack.Extensions\Nuuvify.CommonPack.Extensions.csproj" />
+        <ProjectReference Include="..\Nuuvify.CommonPack.Mediator\Nuuvify.CommonPack.Mediator.csproj" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Nuuvify.CommonPack.Extensions\Nuuvify.CommonPack.Extensions.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <Compile Update="Comum\FluentValidatorR\MsgFluentValidator.Designer.cs">
+            <DependentUpon>MsgFluentValidator.resx</DependentUpon>
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+        </Compile>
+        <Compile Update="FluentValidatorR\MsgFluentValidator.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>MsgFluentValidator.resx</DependentUpon>
+        </Compile>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Comum\FluentValidatorR\MsgFluentValidator.Designer.cs">
-      <DependentUpon>MsgFluentValidator.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-    </Compile>
-    <Compile Update="FluentValidatorR\MsgFluentValidator.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>MsgFluentValidator.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Comum\FluentValidatorR\MsgFluentValidator.pt-BR.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Comum\FluentValidatorR\MsgFluentValidator.resx">
-      <LastGenOutput>MsgFluentValidator.Designer.cs</LastGenOutput>
-      <Generator>PublicResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Update="FluentValidatorR\MsgFluentValidator.pt-BR.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Update="FluentValidatorR\MsgFluentValidator.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>MsgFluentValidator.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Update="Comum\FluentValidatorR\MsgFluentValidator.pt-BR.resx">
+            <Generator>PublicResXFileCodeGenerator</Generator>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Comum\FluentValidatorR\MsgFluentValidator.resx">
+            <LastGenOutput>MsgFluentValidator.Designer.cs</LastGenOutput>
+            <Generator>PublicResXFileCodeGenerator</Generator>
+        </EmbeddedResource>
+        <EmbeddedResource Update="FluentValidatorR\MsgFluentValidator.pt-BR.resx">
+            <Generator>PublicResXFileCodeGenerator</Generator>
+        </EmbeddedResource>
+        <EmbeddedResource Update="FluentValidatorR\MsgFluentValidator.resx">
+            <Generator>PublicResXFileCodeGenerator</Generator>
+            <LastGenOutput>MsgFluentValidator.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+    </ItemGroup>
 
 </Project>

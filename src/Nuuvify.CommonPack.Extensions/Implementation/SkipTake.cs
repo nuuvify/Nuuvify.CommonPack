@@ -1,4 +1,4 @@
-namespace Nuuvify.CommonPack.Extensions.Brazil;
+namespace Nuuvify.CommonPack.Extensions.Implementation;
 
 public class SkipTake
 {

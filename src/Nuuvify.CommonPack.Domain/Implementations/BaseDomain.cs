@@ -1,21 +1,18 @@
-using AutoMapper;
-using MediatR;
+
 using Nuuvify.CommonPack.Domain.Interfaces;
-using Nuuvify.CommonPack.Extensions.Notificator;
+using Nuuvify.CommonPack.MediatoR.Implementation;
+using Nuuvify.CommonPack.MediatoR.Interfaces;
 
 namespace Nuuvify.CommonPack.Domain;
 
 public abstract class BaseDomain : NotifiableR, IBaseDomain
 {
-    protected readonly IMediator _mediator;
-    protected readonly IMapper _mapper;
+    protected readonly IMediatoR _mediator;
 
     protected BaseDomain(
-        IMediator mediator,
-        IMapper mapper)
+        IMediatoR mediator)
     {
         _mediator = mediator;
-        _mapper = mapper;
     }
 
     public virtual IList<NotificationR> ValidationResult()

@@ -2,11 +2,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <Description> This library implements Notification Pattern, which allows passing notifications
       between projects. <br /> Here there are also several extension methods that help handle null
       lists, special characters in strings, <br /> among other useful things.
     </Description>
+    <RootNamespace>Nuuvify.CommonPack.Extensions</RootNamespace>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
     <PackageTags>Nuuvify</PackageTags>

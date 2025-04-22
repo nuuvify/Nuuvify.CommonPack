@@ -2,10 +2,8 @@ using System.Net;
 using System.Net.Http.Headers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 using Nuuvify.CommonPack.StandardHttpClient.xTest.Fixtures;
-using Xunit;
 
 namespace Nuuvify.CommonPack.StandardHttpClient.xTest;
 

@@ -1,5 +1,4 @@
 using System.Globalization;
-using Nuuvify.CommonPack.Extensions.Notificator;
 
 namespace Nuuvify.CommonPack.Extensions.Brazil;
 

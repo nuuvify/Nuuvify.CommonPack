@@ -1,6 +1,3 @@
-using Nuuvify.CommonPack.Extensions.Implementation;
-using Nuuvify.CommonPack.Extensions.Notificator;
-
 namespace Nuuvify.CommonPack.Extensions.Brazil;
 
 

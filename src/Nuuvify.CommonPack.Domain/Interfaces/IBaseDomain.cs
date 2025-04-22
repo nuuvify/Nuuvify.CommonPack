@@ -1,4 +1,5 @@
-using Nuuvify.CommonPack.Extensions.Notificator;
+
+using Nuuvify.CommonPack.MediatoR.Implementation;
 
 namespace Nuuvify.CommonPack.Domain.Interfaces;
 

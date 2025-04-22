@@ -1,5 +1,3 @@
-using Nuuvify.CommonPack.Domain;
-
 namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest;
 
 public class Pedido : DomainEntity

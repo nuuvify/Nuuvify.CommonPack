@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using Nuuvify.CommonPack.Extensions.Implementation;
-using Nuuvify.CommonPack.Extensions.Notificator;
+using Nuuvify.CommonPack.MediatoR.Implementation;
 
 namespace Nuuvify.CommonPack.Domain;
 
@@ -74,7 +74,7 @@ public partial class ValidationConcernR<T> where T : NotifiableR
     }
 
     /// <summary>
-    /// Usage: 
+    /// Usage:
     /// <example>
     /// <code>
     ///        var valido = new ValidationConcernR{Customer}(_customer)
@@ -102,7 +102,7 @@ public partial class ValidationConcernR<T> where T : NotifiableR
         return this;
     }
     /// <summary>
-    /// Usage: 
+    /// Usage:
     /// <example>
     /// <code>
     ///        var valido = new ValidationConcernR{Customer}(_customer)
@@ -129,7 +129,7 @@ public partial class ValidationConcernR<T> where T : NotifiableR
         return this;
     }
     /// <summary>
-    /// Usage: 
+    /// Usage:
     /// <example>
     /// <code>
     ///        var valido = new ValidationConcernR{Customer}(_customer)
@@ -158,7 +158,7 @@ public partial class ValidationConcernR<T> where T : NotifiableR
     }
 
     /// <summary>
-    /// Usage: 
+    /// Usage:
     /// <example>
     /// <code>
     ///        var valido = new ValidationConcernR{Customer}(_customer)
@@ -187,7 +187,7 @@ public partial class ValidationConcernR<T> where T : NotifiableR
     }
 
     /// <summary>
-    /// Usage: 
+    /// Usage:
     /// <example>
     /// <code>
     ///        var valido = new ValidationConcernR{Customer}(_customer)
@@ -219,7 +219,7 @@ public partial class ValidationConcernR<T> where T : NotifiableR
         return this;
     }
     /// <summary>
-    /// Usage: 
+    /// Usage:
     /// <example>
     /// <code>
     ///        var valido = new ValidationConcernR{Customer}(_customer)
@@ -250,7 +250,7 @@ public partial class ValidationConcernR<T> where T : NotifiableR
         return this;
     }
     /// <summary>
-    /// Usage: 
+    /// Usage:
     /// <example>
     /// <code>
     ///        var valido = new ValidationConcernR{Customer}(_customer)
@@ -282,7 +282,7 @@ public partial class ValidationConcernR<T> where T : NotifiableR
         return this;
     }
     /// <summary>
-    /// Usage: 
+    /// Usage:
     /// <example>
     /// <code>
     ///        var valido = new ValidationConcernR{Customer}(_customer)
@@ -313,7 +313,7 @@ public partial class ValidationConcernR<T> where T : NotifiableR
         return this;
     }
     /// <summary>
-    /// Usage: 
+    /// Usage:
     /// <example>
     /// <code>
     ///        var valido = new ValidationConcernR{Customer}(_customer)
@@ -344,7 +344,7 @@ public partial class ValidationConcernR<T> where T : NotifiableR
     }
 
     /// <summary>
-    /// Usage: 
+    /// Usage:
     /// <example>
     /// <code>
     ///        var valido = new ValidationConcernR{Customer}(_customer)

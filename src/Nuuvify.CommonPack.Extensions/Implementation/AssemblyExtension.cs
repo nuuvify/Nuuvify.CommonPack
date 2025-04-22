@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Nuuvify.CommonPack.Extensions.Implementation;
+namespace Nuuvify.CommonPack.Extensions;
 
 public static class AssemblyExtension
 {

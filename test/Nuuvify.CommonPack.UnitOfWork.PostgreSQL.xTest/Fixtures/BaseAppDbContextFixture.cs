@@ -1,4 +1,3 @@
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Nuuvify.CommonPack.Middleware.Abstraction;

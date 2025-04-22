@@ -1,4 +1,3 @@
-using Nuuvify.CommonPack.Domain.ValueObjects;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using Xunit;
 

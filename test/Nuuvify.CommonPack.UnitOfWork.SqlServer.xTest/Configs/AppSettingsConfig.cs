@@ -1,5 +1,3 @@
-using Microsoft.Extensions.Configuration;
-
 namespace Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest;
 
 public static class AppSettingsConfig

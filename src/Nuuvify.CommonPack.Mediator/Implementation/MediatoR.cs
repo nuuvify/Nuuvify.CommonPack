@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Nuuvify.CommonPack.MediatoR.Interfaces;
 
 namespace Nuuvify.CommonPack.MediatoR.Implementation;
@@ -16,13 +17,12 @@ public class MediatoR : IMediatoR
     {
         var handlerType = typeof(IRequestHandler<,>)
             .MakeGenericType(request.GetType(), typeof(TResponse));
-        var handler = _provider.GetService(handlerType);
-        if (handler == null)
-            throw new InvalidOperationException($"Handler not found for {request.GetType().Name}");
+        var handler = _provider.GetService(handlerType)
+            ?? throw new InvalidOperationException($"Handler not found for {request.GetType().Name}");
 
         return await (Task<TResponse>)handlerType
             .GetMethod("Handle")!
-            .Invoke(handler, new object[] { request, cancellationToken })!;
+            .Invoke(handler, [request, cancellationToken])!;
     }
 
     public async Task Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = default)
@@ -35,7 +35,7 @@ public class MediatoR : IMediatoR
         {
             await (Task)handlerType
                 .GetMethod("Handle")!
-                .Invoke(handler, new object[] { notification, cancellationToken })!;
+                .Invoke(handler, [notification, cancellationToken])!;
         }
     }
 }
