@@ -1,4 +1,6 @@
-using Nuuvify.CommonPack.Extensions.Notificator;
+
+using Nuuvify.CommonPack.MediatoR.Implementation;
+using Nuuvify.CommonPack.MediatoR.Interfaces;
 
 namespace Nuuvify.CommonPack.Domain;
 
@@ -9,7 +11,7 @@ namespace Nuuvify.CommonPack.Domain;
 /// public class TransportadorObserve : INotificationHandler{SuaClasseCommandResult}
 /// </summary>
 /// <typeparam name="TSourceId">Representa um object, que devera ser utilizado em um Observable</typeparam>
-public abstract class DomainEvent<TSourceId> : NotifiableR, ICommandResultR
+public abstract class DomainEvent<TSourceId> : NotifiableR, INotification
 {
     public TSourceId SourceId { get; private set; }
     public DateTimeOffset When { get; private set; }

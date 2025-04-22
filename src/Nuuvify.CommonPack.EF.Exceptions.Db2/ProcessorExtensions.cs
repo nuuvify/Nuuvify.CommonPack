@@ -17,7 +17,7 @@ public static class ProcessorExtensions
     ///         {
     ///             optionsBuilder.UseExceptionProcessor();
     ///         }
-    ///     }   
+    ///     }
     /// </code>
     /// </example>
     /// </summary>

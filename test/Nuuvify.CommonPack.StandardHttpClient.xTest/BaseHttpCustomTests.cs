@@ -2,14 +2,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using Moq;
-using Nuuvify.CommonPack.Extensions.Notificator;
 using Nuuvify.CommonPack.Security.Abstraction;
 using Nuuvify.CommonPack.StandardHttpClient.Polly;
 using Nuuvify.CommonPack.StandardHttpClient.xTest.Configs;
 using Nuuvify.CommonPack.StandardHttpClient.xTest.Fixtures;
-using Xunit;
-using Xunit.Extensions.Ordering;
 
 namespace Nuuvify.CommonPack.StandardHttpClient.xTest;
 

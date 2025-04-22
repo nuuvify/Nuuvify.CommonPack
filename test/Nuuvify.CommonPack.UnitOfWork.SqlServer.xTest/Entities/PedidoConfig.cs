@@ -1,7 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Nuuvify.CommonPack.Domain;
-
 namespace Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest.Entities.StubDbContext;
 
 public class PedidoConfig : EntityConfiguration<Pedido>

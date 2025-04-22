@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
-using Nuuvify.CommonPack.Extensions.Notificator;
+using Nuuvify.CommonPack.MediatoR.Implementation;
 
 namespace Nuuvify.CommonPack.Domain;
 

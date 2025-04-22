@@ -1,5 +1,5 @@
 using System.ComponentModel;
-using MediatR;
+using Nuuvify.CommonPack.MediatoR.Interfaces;
 
 namespace Nuuvify.CommonPack.Domain;
 
@@ -12,9 +12,9 @@ public interface ICommandR : IRequest<ICommandResultR>
 
     /// <summary>
     /// Utilizado em um Handle, para chamar ou não o SaveChanges do Respository
-    /// util em casos de processamento dentro de um laço, onde a gravação deve 
-    /// ocorrer apenas no final, ou mesmo, em um processo que envolva varias 
-    /// alterações no banco de dados, por diversas classes diferentes, mas o 
+    /// util em casos de processamento dentro de um laço, onde a gravação deve
+    /// ocorrer apenas no final, ou mesmo, em um processo que envolva varias
+    /// alterações no banco de dados, por diversas classes diferentes, mas o
     /// SaveChanges deve ocorrer apenas uma vez, se esse for seu caso, deixe
     /// esse valor como false, e dentro do Handle utilize:
     /// <example>

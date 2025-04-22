@@ -1,4 +1,3 @@
-using Nuuvify.CommonPack.Domain;
 using Nuuvify.CommonPack.Extensions.Implementation;
 
 namespace Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest;

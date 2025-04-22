@@ -1,7 +1,8 @@
 using System.Globalization;
-using Nuuvify.CommonPack.Extensions.Notificator;
+using Nuuvify.CommonPack.MediatoR.Implementation;
 using Xunit;
 using Xunit.Extensions.Ordering;
+using Nuuvify.CommonPack.Domain;
 
 namespace Nuuvify.CommonPack.Domain.xTest.FluentValidator;
 

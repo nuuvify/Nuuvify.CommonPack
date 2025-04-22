@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Nuuvify.CommonPack.Domain;
 using Nuuvify.CommonPack.UnitOfWork.Abstraction;
 
 namespace Nuuvify.CommonPack.UnitOfWork;

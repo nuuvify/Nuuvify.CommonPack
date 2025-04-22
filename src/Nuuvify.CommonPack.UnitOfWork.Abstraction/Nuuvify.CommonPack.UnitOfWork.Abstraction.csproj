@@ -2,12 +2,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <Description>
-      Essa biblioteca possui as abstrações, ou, as interfaces que podevem ser utilizadas 
+      Essa biblioteca possui as abstrações, ou, as interfaces que podevem ser utilizadas
       em qualquer projeto. Porém a biblioteca contendo as implmentações, deve ser instalada
-      no seu projeto de Infra.Data 
+      no seu projeto de Infra.Data
     </Description>
+    <RootNamespace>Nuuvify.CommonPack.UnitOfWork.Abstraction</RootNamespace>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
     <PackageTags>Nuuvify</PackageTags>
@@ -17,9 +18,9 @@
     <None Include="README.md" Pack="true" PackagePath="\" />
     <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
   </ItemGroup>
-  
+
   <ItemGroup>
-    <ProjectReference Include="..\Nuuvify.CommonPack.Extensions\Nuuvify.CommonPack.Extensions.csproj" />
+    <ProjectReference Include="..\Nuuvify.CommonPack.Mediator\Nuuvify.CommonPack.Mediator.csproj" />
   </ItemGroup>
-  
+
 </Project>

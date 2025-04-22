@@ -4,13 +4,10 @@ using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using Moq;
 using Nuuvify.CommonPack.Security.Abstraction;
 using Nuuvify.CommonPack.StandardHttpClient.Polly;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 using Nuuvify.CommonPack.StandardHttpClient.xTest.Configs;
-using Xunit;
-using Xunit.Extensions.Ordering;
 
 namespace Nuuvify.CommonPack.StandardHttpClient.xTest;
 

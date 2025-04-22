@@ -22,7 +22,7 @@ public interface IUserAuthenticated
     /// <returns></returns>
     bool IsAuthenticated(out string token);
     /// <summary>
-    /// Verifica nas Claims do usuario autenticado (Principal.Identity), se possui algum dos grupos informado no parametro 
+    /// Verifica nas Claims do usuario autenticado (Principal.Identity), se possui algum dos grupos informado no parametro
     /// </summary>
     /// <param name="groups">Grupo(s) que deeja verificar se esta na claim do usuario</param>
     /// <returns></returns>
