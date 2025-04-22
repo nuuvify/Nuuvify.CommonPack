@@ -1,5 +1,3 @@
-using Nuuvify.CommonPack.Extensions.Interfaces;
-
 namespace Nuuvify.CommonPack.UnitOfWork.Oracle.xTest;
 
 public class Endereco : INotPersistingAsTable

@@ -7,6 +7,7 @@
         Essa lib implementa classes/tipos como Value Objects para validação de objetos utilizados em aplicações
         no Brazil
         </Description>
+        <RootNamespace>Nuuvify.CommonPack.Extensions.Brazil</RootNamespace>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
         <PackageTags>Nuuvify</PackageTags>
@@ -17,24 +18,25 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Nuuvify.CommonPack.Mediator\Nuuvify.CommonPack.Mediator.csproj" />
     </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Comum\ValueObjects\MsgValueObjects.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>MsgValueObjects.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
+    <ItemGroup>
+        <Compile Update="Comum\ValueObjects\MsgValueObjects.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>MsgValueObjects.resx</DependentUpon>
+        </Compile>
+    </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Update="Comum\ValueObjects\MsgValueObjects.pt-BR.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Comum\ValueObjects\MsgValueObjects.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>MsgValueObjects.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Update="Comum\ValueObjects\MsgValueObjects.pt-BR.resx">
+            <Generator>PublicResXFileCodeGenerator</Generator>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Comum\ValueObjects\MsgValueObjects.resx">
+            <Generator>PublicResXFileCodeGenerator</Generator>
+            <LastGenOutput>MsgValueObjects.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+    </ItemGroup>
 
 </Project>

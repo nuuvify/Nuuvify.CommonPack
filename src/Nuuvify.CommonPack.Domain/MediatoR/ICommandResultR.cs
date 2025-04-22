@@ -1,4 +1,6 @@
 
+using Nuuvify.CommonPack.MediatoR.Interfaces;
+
 namespace Nuuvify.CommonPack.Domain;
 
 /// <summary>

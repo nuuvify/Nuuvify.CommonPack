@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Logging;
-using Nuuvify.CommonPack.Extensions.Interfaces;
+using Nuuvify.CommonPack.Extensions;
 
 namespace Nuuvify.CommonPack.MediatoR.Implementation;
 

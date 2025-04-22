@@ -1,6 +1,7 @@
+using Nuuvify.CommonPack.Domain.Implementations;
 using Nuuvify.CommonPack.Domain.Interfaces;
-using Nuuvify.CommonPack.Extensions.Interfaces;
-using Nuuvify.CommonPack.Extensions.Notificator;
+using Nuuvify.CommonPack.Extensions;
+using Nuuvify.CommonPack.MediatoR.Implementation;
 
 namespace Nuuvify.CommonPack.Domain;
 
@@ -10,7 +11,7 @@ public abstract class BaseSpecification<TEntity> : NotifiableR,
 
     /// <summary>
     /// Apenas um repositorio deve ser utilizado, se estiver precisando mais de um
-    /// muito provavelmente você precisa quebrar sua especificação, ou melhorar o 
+    /// muito provavelmente você precisa quebrar sua especificação, ou melhorar o
     /// repositorio
     /// </summary>
     /// <param name="repository"></param>

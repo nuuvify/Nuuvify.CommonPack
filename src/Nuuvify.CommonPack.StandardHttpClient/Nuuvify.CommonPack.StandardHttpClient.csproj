@@ -12,6 +12,7 @@
       utilize IStandardHttpClient, e deserealize o retorno conforme o fornecedor
       da api pede.
     </Description>
+    <RootNamespace>Nuuvify.CommonPack.StandardHttpClient</RootNamespace>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
     <PackageTags>Nuuvify</PackageTags>
@@ -21,7 +22,7 @@
     <None Include="README.md" Pack="true" PackagePath="\" />
     <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="8.0.7" />
@@ -29,6 +30,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Nuuvify.CommonPack.Security.Abstraction\Nuuvify.CommonPack.Security.Abstraction.csproj" />
+    <ProjectReference Include="..\Nuuvify.CommonPack.Mediator\Nuuvify.CommonPack.Mediator.csproj" />
   </ItemGroup>
 
 </Project>

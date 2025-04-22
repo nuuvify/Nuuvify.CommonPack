@@ -1,3 +1,5 @@
+using Nuuvify.CommonPack.Domain.Implementations;
+
 namespace Nuuvify.CommonPack.Domain;
 
 /// <summary>

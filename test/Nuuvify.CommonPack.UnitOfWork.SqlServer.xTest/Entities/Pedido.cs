@@ -1,5 +1,3 @@
-using Nuuvify.CommonPack.Domain;
-
 namespace Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest;
 
 public class Pedido : DomainEntity

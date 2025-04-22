@@ -1,4 +1,4 @@
-namespace Nuuvify.CommonPack.Extensions.Implementation;
+namespace Nuuvify.CommonPack.Extensions;
 
 /// <summary>
 /// Utilize essa interface, em sua ViewModel, ela ira disponibilizar

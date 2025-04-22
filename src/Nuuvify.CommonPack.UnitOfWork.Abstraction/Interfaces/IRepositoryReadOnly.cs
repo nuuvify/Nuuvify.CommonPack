@@ -1,6 +1,5 @@
 using System.Linq.Expressions;
-using Nuuvify.CommonPack.Extensions.Interfaces;
-using Nuuvify.CommonPack.Extensions.Notificator;
+using Nuuvify.CommonPack.Extensions;
 
 namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 
