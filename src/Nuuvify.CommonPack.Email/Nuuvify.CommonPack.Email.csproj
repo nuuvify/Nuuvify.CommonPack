@@ -10,13 +10,13 @@
       other layers.
   </Description>
   <PackageReadmeFile>README.md</PackageReadmeFile>
-  <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
+  <releaseNotes>release-notes.md</releaseNotes>
   <PackageTags>Nuuvify</PackageTags>
 </PropertyGroup>
 
 <ItemGroup>
   <None Include="README.md" Pack="true" PackagePath="\" />
-  <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
+  <None Include="release-notes.md" Pack="true" PackagePath="\" />
 </ItemGroup>
 
 <ItemGroup>
