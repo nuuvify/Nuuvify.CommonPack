@@ -8,7 +8,7 @@
       other layers.
   </Description>
   <PackageReadmeFile>README.md</PackageReadmeFile>
-  <PackageReleaseNotes>$(ReleaseNotes)</PackageReleaseNotes>
+  <ReleaseNotes>$(ReleaseNotes)</ReleaseNotes>
   <PackageTags>Nuuvify</PackageTags>
 </PropertyGroup>
 
@@ -35,11 +35,10 @@
       <ReleaseNotes>%(ReleaseNotesContent.Identity)</ReleaseNotes>
     </PropertyGroup>
     <ItemGroup>
-      <NuspecProperties Include="PackageReleaseNotes">
+      <NuspecProperties Include="ReleaseNotes">
         <Value>$(ReleaseNotes)</Value>
       </NuspecProperties>
     </ItemGroup>
   </Target>
-
 
 </Project>
