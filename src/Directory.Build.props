@@ -8,7 +8,7 @@
     <IsPackable>true</IsPackable>
     <Authors>Lincoln Zocateli</Authors>
     <Company>Lincoln Zocateli</Company>
-    <CopyrightText>(c) 2024 $(Company)</CopyrightText>
+    <Copyright>(c) 2024 $(Company)</Copyright>
     <!-- <PackageLicenseFile>LICENSE</PackageLicenseFile> -->
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/lzocateli/Nuuvify.CommonPack</PackageProjectUrl>
