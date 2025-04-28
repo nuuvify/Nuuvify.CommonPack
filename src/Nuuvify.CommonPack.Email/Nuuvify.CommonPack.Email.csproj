@@ -8,6 +8,7 @@
       other layers.
     </Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <releaseNotes>$(ReleaseNotes)</releaseNotes>
     <PackageTags>Nuuvify</PackageTags>
   </PropertyGroup>
 
