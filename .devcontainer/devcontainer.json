@@ -3,7 +3,7 @@
     "build": {
         "context": ".",
         "dockerfile": "Dockerfile",
-        "args": { 
+        "args": {
             "PathApp": "${containerWorkspaceFolder}",
             "NugetMode": "SKIP",
             "HttpProxyEnv": "${localEnv:HTTP_PROXY}",
@@ -47,6 +47,7 @@
 				"ms-dotnettools.csharp",
 				"ms-azuretools.vscode-docker",
 				"ms-vscode.powershell",
+                "ms-azuretools.vscode-containers",
 				"ms-vsliveshare.vsliveshare",
 				"ecmel.vscode-html-css",
 				"bianxianyang.htmlplay",
