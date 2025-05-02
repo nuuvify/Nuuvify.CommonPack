@@ -1,3 +1,4 @@
+using Nuuvify.CommonPack.Extensions.Brazil;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using Xunit;
 
