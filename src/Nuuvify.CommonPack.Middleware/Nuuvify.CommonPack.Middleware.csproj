@@ -10,6 +10,7 @@
       GlobalHandleException - Captura e loga as exceptions de forma global
       ValidateModelAttribute - Retorna os erros da ModelState de forma padronizada
     </Description>
+    <RootNamespace>Nuuvify.CommonPack.Middleware</RootNamespace>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
     <PackageTags>Nuuvify</PackageTags>

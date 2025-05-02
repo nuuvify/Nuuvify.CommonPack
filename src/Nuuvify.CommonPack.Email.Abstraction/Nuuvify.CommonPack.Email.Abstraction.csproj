@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <Description>
-      This library has only abstractions/interfaces and has no external dependencies. <br/>
-      Use this library without your domain project without causing external dependencies. 
-    </Description>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
-    <PackageTags>Nuuvify</PackageTags>
-  </PropertyGroup>
-  <ItemGroup>
-    <None Include="README.md" Pack="true" PackagePath="\" />
-    <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\Nuuvify.CommonPack.Extensions\Nuuvify.CommonPack.Extensions.csproj" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <Description>
+      This library has only abstractions/interfaces and has no external dependencies. <br />
+      Use this library without your domain project without causing external dependencies.
+        </Description>
+        <RootNamespace>Nuuvify.CommonPack.Email.Abstraction</RootNamespace>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
+        <PackageTags>Nuuvify</PackageTags>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\" />
+        <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Nuuvify.CommonPack.Mediator\Nuuvify.CommonPack.Mediator.csproj" />
+    </ItemGroup>
 
 
 </Project>

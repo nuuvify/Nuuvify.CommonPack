@@ -5,7 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nuuvify.CommonPack.Extensions.Implementation;
-using Nuuvify.CommonPack.Extensions.Notificator;
 using Nuuvify.CommonPack.Security.Abstraction;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 
@@ -81,18 +80,18 @@ public class TokenService : ITokenService
         if (!string.IsNullOrWhiteSpace(userClaim))
             _ = _standardHttpClient.WithHeader(Constants.UserClaimHeader, userClaim);
 
-        _logger.LogDebug("{messageLog} - User Claim: {userClaim}", messageLog, userClaim);
+        _logger.LogDebug("{MessageLog} - User Claim: {UserClaim}", messageLog, userClaim);
 
         var response = await _standardHttpClient.Post(urlRoute: urlToken, messageBody: messageBody);
 
         _credentialToken = ReturnClass<CredentialToken>(response);
 
-        if (_credentialToken is null || string.IsNullOrWhiteSpace(_credentialToken?.Token))
+        if (_credentialToken is null || string.IsNullOrWhiteSpace(_credentialToken.Token))
         {
             _credentialToken = new CredentialToken();
             _credentialToken.Warnings.Add("ResponseMessage", response.ReturnMessage);
 
-            _logger.LogWarning("{messageLog} - Response message invalid: {ReturnCode} {ReturnMessage}", messageLog, response?.ReturnCode, response?.ReturnMessage);
+            _logger.LogWarning("{MessageLog} - Response message invalid: {ReturnCode} {ReturnMessage}", messageLog, response?.ReturnCode, response?.ReturnMessage);
 
             return false;
         }
@@ -117,7 +116,7 @@ public class TokenService : ITokenService
         Notifications.Clear();
 
         var messageLog = $"{nameof(TokenService.GetToken)}";
-        _logger.LogDebug($"{messageLog} - Inicio");
+        _logger.LogDebug("{MessageLog} - Inicio", messageLog);
 
         if (string.IsNullOrWhiteSpace(login))
         {
@@ -133,7 +132,7 @@ public class TokenService : ITokenService
         var urlLogin = _configuration.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value;
         var urlToken = $"{urlLogin}{_configuration.GetSection("AppConfig:AppURLs:UrlLoginApiToken")?.Value}";
 
-        _logger.LogDebug("{messageLog} - urlToken: {urlToken}", messageLog, urlToken);
+        _logger.LogDebug("{MessageLog} - urlToken: {UrlToken}", messageLog, urlToken);
 
         if (string.IsNullOrWhiteSpace(login) ||
             string.IsNullOrWhiteSpace(password) ||
@@ -142,7 +141,7 @@ public class TokenService : ITokenService
         {
             Notifications.Add(new NotificationR(nameof(GetToken), "Algum dos dados a seguir não deveria estar branco: login ou password ou urlLogin ou urlToken"));
 
-            _logger.LogWarning("{messageLog} - Algum dos dados a seguir não deveria estar branco: login ou password ou urlLogin ou urlToken", messageLog);
+            _logger.LogWarning("{MessageLog} - Algum dos dados a seguir não deveria estar branco: login ou password ou urlLogin ou urlToken", messageLog);
 
             return null;
         }
@@ -151,11 +150,11 @@ public class TokenService : ITokenService
 
         if (_credentialToken != null && !string.IsNullOrWhiteSpace(_credentialToken?.Token))
         {
-            _logger.LogDebug("{messageLog} - Token obtido para o usuario: {LoginId} - Final", messageLog, _credentialToken.LoginId);
+            _logger.LogDebug("{MessageLog} - Token obtido para o usuario: {LoginId} - Final", messageLog, _credentialToken.LoginId);
         }
         else
         {
-            _logger.LogDebug("{messageLog} - Final", messageLog);
+            _logger.LogDebug("{MessageLog} - Final", messageLog);
         }
 
         return _credentialToken;
@@ -166,15 +165,15 @@ public class TokenService : ITokenService
     public string GetTokenAcessor()
     {
         var messageLog = $"{nameof(TokenService.GetTokenAcessor)}";
-        _logger.LogDebug($"{messageLog} - Inicio");
+        _logger.LogDebug("{MessageLog} - Inicio", messageLog);
 
         if (!IsAuthenticated(out string token))
         {
-            _logger.LogWarning("{messageLog} - Não foi encontrado Authorization no HttpContextAccessor, usuario não esta logado com um token", messageLog);
+            _logger.LogWarning("{MessageLog} - Não foi encontrado Authorization no HttpContextAccessor, usuario não esta logado com um token", messageLog);
             return string.Empty;
         }
 
-        _logger.LogDebug("{messageLog} - Final", messageLog);
+        _logger.LogDebug("{MessageLog} - Final", messageLog);
 
         return token;
     }

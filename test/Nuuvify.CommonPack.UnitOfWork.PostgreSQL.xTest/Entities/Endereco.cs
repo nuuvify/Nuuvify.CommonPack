@@ -1,5 +1,3 @@
-using Nuuvify.CommonPack.Extensions.Interfaces;
-
 namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest;
 
 public class Endereco : INotPersistingAsTable

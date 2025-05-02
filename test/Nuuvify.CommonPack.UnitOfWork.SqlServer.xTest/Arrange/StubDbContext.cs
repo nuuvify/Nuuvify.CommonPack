@@ -1,9 +1,5 @@
 using System.Diagnostics;
 using System.Text;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
 using Nuuvify.CommonPack.AutoHistory.Extensions;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.Middleware.Abstraction;

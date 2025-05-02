@@ -1,6 +1,5 @@
 
-namespace Nuuvify.CommonPack.Extensions.Interfaces;
-
+namespace Nuuvify.CommonPack.Extensions;
 
 /// <summary>
 /// Interface apenas para marcação, é utilizado na implementação do IValidation
