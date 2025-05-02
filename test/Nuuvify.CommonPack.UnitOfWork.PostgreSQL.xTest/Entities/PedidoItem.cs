@@ -1,3 +1,4 @@
+using Nuuvify.CommonPack.Domain.Implementations;
 using Nuuvify.CommonPack.Extensions.Implementation;
 
 namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest;

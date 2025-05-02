@@ -1,3 +1,5 @@
+using Nuuvify.CommonPack.Extensions;
+
 namespace Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest;
 
 public class Endereco : INotPersistingAsTable
