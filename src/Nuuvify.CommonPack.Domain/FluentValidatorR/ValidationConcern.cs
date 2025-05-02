@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using Nuuvify.CommonPack.Domain.FluentValidatorR;
-using Nuuvify.CommonPack.Extensions.Notificator;
+using Nuuvify.CommonPack.Mediator.Implementation;
 
 namespace Nuuvify.CommonPack.Domain;
 

@@ -8,5 +8,6 @@ internal sealed class ReturnStandardErrors
 
 internal sealed class NotificationR
 {
+    public string Property { get; set; }
     public string Message { get; set; }
 }

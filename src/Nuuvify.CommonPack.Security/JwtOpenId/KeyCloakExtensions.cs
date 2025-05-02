@@ -19,7 +19,7 @@ public static class KeyCloakExtensions
         if (options.SameSite == SameSiteMode.None)
         {
             _ = httpContext.Request.Headers["User-Agent"].ToString();
-            // TODO: Use your User Agent library of choice here. 
+            // TODO: Use your User Agent library of choice here.
             //if (/* UserAgent doesn’t support new behavior */)
             {
                 options.SameSite = SameSiteMode.Unspecified;

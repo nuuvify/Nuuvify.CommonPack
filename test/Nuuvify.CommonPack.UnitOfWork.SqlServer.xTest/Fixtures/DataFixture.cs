@@ -1,5 +1,3 @@
-using Bogus;
-
 namespace Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest.Fixtures;
 
 

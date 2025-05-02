@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <Description>
       Middlewares e filtros customizados, deve ser baixado no projeto IoC
       HandlingHeadersMiddleware - Inclui a versão da aplicação e do assembly no header da request,
@@ -12,6 +12,7 @@
       RequestConfiguration - Utilizada pelo LOG e também pelo HandlingHeadersMiddleware para criar
       log com contexto
     </Description>
+    <RootNamespace>Nuuvify.CommonPack.Middleware.Abstraction</RootNamespace>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
     <PackageTags>Nuuvify</PackageTags>
@@ -21,7 +22,7 @@
     <None Include="README.md" Pack="true" PackagePath="\" />
     <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
   </ItemGroup>

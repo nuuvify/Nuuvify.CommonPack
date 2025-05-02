@@ -1,9 +1,3 @@
-
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 /// <summary>
 /// Defines the interface(s) for unit of work.
@@ -19,13 +13,13 @@ public interface IUnitOfWork : IDisposable
     /// Asynchronously saves all changes made in this unit of work to the database.
     /// </summary>
     /// <param name="ensureAutoHistory">If configured, save changes to AutoHistory</param>
-    /// <param name="actualRegistry">In a processing loop, pass the registry count, 
+    /// <param name="actualRegistry">In a processing loop, pass the registry count,
     /// if the result of:
     /// <code>
     ///      Math.DivRem(actualRegistry, limitCommit, out int resto);
     ///      if (resto == 0)
-    /// </code> 
-    /// resto is zero, that is, every time the quantity established in limitCommit is processed, 
+    /// </code>
+    /// resto is zero, that is, every time the quantity established in limitCommit is processed,
     /// it will be implemented in the database.
     /// </param>
     /// <param name="limitCommit">Number of records to run Commit</param>
@@ -35,7 +29,7 @@ public interface IUnitOfWork : IDisposable
     Task<int> SaveChangesAsync(bool ensureAutoHistory = false, int actualRegistry = 1, int limitCommit = 1, bool toSave = true, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Executes the specified SQL command with the ExecuteSqlRaw method 
+    /// Executes the specified SQL command with the ExecuteSqlRaw method
     /// </summary>
     /// <param name="sql">The raw SQL.</param>
     /// <param name="parameters">The parameters.</param>

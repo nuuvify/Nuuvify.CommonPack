@@ -1,5 +1,5 @@
 using System.Linq.Expressions;
-using Nuuvify.CommonPack.Extensions.Notificator;
+using Nuuvify.CommonPack.Mediator.Implementation;
 
 namespace Nuuvify.CommonPack.Domain;
 

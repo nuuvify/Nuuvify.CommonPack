@@ -1,4 +1,5 @@
 using System.Text;
+using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
@@ -60,7 +61,7 @@ public partial class StandardHttpClient
             }
             else
             {
-                _logger.LogWarning("Url base e relativa informada esta invalido Base: {AbsoluteUri} Relativa: {url}", _httpClient?.BaseAddress?.AbsoluteUri, url);
+                _logger.LogWarning("Url base e relativa informada esta invalido Base: {AbsoluteUri} Relativa: {Url}", _httpClient?.BaseAddress?.AbsoluteUri, url);
                 return null;
             }
         }
@@ -72,12 +73,12 @@ public partial class StandardHttpClient
             }
             else
             {
-                _logger.LogWarning("Url informada é invalida: {url}", url);
+                _logger.LogWarning("Url informada é invalida: {Url}", url);
                 return null;
             }
         }
 
-        _logger.LogDebug("Url and message after config: {message} client url: {RequestUri}", message, message?.RequestUri);
+        _logger.LogDebug("Url and message after config: {Message} client url: {RequestUri}", message, message?.RequestUri);
 
         HttpResponseMessage response;
 
@@ -109,7 +110,7 @@ public partial class StandardHttpClient
         HttpRequestMessage message,
         CancellationToken cancellationToken = default)
     {
-        _logger.LogDebug("Url and message before config: {message} url: {url}", message, url);
+        _logger.LogDebug("Url and message before config: {Message} url: {Url}", message, url);
 
         if (url.EndsWith("&") || url.EndsWith("?"))
             url = url[..^1];
@@ -124,7 +125,7 @@ public partial class StandardHttpClient
             }
             else
             {
-                _logger.LogWarning("Url base e relativa informada esta invalido Base: {AbsoluteUri} Relativa: {url}", _httpClient?.BaseAddress?.AbsoluteUri, url);
+                _logger.LogWarning("Url base e relativa informada esta invalido Base: {AbsoluteUri} Relativa: {Url}", _httpClient?.BaseAddress?.AbsoluteUri, url);
                 return null;
             }
         }
@@ -136,12 +137,12 @@ public partial class StandardHttpClient
             }
             else
             {
-                _logger.LogWarning("Url informada é invalida: {url}", url);
+                _logger.LogWarning("Url informada é invalida: {Url}", url);
                 return null;
             }
         }
 
-        _logger.LogDebug("Url and message after config: {message} client url: {RequestUri}", message, message?.RequestUri);
+        _logger.LogDebug("Url and message after config: {Message} client url: {RequestUri}", message, message?.RequestUri);
 
         HttpResponseMessage response;
 
@@ -178,8 +179,7 @@ public partial class StandardHttpClient
         CustomHttpResponseMessage = response;
 
         var resultNumber = (int)response.StatusCode;
-
-        returnMessage.ReturnCode = resultNumber.ToString();
+        returnMessage.ReturnCode = resultNumber.ToString(CultureInfo.InvariantCulture);
         returnMessage.Success = response.IsSuccessStatusCode;
 
         var content = await response.Content.ReadAsStringAsync();
@@ -199,7 +199,7 @@ public partial class StandardHttpClient
 
         var resultNumber = (int)response.StatusCode;
 
-        returnMessage.ReturnCode = resultNumber.ToString();
+        returnMessage.ReturnCode = resultNumber.ToString(CultureInfo.InvariantCulture);
         returnMessage.Success = response.IsSuccessStatusCode;
 
         var content = await response.Content.ReadAsStreamAsync();

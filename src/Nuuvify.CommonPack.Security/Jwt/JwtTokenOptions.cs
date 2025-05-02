@@ -15,7 +15,7 @@ public class JwtTokenOptions
 
     /// <summary>
     /// Data da Criacao do token.
-    /// Não expirar antes de 
+    /// Não expirar antes de
     /// </summary>
     public DateTimeOffset NotBefore { get; set; } = DateTimeOffset.Now;
 

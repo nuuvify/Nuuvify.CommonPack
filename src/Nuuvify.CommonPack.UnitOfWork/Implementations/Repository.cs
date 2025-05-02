@@ -64,8 +64,7 @@ public class Repository<TEntity> : RepositoryReadOnly<TEntity>, IRepository<TEnt
         {
             var typeInfo = typeof(TEntity).GetTypeInfo();
             var key = _dbContext.Model.FindEntityType(typeInfo)
-                                      .FindPrimaryKey().Properties
-                                      .FirstOrDefault();
+                                      .FindPrimaryKey().Properties[0];
 
             var property = typeInfo.GetProperty(key?.Name);
             if (property != null)

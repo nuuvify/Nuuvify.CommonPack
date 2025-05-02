@@ -5,4 +5,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Naming", "CA1716:Identifiers should not match keywords", Justification = "<Pending>", Scope = "member", Target = "~M:Nuuvify.CommonPack.StandardHttpClient.IStandardHttpClient.Get(System.String,System.Threading.CancellationToken)~System.Threading.Tasks.Task{Nuuvify.CommonPack.StandardHttpClient.Results.HttpStandardReturn}")]
+[assembly: SuppressMessage("Naming", "CA1716:Identifiers should not match keywords", Justification = "Para uso apenas na implementação", Scope = "member", Target = "~M:Nuuvify.CommonPack.StandardHttpClient.IStandardHttpClient.Get(System.String,System.Threading.CancellationToken)~System.Threading.Tasks.Task{Nuuvify.CommonPack.StandardHttpClient.Results.HttpStandardReturn}")]
+[assembly: SuppressMessage("Style", "IDE0040:Remove accessibility modifiers", Justification = "Para uso apenas na implementação", Scope = "member", Target = "~P:Nuuvify.CommonPack.StandardHttpClient.IStandardHttpClient.AuthorizationLog")]
+[assembly: SuppressMessage("Style", "IDE0040:Remove accessibility modifiers", Justification = "Para uso apenas na implementação", Scope = "member", Target = "~P:Nuuvify.CommonPack.StandardHttpClient.IStandardHttpClient.CorrelationId")]
+[assembly: SuppressMessage("Style", "IDE0040:Remove accessibility modifiers", Justification = "Para uso apenas na implementação", Scope = "member", Target = "~P:Nuuvify.CommonPack.StandardHttpClient.IStandardHttpClient.LogRequest")]

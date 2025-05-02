@@ -1,5 +1,5 @@
 using System.Globalization;
-using Nuuvify.CommonPack.Extensions.Notificator;
+using Nuuvify.CommonPack.Mediator.Implementation;
 using Xunit;
 using Xunit.Extensions.Ordering;
 
