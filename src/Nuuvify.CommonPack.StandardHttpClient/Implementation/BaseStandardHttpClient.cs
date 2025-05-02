@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.Extensions.JsonConverter;
+using Nuuvify.CommonPack.Mediator.Implementation;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 
 namespace Nuuvify.CommonPack.StandardHttpClient;
@@ -59,7 +60,7 @@ public abstract partial class BaseStandardHttpClient
     /// <summary>
     /// Essa classe retorna um tipo generico (pode ser List ou Classe) para qualquer chamada Http <br/>
     /// Para deserializar XML, use a classe do dotnet conforme documentação aqui: <br/>
-    /// <seealso href="https://learn.microsoft.com/en-us/dotnet/standard/serialization/examples-of-xml-serialization"></seealso> 
+    /// <seealso href="https://learn.microsoft.com/en-us/dotnet/standard/serialization/examples-of-xml-serialization"></seealso>
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public virtual T ReturnGenericClass<T>(string standardReturn, string api, bool removeStartSpace = false) where T : class

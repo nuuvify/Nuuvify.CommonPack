@@ -1,4 +1,6 @@
 
+using Nuuvify.CommonPack.Mediator.Implementation;
+
 namespace Nuuvify.CommonPack.Email.Abstraction;
 
 public interface IEmail

@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Nuuvify.CommonPack.Extensions;
 using Nuuvify.CommonPack.Extensions.Implementation;
 
 namespace Nuuvify.CommonPack.UnitOfWork;
@@ -12,7 +13,7 @@ public static partial class ModelBuilderExtensions
     /// Essa extenção mapeia as propriedades esquecidas pelo desenvolvedor, atribuindo
     /// a elas tamanho 50 ao invés de serem mapeadas como max
     /// Use o metodo abaixo para informar o ProviderName desse contexto
-    /// <para> 
+    /// <para>
     /// <c>
     /// protected override void OnModelCreating(ModelBuilder modelBuilder)
     /// {

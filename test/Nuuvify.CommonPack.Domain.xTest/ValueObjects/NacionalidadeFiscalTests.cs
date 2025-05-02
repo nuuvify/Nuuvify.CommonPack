@@ -1,3 +1,4 @@
+using Nuuvify.CommonPack.Extensions.Brazil;
 using Xunit;
 
 namespace Nuuvify.CommonPack.Domain.xTest.ValueObjects;

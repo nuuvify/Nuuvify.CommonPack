@@ -35,10 +35,23 @@ public class IE : NotifiableR
 
         uf = uf?.Trim().ToUpper();
 
-        _ = new ValidationConcernR<IE>(this)
-            .AssertNotIsNullOrWhiteSpace(x => ie, ie)
-            .AssertHasMaxLength(x => ie, maxIE)
-            .AssertFixedLength(x => uf, maxUF);
+        if (string.IsNullOrWhiteSpace(ie))
+        {
+            AddNotification(nameof(IE), "IE cannot be null or whitespace.");
+            return;
+        }
+
+        if (ie.Length > maxIE)
+        {
+            AddNotification(nameof(IE), $"IE cannot exceed {maxIE} characters.");
+            return;
+        }
+
+        if (uf.Length != maxUF)
+        {
+            AddNotification(nameof(IE), $"UF must be exactly {maxUF} characters.");
+            return;
+        }
 
         var valido = IsValid();
 

@@ -1,3 +1,4 @@
+using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.Mediator.Implementation;
 
 namespace Nuuvify.CommonPack.Extensions.Brazil;
@@ -49,8 +50,10 @@ public class Endereco : NotifiableR
     {
         var validacao = Notifications.Count;
 
-        _ = new ValidationConcernR<Endereco>(this)
-            .AssertHasMaxLength(x => tipoLogradouro, MaxTipoLogradouro);
+        if (tipoLogradouro?.Length > MaxTipoLogradouro)
+        {
+            AddNotification(nameof(TipoLogradouro), $"O tipo de logradouro deve ter no máximo {MaxTipoLogradouro} caracteres.");
+        }
 
         if (validacao.Equals(Notifications.Count))
             TipoLogradouro = tipoLogradouro?.ToUpper();
@@ -60,9 +63,15 @@ public class Endereco : NotifiableR
     {
         var validacao = Notifications.Count;
 
-        _ = new ValidationConcernR<Endereco>(this)
-            .AssertHasMinLength(x => logradouro, MinLogradouro)
-            .AssertHasMaxLength(x => logradouro, MaxLogradouro);
+        if (logradouro?.Length < MinLogradouro)
+        {
+            AddNotification(nameof(Logradouro), $"O logradouro deve ter no mínimo {MinLogradouro} caracteres.");
+        }
+
+        if (logradouro?.Length > MaxLogradouro)
+        {
+            AddNotification(nameof(Logradouro), $"O logradouro deve ter no máximo {MaxLogradouro} caracteres.");
+        }
 
         if (validacao.Equals(Notifications.Count))
             Logradouro = StringExtensionMethods.ToTitleCase(logradouro);
@@ -74,9 +83,15 @@ public class Endereco : NotifiableR
 
         var codigoMunicipio = codigo.GetNumbers();
 
-        _ = new ValidationConcernR<Endereco>(this)
-            .AssertHasMinLength(x => codigoMunicipio, MinCodigoMunicipio)
-            .AssertHasMaxLength(x => codigoMunicipio, MaxCodigoMunicipio);
+        if (codigoMunicipio.Length < MinCodigoMunicipio)
+        {
+            AddNotification(nameof(CodigoMunicipio), $"O código do município deve ter no mínimo {MinCodigoMunicipio} caracteres.");
+        }
+
+        if (codigoMunicipio.Length > MaxCodigoMunicipio)
+        {
+            AddNotification(nameof(CodigoMunicipio), $"O código do município deve ter no máximo {MaxCodigoMunicipio} caracteres.");
+        }
 
         if (validacao.Equals(Notifications.Count))
             CodigoMunicipio = codigoMunicipio;
@@ -86,9 +101,15 @@ public class Endereco : NotifiableR
     {
         var validacao = Notifications.Count;
 
-        _ = new ValidationConcernR<Endereco>(this)
-            .AssertHasMinLength(x => nomeMunicipio, MinNomeMunicipio)
-            .AssertHasMaxLength(x => nomeMunicipio, MaxNomeMunicipio);
+        if (nomeMunicipio?.Length < MinNomeMunicipio)
+        {
+            AddNotification(nameof(NomeMunicipio), $"O nome do município deve ter no mínimo {MinNomeMunicipio} caracteres.");
+        }
+
+        if (nomeMunicipio?.Length > MaxNomeMunicipio)
+        {
+            AddNotification(nameof(NomeMunicipio), $"O nome do município deve ter no máximo {MaxNomeMunicipio} caracteres.");
+        }
 
         if (validacao.Equals(Notifications.Count))
             NomeMunicipio = StringExtensionMethods.ToTitleCase(nomeMunicipio);
@@ -98,8 +119,10 @@ public class Endereco : NotifiableR
     {
         var validacao = Notifications.Count;
 
-        _ = new ValidationConcernR<Endereco>(this)
-            .AssertFixedLength(x => uf, MaxUF);
+        if (uf?.Length != MaxUF)
+        {
+            AddNotification(nameof(UF), $"A UF deve ter exatamente {MaxUF} caracteres.");
+        }
 
         if (validacao.Equals(Notifications.Count))
             UF = uf.ToUpper();
@@ -109,8 +132,10 @@ public class Endereco : NotifiableR
     {
         var validacao = Notifications.Count;
 
-        _ = new ValidationConcernR<Endereco>(this)
-            .AssertHasMaxLength(x => bairro, MaxBairro);
+        if (bairro?.Length > MaxBairro)
+        {
+            AddNotification(nameof(Bairro), $"O bairro deve ter no máximo {MaxBairro} caracteres.");
+        }
 
         if (validacao.Equals(Notifications.Count))
             Bairro = StringExtensionMethods.ToTitleCase(bairro);
@@ -121,8 +146,10 @@ public class Endereco : NotifiableR
         var validacao = Notifications.Count;
         cep = StringExtensionMethods.GetNumbers(cep);
 
-        _ = new ValidationConcernR<Endereco>(this)
-            .AssertFixedLength(x => cep, MaxCep);
+        if (cep.Length != MaxCep)
+        {
+            AddNotification(nameof(Cep), $"O CEP deve ter exatamente {MaxCep} caracteres.");
+        }
 
         if (validacao.Equals(Notifications.Count))
             Cep = cep;
@@ -131,9 +158,15 @@ public class Endereco : NotifiableR
     {
         var validacao = Notifications.Count;
 
-        _ = new ValidationConcernR<Endereco>(this)
-            .AssertHasMinLength(x => numeroLogradouro, MinNumero)
-            .AssertHasMaxLength(x => numeroLogradouro, MaxNumero);
+        if (numeroLogradouro?.Length < MinNumero)
+        {
+            AddNotification(nameof(Numero), $"O número do logradouro deve ter no mínimo {MinNumero} caracteres.");
+        }
+
+        if (numeroLogradouro?.Length > MaxNumero)
+        {
+            AddNotification(nameof(Numero), $"O número do logradouro deve ter no máximo {MaxNumero} caracteres.");
+        }
 
         if (validacao.Equals(Notifications.Count))
             Numero = numeroLogradouro;
@@ -143,8 +176,10 @@ public class Endereco : NotifiableR
     {
         var validacao = Notifications.Count;
 
-        _ = new ValidationConcernR<Endereco>(this)
-            .AssertHasMaxLength(x => complemento, MaxComplemento);
+        if (complemento?.Length > MaxComplemento)
+        {
+            AddNotification(nameof(Complemento), $"O complemento deve ter no máximo {MaxComplemento} caracteres.");
+        }
 
         if (validacao.Equals(Notifications.Count) && (!(complemento is null)))
         {
@@ -156,9 +191,15 @@ public class Endereco : NotifiableR
     {
         var validacao = Notifications.Count;
 
-        _ = new ValidationConcernR<Endereco>(this)
-            .AssertHasMinLength(x => siglaPais, MinSiglaPais)
-            .AssertHasMaxLength(x => siglaPais, MaxSiglaPais);
+        if (siglaPais?.Length < MinSiglaPais)
+        {
+            AddNotification(nameof(SiglaPais), $"A sigla do país deve ter no mínimo {MinSiglaPais} caracteres.");
+        }
+
+        if (siglaPais?.Length > MaxSiglaPais)
+        {
+            AddNotification(nameof(SiglaPais), $"A sigla do país deve ter no máximo {MaxSiglaPais} caracteres.");
+        }
 
         if (validacao.Equals(Notifications.Count))
             SiglaPais = siglaPais.ToUpper();

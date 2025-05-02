@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Nuuvify.CommonPack.Domain.Implementations;
 using Nuuvify.CommonPack.UnitOfWork.Abstraction;
 
 namespace Nuuvify.CommonPack.UnitOfWork;
@@ -17,7 +18,7 @@ namespace Nuuvify.CommonPack.UnitOfWork;
 /// ou ignore, caso sua tabela não necessite desses campos:   <br/>
 /// AuditIgnore(builder);  <br/>
 /// AuditUserIdIgnore(builder); <br/>
-/// </para>   
+/// </para>
 /// </summary>
 /// <typeparam name="TEntity"></typeparam>
 public abstract class EntityConfiguration<TEntity> :
@@ -29,7 +30,7 @@ public abstract class EntityConfiguration<TEntity> :
     /// <summary>
     /// Sera mapeado a PK para o EF conforme o parametro informado, <br/>
     /// <para>
-    /// esse campo na tabela será mapeado com a propriedade ID contida na classe 
+    /// esse campo na tabela será mapeado com a propriedade ID contida na classe
     /// de dominio TEntity <br/>
     /// Caso necessite de uma PK com multiplos campos, crie no seu arquivo config:  <br/>
     /// <br/>
