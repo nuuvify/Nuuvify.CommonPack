@@ -7,8 +7,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Nuuvify.CommonPack.Extensions.Implementation;
-using Nuuvify.CommonPack.Extensions.Notificator;
 using Nuuvify.CommonPack.Middleware.Abstraction.Results;
+using Nuuvify.CommonPack.Middleware.Handle;
 
 namespace Nuuvify.CommonPack.Middleware.Filters;
 
@@ -85,7 +85,7 @@ public class ApiKeyFilter : IResourceFilter, IActionFilter, IExceptionFilter
         if (_logger == null)
             Debug.WriteLine($"Console: {logMessage}");
         else
-            _logger.LogDebug($"ILogger: {logMessage}");
+            _logger.LogDebug("ILocgger: {LogMessage}", logMessage);
 
     }
 
@@ -96,7 +96,8 @@ public class ApiKeyFilter : IResourceFilter, IActionFilter, IExceptionFilter
         if (_logger == null)
             Debug.WriteLine($"Console: {logMessage}");
         else
-            _logger.LogDebug($"ILogger: {logMessage}");
+            _logger.LogDebug("ILocgger: {LogMessage}", logMessage);
+
 
     }
 
@@ -141,7 +142,11 @@ public class ApiKeyFilter : IResourceFilter, IActionFilter, IExceptionFilter
 
             }
 
-            var notification = new NotificationR(nameof(_keyName), "ApiKey informed in the request header, is not valid, or does not exist in the Vault of this application.");
+            var notification = new NotificationR
+            {
+                Property = nameof(_keyName),
+                Message = "ApiKey informed in the request header, is not valid, or does not exist in the Vault of this application."
+            };
             var jsonResult = JsonSerializer.Serialize(new ReturnStandardErrors<NotificationR>
             {
                 Success = false,
@@ -172,13 +177,17 @@ public class ApiKeyFilter : IResourceFilter, IActionFilter, IExceptionFilter
         if (_logger == null)
             Debug.WriteLine($"Console: {logMessage}");
         else
-            _logger.LogDebug($"ILogger: {logMessage}");
+            _logger.LogDebug("ILogger: {LogMessage}", logMessage);
 
     }
 
     public void OnException(ExceptionContext context)
     {
-        var notification = new NotificationR(nameof(_keyName), context.Exception.Message);
+        var notification = new NotificationR
+        {
+            Property = nameof(_keyName),
+            Message = context.Exception.Message
+        };
         var jsonResult = JsonSerializer.Serialize(new ReturnStandardErrors<NotificationR>
         {
             Success = false,

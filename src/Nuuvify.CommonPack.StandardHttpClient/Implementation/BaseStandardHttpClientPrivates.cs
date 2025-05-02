@@ -1,7 +1,6 @@
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Nuuvify.CommonPack.Extensions.Notificator;
 using Nuuvify.CommonPack.StandardHttpClient.Helpers;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 
@@ -132,11 +131,12 @@ public abstract partial class BaseStandardHttpClient
         catch (Exception ex)
         {
 
-            Notifications.Add(new NotificationR(property: ex.Source,
-                 message: $"Ocorreu o erro: {ex.Message} ao deserializar o retorno: {standardReturn.ReturnMessage}. Correlation: {_standardHttpClient.CorrelationId} - Talvez possa ser resolvido com parametros da propriedade JsonSettings ou com uma classe para deserialização mais adequada",
-                 aggregatorId: $"{api}",
-                 type: "application",
-                 originNotification: null));
+            Notifications.Add(new NotificationR(
+                property: ex.Source,
+                message: $"Ocorreu o erro: {ex.Message} ao deserializar o retorno: {standardReturn.ReturnMessage}. Correlation: {_standardHttpClient.CorrelationId} - Talvez possa ser resolvido com parametros da propriedade JsonSettings ou com uma classe para deserialização mais adequada",
+                aggregatorId: $"{api}",
+                type: "application",
+                originNotification: null));
 
         }
     }

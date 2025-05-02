@@ -1,5 +1,3 @@
-using Xunit;
-
 namespace Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest;
 
 public sealed class InMemoryTestFactAttribute : FactAttribute

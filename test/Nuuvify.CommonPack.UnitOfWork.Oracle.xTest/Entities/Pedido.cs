@@ -1,5 +1,3 @@
-using Nuuvify.CommonPack.Domain;
-
 namespace Nuuvify.CommonPack.UnitOfWork.Oracle.xTest;
 
 public class Pedido : DomainEntity

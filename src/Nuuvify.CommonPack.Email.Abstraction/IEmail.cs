@@ -1,4 +1,3 @@
-using Nuuvify.CommonPack.Extensions.Notificator;
 
 namespace Nuuvify.CommonPack.Email.Abstraction;
 
@@ -33,12 +32,12 @@ public interface IEmail
     ///     AccountUserName: fulano@gmail.com
     ///     AccountPassword: senha do seu provedor de email
     /// }
-    /// 
+    ///
     /// Para ler os endereços de e-mail no appsettings.json utilize:
-    /// 
+    ///
     /// var emails = _configuration.GetChildren("EmailConfig:RemetenteEmail")
     ///                            .ToDictionary(x => x.Key, x => x.Value);
-    /// </code> 
+    /// </code>
     /// </example>
     /// </summary>
     /// <param name="recipients">Lista do tipo Dictionary onde KEY=e-mail, VALUE=Nome</param>

@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Nuuvify.CommonPack.Extensions.Interfaces;
 using Nuuvify.CommonPack.UnitOfWork.Abstraction;
 
 namespace Nuuvify.CommonPack.UnitOfWork;
@@ -80,7 +79,6 @@ public static partial class ModelBuilderExtensions
                     {
                         entityTypes = modelBuilder.Model.GetEntityTypes()?
                             .Where(e =>
-                            
                                 (typeof(INotPersistingAsTable)
                                 .IsAssignableFrom(e.ClrType) && !e.IsOwned()) ||
                                 (classIgnore
@@ -93,7 +91,6 @@ public static partial class ModelBuilderExtensions
                     {
                         entityTypes = modelBuilder.Model.GetEntityTypes()?
                             .Where(e =>
-                            
                                 (typeof(INotPersistingAsTable)
                                 .IsAssignableFrom(e.ClrType) && e.IsOwned()) ||
                                 (classIgnore
@@ -106,7 +103,6 @@ public static partial class ModelBuilderExtensions
                     {
                         entityTypes = modelBuilder.Model.GetEntityTypes()?
                             .Where(e =>
-                            
                                 typeof(INotPersistingAsTable)
                                 .IsAssignableFrom(e.ClrType) ||
                                 classIgnore

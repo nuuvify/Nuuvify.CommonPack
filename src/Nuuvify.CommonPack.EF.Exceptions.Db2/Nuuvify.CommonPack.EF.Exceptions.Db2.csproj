@@ -4,6 +4,7 @@
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <Description>Handle database errors easily when working with Entity Framework Core. Catch specific exceptions such as UniqueConstraintException, CannotInsertNullException, MaxLengthExceededException, NumericOverflowException or ReferenceConstraintException instead of generic DbUpdateException</Description>
+        <RootNamespace>Nuuvify.CommonPack.EF.Exceptions.Db2</RootNamespace>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
         <PackageTags>EntityFramework;EF;EFCore;Database;IBM;DB2</PackageTags>

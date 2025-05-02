@@ -1,6 +1,5 @@
 using MimeKit;
 using Nuuvify.CommonPack.Email.Abstraction;
-using Nuuvify.CommonPack.Extensions.Notificator;
 
 namespace Nuuvify.CommonPack.Email;
 
