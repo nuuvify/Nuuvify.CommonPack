@@ -1,4 +1,6 @@
 //Optional
+using Xunit;
+
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 //Optional
 [assembly: TestCaseOrderer("Xunit.Extensions.Ordering.TestCaseOrderer", "Xunit.Extensions.Ordering")]

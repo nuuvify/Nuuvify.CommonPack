@@ -1,3 +1,5 @@
+using Nuuvify.CommonPack.Domain.ValueObjects;
+using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.Mediator.Implementation;
 
 namespace Nuuvify.CommonPack.Extensions.Brazil;
@@ -35,5 +37,5 @@ public class TipoOperacaoExecutadaVo : NotifiableR
         return false;
     }
 
-    public const int maxTipoOperacaoExecutada = 1;
+    public const int MaxTipoOperacaoExecutada = 1;
 }

@@ -1,26 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Description>
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Description>
       Essa biblioteca tem objetivo de implementar UnitOfWork para qualquer banco de dados,
       implementando metodos de uso basico e comumente utilizado em projetos.
       Deve ser instalada no projeto Infra.IoC
-    </Description>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
-    <PackageTags>Nuuvify</PackageTags>
-  </PropertyGroup>
+        </Description>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
+        <PackageTags>Nuuvify</PackageTags>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <None Include="README.md" Pack="true" PackagePath="\" />
-    <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\Nuuvify.CommonPack.UnitOfWork.Abstraction\Nuuvify.CommonPack.UnitOfWork.Abstraction.csproj" />
-    <ProjectReference Include="..\Nuuvify.CommonPack.AutoHistory\Nuuvify.CommonPack.AutoHistory.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\" />
+        <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Nuuvify.CommonPack.Domain\Nuuvify.CommonPack.Domain.csproj" />
+        <ProjectReference Include="..\Nuuvify.CommonPack.UnitOfWork.Abstraction\Nuuvify.CommonPack.UnitOfWork.Abstraction.csproj" />
+        <ProjectReference Include="..\Nuuvify.CommonPack.AutoHistory\Nuuvify.CommonPack.AutoHistory.csproj" />
+    </ItemGroup>
 
 </Project>

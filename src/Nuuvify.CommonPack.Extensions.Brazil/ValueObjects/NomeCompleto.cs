@@ -1,3 +1,4 @@
+using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.Mediator.Implementation;
 
 namespace Nuuvify.CommonPack.Extensions.Brazil;
@@ -9,13 +10,31 @@ public class NomeCompleto : NotifiableR
     public NomeCompleto(string nome, string sobrenome)
     {
 
-        _ = new ValidationConcernR<NomeCompleto>(this)
-            .AssertNotIsNullOrWhiteSpace(x => nome, nome)
-            .AssertHasMinLength(x => nome, minNome)
-            .AssertHasMaxLength(x => nome, maxNome)
-            .AssertNotIsNullOrWhiteSpace(x => sobrenome, sobrenome)
-            .AssertHasMinLength(x => sobrenome, minSobreNome)
-            .AssertHasMaxLength(x => sobrenome, maxSobreNome);
+        if (string.IsNullOrWhiteSpace(nome))
+        {
+            AddNotification(nameof(Nome), "Nome não pode ser nulo ou vazio.");
+        }
+        else if (nome.Length < MinNome)
+        {
+            AddNotification(nameof(Nome), $"Nome deve ter no mínimo {MinNome} caracteres.");
+        }
+        else if (nome.Length > MaxNome)
+        {
+            AddNotification(nameof(Nome), $"Nome deve ter no máximo {MaxNome} caracteres.");
+        }
+
+        if (string.IsNullOrWhiteSpace(sobrenome))
+        {
+            AddNotification(nameof(SobreNome), "Sobrenome não pode ser nulo ou vazio.");
+        }
+        else if (sobrenome.Length < MinSobreNome)
+        {
+            AddNotification(nameof(SobreNome), $"Sobrenome deve ter no mínimo {MinSobreNome} caracteres.");
+        }
+        else if (sobrenome.Length > MaxSobreNome)
+        {
+            AddNotification(nameof(SobreNome), $"Sobrenome deve ter no máximo {MaxSobreNome} caracteres.");
+        }
 
         if (!IsValid())
         {

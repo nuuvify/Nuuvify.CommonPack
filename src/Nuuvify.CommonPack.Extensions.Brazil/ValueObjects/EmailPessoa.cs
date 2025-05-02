@@ -17,9 +17,15 @@ public class EmailPessoa : NotifiableR
     private void Validate(string endereco)
     {
 
-        _ = new ValidationConcernR<EmailPessoa>(this)
-            .AssertIsEmail(x => endereco)
-            .AssertHasMaxLength(x => endereco, MaxEndereco);
+        if (string.IsNullOrWhiteSpace(endereco) || !endereco.Contains("@"))
+        {
+            AddNotification(nameof(Endereco), "Invalid email address.");
+        }
+
+        if (endereco.Length > MaxEndereco)
+        {
+            AddNotification(nameof(Endereco), $"Email address exceeds maximum length of {MaxEndereco} characters.");
+        }
 
         if (!IsValid())
         {

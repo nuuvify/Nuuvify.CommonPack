@@ -1,4 +1,5 @@
 
+using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.Mediator.Implementation;
 
 namespace Nuuvify.CommonPack.Extensions.Brazil;
@@ -28,8 +29,10 @@ public class Cnpj : NotifiableR
             AddNotification(nameof(Cnpj), "Codigo invalido");
         }
 
-        _ = new ValidationConcernR<Cnpj>(this)
-            .AssertFixedLength(x => x.Codigo, MaxCnpj);
+        if (Codigo.Length != MaxCnpj)
+        {
+            AddNotification(nameof(Cnpj), $"Codigo deve ter {MaxCnpj} digitos");
+        }
 
         if (!IsValid())
             Codigo = null;
