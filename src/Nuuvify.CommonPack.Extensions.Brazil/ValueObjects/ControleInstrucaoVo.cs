@@ -1,4 +1,7 @@
 using System.Globalization;
+using Nuuvify.CommonPack.Domain.ValueObjects;
+using Nuuvify.CommonPack.Extensions.Implementation;
+using Nuuvify.CommonPack.Mediator.Implementation;
 
 namespace Nuuvify.CommonPack.Extensions.Brazil;
 
@@ -30,7 +33,7 @@ public class ControleInstrucao : NotifiableR
         Codigo = situacao;
     }
 
-    public const int maxCodigo = 1;
+    public const int MaxCodigo = 1;
 
     public override string ToString()
     {

@@ -1,4 +1,5 @@
 using Nuuvify.CommonPack.Extensions.Implementation;
+using Nuuvify.CommonPack.Mediator.Implementation;
 using Nuuvify.CommonPack.Security.Abstraction;
 
 namespace Nuuvify.CommonPack.StandardHttpClient;

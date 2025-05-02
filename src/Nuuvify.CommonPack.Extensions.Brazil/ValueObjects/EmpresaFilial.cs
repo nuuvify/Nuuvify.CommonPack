@@ -1,3 +1,5 @@
+using Nuuvify.CommonPack.Mediator.Implementation;
+
 namespace Nuuvify.CommonPack.Extensions.Brazil;
 
 public class EmpresaFilial : NotifiableR
@@ -19,9 +21,10 @@ public class EmpresaFilial : NotifiableR
     {
         var validacao = Notifications.Count;
 
-        _ = new ValidationConcernR<EmpresaFilial>(this)
-            .AssertHasMinLength(x => empresa, minEmpresa)
-            .AssertHasMaxLength(x => empresa, maxEmpresa);
+        if (empresa.Length < MinEmpresa || empresa.Length > MaxEmpresa)
+        {
+            AddNotification(nameof(CodigoEmpresa), $"Empresa must be between {MinEmpresa} and {MaxEmpresa} characters.");
+        }
 
         if (validacao.Equals(Notifications.Count))
             CodigoEmpresa = empresa;
@@ -31,18 +34,19 @@ public class EmpresaFilial : NotifiableR
     {
         var validacao = Notifications.Count;
 
-        _ = new ValidationConcernR<EmpresaFilial>(this)
-            .AssertHasMinLength(x => filial, minFilial)
-            .AssertHasMaxLength(x => filial, maxFilial);
+        if (filial.Length < MinFilial || filial.Length > MaxFilial)
+        {
+            AddNotification(nameof(CodigoFilial), $"Filial must be between {MinFilial} and {MaxFilial} characters.");
+        }
 
         if (validacao.Equals(Notifications.Count))
             CodigoFilial = filial;
     }
 
-    public const int minEmpresa = 0;
-    public const int maxEmpresa = 5;
+    public const int MinEmpresa = 0;
+    public const int MaxEmpresa = 5;
 
-    public const int minFilial = 0;
-    public const int maxFilial = 4;
+    public const int MinFilial = 0;
+    public const int MaxFilial = 4;
 
 }

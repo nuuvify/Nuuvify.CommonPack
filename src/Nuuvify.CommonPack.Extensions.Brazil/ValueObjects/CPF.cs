@@ -1,3 +1,4 @@
+using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.Mediator.Implementation;
 
 namespace Nuuvify.CommonPack.Extensions.Brazil;
@@ -22,8 +23,10 @@ public class Cpf : NotifiableR
             AddNotification(nameof(Cpf), "Codigo invalido");
         }
 
-        _ = new ValidationConcernR<Cpf>(this)
-            .AssertFixedLength(x => x.Codigo, MaxCpf);
+        if (Codigo.Length != MaxCpf)
+        {
+            AddNotification(nameof(Cnpj), $"Codigo deve ter {MaxCpf} digitos");
+        }
 
         if (!IsValid())
             Codigo = null;
