@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using Nuuvify.CommonPack.Extensions;
+using Nuuvify.CommonPack.Mediator.Implementation;
 
 namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 
@@ -255,7 +256,7 @@ public interface IRepositoryReadOnly<TEntity> : IRepositoryValidation where TEnt
         int take = 25);
 
     /// <summary>
-    /// Gets all entities based on a predicate, with only the properties you choose with selector 
+    /// Gets all entities based on a predicate, with only the properties you choose with selector
     /// <example>
     /// var items = _repository.GetAllAsync(selector: b => new MyClassQueryResult { Name = b.Title, Link = b.Url });
     /// </example>

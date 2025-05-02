@@ -1,3 +1,7 @@
+using Nuuvify.CommonPack.Domain.ValueObjects;
+using Nuuvify.CommonPack.Extensions.Implementation;
+using Nuuvify.CommonPack.Mediator.Implementation;
+
 namespace Nuuvify.CommonPack.Extensions.Brazil;
 
 public class ProdutorRural : NotifiableR
@@ -30,9 +34,10 @@ public class ProdutorRural : NotifiableR
         {
             var validacao = Notifications.Count;
 
-            _ = new ValidationConcernR<ProdutorRural>(this)
-                .AssertHasMinLength(x => cei, minCei)
-                .AssertHasMaxLength(x => cei, maxCei);
+            if (cei.Length < MinCei || cei.Length > MaxCei)
+            {
+                AddNotification(nameof(CeiDoProdutorRural), $"CEI must be between {MinCei} and {MaxCei} characters.");
+            }
 
             if (validacao.Equals(Notifications.Count))
                 CeiDoProdutorRural = cei;
@@ -41,7 +46,7 @@ public class ProdutorRural : NotifiableR
 
     }
 
-    public const int minCei = 0;
-    public const int maxCei = 12;
+    public const int MinCei = 0;
+    public const int MaxCei = 12;
 
 }

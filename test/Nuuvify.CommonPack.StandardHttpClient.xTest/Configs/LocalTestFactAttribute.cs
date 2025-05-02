@@ -1,3 +1,5 @@
+using Xunit;
+
 namespace Nuuvify.CommonPack.StandardHttpClient.xTest.Configs;
 
 public sealed class LocalTestFactAttribute : FactAttribute

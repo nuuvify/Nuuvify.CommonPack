@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nuuvify.CommonPack.Extensions.Implementation;
+using Nuuvify.CommonPack.Mediator.Implementation;
 using Nuuvify.CommonPack.Security.Abstraction;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 

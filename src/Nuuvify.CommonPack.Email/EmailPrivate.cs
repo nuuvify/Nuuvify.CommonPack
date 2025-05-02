@@ -4,6 +4,8 @@ using MailKit.Net.Smtp;
 using MimeKit;
 using MimeKit.Text;
 using Nuuvify.CommonPack.Email.Abstraction;
+using Nuuvify.CommonPack.Extensions.Implementation;
+using Nuuvify.CommonPack.Mediator.Implementation;
 
 namespace Nuuvify.CommonPack.Email;
 

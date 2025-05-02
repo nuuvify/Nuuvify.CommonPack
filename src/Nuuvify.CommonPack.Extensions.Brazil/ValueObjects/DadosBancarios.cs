@@ -1,3 +1,5 @@
+using Nuuvify.CommonPack.Domain.ValueObjects;
+using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.Mediator.Implementation;
 
 namespace Nuuvify.CommonPack.Extensions.Brazil;
@@ -33,9 +35,15 @@ public class DadosBancarios : NotifiableR
 
         var _bancoNumero = bancoNumero.GetNumbers();
 
-        _ = new ValidationConcernR<DadosBancarios>(this)
-            .AssertHasMinLength(x => _bancoNumero, minBancoNumero)
-            .AssertHasMaxLength(x => _bancoNumero, maxBancoNumero);
+        if (_bancoNumero.Length < MinBancoNumero)
+        {
+            AddNotification(nameof(DadosBancarios), $"O número do banco deve ter no mínimo {MinBancoNumero} caracteres.");
+        }
+
+        if (_bancoNumero.Length > MaxBancoNumero)
+        {
+            AddNotification(nameof(DadosBancarios), $"O número do banco deve ter no máximo {MaxBancoNumero} caracteres.");
+        }
 
         if (validacao.Equals(Notifications.Count))
             BancoNumero = _bancoNumero;
@@ -45,9 +53,15 @@ public class DadosBancarios : NotifiableR
     {
         var validacao = Notifications.Count;
 
-        _ = new ValidationConcernR<DadosBancarios>(this)
-            .AssertHasMinLength(x => agenciaNumero, minAgenciaNumero)
-            .AssertHasMaxLength(x => agenciaNumero, maxAgenciaNumero);
+        if (agenciaNumero.Length < MinAgenciaNumero)
+        {
+            AddNotification(nameof(DadosBancarios), $"O número da agência deve ter no mínimo {MinAgenciaNumero} caracteres.");
+        }
+
+        if (agenciaNumero.Length > MaxAgenciaNumero)
+        {
+            AddNotification(nameof(DadosBancarios), $"O número da agência deve ter no máximo {MaxAgenciaNumero} caracteres.");
+        }
 
         if (validacao.Equals(Notifications.Count))
             AgenciaNumero = agenciaNumero;
@@ -59,9 +73,15 @@ public class DadosBancarios : NotifiableR
 
         var _nome = StringExtensionMethods.ToTitleCase(agenciaNome);
 
-        _ = new ValidationConcernR<DadosBancarios>(this)
-            .AssertHasMinLength(x => _nome, minAgenciaNome)
-            .AssertHasMaxLength(x => _nome, maxAgenciaNome);
+        if (_nome.Length < MinAgenciaNome)
+        {
+            AddNotification(nameof(DadosBancarios), $"O nome da agência deve ter no mínimo {MinAgenciaNome} caracteres.");
+        }
+
+        if (_nome.Length > MaxAgenciaNome)
+        {
+            AddNotification(nameof(DadosBancarios), $"O nome da agência deve ter no máximo {MaxAgenciaNome} caracteres.");
+        }
 
         if (validacao.Equals(Notifications.Count))
             AgenciaNome = _nome;
@@ -71,9 +91,15 @@ public class DadosBancarios : NotifiableR
     {
         var validacao = Notifications.Count;
 
-        _ = new ValidationConcernR<DadosBancarios>(this)
-            .AssertHasMinLength(x => cc, minContaCorrente)
-            .AssertHasMaxLength(x => cc, maxContaCorrente);
+        if (cc.Length < MinContaCorrente)
+        {
+            AddNotification(nameof(DadosBancarios), $"A conta corrente deve ter no mínimo {MinContaCorrente} caracteres.");
+        }
+
+        if (cc.Length > MaxContaCorrente)
+        {
+            AddNotification(nameof(DadosBancarios), $"A conta corrente deve ter no máximo {MaxContaCorrente} caracteres.");
+        }
 
         if (validacao.Equals(Notifications.Count))
             ContaCorrente = cc;
@@ -86,25 +112,37 @@ public class DadosBancarios : NotifiableR
 
         if (tipoConta.GetHashCode().Equals(TipoContaBancaria.NaoPossuiConta.GetHashCode()))
         {
-            _ = new ValidationConcernR<DadosBancarios>(this)
-                .AssertIsNullOrWhiteSpace(x => x.BancoNumero)
-                .AssertIsNullOrWhiteSpace(x => x.AgenciaNumero)
-                .AssertIsNullOrWhiteSpace(x => x.AgenciaNome)
-                .AssertIsNullOrWhiteSpace(x => x.ContaCorrente);
+            if (string.IsNullOrWhiteSpace(BancoNumero))
+            {
+                AddNotification(nameof(DadosBancarios), "O número do banco não pode ser vazio ou nulo.");
+            }
+
+            if (string.IsNullOrWhiteSpace(AgenciaNumero))
+            {
+                AddNotification(nameof(DadosBancarios), "O número da agência não pode ser vazio ou nulo.");
+            }
+
+            if (string.IsNullOrWhiteSpace(AgenciaNome))
+            {
+                AddNotification(nameof(DadosBancarios), "O nome da agência não pode ser vazio ou nulo.");
+            }
+
+            if (string.IsNullOrWhiteSpace(ContaCorrente))
+            {
+                AddNotification(nameof(DadosBancarios), "A conta corrente não pode ser vazia ou nula.");
+            }
         }
 
     }
 
-    public const int minBancoNumero = 0;
-    public const int maxBancoNumero = 3;
+    public const int MinBancoNumero = 0;
+    public const int MaxBancoNumero = 3;
 
-    public const int minAgenciaNumero = 0;
-    public const int maxAgenciaNumero = 8;
-
-    public const int minAgenciaNome = 0;
-    public const int maxAgenciaNome = 30;
-
-    public const int minContaCorrente = 0;
-    public const int maxContaCorrente = 20;
+    public const int MinAgenciaNumero = 0;
+    public const int MaxAgenciaNumero = 8;
+    public const int MinAgenciaNome = 0;
+    public const int MaxAgenciaNome = 30;
+    public const int MinContaCorrente = 0;
+    public const int MaxContaCorrente = 20;
 
 }
