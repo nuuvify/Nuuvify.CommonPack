@@ -1,3 +1,5 @@
+using Nuuvify.CommonPack.Domain.ValueObjects;
+using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.Mediator.Implementation;
 
 namespace Nuuvify.CommonPack.Extensions.Brazil;
@@ -29,8 +31,10 @@ public class OptanteSimples : NotifiableR
     {
         var validacao = Notifications.Count;
 
-        _ = new ValidationConcernR<OptanteSimples>(this)
-            .AssertNotDateTimeNull(x => dataOpcaoPeloSimples);
+        if (dataOpcaoPeloSimples == default)
+        {
+            AddNotification(nameof(DataOpcaoPeloSimples), "A data de opção pelo Simples não pode ser nula ou inválida.");
+        }
 
         if (validacao.Equals(Notifications.Count))
             DataOpcaoPeloSimples = dataOpcaoPeloSimples;

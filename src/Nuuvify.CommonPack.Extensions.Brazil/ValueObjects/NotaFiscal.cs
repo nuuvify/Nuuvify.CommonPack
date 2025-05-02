@@ -1,3 +1,5 @@
+using Nuuvify.CommonPack.Domain.ValueObjects;
+using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.Mediator.Implementation;
 
 namespace Nuuvify.CommonPack.Extensions.Brazil;
@@ -43,9 +45,10 @@ public class NotaFiscal : NotifiableR
 
         var numeroNota = numero.GetNumbers();
 
-        _ = new ValidationConcernR<NotaFiscal>(this)
-            .AssertHasMinLength(x => numeroNota, minNumero)
-            .AssertHasMaxLength(x => numeroNota, maxNumero);
+        if (numeroNota.Length < MinNumero || numeroNota.Length > MaxNumero)
+        {
+            AddNotification(nameof(Numero), $"O número deve ter entre {MinNumero} e {MaxNumero} caracteres.");
+        }
 
         if (validacao.Equals(Notifications.Count))
             Numero = numeroNota;
@@ -55,9 +58,10 @@ public class NotaFiscal : NotifiableR
     {
         var validacao = Notifications.Count;
 
-        _ = new ValidationConcernR<NotaFiscal>(this)
-            .AssertHasMinLength(x => serieNota, minSerie)
-            .AssertHasMaxLength(x => serieNota, maxSerie);
+        if (serieNota.Length < MinSerie || serieNota.Length > MaxSerie)
+        {
+            AddNotification(nameof(Serie), $"A série deve ter entre {MinSerie} e {MaxSerie} caracteres.");
+        }
 
         if (validacao.Equals(Notifications.Count))
             Serie = serieNota;
@@ -66,8 +70,10 @@ public class NotaFiscal : NotifiableR
     private void DefinirEmissao(DateTime emissao)
     {
 
-        _ = new ValidationConcernR<NotaFiscal>(this)
-            .AssertNotDateTimeNull(x => emissao);
+        if (emissao == default)
+        {
+            AddNotification(nameof(Emissao), "A data de emissão não pode ser nula ou inválida.");
+        }
 
         if (IsValid())
         {

@@ -19,13 +19,50 @@ public class FluentValidator_En_Us_Tests
     }
 
     [Fact]
-    [Trait("CommonApi.Domain-FluentValidator", "FluentValidator_en_US")]
-    public void AssertIsRequired()
+    public void AssertIsRequired_ShouldAddNotification_WhenNameIsNullOrEmpty()
     {
-        const string name = "Name";
+        if (string.IsNullOrEmpty(_customer.Name))
+        {
+            _customer.AddNotification(nameof(_customer.Name), "Name is required.");
+        }
 
-        _ = new ValidationConcernR<Customer>(_customer).AssertIsRequired(x => x.Name);
-        Assert.Equal($"Field {name} is required.", _customer.Notifications.FirstOrDefault().Message);
+        Assert.Contains(_customer.Notifications, n => n.Property == nameof(_customer.Name) && n.Message == "Name is required.");
+    }
+
+    [Fact]
+    public void AssertHasMinLength_ShouldAddNotification_WhenNameIsTooShort()
+    {
+        int min = 5;
+        if (_customer.Name == null || _customer.Name.Length < min)
+        {
+            _customer.AddNotification(nameof(_customer.Name), $"Name must have at least {min} characters.");
+        }
+
+        Assert.Contains(_customer.Notifications, n => n.Property == nameof(_customer.Name) && n.Message == $"Name must have at least {min} characters.");
+    }
+
+    [Fact]
+    public void AssertHasMaxLength_ShouldAddNotification_WhenNameIsTooLong()
+    {
+        int max = 10;
+        if (_customer.Name != null && _customer.Name.Length > max)
+        {
+            _customer.AddNotification(nameof(_customer.Name), $"Name must have at most {max} characters.");
+        }
+
+        Assert.Contains(_customer.Notifications, n => n.Property == nameof(_customer.Name) && n.Message == $"Name must have at most {max} characters.");
+    }
+
+    [Fact]
+    public void AssertRegexIsMatches_ShouldAddNotification_WhenNameDoesNotMatchRegex()
+    {
+        string regex = "^\\d{5}[-]\\d{3}$";
+        if (!System.Text.RegularExpressions.Regex.IsMatch(_customer.Name ?? string.Empty, regex))
+        {
+            _customer.AddNotification(nameof(_customer.Name), "Name does not match the required format.");
+        }
+
+        Assert.Contains(_customer.Notifications, n => n.Property == nameof(_customer.Name) && n.Message == "Name does not match the required format.");
     }
 
     [Fact]

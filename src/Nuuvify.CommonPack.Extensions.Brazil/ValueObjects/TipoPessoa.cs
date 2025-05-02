@@ -1,4 +1,6 @@
 using System.Globalization;
+using Nuuvify.CommonPack.Domain.ValueObjects;
+using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.Mediator.Implementation;
 
 namespace Nuuvify.CommonPack.Extensions.Brazil;
@@ -42,8 +44,12 @@ public class TipoPessoa : NotifiableR
     private bool ValidarNascimento(DateTime? nascimento)
     {
 
-        _ = new ValidationConcernR<TipoPessoa>(this)
-            .AssertNotDateTimeNull(x => nascimento.Value);
+        if (nascimento == null)
+        {
+            AddNotification(nameof(DataDeNascimento), MsgValueObjects.ResourceManager.GetString("ValueObjectInvalidDate",
+            CultureInfo.CurrentCulture).Replace("{property}", nameof(DataDeNascimento)));
+            return false;
+        }
 
         if (IsValid())
         {

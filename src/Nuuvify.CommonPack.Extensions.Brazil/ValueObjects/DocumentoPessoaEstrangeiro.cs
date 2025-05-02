@@ -1,3 +1,4 @@
+using Nuuvify.CommonPack.Domain.ValueObjects;
 using Nuuvify.CommonPack.Mediator.Implementation;
 
 namespace Nuuvify.CommonPack.Extensions.Brazil;
@@ -35,37 +36,37 @@ public class DocumentoPessoaEstrangeiro : NotifiableR
 
     private void DefinirCodigoInfBeneficiarioRendimento(string codigoInfBeneficiario)
     {
-        var validacao = Notifications.Count;
+        if (string.IsNullOrEmpty(codigoInfBeneficiario) || codigoInfBeneficiario.Length > MaxCodigoInfBeneficiarioRendimento)
+        {
+            AddNotification(nameof(CodigoInfBeneficiarioRendimento), $"O código do beneficiário deve ter no máximo {MaxCodigoInfBeneficiarioRendimento} caracteres.");
+            return;
+        }
 
-        _ = new ValidationConcernR<DocumentoPessoaEstrangeiro>(this)
-            .AssertHasMaxLength(x => codigoInfBeneficiario, maxCodigoInfBeneficiarioRendimento);
-
-        if (validacao.Equals(Notifications.Count))
-            CodigoInfBeneficiarioRendimento = codigoInfBeneficiario;
+        CodigoInfBeneficiarioRendimento = codigoInfBeneficiario;
     }
 
     private void DefinirNumeroIdentificacaoFiscal(string numeroIdentificacaoFiscal)
     {
-        var validacao = Notifications.Count;
+        if (string.IsNullOrEmpty(numeroIdentificacaoFiscal) || numeroIdentificacaoFiscal.Length > MaxNumeroIdentificacaoFiscal)
+        {
+            AddNotification(nameof(NumeroIdentificacaoFiscal), $"O número de identificação fiscal deve ter no máximo {MaxNumeroIdentificacaoFiscal} caracteres.");
+            return;
+        }
 
-        _ = new ValidationConcernR<DocumentoPessoaEstrangeiro>(this)
-            .AssertHasMaxLength(x => numeroIdentificacaoFiscal, maxNumeroIdentificacaoFiscal);
-
-        if (validacao.Equals(Notifications.Count))
-            NumeroIdentificacaoFiscal = numeroIdentificacaoFiscal;
+        NumeroIdentificacaoFiscal = numeroIdentificacaoFiscal;
     }
 
     private void DefinirProvincia(string provincia)
     {
-        var validacao = Notifications.Count;
-
         var provinciaContribuinte = provincia?.ToUpper();
 
-        _ = new ValidationConcernR<DocumentoPessoaEstrangeiro>(this)
-            .AssertHasMaxLength(x => provinciaContribuinte, maxProvincia);
+        if (string.IsNullOrEmpty(provinciaContribuinte) || provinciaContribuinte.Length > MaxProvincia)
+        {
+            AddNotification(nameof(Provincia), $"A província deve ter no máximo {MaxProvincia} caracteres.");
+            return;
+        }
 
-        if (validacao.Equals(Notifications.Count))
-            Provincia = provinciaContribuinte;
+        Provincia = provinciaContribuinte;
     }
 
     private void DefinirNacionalidade(NacionalidadeFiscal nacionalidade)

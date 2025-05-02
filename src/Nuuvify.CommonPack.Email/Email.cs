@@ -1,6 +1,7 @@
 using System.Text;
 using MailKit.Net.Smtp;
 using Nuuvify.CommonPack.Email.Abstraction;
+using Nuuvify.CommonPack.Mediator.Implementation;
 
 namespace Nuuvify.CommonPack.Email;
 
