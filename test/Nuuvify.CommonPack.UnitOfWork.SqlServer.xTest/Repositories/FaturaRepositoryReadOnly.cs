@@ -1,5 +1,9 @@
+using Microsoft.EntityFrameworkCore;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest.Fixtures;
+using Xunit;
+using Xunit.Abstractions;
+using Xunit.Extensions.Ordering;
 
 namespace Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest.Repositories;
 
