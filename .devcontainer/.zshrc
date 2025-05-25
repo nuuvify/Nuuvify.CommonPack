@@ -18,22 +18,26 @@ alias lh='ls -lha'
 alias la='ls -A'
 alias l='ls -CF'
 
+export PATH="$PATH:$HOME/.local/bin"
 
 # Lines configured by zsh-newuser-install
-HISTFILE=~/.zsh_history
+HISTFILE=~/.histfile
 HISTSIZE=1000
 SAVEHIST=1000
 bindkey -e
 # End of lines configured by zsh-newuser-install
 # The following lines were added by compinstall
-# zstyle :compinstall filename '~/.zshrc'
+zstyle :compinstall filename '~/.zshrc'
 
-# autoload -Uz compinit
-# compinit
+autoload -Uz compinit
+compinit
 # End of lines added by compinstall
 
-export PATH=$PATH:/root/.local/bin
 
-#source ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+if [ -f ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]; then
+    source ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+else
+    source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+fi
 plugins=(zsh-autosuggestions)
 eval "$(oh-my-posh init zsh --config ~/.config/atomic.omp.json)"
