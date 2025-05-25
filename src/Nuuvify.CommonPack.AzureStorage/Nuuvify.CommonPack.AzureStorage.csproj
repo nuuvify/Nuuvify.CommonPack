@@ -18,9 +18,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Azure.Storage.Blobs" Version="12.20.0" />
+        <PackageReference Include="Azure.Storage.Blobs" Version="12.24.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
     </ItemGroup>
 
     <ItemGroup>
