@@ -16,14 +16,14 @@ try
     var builder = Host.CreateApplicationBuilder(args);
     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
     {
-        builder.Services.AddWindowsService(options =>
+        _ = builder.Services.AddWindowsService(options =>
         {
             options.ServiceName = ".NET Windows Service";
         });
     }
     else
     {
-        builder.Services.AddSystemd();
+        _ = builder.Services.AddSystemd();
     }
 
     var serviceProvider = builder.Services.BuildServiceProvider();

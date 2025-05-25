@@ -2,37 +2,30 @@
     "name": "(.NET)",
     "build": {
         "context": ".",
-        "dockerfile": "Dockerfile",
+		"dockerfile": "Dockerfile",
         "args": {
             "PathApp": "${containerWorkspaceFolder}",
-            "NugetMode": "SKIP",
-            "HttpProxyEnv": "${localEnv:HTTP_PROXY}",
-            "HttpsProxyEnv": "${localEnv:HTTPS_PROXY}",
-            "NoProxyEnv": "${localEnv:NO_PROXY}"
+            "NugetMode": "SKIP"
         }
-    },
-    "remoteEnv": {
-        "HOST_USER": "${localEnv:USERNAME}",
-        "APP_PATH": "${containerWorkspaceFolder}"
-    },
-
-    "mounts": [
-		// Se estiver utilizando Linux ou WSL2 desmarque essas linhas
-		// "source=/${localEnv:HOME}/.nuget/NuGet/NuGet.Config,target=/root/.nuget/NuGet/NuGet.Config,type=bind,consistency=cached",
-		// "source=/${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,consistency=cached",
-		// "source=/${localEnv:HOME}/.microsoft/usersecrets,target=/root/.microsoft/usersecrets,type=bind,consistency=cached"
-
-		// Se estiver usando Windows ou Docker Desktop, desmarque essas linhas
-		"source=${localEnv:HOME}${localEnv:USERPROFILE}\\.docker\\config.json,target=/root/.docker/config.json,type=bind,consistency=cached",
+	},
+	"remoteEnv": {
+        "AZURE_DEVOPS_EXT_PAT": "${localEnv:AZURE_DEVOPS_EXT_PAT}",
+        "ASPNETCORE_Kestrel__Certificates__Default__Password": "SecurePwdGoesHere",
+        "ASPNETCORE_Kestrel__Certificates__Default__Path": "/root/.aspnet/https/aspnetapp.pfx"
+	},
+	"mounts": [
+		"source=${localEnv:TMP}\\linux,target=/tmp,type=bind,consistency=cached",
+		"source=${localEnv:APPDATA}\\pip\\linux\\pip.conf,target=/root/.config/pip/pip.conf,type=bind,consistency=cached",
 		"source=${localEnv:APPDATA}\\NuGet\\linux\\NuGet.Config,target=/root/.nuget/NuGet/NuGet.Config,type=bind,consistency=cached",
 		"source=${localEnv:APPDATA}\\Microsoft\\UserSecrets,target=/root/.microsoft/usersecrets,type=bind,consistency=cached"
-    ],
-
+	],
 	"containerEnv": {
-		"WORKFOLDER": "${containerWorkspaceFolder}"
+		"WORKFOLDER": "${containerWorkspaceFolder}",
+		"HTTP_PROXY": "",
+		"HTTPS_PROXY": "",
+		"NO_PROXY": ""
 	},
-
-    "postStartCommand": "./.devcontainer/custom-install.sh",
+	"postCreateCommand": "./.devcontainer/custom-install.sh",
 
 	"customizations": {
 		"vscode": {
@@ -45,7 +38,6 @@
 				"ms-dotnettools.vscodeintellicode-csharp",
 				"ms-dotnettools.vscode-dotnet-runtime",
 				"ms-dotnettools.csharp",
-				"ms-azuretools.vscode-docker",
 				"ms-vscode.powershell",
                 "ms-azuretools.vscode-containers",
 				"ms-vsliveshare.vsliveshare",
@@ -67,7 +59,8 @@
 				"ms-mssql.mssql",
 				"humao.rest-client",
 				"shynet.vscode-taskkill",
-				"dotjoshjohnson.xml"
+				"dotjoshjohnson.xml",
+                "patcx.vscode-nuget-gallery"
 			]
 		}
 	}

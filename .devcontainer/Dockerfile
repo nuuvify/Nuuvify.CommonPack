@@ -3,7 +3,7 @@
 
 ARG BUILDPLATFORM=linux/amd64
 
-FROM --platform=$BUILDPLATFORM lzocateli/dotnet-sdk:8.0.303-jammy-amd64
+FROM --platform=$BUILDPLATFORM lzocateli/dotnet-sdk:8.0.410-jammy-dev
 
 ENV HTTP_PROXY=
 ENV HTTPS_PROXY=
@@ -14,7 +14,6 @@ ARG PathApp=/workspaces
 RUN apt update -y \
  && apt upgrade -y
 
-ARG UserApp=root
 ARG TZ=America/Sao_Paulo
 ARG DOTNET_ENVIRONMENT
 
