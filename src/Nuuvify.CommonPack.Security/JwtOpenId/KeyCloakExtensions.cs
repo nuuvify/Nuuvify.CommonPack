@@ -6,8 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
 
 namespace Nuuvify.CommonPack.Security.JwtOpenId;
 
@@ -126,16 +125,19 @@ public static class KeyCloakExtensions
         var claim = context.SecurityToken.Claims.SingleOrDefault(it => it.Type == "resource_access" && it.ValueType == "JSON");
         if (claim != null)
         {
-            JObject value = JsonConvert.DeserializeObject<JObject>(claim.Value);
+
+            var value = JsonDocument.Parse(claim.Value);
             string audience = context.SecurityToken.Audiences.Single();
-            var prop = value[audience];
-            var roles = prop?["roles"];
-            if (roles != null)
+
+            if (value.RootElement.TryGetProperty(audience, out var audienceProp) &&
+                audienceProp.TryGetProperty("roles", out var rolesProp) &&
+                rolesProp.ValueKind == JsonValueKind.Array)
             {
                 var identity = (ClaimsIdentity)context.Principal.Identity;
-                identity.AddClaims(
-                    roles.Select(it => new Claim(ClaimTypes.Role, it.Value<string>())).ToArray()
-                );
+                foreach (var role in rolesProp.EnumerateArray())
+                {
+                    identity.AddClaim(new Claim(ClaimTypes.Role, role.GetString()));
+                }
             }
         }
         return Task.CompletedTask;

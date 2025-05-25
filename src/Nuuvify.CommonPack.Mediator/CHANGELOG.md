@@ -1,1 +1,1 @@
-## 1.0.0 (2022-03-01)
+[https://github.com/nuuvify/Nuuvify.CommonPack](https://github.com/nuuvify/Nuuvify.CommonPack)
