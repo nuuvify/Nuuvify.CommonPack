@@ -1,23 +1,20 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
 using Microsoft.Extensions.Logging;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 
 namespace Nuuvify.CommonPack.StandardHttpClient;
 
-
-
-public partial class StandardHttpClient
+public partial class StandardHttpClientService
 {
-
 
     private void LogRequestMessage(HttpRequestMessage message)
     {
-
         var logString = new StringBuilder("==== REQUEST ==========================================================")
             .AppendLine()
-            .AppendLine($"Verb: {message.Method.Method}")
-            .AppendLine($"Uri:  {message.RequestUri.AbsoluteUri}");
+            .AppendLine(CultureInfo.InvariantCulture, $"Verb: {message.Method.Method}")
+            .AppendLine(CultureInfo.InvariantCulture, $"Uri:  {message.RequestUri.AbsoluteUri}");
 
         string recurseValue;
         foreach (var item in message.Headers)
@@ -28,34 +25,28 @@ public partial class StandardHttpClient
                 recurseValue += $",{itemValue}";
             }
             recurseValue = recurseValue.SubstringNotNull(1, recurseValue.Length - 1);
-
-            logString.AppendLine($"{item.Key} : {recurseValue}");
+            _ = logString.AppendLine(CultureInfo.InvariantCulture, $"{item.Key} : {recurseValue}");
 
             if (item.Key.StartsWith("authorization", StringComparison.InvariantCultureIgnoreCase))
                 AuthorizationLog = recurseValue;
 
         }
-
-        logString.AppendLine($"Content: {message.Content}")
-            .AppendLine($"=======================================================================");
-
+        _ = logString.AppendLine(CultureInfo.InvariantCulture, $"Content: {message.Content}")
+            .AppendLine("=======================================================================");
 
         _logger.LogInformation(logString.ToString());
 
     }
-
 
     private async Task<HttpStandardReturn> StandardSendAsync(
         string url,
         HttpRequestMessage message,
         CancellationToken cancellationToken = default)
     {
-        _logger.LogDebug("Url and message before config: {message} url: {url}", message, url);
+        _logger.LogDebug("Url and message before config: {Message} url: {Url}", message, url);
 
-
-        if (url.EndsWith("&") || url.EndsWith("?"))
+        if (url.EndsWith("&", StringComparison.Ordinal) || url.EndsWith("?", StringComparison.Ordinal))
             url = url[..^1];
-
 
         if (!string.IsNullOrWhiteSpace(_httpClient?.BaseAddress?.AbsoluteUri) &&
             _httpClient.BaseAddress.IsAbsoluteUri)
@@ -67,7 +58,7 @@ public partial class StandardHttpClient
             }
             else
             {
-                _logger.LogWarning("Url base e relativa informada esta invalido Base: {AbsoluteUri} Relativa: {url}", _httpClient?.BaseAddress?.AbsoluteUri, url);
+                _logger.LogWarning("Url base e relativa informada esta invalido Base: {AbsoluteUri} Relativa: {Url}", _httpClient?.BaseAddress?.AbsoluteUri, url);
                 return null;
             }
         }
@@ -79,16 +70,14 @@ public partial class StandardHttpClient
             }
             else
             {
-                _logger.LogWarning("Url informada é invalida: {url}", url);
+                _logger.LogWarning("Url informada é invalida: {Url}", url);
                 return null;
             }
         }
 
-        _logger.LogDebug("Url and message after config: {message} client url: {RequestUri}", message, message?.RequestUri);
-
+        _logger.LogDebug("Url and message after config: {Message} client url: {RequestUri}", message, message?.RequestUri);
 
         HttpResponseMessage response;
-
 
         if (HttpCompletionOption.Defult != CompletionOption)
         {
@@ -106,12 +95,9 @@ public partial class StandardHttpClient
         if (LogRequest)
             LogRequestMessage(message);
 
-
         HttpStandardReturn httpStandardReturn = await HandleResponseMessage(response);
 
-
         _logger.LogDebug("HttpStandardReturn return: {ReturnCode}", httpStandardReturn.ReturnCode);
-
 
         return httpStandardReturn;
     }
@@ -121,12 +107,10 @@ public partial class StandardHttpClient
         HttpRequestMessage message,
         CancellationToken cancellationToken = default)
     {
-        _logger.LogDebug("Url and message before config: {message} url: {url}", message, url);
+        _logger.LogDebug("Url and message before config: {Message} url: {Url}", message, url);
 
-
-        if (url.EndsWith("&") || url.EndsWith("?"))
+        if (url.EndsWith("&", StringComparison.Ordinal) || url.EndsWith("?", StringComparison.Ordinal))
             url = url[..^1];
-
 
         if (!string.IsNullOrWhiteSpace(_httpClient?.BaseAddress?.AbsoluteUri) &&
             _httpClient.BaseAddress.IsAbsoluteUri)
@@ -138,7 +122,7 @@ public partial class StandardHttpClient
             }
             else
             {
-                _logger.LogWarning("Url base e relativa informada esta invalido Base: {AbsoluteUri} Relativa: {url}", _httpClient?.BaseAddress?.AbsoluteUri, url);
+                _logger.LogWarning("Url base e relativa informada esta invalido Base: {AbsoluteUri} Relativa: {Url}", _httpClient?.BaseAddress?.AbsoluteUri, url);
                 return null;
             }
         }
@@ -150,16 +134,14 @@ public partial class StandardHttpClient
             }
             else
             {
-                _logger.LogWarning("Url informada é invalida: {url}", url);
+                _logger.LogWarning("Url informada é invalida: {Url}", url);
                 return null;
             }
         }
 
-        _logger.LogDebug("Url and message after config: {message} client url: {RequestUri}", message, message?.RequestUri);
-
+        _logger.LogDebug("Url and message after config: {Message} client url: {RequestUri}", message, message?.RequestUri);
 
         HttpResponseMessage response;
-
 
         if (HttpCompletionOption.Defult != CompletionOption)
         {
@@ -177,12 +159,9 @@ public partial class StandardHttpClient
         if (LogRequest)
             LogRequestMessage(message);
 
-
         HttpStandardStreamReturn httpStandardStreamReturn = await HandleResponseMessageStream(response);
 
-
         _logger.LogDebug("HttpStandardReturn return: {ReturnCode}", httpStandardStreamReturn?.ReturnCode);
-
 
         return httpStandardStreamReturn;
 
@@ -196,17 +175,14 @@ public partial class StandardHttpClient
 
         CustomHttpResponseMessage = response;
 
-
         var resultNumber = (int)response.StatusCode;
 
-        returnMessage.ReturnCode = resultNumber.ToString();
+        returnMessage.ReturnCode = resultNumber.ToString(CultureInfo.InvariantCulture);
         returnMessage.Success = response.IsSuccessStatusCode;
 
         var content = await response.Content.ReadAsStringAsync();
 
-
         returnMessage.ReturnMessage = content;
-
 
         return returnMessage;
     }
@@ -219,22 +195,17 @@ public partial class StandardHttpClient
 
         CustomHttpResponseMessage = response;
 
-
         var resultNumber = (int)response.StatusCode;
 
-        returnMessage.ReturnCode = resultNumber.ToString();
+        returnMessage.ReturnCode = resultNumber.ToString(CultureInfo.InvariantCulture);
         returnMessage.Success = response.IsSuccessStatusCode;
 
         var content = await response.Content.ReadAsStreamAsync();
 
-
         returnMessage.ReturnMessage = content;
-
 
         return returnMessage;
     }
-
-
 
 }
 

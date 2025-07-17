@@ -2,14 +2,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <TargetFramework>netstandard2.1</TargetFramework>
         <Description>
         Essa biblioteca contem abstrações (interfaces) e demais classes auxilires para a lib
         que implementa Security.
-        Essa biblioteca pode ser instalada em qualquer projeto da sua solução, diferente da 
-        biblioteca de Security que deve ser instalada apenas no seu projeto de IoC 
+        Essa biblioteca pode ser instalada em qualquer projeto da sua solução, diferente da
+        biblioteca de Security que deve ser instalada apenas no seu projeto de IoC
         </Description>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
+        <PackageTags>Security;Jwt;ClaimPrincipalExtensions</PackageTags>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\" />
+        <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />

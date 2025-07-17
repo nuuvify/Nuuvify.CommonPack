@@ -3,16 +3,14 @@ using Nuuvify.CommonPack.Extensions.Implementation;
 
 namespace Nuuvify.CommonPack.StandardHttpClient;
 
-
 ///<inheritdoc/>
-public partial class StandardHttpClient : IStandardHttpClient
+public partial class StandardHttpClientService : IStandardHttpClient, IDisposable
 {
-
 
     private readonly IHttpClientFactory _httpClientFactory;
     private HttpClient _httpClient;
     private HttpCompletionOption CompletionOption;
-    private readonly ILogger<StandardHttpClient> _logger;
+    private readonly ILogger<StandardHttpClientService> _logger;
     private readonly Dictionary<string, string> _formParameter;
     private readonly Dictionary<string, object> _headerStandard;
     private readonly Dictionary<string, object> _headerAuthorization;
@@ -21,33 +19,26 @@ public partial class StandardHttpClient : IStandardHttpClient
     public bool LogRequest { get; set; }
     public string AuthorizationLog { get; private set; }
 
-
-
     ///<inheritdoc/>
     public Uri FullUrl { get; private set; }
     ///<inheritdoc/>
     public string CorrelationId { get; private set; }
 
-
     public HttpResponseMessage CustomHttpResponseMessage { get; private set; }
 
-
-
-    public StandardHttpClient(
+    public StandardHttpClientService(
         IHttpClientFactory httpClientFactory,
-        ILogger<StandardHttpClient> logger)
+        ILogger<StandardHttpClientService> logger)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _queryString = new Dictionary<String, String>();
-
 
         _headerAuthorization = new Dictionary<string, object>();
         _headerStandard = new Dictionary<string, object>();
         _formParameter = new Dictionary<string, string>();
 
     }
-
 
     ///<inheritdoc/>
     public void ResetStandardHttpClient()
@@ -75,10 +66,7 @@ public partial class StandardHttpClient : IStandardHttpClient
     public void CreateClient(HttpClientHandler httpClientHandler)
     {
 
-        if (httpClientHandler == null)
-        {
-            throw new ArgumentNullException(nameof(httpClientHandler));
-        }
+        ArgumentNullException.ThrowIfNull(httpClientHandler);
 
         _httpClient = new HttpClient(httpClientHandler);
 
@@ -98,8 +86,6 @@ public partial class StandardHttpClient : IStandardHttpClient
         CompletionOption = httpCompletionOption;
     }
 
-
-
     ///<inheritdoc/>
     public IStandardHttpClient WithQueryString(string key, object value)
     {
@@ -111,8 +97,6 @@ public partial class StandardHttpClient : IStandardHttpClient
         return this;
     }
 
-
-
     ///<inheritdoc/>
     public IStandardHttpClient WithAuthorization(
         string schema = null,
@@ -123,10 +107,9 @@ public partial class StandardHttpClient : IStandardHttpClient
         if (!string.IsNullOrWhiteSpace(schema) &&
             !string.IsNullOrWhiteSpace(token))
         {
-
-            if (_headerAuthorization.TryGetValue(schema, out object valueObject))
+            if (_headerAuthorization.TryGetValue(schema, out _))
             {
-                _headerAuthorization.Remove(schema);
+                _ = _headerAuthorization.Remove(schema);
             }
             _headerAuthorization.Add(schema, token);
 
@@ -134,7 +117,7 @@ public partial class StandardHttpClient : IStandardHttpClient
 
         if (!string.IsNullOrWhiteSpace(userClaim))
         {
-            WithHeader(Constants.UserClaimHeader, userClaim);
+            _ = WithHeader(Constants.UserClaimHeader, userClaim);
         }
 
         return this;
@@ -144,13 +127,11 @@ public partial class StandardHttpClient : IStandardHttpClient
     public IStandardHttpClient WithCurrelationHeader(string correlationId)
     {
         if (string.IsNullOrWhiteSpace(correlationId)) return this;
-
-        if (!_headerStandard.TryGetValue(Constants.CorrelationHeader, out object valueObject))
+        if (!_headerStandard.TryGetValue(Constants.CorrelationHeader, out _))
         {
             _headerStandard.Add(Constants.CorrelationHeader, correlationId);
             CorrelationId = correlationId;
         }
-
 
         return this;
     }
@@ -159,19 +140,15 @@ public partial class StandardHttpClient : IStandardHttpClient
     public IStandardHttpClient WithHeader(string key, object value)
     {
         if (string.IsNullOrWhiteSpace(key)) return this;
-
-
-
-        if (!_headerStandard.TryGetValue(key, out object valueObject))
+        if (!_headerStandard.TryGetValue(key, out _))
         {
             _headerStandard.Add(key, value);
         }
-        else if (Constants.UserClaimHeader.Equals(key, StringComparison.InvariantCultureIgnoreCase))
+        else if (Constants.UserClaimHeader.Equals(key, StringComparison.OrdinalIgnoreCase))
         {
-            _headerStandard.Remove(key);
+            _ = _headerStandard.Remove(key);
             _headerStandard.Add(key, value);
         }
-
 
         return this;
     }
@@ -179,19 +156,15 @@ public partial class StandardHttpClient : IStandardHttpClient
     public IStandardHttpClient WithFormParameter(string key, string value)
     {
         if (string.IsNullOrWhiteSpace(key)) return this;
-
-
-
-        if (!_formParameter.TryGetValue(key, out string valueString))
+        if (!_formParameter.TryGetValue(key, out _))
         {
             _formParameter.Add(key, value);
         }
-        else if (Constants.UserClaimHeader.Equals(key, StringComparison.InvariantCultureIgnoreCase))
+        else if (Constants.UserClaimHeader.Equals(key, StringComparison.OrdinalIgnoreCase))
         {
-            _formParameter.Remove(key);
+            _ = _formParameter.Remove(key);
             _formParameter.Add(key, value);
         }
-
 
         return this;
     }
@@ -201,6 +174,19 @@ public partial class StandardHttpClient : IStandardHttpClient
         return WithHeader(header.Key, header.Value);
     }
 
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _httpClient?.Dispose();
+        }
+    }
 
 }
 
