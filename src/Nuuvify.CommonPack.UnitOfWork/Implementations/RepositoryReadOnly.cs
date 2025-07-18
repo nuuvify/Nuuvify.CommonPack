@@ -12,10 +12,10 @@ namespace Nuuvify.CommonPack.UnitOfWork;
 public partial class RepositoryReadOnly<TEntity> : NotifiableR, IRepositoryReadOnly<TEntity> where TEntity : class
 {
 
-    protected readonly DbContext _dbContext;
-    protected readonly DbSet<TEntity> _dbSet;
-
-
+    private readonly DbContext _dbContext;
+    private readonly DbSet<TEntity> _dbSet;
+    protected DbContext DbContext => _dbContext;
+    protected DbSet<TEntity> DbSet => _dbSet;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RepositoryReadOnly{TEntity}"/> class.
@@ -28,9 +28,6 @@ public partial class RepositoryReadOnly<TEntity> : NotifiableR, IRepositoryReadO
 
         Includes = new List<string>();
     }
-
-
-
 
     private IQueryable<TEntity> SetWithIncludes(IQueryable<TEntity> query)
     {
@@ -45,8 +42,7 @@ public partial class RepositoryReadOnly<TEntity> : NotifiableR, IRepositoryReadO
     }
     private IList<string> Includes { get; set; }
 
-
-    IRepositoryReadOnly<TEntity> IRepositoryReadOnly<TEntity>.Include(params string[] navigationProperties)
+    public virtual IRepositoryReadOnly<TEntity> Include(params string[] navigationProperties)
     {
         foreach (string navigationProperty in navigationProperties)
         {
@@ -56,15 +52,11 @@ public partial class RepositoryReadOnly<TEntity> : NotifiableR, IRepositoryReadO
         return this;
     }
 
-
     ///<inheritdoc/>
     public async Task<IList<TEntity>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await _dbSet.ToListAsync(cancellationToken);
     }
-
-
-
 
     ///<inheritdoc/>
     public async Task<IList<TResult>> GetAllAsync<TResult>(
@@ -79,13 +71,10 @@ public partial class RepositoryReadOnly<TEntity> : NotifiableR, IRepositoryReadO
     {
         IQueryable<TEntity> query = _dbSet;
 
-
-
         if (disableTracking)
         {
             query = query.AsNoTracking();
         }
-
 
         if (Includes?.Count > 0)
         {
@@ -117,9 +106,7 @@ public partial class RepositoryReadOnly<TEntity> : NotifiableR, IRepositoryReadO
             return await query.Select(selector).ToArrayAsync(cancellationToken);
         }
 
-
     }
-
 
     ///<inheritdoc/>
     public async Task<IList<TEntity>> GetAllAsync(
@@ -133,13 +120,10 @@ public partial class RepositoryReadOnly<TEntity> : NotifiableR, IRepositoryReadO
     {
         IQueryable<TEntity> query = _dbSet;
 
-
-
         if (disableTracking)
         {
             query = query.AsNoTracking();
         }
-
 
         if (Includes?.Count > 0)
         {
@@ -168,7 +152,6 @@ public partial class RepositoryReadOnly<TEntity> : NotifiableR, IRepositoryReadO
         }
         return await query.ToListAsync(cancellationToken);
 
-
     }
 
     ///<inheritdoc/>
@@ -188,12 +171,10 @@ public partial class RepositoryReadOnly<TEntity> : NotifiableR, IRepositoryReadO
     {
         IQueryable<TEntity> query = _dbSet;
 
-
         if (disableTracking)
         {
             query = query.AsNoTracking();
         }
-
 
         if (Includes?.Count > 0)
         {
@@ -222,10 +203,7 @@ public partial class RepositoryReadOnly<TEntity> : NotifiableR, IRepositoryReadO
 
         return query;
 
-
     }
-
-
 
     ///<inheritdoc/>
     public virtual TResult GetFirstOrDefault<TResult>(
@@ -276,14 +254,12 @@ public partial class RepositoryReadOnly<TEntity> : NotifiableR, IRepositoryReadO
         bool ignoreQueryFilters = false)
     {
 
-
         IQueryable<TEntity> query = _dbSet;
 
         if (disableTracking)
         {
             query = query.AsNoTracking();
         }
-
 
         if (Includes?.Count > 0)
         {
@@ -310,7 +286,6 @@ public partial class RepositoryReadOnly<TEntity> : NotifiableR, IRepositoryReadO
         }
     }
 
-
     /// <inheritdoc />
     public virtual async Task<TEntity> GetFirstOrDefaultAsync(
         Expression<Func<TEntity, bool>> predicate = null,
@@ -325,7 +300,6 @@ public partial class RepositoryReadOnly<TEntity> : NotifiableR, IRepositoryReadO
         {
             query = query.AsNoTracking();
         }
-
 
         if (Includes?.Count > 0)
         {
@@ -352,7 +326,6 @@ public partial class RepositoryReadOnly<TEntity> : NotifiableR, IRepositoryReadO
         }
     }
 
-
     /// <inheritdoc />
     public virtual async Task<TResult> GetFirstOrDefaultAsync<TResult>(
         Expression<Func<TEntity, TResult>> selector,
@@ -368,7 +341,6 @@ public partial class RepositoryReadOnly<TEntity> : NotifiableR, IRepositoryReadO
         {
             query = query.AsNoTracking();
         }
-
 
         if (Includes?.Count > 0)
         {
@@ -401,6 +373,5 @@ public partial class RepositoryReadOnly<TEntity> : NotifiableR, IRepositoryReadO
 
         return notifications;
     }
-
 
 }

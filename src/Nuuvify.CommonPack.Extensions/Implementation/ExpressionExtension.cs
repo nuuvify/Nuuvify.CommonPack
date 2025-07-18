@@ -1,48 +1,44 @@
-using System.Collections.Generic;
-
 namespace System.Linq.Expressions;
 
 public static class ExpressionExtension
 {
 
-
-
     /// <summary>
     /// CombineExpressions deve ser utilizado para gerar WHERE dinamicamente para o Entity Framework,
-    /// <p>Veja aqui um exemplo de uso:</p> 
+    /// <p>Veja aqui um exemplo de uso:</p>
     /// </summary>
     /// <example>
     /// <code>
     /// public Expression{Func{GfciFci, bool}} GetFilter()
     /// {
     ///     Expression{Func{GfciFci, bool}} filter = p => true;
-    /// 
+    ///
     ///     filter = p => p.Periodo == Periodo ee
     ///              p.MercCodigo == CodigoMercadoria ee
     ///              p.Estabelicimento == Estabelecimento;
-    /// 
+    ///
     ///     if (TipoMaterial.NotNullOrZero())
     ///     {
     ///         filter = filter.CombineExpressions{GfciFci}(
     ///             p => TipoMaterial.Contains(p.TipoMaterial));
     ///     }
-    /// 
+    ///
     ///     if (OM.NotNullOrZero())
     ///     {
     ///         filter = filter.CombineExpressions{GfciFci}(
     ///             p => OM.Contains(p.OmCodigo));
     ///     }
-    /// 
+    ///
     ///     return filter;
     /// }
     /// </code>
     /// No EFCore, usando o método acima no metodo WHERE poderia ser no LINQ também:
-    /// <code> 
+    /// <code>
     ///  var query = _context.GfciFcis.AsNoTracking()
     ///      .Where(obtemMercadoriaFciQuery.GetFilter())
     ///      .OrderByDescending(p => p.Periodo)
     ///      .ThenBy(p => p.MercCodigo);
-    /// 
+    ///
     ///  var result = await query.ToListAsync();
     /// </code>
     /// </example>

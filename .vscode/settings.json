@@ -1,3 +1,49 @@
 {
-    "dotnet.defaultSolution": "CommonPack.sln"
+    "dotnet.defaultSolution": "CommonPack.sln",
+    "todo-tree.highlights.defaultHighlight": {
+        "icon": "alert",
+        "type": "line",
+        "foreground": "#082dfc",
+        "background": "#f9f8fc21",
+        "opacity": 50,
+        "iconColour": "#FFFF00",
+    },
+    "todo-tree.highlights.customHighlight": {
+        "HACK": {
+            "type": "text",
+            "foreground": "#0efa06",
+            "background": "#f9f8fc21",
+            "iconColour": "#FFFF00",
+            "gutterIcon": true
+        },
+        "TODO": {
+            "type": "text",
+            "foreground": "#06eafa",
+            "background": "#f9f8fc21",
+            "iconColour": "#FFFF00",
+            "gutterIcon": true
+        },
+        "FIXME": {
+            "type": "text",
+            "foreground": "#fa7c06",
+            "background": "#f9f8fc21",
+            "iconColour": "#FFFF00",
+            "gutterIcon": true
+        },
+        "BUG": {
+            "type": "text",
+            "foreground": "#fc0808",
+            "background": "#f9f8fc21",
+            "iconColour": "#FFFF00",
+            "gutterIcon": true
+        }
+    },
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "explicit",
+        "source.organizeImports": "explicit",
+        "source.addMissingImports": "explicit",
+        "source.removeUnused": "explicit",
+    },
+    "editor.formatOnSave": true,
+    "terminal.integrated.fontFamily": "MesloLGM Nerd Font"
 }
