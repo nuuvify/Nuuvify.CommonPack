@@ -3,8 +3,10 @@ using System.Net.Http.Headers;
 
 namespace Nuuvify.CommonPack.StandardHttpClient;
 
-public partial class StandardHttpClientService
+
+public partial class StandardHttpClient
 {
+
 
     public async Task<HttpStandardReturn> Delete(
         string urlRoute,
@@ -12,9 +14,11 @@ public partial class StandardHttpClientService
     {
         var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
+
         var message = new HttpRequestMessage(HttpMethod.Delete, url)
             .CustomRequestHeader(_headerStandard)
             .AddAuthorizationHeader(_headerAuthorization);
+
 
         return await StandardSendAsync(url, message, cancellationToken);
 
@@ -28,6 +32,7 @@ public partial class StandardHttpClientService
     {
         var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
+
         var message = new HttpRequestMessage(HttpMethod.Delete, url)
         {
             Content = messageBody
@@ -36,8 +41,11 @@ public partial class StandardHttpClientService
         .AddAuthorizationHeader(_headerAuthorization);
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType));
 
+
+
         return await StandardStreamSendAsync(url, message, cancellationToken);
     }
+
 
 }
 

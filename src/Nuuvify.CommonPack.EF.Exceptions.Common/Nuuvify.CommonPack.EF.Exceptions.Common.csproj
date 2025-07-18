@@ -3,27 +3,20 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
+        <PackageTags>EntityFramework EF Exception SqlServer PostgreSQL MySql EntityFrameworkCore
+            entity-framework-core EFCore Data Database</PackageTags>
+        <PackageReleaseNotes>Populate Entries property of the exceptions</PackageReleaseNotes>
         <Description>Handle database errors easily when working with Entity Framework Core. Catch
             specific exceptions such as UniqueConstraintException, CannotInsertNullException,
             MaxLengthExceededException, NumericOverflowException or ReferenceConstraintException
             instead of generic DbUpdateException
 
             This is a base package for database specific packages. Install one of the specific
-            packages instead of this
-        </Description>
-        <RootNamespace>Nuuvify.CommonPack.EF.Exceptions.Common</RootNamespace>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
-        <PackageTags>EntityFramework;EF;EFCore;Database;IBM;DB2</PackageTags>
+            packages instead of this</Description>
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="README.md" Pack="true" PackagePath="\" />
-        <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.16" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.7" />
     </ItemGroup>
 
 </Project>

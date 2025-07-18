@@ -1,9 +1,9 @@
 {
-    "projects": [
-        "src",
-        "test"
-    ],
-    "sdk": {
-        "version": "8.0.410"
-    }
+  "projects": [
+    "src",
+    "test"
+  ],
+  "sdk": {
+    "version": "8.0.303"
+  }
 }

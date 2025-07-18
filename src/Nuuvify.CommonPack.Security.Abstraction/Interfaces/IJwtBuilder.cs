@@ -1,19 +1,21 @@
+using System;
 using System.Security.Claims;
 
-namespace Nuuvify.CommonPack.Security.Abstraction;
-
-public interface IJwtBuilder
+namespace Nuuvify.CommonPack.Security.Abstraction
 {
-    long ToUnixEpochDate(DateTime dateTime);
-    IJwtBuilder WithJwtClaims();
+    public interface IJwtBuilder
+    {
+        long ToUnixEpochDate(DateTime date);
+        IJwtBuilder WithJwtClaims();
 
-    IJwtBuilder WithJwtUserClaims(PersonWithRolesQueryResult personGroups);
+        IJwtBuilder WithJwtUserClaims(PersonWithRolesQueryResult personGroups);
 
-    ClaimsIdentity GetClaimsIdentity();
+        ClaimsIdentity GetClaimsIdentity();
 
-    string BuildToken();
+        string BuildToken();
 
-    CredentialToken GetUserToken();
-    bool CheckTokenIsValid(string token);
+        CredentialToken GetUserToken();
+        bool CheckTokenIsValid(string token);
 
+    }
 }

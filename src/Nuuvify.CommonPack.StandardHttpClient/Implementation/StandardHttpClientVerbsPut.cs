@@ -5,13 +5,16 @@ using System.Net.Http.Headers;
 
 namespace Nuuvify.CommonPack.StandardHttpClient;
 
-public partial class StandardHttpClientService
+
+public partial class StandardHttpClient
 {
+
 
     public async Task<HttpStandardReturn> Put(string urlRoute, object messageBody, CancellationToken cancellationToken = default)
     {
 
         var url = $"{urlRoute}{_queryString.ToQueryString()}";
+
 
         var message = new HttpRequestMessage(HttpMethod.Put, url)
         {
@@ -27,11 +30,14 @@ public partial class StandardHttpClientService
 
     }
 
+
     public async Task<HttpStandardReturn> Put(
         string urlRoute,
         CancellationToken cancellationToken = default)
     {
         var url = $"{urlRoute}{_queryString.ToQueryString()}";
+
+
 
         var message = new HttpRequestMessage(HttpMethod.Put, url);
 
@@ -43,9 +49,11 @@ public partial class StandardHttpClientService
         message.CustomRequestHeader(_headerStandard)
                .AddAuthorizationHeader(_headerAuthorization);
 
+
         return await StandardSendAsync(url, message, cancellationToken);
 
     }
+
 
     public async Task<HttpStandardStreamReturn> PutStream(
         string urlRoute,
@@ -55,6 +63,7 @@ public partial class StandardHttpClientService
     {
         var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
+
         var message = new HttpRequestMessage(HttpMethod.Put, url)
         {
             Content = messageBody
@@ -63,8 +72,11 @@ public partial class StandardHttpClientService
         .AddAuthorizationHeader(_headerAuthorization);
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType));
 
+
+
         return await StandardStreamSendAsync(url, message, cancellationToken);
     }
+
 
 }
 

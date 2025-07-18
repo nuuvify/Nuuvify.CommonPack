@@ -1,19 +1,22 @@
-﻿
-namespace Nuuvify.CommonPack.StandardHttpClient.xTest.Configs;
+﻿using System;
+using Xunit;
 
-public sealed class LocalTestFactAttribute : FactAttribute
+namespace Nuuvify.CommonPack.StandardHttpClient.xTest.Configs
 {
-    public LocalTestFactAttribute()
+    public sealed class LocalTestFactAttribute : FactAttribute
     {
-        if (!IsLocalMachine())
+        public LocalTestFactAttribute()
         {
-            Skip = "Ignore test in Server";
+            if (!IsLocalMachine())
+            {
+                Skip = "Ignore test in Server";
+            }
         }
-    }
 
-    private static bool IsLocalMachine()
-    {
-        var machineName = Environment.MachineName;
-        return machineName.StartsWith("B8", StringComparison.OrdinalIgnoreCase);
+        private static bool IsLocalMachine()
+        {
+            var machineName = Environment.MachineName;
+            return machineName.StartsWith("B8", StringComparison.OrdinalIgnoreCase);
+        }
     }
 }

@@ -3,24 +3,23 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <Description>Handle database errors easily when working with Entity Framework Core. Catch specific exceptions such as UniqueConstraintException, CannotInsertNullException, MaxLengthExceededException, NumericOverflowException or ReferenceConstraintException instead of generic DbUpdateException</Description>
-        <RootNamespace>Nuuvify.CommonPack.EF.Exceptions.Db2</RootNamespace>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
-        <PackageTags>EntityFramework;EF;EFCore;Database;IBM;DB2</PackageTags>
+        <PackageTags>EntityFramework EF Oracle EntityFrameworkCore ODP.NET entity-framework-core EFCore Data Database</PackageTags>
+        <PackageReleaseNotes>Populate Entries property of the exceptions</PackageReleaseNotes>
+        <Description>Handle database errors easily when working with Entity Framework Core. Catch specific exceptions such as UniqueConstraintException, CannotInsertNullException, MaxLengthExceededException, NumericOverflowException or ReferenceConstraintException instead of generic DbUpdateException</Description>
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="README.md" Pack="true" PackagePath="\" />
-        <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
-    </ItemGroup>
-    <ItemGroup>
-        <PackageReference Include="Net.IBM.Data.Db2" Version="8.0.0.400" Condition="'$(os)' == 'Windows_NT'" />
-        <PackageReference Include="Net.IBM.Data.Db2-lnx" Version="8.0.0.400" Condition="'$(os)' == 'UNIX'" />
+		<PackageReference Include="Net.IBM.Data.Db2" Version="8.0.0.200" Condition="'$(os)' == 'Windows_NT'" />
+		<PackageReference Include="Net.IBM.Data.Db2-lnx" Version="8.0.0.200" Condition="'$(os)' == 'UNIX'" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Nuuvify.CommonPack.EF.Exceptions.Common\Nuuvify.CommonPack.EF.Exceptions.Common.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\" />
     </ItemGroup>
 
 </Project>

@@ -1,128 +1,155 @@
-﻿namespace Nuuvify.CommonPack.StandardHttpClientService.xTest;
+﻿using System;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
+using Moq;
+using Nuuvify.CommonPack.Extensions.Notificator;
+using Nuuvify.CommonPack.Security.Abstraction;
+using Nuuvify.CommonPack.StandardHttpClient.Polly;
+using Nuuvify.CommonPack.StandardHttpClient.xTest.Configs;
+using Nuuvify.CommonPack.StandardHttpClient.xTest.Fixtures;
+using Xunit;
+using Xunit.Extensions.Ordering;
 
-[Order(2)]
-public class BaseHttpCustomTests : NotifiableR
+namespace Nuuvify.CommonPack.StandardHttpClient.xTest
 {
-    private readonly Mock<IHttpClientFactory> mockFactory;
-    private readonly Mock<IConfiguration> mockConfiguration;
-    private readonly Mock<IHttpContextAccessor> mockUserAuthenticated;
-
-    private readonly IConfiguration Config;
-
-    public BaseHttpCustomTests()
+    [Order(2)]
+    public class BaseHttpCustomTests : NotifiableR
     {
-        mockFactory = new Mock<IHttpClientFactory>();
-        mockConfiguration = new Mock<IConfiguration>();
-        mockUserAuthenticated = new Mock<IHttpContextAccessor>();
+        private readonly Mock<IHttpClientFactory> mockFactory;
+        private readonly Mock<IConfiguration> mockConfiguration;
+        private readonly Mock<IHttpContextAccessor> mockUserAuthenticated;
 
-        Config = AppSettingsConfig.GetConfig();
-    }
+        private readonly IConfiguration Config;
 
-    [Fact, Order(1)]
-    public async Task QuandoObterTokenRetornarErroNotificationDeveSerLancada()
-    {
-
-        using var handler = new HttpClientHandler();
-        using var client = new HttpClient(handler, true)
+        public BaseHttpCustomTests()
         {
-            BaseAddress = new Uri(Config.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value)
-        };
-        client.DefaultRequestHeaders.Add("Accept", "application/json");
+            mockFactory = new Mock<IHttpClientFactory>();
+            mockConfiguration = new Mock<IConfiguration>();
+            mockUserAuthenticated = new Mock<IHttpContextAccessor>();
 
-        _ = mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>()))
-            .Returns(client);
 
-        using var standardClient = new StandardHttpClient.StandardHttpClientService(
-            mockFactory.Object,
-            new NullLogger<StandardHttpClient.StandardHttpClientService>());
+            Config = AppSettingsConfig.GetConfig();
+        }
 
-        var username = Config.GetSection("AzureAdOpenID:cc:ClientId")?.Value;
-        var password = Config.GetSection("AzureAdOpenID:cc:ClientSecret")?.Value;
-        var urlusername = Config.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value;
-        var urlToken = "api/urlfake";
 
-        _ = mockConfiguration.Setup(x => x.GetSection("AzureAdOpenID:cc:ClientId").Value)
-            .Returns(username);
-        _ = mockConfiguration.Setup(x => x.GetSection("AzureAdOpenID:cc:ClientSecret").Value)
-            .Returns(password);
-        _ = mockConfiguration.Setup(x => x.GetSection("AppConfig:AppURLs:UrlLoginApiToken").Value)
-            .Returns(urlToken);
 
-        var credentialToken = new CredentialToken()
+
+        [Fact, Order(1)]
+        public async Task QuandoObterTokenRetornarErroNotificationDeveSerLancada()
         {
-            LoginId = username,
-            Password = password,
-            Expires = DateTimeOffset.Now.AddMinutes(-10)
-        };
-        var mockCredentialToken = new Mock<IOptions<CredentialToken>>();
-        _ = mockCredentialToken.Setup(ap => ap.Value)
-            .Returns(credentialToken);
 
-        var user = new UserFixture().GetUserPrincipalFake();
+            var handler = new HttpClientHandler();
+            var client = new HttpClient(handler, true)
+            {
+                BaseAddress = new Uri(Config.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value)
+            };
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
 
-        _ = mockUserAuthenticated.Setup(_ => _.HttpContext.User)
-            .Returns(user);
 
-        var tokenService = new TokenService(
-            mockCredentialToken.Object,
-            standardClient,
-            mockConfiguration.Object,
-            new NullLogger<TokenService>(),
-            mockUserAuthenticated.Object);
-        var retorno = await tokenService.GetToken();
+            mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>()))
+                .Returns(client);
 
-        Assert.Null(tokenService.GetActualToken()?.Token);
-        Assert.Null(retorno);
-        Assert.True(tokenService.Notifications.Count > 0);
-    }
 
-    [LocalTestFact, Order(2)]
-    public async Task ObtemCadastroPessoaValido()
-    {
-        var config = AppSettingsConfig.GetConfig();
+            var standardClient = new StandardHttpClient(mockFactory.Object, new NullLogger<StandardHttpClient>());
 
-        var tokenFactory = new TokenFactory(config);
-        var tokenValido = await tokenFactory.ObtemTokenValido(
-            loginId: config.GetSection("AzureAdOpenID:cc:ClientId")?.Value,
-            password: config.GetSection("AzureAdOpenID:cc:ClientSecret")?.Value
-        );
 
-        var notification = tokenFactory.Notifications.LastOrDefault();
-        Assert.True(string.IsNullOrWhiteSpace(notification?.Message), notification?.Message);
+            var username = Config.GetSection("AzureAdOpenID:cc:ClientId")?.Value;
+            var password = Config.GetSection("AzureAdOpenID:cc:ClientSecret")?.Value;
+            var urlusername = Config.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value;
+            var urlToken = "api/urlfake";
 
-        var urlSynchro = config.GetSection("AppConfig:AppURLs:UrlPessoasApi")?.Value;
 
-        using var handler = new HttpClientHandler();
-        using var client = new HttpClient(handler, true)
+            mockConfiguration.Setup(x => x.GetSection("AzureAdOpenID:cc:ClientId").Value)
+                .Returns(username);
+            mockConfiguration.Setup(x => x.GetSection("AzureAdOpenID:cc:ClientSecret").Value)
+                .Returns(password);
+            mockConfiguration.Setup(x => x.GetSection("AppConfig:AppURLs:UrlLoginApiToken").Value)
+                .Returns(urlToken);
+
+            var credentialToken = new CredentialToken()
+            {
+                LoginId = username,
+                Password = password,
+                Expires = DateTimeOffset.Now.AddMinutes(-10)
+            };
+            var mockCredentialToken = new Mock<IOptions<CredentialToken>>();
+            mockCredentialToken.Setup(ap => ap.Value)
+                .Returns(credentialToken);
+
+
+            var user = new UserFixture().GetUserPrincipalFake();
+
+            mockUserAuthenticated.Setup(_ => _.HttpContext.User)
+                .Returns(user);
+
+
+            var tokenService = new TokenService(mockCredentialToken.Object, standardClient, mockConfiguration.Object, new NullLogger<TokenService>(), mockUserAuthenticated.Object);
+            var retorno = await tokenService.GetToken();
+
+
+            Assert.Null(tokenService.GetActualToken()?.Token);
+            Assert.Null(retorno);
+            Assert.True(tokenService.Notifications.Count > 0);
+        }
+
+
+
+        [LocalTestFact, Order(2)]
+        public async Task ObtemCadastroPessoaValido()
         {
-            BaseAddress = new Uri(urlSynchro)
-        };
-        client.DefaultRequestHeaders.Add("Accept", "application/json");
+            var config = AppSettingsConfig.GetConfig();
 
-        _ = mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>()))
-            .Returns(client);
 
-        var url = $"api/v2/Pessoas/cpfcnpj";
+            var tokenFactory = new TokenFactory(config);
+            var tokenValido = await tokenFactory.ObtemTokenValido(
+                loginId: config.GetSection("AzureAdOpenID:cc:ClientId")?.Value,
+                password: config.GetSection("AzureAdOpenID:cc:ClientSecret")?.Value
+            );
 
-        using var standardClientSynchro = new StandardHttpClient.StandardHttpClientService(
-            mockFactory.Object,
-            new NullLogger<StandardHttpClient.StandardHttpClientService>());
-        standardClientSynchro.CreateClient();
-        standardClientSynchro.ResetStandardHttpClient();
+            var notification = tokenFactory?.Notifications.LastOrDefault();
+            Assert.True(string.IsNullOrWhiteSpace(notification?.Message), notification?.Message);
 
-        var returnSynchro = await standardClientSynchro
-            .WithCurrelationHeader("teste1234")
-            .WithQueryString("codigo", "61064911000177")
-            .WithQueryString("vigenciaInicial", "2020-01-19")
-            .WithQueryString("vigenciaFinal", "2020-01-19")
-            .WithAuthorization("bearer", tokenValido)
-            .Get(url);
 
-        var expected = "200";
-        var actual = returnSynchro?.ReturnCode;
+            var urlSynchro = config.GetSection("AppConfig:AppURLs:UrlPessoasApi")?.Value;
 
-        Assert.Equal(expected, actual);
+            var handler = new HttpClientHandler();
+            var client = new HttpClient(handler, true)
+            {
+                BaseAddress = new Uri(urlSynchro)
+            };
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+
+
+            mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>()))
+                .Returns(client);
+
+            var url = $"api/v2/Pessoas/cpfcnpj";
+
+            var standardClientSynchro = new StandardHttpClient(mockFactory.Object, new NullLogger<StandardHttpClient>());
+            standardClientSynchro.CreateClient();
+            standardClientSynchro.ResetStandardHttpClient();
+
+            var returnSynchro = await standardClientSynchro
+                .WithCurrelationHeader("teste1234")
+                .WithQueryString("codigo", "61064911000177")
+                .WithQueryString("vigenciaInicial", "2020-01-19")
+                .WithQueryString("vigenciaFinal", "2020-01-19")
+                .WithAuthorization("bearer", tokenValido)
+                .Get(url);
+
+            var expected = "200";
+            var actual = returnSynchro?.ReturnCode;
+
+            Assert.Equal(expected, actual);
+
+
+        }
+
 
     }
-
 }

@@ -1,47 +1,51 @@
 using System.Reflection;
 
-namespace Nuuvify.CommonPack.HealthCheck.Helpers;
-
-internal static class AssemblyExtension
+namespace Nuuvify.CommonPack.HealthCheck.Helpers
 {
-
-    public static string GetApplicationNameByAssembly
+    internal static class AssemblyExtension
     {
 
-        get
+
+        public static string GetApplicationNameByAssembly
         {
-            var entryAssembly = Assembly.GetEntryAssembly().GetName().Name;
 
-            var appCustomName = entryAssembly?.Replace(".", "")
-                                              .Replace(".WebApi", "");
+            get
+            {
+                var entryAssembly = Assembly.GetEntryAssembly().GetName().Name;
 
-            return appCustomName;
+                var appCustomName = entryAssembly?.Replace(".", "")
+                                                  .Replace(".WebApi", "");
 
+
+                return appCustomName;
+
+            }
         }
-    }
 
-    public static string GetApplicationBuildNumber
-    {
-        get
+        public static string GetApplicationBuildNumber
         {
-            var buildNumber = Assembly.GetEntryAssembly()
-                .GetCustomAttribute<AssemblyFileVersionAttribute>()
-                .Version;
+            get
+            {
+                var buildNumber = Assembly.GetEntryAssembly()
+                    .GetCustomAttribute<AssemblyFileVersionAttribute>()
+                    .Version;
 
-            return buildNumber;
+                return buildNumber;
+            }
         }
-    }
-    public static string GetApplicationVersion
-    {
-
-        get
+        public static string GetApplicationVersion
         {
-            var applicationVersion = $"{Assembly.GetEntryAssembly().GetName().Version.Major}." +
-                $"{Assembly.GetEntryAssembly().GetName().Version.Minor}." +
-                $"{Assembly.GetEntryAssembly().GetName().Version.Build}";
 
-            return applicationVersion;
+            get
+            {
+                var applicationVersion = $"{Assembly.GetEntryAssembly().GetName().Version.Major}." +
+                    $"{Assembly.GetEntryAssembly().GetName().Version.Minor}." +
+                    $"{Assembly.GetEntryAssembly().GetName().Version.Build}";
+
+
+                return applicationVersion;
+            }
         }
-    }
 
+    }
 }

@@ -69,8 +69,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nuuvify.CommonPack.UnitOfWo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nuuvify.CommonPack.AzureStorage.xTest", "test\Nuuvify.CommonPack.AzureStorage.xTest\Nuuvify.CommonPack.AzureStorage.xTest.csproj", "{3EC2A103-034D-4B88-BB53-4D80643E4723}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nuuvify.CommonPack.BackgroundService", "src\Nuuvify.CommonPack.BackgroundService\Nuuvify.CommonPack.BackgroundService.csproj", "{754FA185-6C7B-4764-AD4D-3B14DDF825EB}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -456,18 +454,6 @@ Global
 		{3EC2A103-034D-4B88-BB53-4D80643E4723}.Release|x64.Build.0 = Release|Any CPU
 		{3EC2A103-034D-4B88-BB53-4D80643E4723}.Release|x86.ActiveCfg = Release|Any CPU
 		{3EC2A103-034D-4B88-BB53-4D80643E4723}.Release|x86.Build.0 = Release|Any CPU
-		{754FA185-6C7B-4764-AD4D-3B14DDF825EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{754FA185-6C7B-4764-AD4D-3B14DDF825EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{754FA185-6C7B-4764-AD4D-3B14DDF825EB}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{754FA185-6C7B-4764-AD4D-3B14DDF825EB}.Debug|x64.Build.0 = Debug|Any CPU
-		{754FA185-6C7B-4764-AD4D-3B14DDF825EB}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{754FA185-6C7B-4764-AD4D-3B14DDF825EB}.Debug|x86.Build.0 = Debug|Any CPU
-		{754FA185-6C7B-4764-AD4D-3B14DDF825EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{754FA185-6C7B-4764-AD4D-3B14DDF825EB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{754FA185-6C7B-4764-AD4D-3B14DDF825EB}.Release|x64.ActiveCfg = Release|Any CPU
-		{754FA185-6C7B-4764-AD4D-3B14DDF825EB}.Release|x64.Build.0 = Release|Any CPU
-		{754FA185-6C7B-4764-AD4D-3B14DDF825EB}.Release|x86.ActiveCfg = Release|Any CPU
-		{754FA185-6C7B-4764-AD4D-3B14DDF825EB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{50E00779-5976-4095-A732-A13D51BA1538} = {7238E60E-1995-4288-9662-D5492A953218}
@@ -501,6 +487,5 @@ Global
 		{AAB67F09-961C-4AC9-839F-2046C1660BFA} = {0601F6A8-A2A7-4EC3-8329-14FE4FF1A4BE}
 		{9E87A795-E740-4FE2-A819-F70FC86F40CC} = {0601F6A8-A2A7-4EC3-8329-14FE4FF1A4BE}
 		{3EC2A103-034D-4B88-BB53-4D80643E4723} = {0601F6A8-A2A7-4EC3-8329-14FE4FF1A4BE}
-		{754FA185-6C7B-4764-AD4D-3B14DDF825EB} = {7238E60E-1995-4288-9662-D5492A953218}
 	EndGlobalSection
 EndGlobal
