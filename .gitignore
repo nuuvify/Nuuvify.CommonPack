@@ -28,11 +28,12 @@ bld/
 # Visual Studio 2015 cache/options directory
 .vs/
 # Uncomment if you have tasks that create the project's static files in wwwroot
-wwwroot/
+#wwwroot/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
+coverage.*.xml
 
 # NUNIT
 *.VisualState.xml
@@ -112,8 +113,6 @@ _TeamCity*
 
 # DotCover is a Code Coverage Tool
 *.dotCover
-coverage.*.xml
-.env
 
 # NCrunch
 _NCrunch_*
@@ -157,7 +156,7 @@ publish/
 *.nupkg
 # The packages folder can be ignored because of Package Restore
 **/packages/*
-# exComicst build/, which is used as an MSBuild target.
+# except build/, which is used as an MSBuild target.
 !**/packages/build/
 # Uncomment if necessary however generally it will be regenerated when needed
 #!**/packages/repositories.config
@@ -166,6 +165,7 @@ publish/
 *.nuget.targets
 
 # Microsoft Azure Build Output
+csx/
 *.build.csdef
 
 # Microsoft Azure Emulator
@@ -193,7 +193,6 @@ ClientBin/
 *.publishsettings
 node_modules/
 orleans.codegen.cs
-healthchecks.db
 
 # RIA/Silverlight projects
 Generated_Code/

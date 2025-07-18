@@ -1,299 +1,363 @@
-﻿namespace Nuuvify.CommonPack.Email.xTest;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using MailKit.Net.Smtp;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using Moq;
+using Nuuvify.CommonPack.Email.Abstraction;
+using Nuuvify.CommonPack.Email.xTest.Configs;
+using Nuuvify.CommonPack.Email.xTest.Fixtures;
+using Xunit;
 
-[Collection(nameof(DataCollection))]
-public class EmailTests
+namespace Nuuvify.CommonPack.Email.xTest
 {
-
-    private readonly EmailServerConfiguration emailServerConfiguration;
-    private Dictionary<string, string> Remetentes { get; set; }
-    private readonly IConfiguration config;
-    private readonly ConfigureFromConfigurationOptions<EmailServerConfiguration> configEmailServer;
-
-    private readonly EmailConfigFixture _emailConfigFixture;
-
-    public EmailTests(EmailConfigFixture emailConfigFixture)
-    {
-        _emailConfigFixture = emailConfigFixture;
-
-        config = AppSettingsConfig.GetConfig();
-
-        emailServerConfiguration = new EmailServerConfiguration();
-
-        var remetenteMock1 = new Mock<IConfigurationSection>();
-        _ = remetenteMock1.Setup(s => s.Path).Returns("EmailConfig:RemetenteEmail");
-        _ = remetenteMock1.Setup(s => s.Key).Returns("cat@zzz.com");
-        _ = remetenteMock1.Setup(s => s.Value).Returns("Teste Automatizado");
-
-        var (envEmailUsername, envEmailPassword) = _emailConfigFixture.GetEmailCredential(config);
-
-        Remetentes = new Dictionary<string, string>
-        {
-            { envEmailUsername, "dotnet teste" }
-        };
-
-        configEmailServer = new ConfigureFromConfigurationOptions<EmailServerConfiguration>(
-            config.GetSection("EmailConfig:EmailServerConfigurationFake"));
-
-        configEmailServer.Configure(emailServerConfiguration);
-
-    }
-
-    [Fact]
-    [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
-    public void EmailComRemetenteNuloInvalido()
+    [Collection(nameof(DataCollection))]
+    public class EmailTests
     {
 
-        var destinatarios = new Dictionary<string, string>
+        private readonly EmailServerConfiguration emailServerConfiguration;
+        private Dictionary<string, string> Remetentes { get; set; }
+        private readonly IConfiguration config;
+        private readonly ConfigureFromConfigurationOptions<EmailServerConfiguration> configEmailServer;
+
+
+
+        private readonly EmailConfigFixture _emailConfigFixture;
+
+        public EmailTests(EmailConfigFixture emailConfigFixture)
         {
-            { "fulano@gmail.com", "Fulano" }
-        };
+            _emailConfigFixture = emailConfigFixture;
 
-        const string assunto = "Teste da classe de envio de email";
-        const string mensagem = "Esse é o corpo do email";
+            config = AppSettingsConfig.GetConfig();
 
-        const bool teste = false;
+            emailServerConfiguration = new EmailServerConfiguration();
 
-        var testarEnvio = new Email(emailServerConfiguration);
 
-        var emailEnviado = testarEnvio.EnviarAsync(destinatarios, null, assunto, mensagem);
+            var remetenteMock1 = new Mock<IConfigurationSection>();
+            remetenteMock1.Setup(s => s.Path).Returns("EmailConfig:RemetenteEmail");
+            remetenteMock1.Setup(s => s.Key).Returns("cat@zzz.com");
+            remetenteMock1.Setup(s => s.Value).Returns("Teste Automatizado");
 
-        Assert.True(emailEnviado.Result.Equals(teste));
-        Assert.False(testarEnvio.IsValid());
+            var (envEmailUsername, envEmailPassword) = _emailConfigFixture.GetEmailCredential(config);
 
-    }
+            Remetentes = new Dictionary<string, string>
+            {
+                { envEmailUsername, "dotnet teste" }
+            };
 
-    [Fact]
-    [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
-    public void EmailComEnderecoDoDestinatarioNuloDeveSerInvalido()
-    {
 
-        var destinatarios = new Dictionary<string, string>
+
+            configEmailServer = new ConfigureFromConfigurationOptions<EmailServerConfiguration>(
+                config.GetSection("EmailConfig:EmailServerConfigurationFake"));
+
+
+            configEmailServer.Configure(emailServerConfiguration);
+
+
+        }
+
+
+        [Fact]
+        [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
+        public void EmailComRemetenteNuloInvalido()
         {
-            { string.Empty, "Fulano" }
-        };
 
-        const string assunto = "Teste da classe de envio de email";
-        const string mensagem = "Esse é o corpo do email";
+            var destinatarios = new Dictionary<string, string>
+            {
+                { "fulano@gmail.com", "Fulano" }
+            };
 
-        const bool teste = false;
 
-        var testarEnvio = new Email(emailServerConfiguration);
 
-        var emailEnviado = testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
 
-        Assert.True(emailEnviado.Result.Equals(teste));
-        Assert.False(testarEnvio.IsValid());
+            const string assunto = "Teste da classe de envio de email";
+            const string mensagem = "Esse é o corpo do email";
 
-    }
+            const bool teste = false;
 
-    [Fact]
-    [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
-    public void EnviarEmailSemAnexoIncorreto()
-    {
 
-        var destinatarios = new Dictionary<string, string>
+
+            var testarEnvio = new Email(emailServerConfiguration);
+
+
+            var emailEnviado = testarEnvio.EnviarAsync(destinatarios, null, assunto, mensagem);
+
+            Assert.True(emailEnviado.Result.Equals(teste));
+            Assert.False(testarEnvio.IsValid());
+
+        }
+
+        [Fact]
+        [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
+        public void EmailComEnderecoDoDestinatarioNuloDeveSerInvalido()
         {
-            { "Fulano", "fulano@gmail.com" },
-            { "Cicrano", "cicrano@gmail.com" },
-        };
-        const string assunto = "Teste da classe de envio de email";
-        const string mensagem = "Esse é o corpo do email";
 
-        const bool teste = false;
+            var destinatarios = new Dictionary<string, string>
+            {
+                { string.Empty, "Fulano" }
+            };
 
-        var testarEnvio = new Email(emailServerConfiguration);
+            const string assunto = "Teste da classe de envio de email";
+            const string mensagem = "Esse é o corpo do email";
 
-        var emailEnviado = testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
 
-        Assert.True(emailEnviado.Result.Equals(teste));
-        Assert.False(testarEnvio.IsValid());
-    }
+            const bool teste = false;
 
-    [ServerTestFact]
-    [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
-    public async Task EnviarEmailSemAnexoCorrreto()
-    {
 
-        var destinatarios = new Dictionary<string, string>
+            var testarEnvio = new Email(emailServerConfiguration);
+
+
+            var emailEnviado = testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
+
+            Assert.True(emailEnviado.Result.Equals(teste));
+            Assert.False(testarEnvio.IsValid());
+
+        }
+
+        [Fact]
+        [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
+        public void EnviarEmailSemAnexoIncorreto()
         {
-            { "fulano@gmail.com", "Fulano" },
-            { "cicrano@gmail.com", "Cicrano" },
-        };
-        const string assunto = "Teste da classe de envio de email";
-        const string mensagem = "Esse é o corpo do email";
 
-        var testarEnvio = new Email(emailServerConfiguration);
+            var destinatarios = new Dictionary<string, string>
+            {
+                { "Fulano", "fulano@gmail.com" },
+                { "Cicrano", "cicrano@gmail.com" },
+            };
+            const string assunto = "Teste da classe de envio de email";
+            const string mensagem = "Esse é o corpo do email";
 
-        var emailEnviado = await testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
+            const bool teste = false;
 
-        Assert.NotNull(emailEnviado);
-        Assert.True(testarEnvio.IsValid());
-    }
 
-    [Fact]
-    [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
-    public async Task EmailComVariosDestinatariosConcatenadosIncorreto()
-    {
+            var testarEnvio = new Email(emailServerConfiguration);
 
-        var destinatarios = new Dictionary<string, string>
+
+            var emailEnviado = testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
+
+            Assert.True(emailEnviado.Result.Equals(teste));
+            Assert.False(testarEnvio.IsValid());
+        }
+
+        [Fact]
+        [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
+        public void EnviarEmailSemAnexoCorrreto()
         {
-            { "Fulano", "fulano@gmail.com, cicrano@gmail.com" }
-        };
-        const string assunto = "Teste da classe de envio de email";
-        const string mensagem = "Esse é o corpo do email";
 
-        var testarEnvio = new Email(emailServerConfiguration);
+            var destinatarios = new Dictionary<string, string>
+            {
+                { "fulano@gmail.com", "Fulano" },
+                { "cicrano@gmail.com", "Cicrano" },
+            };
+            const string assunto = "Teste da classe de envio de email";
+            const string mensagem = "Esse é o corpo do email";
 
-        var emailEnviado = await testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
 
-        Assert.True(emailEnviado.Equals(false));
-        Assert.False(testarEnvio.IsValid());
 
-    }
+            var testarEnvio = new Email(emailServerConfiguration);
 
-    [ServerTestFact]
-    [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
-    public async Task EmailComVariosDestinatariosERemetentesConcatenadosCorreto()
-    {
 
-        var destinatarios = new Dictionary<string, string>
+
+            var emailEnviado = testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
+
+            Assert.NotNull(emailEnviado);
+            Assert.True(testarEnvio.IsValid());
+        }
+
+        [Fact]
+        [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
+        public void EmailComVariosDestinatariosConcatenadosIncorreto()
         {
-            { "fulano@gmail.com, cicrano@gmail.com","Fulano" }
-        };
-        const string assunto = "Teste da classe de envio de email";
-        const string mensagem = "Esse é o corpo do email";
 
-        var testarEnvio = new Email(emailServerConfiguration);
+            var destinatarios = new Dictionary<string, string>
+            {
+                { "Fulano", "fulano@gmail.com, cicrano@gmail.com" }
+            };
+            const string assunto = "Teste da classe de envio de email";
+            const string mensagem = "Esse é o corpo do email";
 
-        var emailEnviado = await testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
 
-        Assert.NotNull(emailEnviado);
-        Assert.True(testarEnvio.IsValid());
+            var testarEnvio = new Email(emailServerConfiguration);
 
-    }
 
-    [Fact]
-    [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
-    public async Task EmailComVariosDestinatariosERemetentesConcatenadosIncorreto()
-    {
 
-        var destinatarios = new Dictionary<string, string>
+            var emailEnviado = testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
+
+
+            Assert.True(emailEnviado.Result.Equals(false));
+            Assert.False(testarEnvio.IsValid());
+
+        }
+
+        [Fact]
+        [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
+        public void EmailComVariosDestinatariosERemetentesConcatenadosCorreto()
         {
-            { "Fulano","fulano@gmail.com, cicrano@gmail.com" }
-        };
-        var remetentes = new Dictionary<string, string>
+
+            var destinatarios = new Dictionary<string, string>
+            {
+                { "fulano@gmail.com, cicrano@gmail.com","Fulano" }
+            };
+            const string assunto = "Teste da classe de envio de email";
+            const string mensagem = "Esse é o corpo do email";
+
+
+            var testarEnvio = new Email(emailServerConfiguration);
+
+
+
+            var emailEnviado = testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
+
+            Assert.NotNull(emailEnviado);
+            Assert.True(testarEnvio.IsValid());
+
+        }
+
+        [Fact]
+        [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
+        public void EmailComVariosDestinatariosERemetentesConcatenadosIncorreto()
         {
-            { "Zezito","fulano@gmail.com, cicrano@gmail.com" }
-        };
-        const string assunto = "Teste da classe de envio de email";
-        const string mensagem = "Esse é o corpo do email";
-        const bool teste = false;
 
-        var testarEnvio = new Email(emailServerConfiguration);
+            var destinatarios = new Dictionary<string, string>
+            {
+                { "Fulano","fulano@gmail.com, cicrano@gmail.com" }
+            };
+            var remetentes = new Dictionary<string, string>
+            {
+                { "Zezito","fulano@gmail.com, cicrano@gmail.com" }
+            };
+            const string assunto = "Teste da classe de envio de email";
+            const string mensagem = "Esse é o corpo do email";
+            const bool teste = false;
 
-        var emailEnviado = await testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, mensagem);
 
-        Assert.True(emailEnviado.Equals(teste));
-        Assert.False(testarEnvio.IsValid());
+            var testarEnvio = new Email(emailServerConfiguration);
 
-    }
 
-    [Fact]
-    [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
-    public async Task EmailComVariosDestinatariosENenhumRemetenteConcatenadosIncorreto()
-    {
 
-        var destinatarios = new Dictionary<string, string>
+            var emailEnviado = testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, mensagem);
+
+            Assert.True(emailEnviado.Result.Equals(teste));
+            Assert.False(testarEnvio.IsValid());
+
+        }
+
+        [Fact]
+        [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
+        public void EmailComVariosDestinatariosENenhumRemetenteConcatenadosIncorreto()
         {
-            { "fulano@gmail.com, ermenegildo@gmail.com", "Fulano" },
-            { "meuemail@gmail.com, cicrano@gmail.com", "Cigrano" }
-        };
-        var remetentes = new Dictionary<string, string>();
 
-        const string assunto = "Teste da classe de envio de email";
-        const string mensagem = "Esse é o corpo do email";
-        const bool teste = false;
+            var destinatarios = new Dictionary<string, string>
+            {
+                { "fulano@gmail.com, ermenegildo@gmail.com", "Fulano" },
+                { "meuemail@gmail.com, cicrano@gmail.com", "Cigrano" }
+            };
+            var remetentes = new Dictionary<string, string>();
 
-        var testarEnvio = new Email(emailServerConfiguration);
+            const string assunto = "Teste da classe de envio de email";
+            const string mensagem = "Esse é o corpo do email";
+            const bool teste = false;
 
-        var emailEnviado = await testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, mensagem);
 
-        Assert.True(emailEnviado.Equals(teste));
-        Assert.False(testarEnvio.IsValid());
+            var testarEnvio = new Email(emailServerConfiguration);
 
-    }
 
-    [Fact]
-    [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
-    public async Task EmailSemDestinatariosENenhumRemetenteConcatenadosDeveSerInvalido()
-    {
 
-        var destinatarios = new Dictionary<string, string>();
-        var remetentes = new Dictionary<string, string>();
+            var emailEnviado = testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, mensagem);
 
-        const string assunto = "Teste da classe de envio de email";
-        const string mensagem = "Esse é o corpo do email";
-        const bool teste = false;
 
-        var testarEnvio = new Email(emailServerConfiguration);
+            Assert.True(emailEnviado.Result.Equals(teste));
+            Assert.False(testarEnvio.IsValid());
 
-        var emailEnviado = await testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, mensagem);
+        }
 
-        Assert.True(emailEnviado.Equals(teste));
-        Assert.False(testarEnvio.IsValid());
-
-    }
-
-    [Fact]
-    [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
-    public async Task EmailComHostNuloDeveSerInvalido()
-    {
-        var destinatarios = new Dictionary<string, string>
+        [Fact]
+        [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
+        public void EmailSemDestinatariosENenhumRemetenteConcatenadosDeveSerInvalido()
         {
-            { "fulano@gmail.com", "Fulano" }
-        };
-        var remetentes = new Dictionary<string, string>
+
+            var destinatarios = new Dictionary<string, string>();
+            var remetentes = new Dictionary<string, string>();
+
+            const string assunto = "Teste da classe de envio de email";
+            const string mensagem = "Esse é o corpo do email";
+            const bool teste = false;
+
+
+            var testarEnvio = new Email(emailServerConfiguration);
+
+
+
+            var emailEnviado = testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, mensagem);
+
+
+            Assert.True(emailEnviado.Result.Equals(teste));
+            Assert.False(testarEnvio.IsValid());
+
+        }
+
+        [Fact]
+        [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
+        public void EmailComHostNuloDeveSerInvalido()
         {
-            { "eu@gmail.com", "Eu" }
-        };
-        const string assunto = "Teste da classe de envio de email";
-        const string mensagem = "Esse é o corpo do email";
-        const bool teste = false;
+            var destinatarios = new Dictionary<string, string>
+            {
+                { "fulano@gmail.com", "Fulano" }
+            };
+            var remetentes = new Dictionary<string, string>
+            {
+                { "eu@gmail.com", "Eu" }
+            };
+            const string assunto = "Teste da classe de envio de email";
+            const string mensagem = "Esse é o corpo do email";
+            const bool teste = false;
 
-        var testarEnvio = new Email(emailServerConfiguration);
 
-        var emailEnviado = await testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, mensagem);
 
-        Assert.True(emailEnviado.Equals(teste));
+            var testarEnvio = new Email(emailServerConfiguration);
 
-    }
 
-    [Fact]
-    [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
-    public void EmailComHostIncorretoDeveGerarException()
-    {
-        var destinatarios = new Dictionary<string, string>
+
+            var emailEnviado = testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, mensagem);
+
+            Assert.True(emailEnviado.Result.Equals(teste));
+
+        }
+
+        [Fact]
+        [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
+        public void EmailComHostIncorretoDeveGerarException()
         {
-            { "fulano@gmail.com", "Fulano" }
-        };
-        var remetentes = new Dictionary<string, string>
-        {
-            { "eu@gmail.com", "Eu" }
-        };
-        const string assunto = "Teste da classe de envio de email";
-        const string mensagem = "Esse é o corpo do email";
-        const bool teste = false;
+            var destinatarios = new Dictionary<string, string>
+            {
+                { "fulano@gmail.com", "Fulano" }
+            };
+            var remetentes = new Dictionary<string, string>
+            {
+                { "eu@gmail.com", "Eu" }
+            };
+            const string assunto = "Teste da classe de envio de email";
+            const string mensagem = "Esse é o corpo do email";
+            const bool teste = false;
 
-        var mockSmpt = new Mock<SmtpClient>();
-        _ = mockSmpt.Setup(s => s.ConnectAsync(config.GetSection("EmailConfig:EmailServerConfigurationFake:ServerHost").Value, 0, MailKit.Security.SecureSocketOptions.Auto, default))
-            .Throws<Exception>();
 
-        var testarEnvio = new Email(emailServerConfiguration);
 
-        var emailEnviado = testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, mensagem);
+            var mockSmpt = new Mock<SmtpClient>();
+            mockSmpt.Setup(s => s.ConnectAsync(config.GetSection("EmailConfig:EmailServerConfigurationFake:ServerHost").Value, 0, MailKit.Security.SecureSocketOptions.Auto, default))
+                .Throws<Exception>();
 
-        Assert.True(emailEnviado.Result.Equals(teste));
-        _ = Assert.ThrowsAsync<Exception>(() => Task.FromResult(teste));
+
+            var testarEnvio = new Email(emailServerConfiguration);
+
+
+
+            var emailEnviado = testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, mensagem);
+
+            Assert.True(emailEnviado.Result.Equals(teste));
+            Assert.ThrowsAsync<Exception>(() => Task.FromResult(teste));
+
+        }
 
     }
 

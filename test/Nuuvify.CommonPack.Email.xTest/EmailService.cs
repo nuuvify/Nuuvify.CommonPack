@@ -1,15 +1,23 @@
-﻿namespace Nuuvify.CommonPack.Email.xTest;
+﻿using MailKit.Net.Smtp;
+using Moq;
+using Nuuvify.CommonPack.Email.Abstraction;
 
-public class EmailService : Email
+namespace Nuuvify.CommonPack.Email.xTest
 {
-    public static bool Teste { get; set; }
-    public static Mock<SmtpClient> MockSmpt { get; set; }
-
-    public EmailService(EmailServerConfiguration emailServerConfiguration)
-        : base(emailServerConfiguration)
+    public class EmailService : Email
     {
+        public static bool Teste { get; set; }
+        public static Mock<SmtpClient> MockSmpt { get; set; }
 
-        SmtpCustomClient = MockSmpt.Object;
+
+        public EmailService(EmailServerConfiguration emailServerConfiguration)
+            : base(emailServerConfiguration)
+        {
+
+
+            SmtpCustomClient = MockSmpt.Object;
+        }
+
+
     }
-
 }

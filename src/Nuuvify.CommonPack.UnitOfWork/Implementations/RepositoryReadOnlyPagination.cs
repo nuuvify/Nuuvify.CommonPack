@@ -18,12 +18,15 @@ public partial class RepositoryReadOnly<TEntity> : IRepositoryReadOnly<TEntity> 
         bool ignoreQueryFilters = false)
     {
 
+
         IQueryable<TEntity> query = _dbSet;
 
         if (disableTracking)
         {
             query = query.AsNoTracking();
         }
+
+
 
         if (Includes?.Count > 0)
         {
@@ -50,6 +53,7 @@ public partial class RepositoryReadOnly<TEntity> : IRepositoryReadOnly<TEntity> 
         }
     }
 
+
     ///<inheritdoc/>
     public virtual IPagedList<TResult> GetPagedList<TResult>(
         Expression<Func<TEntity, TResult>> selector,
@@ -67,6 +71,7 @@ public partial class RepositoryReadOnly<TEntity> : IRepositoryReadOnly<TEntity> 
         {
             query = query.AsNoTracking();
         }
+
 
         if (Includes?.Count > 0)
         {
@@ -112,6 +117,7 @@ public partial class RepositoryReadOnly<TEntity> : IRepositoryReadOnly<TEntity> 
             query = query.AsNoTracking();
         }
 
+
         if (Includes?.Count > 0)
         {
             query = SetWithIncludes(query);
@@ -155,6 +161,7 @@ public partial class RepositoryReadOnly<TEntity> : IRepositoryReadOnly<TEntity> 
         {
             query = query.AsNoTracking();
         }
+
 
         if (Includes?.Count > 0)
         {

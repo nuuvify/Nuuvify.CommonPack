@@ -1,9 +1,0 @@
-global using MailKit.Net.Smtp;
-global using Microsoft.Extensions.Configuration;
-global using Microsoft.Extensions.Options;
-global using Moq;
-global using Nuuvify.CommonPack.Email.Abstraction;
-global using Nuuvify.CommonPack.Email.xTest.Configs;
-global using Nuuvify.CommonPack.Email.xTest.Fixtures;
-global using Xunit;
-global using Xunit.Abstractions;

@@ -1,53 +1,45 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <Description>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Description>
       Implementa Autorização e Autenticação com OAuth2, JWT - deve ser baixado no projeto IoC, aqui
       não contempla OpenId
       que esta em outra Lib
-        </Description>
-        <RootNamespace>Nuuvify.CommonPack.Security</RootNamespace>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
-        <PackageTags>Nuuvify</PackageTags>
-    </PropertyGroup>
+    </Description>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <None Include="README.md" Pack="true" PackagePath="\" />
-        <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Caching.SqlServer" Version="8.0.16" />
-        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="8.0.16" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.16" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.16" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Caching.SqlServer" Version="8.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="8.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.7" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
 
 
-    <ItemGroup>
-        <ProjectReference Include="..\Nuuvify.CommonPack.Security.Abstraction\Nuuvify.CommonPack.Security.Abstraction.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Nuuvify.CommonPack.Security.Abstraction\Nuuvify.CommonPack.Security.Abstraction.csproj" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <Compile Update="Resources\MsgSecurityJwt.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>MsgSecurityJwt.resx</DependentUpon>
-        </Compile>
-    </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Resources\MsgSecurityJwt.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>MsgSecurityJwt.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
 
-    <ItemGroup>
-        <EmbeddedResource Update="Resources\MsgSecurityJwt.pt-BR.resx">
-            <Generator>PublicResXFileCodeGenerator</Generator>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\MsgSecurityJwt.resx">
-            <Generator>PublicResXFileCodeGenerator</Generator>
-            <LastGenOutput>MsgSecurityJwt.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-    </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\MsgSecurityJwt.pt-BR.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\MsgSecurityJwt.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>MsgSecurityJwt.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
 
 </Project>

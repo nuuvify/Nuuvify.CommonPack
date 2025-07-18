@@ -5,8 +5,10 @@ using System.Net.Http.Headers;
 
 namespace Nuuvify.CommonPack.StandardHttpClient;
 
-public partial class StandardHttpClientService
+
+public partial class StandardHttpClient
 {
+
 
     public async Task<HttpStandardReturn> Patch(
         string urlRoute,
@@ -14,6 +16,7 @@ public partial class StandardHttpClientService
         CancellationToken cancellationToken = default)
     {
         var url = $"{urlRoute}{_queryString.ToQueryString()}";
+
 
         var message = new HttpRequestMessage(HttpMethod.Patch, url)
         {
@@ -35,6 +38,8 @@ public partial class StandardHttpClientService
     {
         var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
+
+
         var message = new HttpRequestMessage(HttpMethod.Patch, url);
 
         IEnumerable<KeyValuePair<string, string>> enumerable = _formParameter;
@@ -44,6 +49,7 @@ public partial class StandardHttpClientService
         message.Content = content;
         message.CustomRequestHeader(_headerStandard)
                .AddAuthorizationHeader(_headerAuthorization);
+
 
         return await StandardSendAsync(url, message, cancellationToken);
 
@@ -57,6 +63,7 @@ public partial class StandardHttpClientService
     {
         var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
+
         var message = new HttpRequestMessage(HttpMethod.Patch, url)
         {
             Content = messageBody
@@ -65,8 +72,12 @@ public partial class StandardHttpClientService
         .AddAuthorizationHeader(_headerAuthorization);
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType));
 
+
+
         return await StandardStreamSendAsync(url, message, cancellationToken);
     }
+
+
 
 }
 

@@ -9,22 +9,15 @@
             para que seja validado pelos clients.
             Essa biblioteca destinase apenas a aplicação que fornece um token.
         </Description>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
-        <PackageTags>Nuuvify</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="README.md" Pack="true" PackagePath="\" />
-        <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.7" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.16" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\Nuuvify.CommonPack.Security.JwtCredentials\Nuuvify.CommonPack.Security.JwtCredentials.csproj" />
+        <ProjectReference
+            Include="..\Nuuvify.CommonPack.Security.JwtCredentials\Nuuvify.CommonPack.Security.JwtCredentials.csproj" />
     </ItemGroup>
 
 

@@ -3,20 +3,13 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
+        <PackageTags>EntityFramework EF Oracle EntityFrameworkCore ODP.NET entity-framework-core EFCore Data Database</PackageTags>
+        <PackageReleaseNotes>Populate Entries property of the exceptions</PackageReleaseNotes>
         <Description>Handle database errors easily when working with Entity Framework Core. Catch specific exceptions such as UniqueConstraintException, CannotInsertNullException, MaxLengthExceededException, NumericOverflowException or ReferenceConstraintException instead of generic DbUpdateException</Description>
-        <RootNamespace>Nuuvify.CommonPack.EF.Exceptions.Oracle</RootNamespace>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
-        <PackageTags>EntityFramework;EF;EFCore;Database;Oracle</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="README.md" Pack="true" PackagePath="\" />
-        <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.8.0" />
+        <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.5.0" />
     </ItemGroup>
 
     <ItemGroup>
