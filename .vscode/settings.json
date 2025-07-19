@@ -1,5 +1,5 @@
 {
-    "dotnet.defaultSolution": "Nuuvify.CommonPack.sln",
+    "dotnet.defaultSolution": "Nuuvify.Commonpack.sln",
     "todo-tree.highlights.defaultHighlight": {
         "icon": "alert",
         "type": "line",
