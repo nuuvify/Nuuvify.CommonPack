@@ -10,4 +10,5 @@ public class JwtCacheToken
     public long? SlidingExpirationInSeconds { get; set; }
     public DateTimeOffset AbsoluteExpiration { get; set; }
 
+
 }

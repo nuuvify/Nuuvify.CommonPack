@@ -1,45 +1,48 @@
+﻿using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 
-namespace Nuuvify.CommonPack.OpenApi;
-
-public static class SwaggerGenSecurity
+namespace Nuuvify.CommonPack.OpenApi
 {
-    public static void Configuration(this IServiceCollection services)
+    public static class SwaggerGenSecurity
     {
-        _ = services.AddSwaggerGen(options =>
+        public static void Configuration(this IServiceCollection services)
         {
-            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            services.AddSwaggerGen(options =>
             {
-                Description = @"JWT Authorization header using the Bearer scheme.
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = @"JWT Authorization header using the Bearer scheme.
                                         Enter 'Bearer' [space] and then your token in the text input below.
                                         Example: 'Bearer 12345abcdef'",
-                Name = "Authorization",
-                Scheme = "Bearer",
-                In = ParameterLocation.Header,
-                Type = SecuritySchemeType.ApiKey,
-            });
-
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement()
-            {
+                    Name = "Authorization",
+                    Scheme = "Bearer",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                });
+                
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement()
                 {
-                    new OpenApiSecurityScheme
                     {
-                        Reference = new OpenApiReference
+                        new OpenApiSecurityScheme
                         {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer"
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            },
+                            Scheme = "oauth2",
+                            Name = "Bearer",
+                            In = ParameterLocation.Header,
+
                         },
-                        Scheme = "oauth2",
-                        Name = "Bearer",
-                        In = ParameterLocation.Header,
+                        new List<string>()
+                    }
+                });
 
-                    },
-                    new List<string>()
-                }
+
             });
+        }
 
-        });
     }
-
 }

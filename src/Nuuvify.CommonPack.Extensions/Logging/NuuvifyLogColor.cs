@@ -13,6 +13,8 @@ public sealed class NuuvifyLogColor(
     public bool IsEnabled(LogLevel logLevel) =>
         getCurrentConfig().LogLevelToColorMap.ContainsKey(logLevel);
 
+
+
     public void Log<TState>(
         LogLevel logLevel,
         EventId eventId,
@@ -22,7 +24,9 @@ public sealed class NuuvifyLogColor(
     {
         if (!IsEnabled(logLevel)) return;
 
+
         NuuvifyLogColorConfiguration config = getCurrentConfig();
+
 
         if (config.EventId == 0 || config.EventId == eventId.Id)
         {
@@ -42,6 +46,7 @@ public sealed class NuuvifyLogColor(
             //         Console.Out,
             //         name);
 
+
             var messageLogLevel = $"[ {logLevel,-12} ]";
             Console.ForegroundColor = config.LogLevelToColorMap[logLevel];
             Console.WriteLine(messageLogLevel);
@@ -50,11 +55,15 @@ public sealed class NuuvifyLogColor(
             Console.WriteLine($"{name.PadLeft(name.Length + 5)}");
             Console.WriteLine($"{message.PadLeft(message.Length + 5)}");
 
+
             Console.ResetColor();
             Console.WriteLine();
             // }
 
+
+
         }
+
 
     }
 }

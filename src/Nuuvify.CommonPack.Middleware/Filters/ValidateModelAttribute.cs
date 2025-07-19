@@ -1,11 +1,12 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Nuuvify.CommonPack.Middleware.Filters;
-
-public sealed partial class ValidateModelStateCustomAttribute : TypeFilterAttribute
+namespace Nuuvify.CommonPack.Middleware.Filters
 {
-    public ValidateModelStateCustomAttribute()
-        : base(typeof(ValidateModelAttributeCustom))
+    public sealed partial class ValidateModelStateCustomAttribute : TypeFilterAttribute
     {
+        public ValidateModelStateCustomAttribute()
+            : base(typeof(ValidateModelAttributeCustom))
+        {
+        }
     }
 }

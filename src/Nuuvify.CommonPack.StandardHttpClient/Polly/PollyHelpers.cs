@@ -1,11 +1,12 @@
-namespace Nuuvify.CommonPack.StandardHttpClient.Polly;
-
-internal static class PollyHelpers
+namespace Nuuvify.CommonPack.StandardHttpClient.Polly
 {
-    internal static TimeSpan ComputeDuration(double input)
+    internal static class PollyHelpers
     {
-        return TimeSpan.FromSeconds(Math.Pow(2, input)) +
-               TimeSpan.FromMilliseconds(new Random().Next(0, 1000));
-    }
+        internal static TimeSpan ComputeDuration(double input)
+        {
+            return TimeSpan.FromSeconds(Math.Pow(2, input)) +
+                   TimeSpan.FromMilliseconds(new Random().Next(0, 1000));
+        }
 
+    }
 }

@@ -1,16 +1,16 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Nuuvify.CommonPack.Extensions.Implementation;
 
 namespace Nuuvify.CommonPack.StandardHttpClient;
 
 ///<inheritdoc/>
-public partial class StandardHttpClient : IStandardHttpClient, IDisposable
+public partial class StandardHttpClientService : IStandardHttpClient, IDisposable
 {
 
     private readonly IHttpClientFactory _httpClientFactory;
     private HttpClient _httpClient;
     private HttpCompletionOption CompletionOption;
-    private readonly ILogger<StandardHttpClient> _logger;
+    private readonly ILogger<StandardHttpClientService> _logger;
     private readonly Dictionary<string, string> _formParameter;
     private readonly Dictionary<string, object> _headerStandard;
     private readonly Dictionary<string, object> _headerAuthorization;
@@ -26,9 +26,9 @@ public partial class StandardHttpClient : IStandardHttpClient, IDisposable
 
     public HttpResponseMessage CustomHttpResponseMessage { get; private set; }
 
-    public StandardHttpClient(
+    public StandardHttpClientService(
         IHttpClientFactory httpClientFactory,
-        ILogger<StandardHttpClient> logger)
+        ILogger<StandardHttpClientService> logger)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -174,30 +174,19 @@ public partial class StandardHttpClient : IStandardHttpClient, IDisposable
         return WithHeader(header.Key, header.Value);
     }
 
-    private bool _disposed = false;
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposed)
-        {
-            if (disposing)
-            {
-                _httpClient?.Dispose();
-            }
-
-            _disposed = true;
-        }
-    }
-
     public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
 
-    ~StandardHttpClient()
+    protected virtual void Dispose(bool disposing)
     {
-        Dispose(false);
+        if (disposing)
+        {
+            _httpClient?.Dispose();
+        }
     }
+
 }
 

@@ -1,10 +1,4 @@
-using MailKit.Net.Smtp;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using Moq;
-using Nuuvify.CommonPack.Email.Abstraction;
-using Nuuvify.CommonPack.Email.xTest.Configs;
-using Xunit;
+﻿using System.Threading.Tasks;
 
 namespace Nuuvify.CommonPack.Email.xTest;
 
@@ -14,7 +8,7 @@ public class EmailServiceTests
     private readonly EmailServerConfiguration emailServerConfiguration;
     private readonly IConfiguration config;
     private readonly Mock<IConfiguration> configMock;
-    private readonly ConfigureFromConfigurationOptions<EmailServerConfiguration> configEmailServer;
+    private ConfigureFromConfigurationOptions<EmailServerConfiguration> configEmailServer;
 
     public EmailServiceTests()
     {
@@ -48,7 +42,7 @@ public class EmailServiceTests
     }
 
     [Fact]
-    public void EmailComRemetenteNuloInvalido()
+    public async Task EmailComRemetenteNuloInvalido()
     {
 
         var destinatarios = new Dictionary<string, string>
@@ -68,9 +62,9 @@ public class EmailServiceTests
         EmailService.MockSmpt = mockSmpt;
 
         var testarEnvio = new EmailService(emailServerConfiguration);
-        var emailEnviado = testarEnvio.EnviarAsync(destinatarios, null, assunto, mensagem);
+        var emailEnviado = await testarEnvio.EnviarAsync(destinatarios, null, assunto, mensagem);
 
-        Assert.True(emailEnviado.Result.Equals(EmailService.Teste));
+        Assert.True(emailEnviado.Equals(EmailService.Teste));
         Assert.False(testarEnvio.IsValid());
 
     }

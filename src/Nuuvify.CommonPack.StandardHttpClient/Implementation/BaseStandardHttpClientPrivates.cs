@@ -1,11 +1,13 @@
-using System.Net;
+﻿using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Nuuvify.CommonPack.Mediator.Implementation;
+using Nuuvify.CommonPack.Extensions.Notificator;
 using Nuuvify.CommonPack.StandardHttpClient.Helpers;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 
+
 namespace Nuuvify.CommonPack.StandardHttpClient;
+
 
 public abstract partial class BaseStandardHttpClient
 {
@@ -21,6 +23,7 @@ public abstract partial class BaseStandardHttpClient
             return returnList;
         }
 
+
         return new List<T>();
     }
 
@@ -33,6 +36,7 @@ public abstract partial class BaseStandardHttpClient
             var returnData = jsonData.Data;
             return returnData;
         }
+
 
         return (T)Convert.ChangeType(null, typeof(T));
     }
@@ -53,10 +57,14 @@ public abstract partial class BaseStandardHttpClient
 
             };
 
-            _ = int.TryParse(standardReturn.ReturnCode, out int codigoRetorno);
+
+            int.TryParse(standardReturn.ReturnCode, out int codigoRetorno);
             var returnMessage = standardReturn?.ReturnMessage;
 
             var propertyNotification = $"Codigo Retorno: {codigoRetorno}";
+
+
+
 
             if (codigoRetorno.Equals(HttpStatusCode.ExpectationFailed.GetHashCode()))
             {
@@ -132,15 +140,16 @@ public abstract partial class BaseStandardHttpClient
         catch (Exception ex)
         {
 
-            Notifications.Add(new NotificationR(
-                property: ex.Source,
-                message: $"Ocorreu o erro: {ex.Message} ao deserializar o retorno: {standardReturn.ReturnMessage}. Correlation: {_standardHttpClient.CorrelationId} - Talvez possa ser resolvido com parametros da propriedade JsonSettings ou com uma classe para deserialização mais adequada",
-                aggregatorId: $"{api}",
-                type: "application",
-                originNotification: null));
+            Notifications.Add(new NotificationR(property: ex.Source,
+                 message: $"Ocorreu o erro: {ex.Message} ao deserializar o retorno: {standardReturn.ReturnMessage}. Correlation: {_standardHttpClient.CorrelationId} - Talvez possa ser resolvido com parametros da propriedade JsonSettings ou com uma classe para deserialização mais adequada",
+                 aggregatorId: $"{api}",
+                 type: "application",
+                 originNotification: null));
 
         }
     }
+
+
 
 }
 

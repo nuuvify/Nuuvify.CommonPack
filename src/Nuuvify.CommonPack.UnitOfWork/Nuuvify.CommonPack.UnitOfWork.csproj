@@ -19,7 +19,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Nuuvify.CommonPack.Domain\Nuuvify.CommonPack.Domain.csproj" />
         <ProjectReference Include="..\Nuuvify.CommonPack.UnitOfWork.Abstraction\Nuuvify.CommonPack.UnitOfWork.Abstraction.csproj" />
         <ProjectReference Include="..\Nuuvify.CommonPack.AutoHistory\Nuuvify.CommonPack.AutoHistory.csproj" />
     </ItemGroup>

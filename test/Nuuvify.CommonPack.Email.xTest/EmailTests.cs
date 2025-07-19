@@ -1,13 +1,4 @@
-using MailKit.Net.Smtp;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using Moq;
-using Nuuvify.CommonPack.Email.Abstraction;
-using Nuuvify.CommonPack.Email.xTest.Configs;
-using Nuuvify.CommonPack.Email.xTest.Fixtures;
-using Xunit;
-
-namespace Nuuvify.CommonPack.Email.xTest;
+﻿namespace Nuuvify.CommonPack.Email.xTest;
 
 [Collection(nameof(DataCollection))]
 public class EmailTests
@@ -118,9 +109,9 @@ public class EmailTests
         Assert.False(testarEnvio.IsValid());
     }
 
-    [Fact]
+    [ServerTestFact]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
-    public void EnviarEmailSemAnexoCorrreto()
+    public async Task EnviarEmailSemAnexoCorrreto()
     {
 
         var destinatarios = new Dictionary<string, string>
@@ -133,7 +124,7 @@ public class EmailTests
 
         var testarEnvio = new Email(emailServerConfiguration);
 
-        var emailEnviado = testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
+        var emailEnviado = await testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
 
         Assert.NotNull(emailEnviado);
         Assert.True(testarEnvio.IsValid());
@@ -141,7 +132,7 @@ public class EmailTests
 
     [Fact]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
-    public void EmailComVariosDestinatariosConcatenadosIncorreto()
+    public async Task EmailComVariosDestinatariosConcatenadosIncorreto()
     {
 
         var destinatarios = new Dictionary<string, string>
@@ -153,16 +144,16 @@ public class EmailTests
 
         var testarEnvio = new Email(emailServerConfiguration);
 
-        var emailEnviado = testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
+        var emailEnviado = await testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
 
-        Assert.True(emailEnviado.Result.Equals(false));
+        Assert.True(emailEnviado.Equals(false));
         Assert.False(testarEnvio.IsValid());
 
     }
 
-    [Fact]
+    [ServerTestFact]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
-    public void EmailComVariosDestinatariosERemetentesConcatenadosCorreto()
+    public async Task EmailComVariosDestinatariosERemetentesConcatenadosCorreto()
     {
 
         var destinatarios = new Dictionary<string, string>
@@ -174,7 +165,7 @@ public class EmailTests
 
         var testarEnvio = new Email(emailServerConfiguration);
 
-        var emailEnviado = testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
+        var emailEnviado = await testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
 
         Assert.NotNull(emailEnviado);
         Assert.True(testarEnvio.IsValid());
@@ -183,7 +174,7 @@ public class EmailTests
 
     [Fact]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
-    public void EmailComVariosDestinatariosERemetentesConcatenadosIncorreto()
+    public async Task EmailComVariosDestinatariosERemetentesConcatenadosIncorreto()
     {
 
         var destinatarios = new Dictionary<string, string>
@@ -200,16 +191,16 @@ public class EmailTests
 
         var testarEnvio = new Email(emailServerConfiguration);
 
-        var emailEnviado = testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, mensagem);
+        var emailEnviado = await testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, mensagem);
 
-        Assert.True(emailEnviado.Result.Equals(teste));
+        Assert.True(emailEnviado.Equals(teste));
         Assert.False(testarEnvio.IsValid());
 
     }
 
     [Fact]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
-    public void EmailComVariosDestinatariosENenhumRemetenteConcatenadosIncorreto()
+    public async Task EmailComVariosDestinatariosENenhumRemetenteConcatenadosIncorreto()
     {
 
         var destinatarios = new Dictionary<string, string>
@@ -225,16 +216,16 @@ public class EmailTests
 
         var testarEnvio = new Email(emailServerConfiguration);
 
-        var emailEnviado = testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, mensagem);
+        var emailEnviado = await testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, mensagem);
 
-        Assert.True(emailEnviado.Result.Equals(teste));
+        Assert.True(emailEnviado.Equals(teste));
         Assert.False(testarEnvio.IsValid());
 
     }
 
     [Fact]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
-    public void EmailSemDestinatariosENenhumRemetenteConcatenadosDeveSerInvalido()
+    public async Task EmailSemDestinatariosENenhumRemetenteConcatenadosDeveSerInvalido()
     {
 
         var destinatarios = new Dictionary<string, string>();
@@ -246,16 +237,16 @@ public class EmailTests
 
         var testarEnvio = new Email(emailServerConfiguration);
 
-        var emailEnviado = testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, mensagem);
+        var emailEnviado = await testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, mensagem);
 
-        Assert.True(emailEnviado.Result.Equals(teste));
+        Assert.True(emailEnviado.Equals(teste));
         Assert.False(testarEnvio.IsValid());
 
     }
 
     [Fact]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
-    public void EmailComHostNuloDeveSerInvalido()
+    public async Task EmailComHostNuloDeveSerInvalido()
     {
         var destinatarios = new Dictionary<string, string>
         {
@@ -271,9 +262,9 @@ public class EmailTests
 
         var testarEnvio = new Email(emailServerConfiguration);
 
-        var emailEnviado = testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, mensagem);
+        var emailEnviado = await testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, mensagem);
 
-        Assert.True(emailEnviado.Result.Equals(teste));
+        Assert.True(emailEnviado.Equals(teste));
 
     }
 

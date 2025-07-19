@@ -1,38 +1,43 @@
-using Xunit;
+﻿using Xunit;
 using Xunit.Extensions.Ordering;
 
-namespace Nuuvify.CommonPack.Domain.xTest.FluentValidator;
-
-[Order(7)]
-public class AssertAreEqualsTests
+namespace Nuuvify.CommonPack.Domain.xTest.FluentValidator
 {
-
-    [Fact]
-    public void AssertAreEqualsObjectNull()
+    [Order(7)]
+    public class AssertAreEqualsTests
     {
-        Customer customer = null;
 
-        var valido = new ValidationConcernR<Customer>(customer)
-            .AssertAreEquals(x => x.Name == "João", true);
 
-        Assert.Null(customer);
-        Assert.True(valido.Errors.Count > 0);
-    }
-
-    [Fact]
-    public void AssertAreEqualsObjectNotNull()
-    {
-        Customer customer = new Customer
+        [Fact]
+        public void AssertAreEqualsObjectNull()
         {
-            Name = "João",
-            Age = 41
-        };
+            Customer customer = null;
 
-        _ = new ValidationConcernR<Customer>(customer)
-            .AssertAreEquals(x => x.Name, "João")
-            .AssertAreEquals(x => x.Age + 10 == 50, true);
+            var valido = new ValidationConcernR<Customer>(customer)
+                .AssertAreEquals(x => x.Name == "João", true);
 
-        Assert.NotNull(customer);
-        Assert.True(customer.Notifications.Count == 1);
+
+
+            Assert.Null(customer);
+            Assert.True(valido.Errors.Count > 0);
+        }
+
+        [Fact]
+        public void AssertAreEqualsObjectNotNull()
+        {
+            Customer customer = new Customer
+            {
+                Name = "João",
+                Age = 41
+            };
+
+            new ValidationConcernR<Customer>(customer)
+                .AssertAreEquals(x => x.Name, "João")
+                .AssertAreEquals(x => x.Age + 10 == 50, true);
+
+
+            Assert.NotNull(customer);
+            Assert.True(customer.Notifications.Count == 1);
+        }
     }
 }

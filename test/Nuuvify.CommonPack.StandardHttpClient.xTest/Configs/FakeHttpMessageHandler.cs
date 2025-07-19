@@ -1,18 +1,25 @@
-namespace Nuuvify.CommonPack.StandardHttpClient.xTest;
+﻿using System;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
-public class HttpMessageHandler : System.Net.Http.HttpMessageHandler
+namespace Nuuvify.CommonPack.StandardHttpClient.xTest
 {
-
-    public virtual HttpResponseMessage Send(HttpRequestMessage request)
-    {
-        throw new NotImplementedException("Esse conteudo não sera retornado, pois esse metodo esta sendo mocado");
-
-    }
-
-    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
-                                                           CancellationToken cancellationToken)
+    public class HttpMessageHandler : System.Net.Http.HttpMessageHandler
     {
 
-        return Task.FromResult(Send(request));
+
+        public virtual HttpResponseMessage Send(HttpRequestMessage request)
+        {
+            throw new NotImplementedException("Esse conteudo não sera retornado, pois esse metodo esta sendo mocado");
+
+        }
+
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
+                                                               CancellationToken cancellationToken)
+        {
+
+            return Task.FromResult(Send(request));
+        }
     }
 }

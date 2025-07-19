@@ -1,15 +1,18 @@
-namespace Nuuvify.CommonPack.Domain.xTest.Entities;
+using System;
 
-public class Cliente : AggregateRoot
+namespace Nuuvify.CommonPack.Domain.xTest.Entities
 {
-    public Cliente(int codigo, string nome)
+    public class Cliente : AggregateRoot
     {
-        Codigo = codigo;
-        Nome = nome;
+        public Cliente(int codigo, string nome)
+        {
+            Codigo = codigo;
+            Nome = nome;
+        }
+
+        public int Codigo { get; private set; }
+        public string Nome { get; private set; }
+        public DateTime? DataUltimoPedido { get; set; }
+        
     }
-
-    public int Codigo { get; private set; }
-    public string Nome { get; private set; }
-    public DateTime? DataUltimoPedido { get; set; }
-
 }

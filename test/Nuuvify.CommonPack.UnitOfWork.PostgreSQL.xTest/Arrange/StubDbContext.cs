@@ -1,145 +1,160 @@
+﻿using System;
 using System.Diagnostics;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Nuuvify.CommonPack.AutoHistory.Extensions;
+using Nuuvify.CommonPack.Extensions.Implementation;
+using Nuuvify.CommonPack.Middleware.Abstraction;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
-using Nuuvify.CommonPack.AutoHistory.Extensions;
-using Nuuvify.CommonPack.Extensions.Implementation;
-using Nuuvify.CommonPack.Middleware.Abstraction;
 
-namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Arrange;
-
-public class StubDbContext : DbContext
+namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Arrange
 {
-
-    public readonly IConfigurationCustom Configuration;
-    public readonly string ownerDB;
-
-    public StubDbContext(DbContextOptions<StubDbContext> options,
-        IConfigurationCustom configuration)
-        : base(options)
+    public class StubDbContext : DbContext
     {
 
-        Configuration = configuration;
+        public readonly IConfigurationCustom Configuration;
+        public readonly string ownerDB;
 
-        ownerDB = Configuration.GetSectionValue("AppConfig:OwnerDB");
 
-        try
+
+        public StubDbContext(DbContextOptions<StubDbContext> options,
+            IConfigurationCustom configuration)
+            : base(options)
         {
-            var databaseCreator = Database.GetService<IDatabaseCreator>() as RelationalDatabaseCreator;
 
-            var script = Database.GenerateCreateScript();
-            Debug.WriteLine(script);
+            Configuration = configuration;
 
-            if (!Database.EnsureCreated())
+            ownerDB = Configuration.GetSectionValue("AppConfig:OwnerDB");
+
+
+            try
             {
-                var dropSchema = $"DROP SCHEMA IF EXISTS {ownerDB} CASCADE";
+                var databaseCreator = Database.GetService<IDatabaseCreator>() as RelationalDatabaseCreator;
 
-                _ = Database.ExecuteSqlRaw(dropSchema);
-                databaseCreator.CreateTables();
+                var script = Database.GenerateCreateScript();
+                Debug.WriteLine(script);
 
-            }
 
-        }
-        catch (Exception ex)
-        {
-            Trace.WriteLine($"Não foi possivel criar as tabelas para teste, owner: {ownerDB} para execução do teste. {ex.Message}");
-        }
-
-    }
-
-    public virtual DbSet<PedidoItem> PedidoItens { get; set; }
-    public virtual DbSet<Pedido> Pedidos { get; set; }
-    public virtual DbSet<Fatura> Faturas { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        if (!optionsBuilder.IsConfigured)
-        {
-
-            var cnn = Configuration.GetConnectionString(ownerDB);
-
-            _ = optionsBuilder
-                .UseNpgsql(cnn)
-                .UseSnakeCaseNamingConvention()
-                .UseLazyLoadingProxies()
-                .EnableDetailedErrors()
-                .EnableSensitiveDataLogging();
-
-            Console.WriteLine($"EF OnConfiguring: {cnn.SubstringNotNull(0, cnn.IndexOf("User"))}");
-
-        }
-
-    }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.SetDatabaseProviderName(Database);
-
-        _ = modelBuilder.HasDefaultSchema(ownerDB);
-
-        _ = modelBuilder.ApplyConfigurationsFromAssembly(typeof(StubDbContext).Assembly);
-
-        modelBuilder.IgnoreValueObject();
-
-        modelBuilder.MappingPropertiesForgotten();
-
-        _ = modelBuilder.EnableAutoHistory<Nuuvify.CommonPack.AutoHistory.AutoHistory>(o =>
-        {
-            o.ProviderName = Database.ProviderName;
-        });
-
-        base.OnModelCreating(modelBuilder);
-
-    }
-
-    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            var registries = await SaveChangesAsync(true, cancellationToken);
-
-            Debug.WriteLine($"SaveChanges executado com sucesso para {registries} registros, e {this.GetAggregatesChanges()} registros em entidades agregadas");
-
-            return await Task.FromResult(registries);
-        }
-        catch (DbUpdateException ex)
-        {
-            PropertyValues proposedValues;
-            PropertyValues databaseValues;
-            var columnName = string.Empty;
-
-            var baseMessage = new StringBuilder()
-                .AppendLine($"Houve um erro em SaveChanges, verifique o log de erros: {ex.Message} inner: {ex?.InnerException?.Message}");
-
-            foreach (var entry in ex.Entries)
-            {
-                proposedValues = entry.CurrentValues;
-                databaseValues = entry.GetDatabaseValues();
-
-                foreach (var property in proposedValues.Properties)
+                if (!Database.EnsureCreated())
                 {
-                    columnName = property.GetColumnName();
+                    var dropSchema = $"DROP SCHEMA IF EXISTS {ownerDB} CASCADE";
 
-                    _ = baseMessage.AppendLine($"Proposed: {columnName} = {proposedValues[property]}");
-                    if (!(databaseValues?[property] is null))
-                    {
-                        _ = baseMessage.AppendLine($"DataBaseValue: {columnName} = {databaseValues?[property]}");
-                    }
+                    Database.ExecuteSqlRaw(dropSchema);
+                    databaseCreator.CreateTables();
+
                 }
 
             }
-
-            Debug.WriteLine($"{baseMessage}");
-            throw;
+            catch (Exception ex)
+            {
+                Trace.WriteLine($"Não foi possivel criar as tabelas para teste, owner: {ownerDB} para execução do teste. {ex.Message}");
+            }
 
         }
-        catch (Exception ex)
+
+
+        public virtual DbSet<PedidoItem> PedidoItens { get; set; }
+        public virtual DbSet<Pedido> Pedidos { get; set; }
+        public virtual DbSet<Fatura> Faturas { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            Debug.WriteLine($"{ex.Message} inner: {ex?.InnerException?.Message}");
-            throw;
+            if (!optionsBuilder.IsConfigured)
+            {
+
+                var cnn = Configuration.GetConnectionString(ownerDB);
+
+                optionsBuilder
+                    .UseNpgsql(cnn)
+                    .UseSnakeCaseNamingConvention()
+                    .UseLazyLoadingProxies()
+                    .EnableDetailedErrors()
+                    .EnableSensitiveDataLogging();
+
+                Console.WriteLine($"EF OnConfiguring: {cnn.SubstringNotNull(0, cnn.IndexOf("User"))}");
+
+
+            }
+
         }
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.SetDatabaseProviderName(Database);
+
+            modelBuilder.HasDefaultSchema(ownerDB);
+
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(StubDbContext).Assembly);
+
+            modelBuilder.IgnoreValueObject();
+
+            modelBuilder.MappingPropertiesForgotten();
+
+            modelBuilder.EnableAutoHistory<Nuuvify.CommonPack.AutoHistory.AutoHistory>(o =>
+            {
+                o.ProviderName = Database.ProviderName;
+            });
+
+
+            base.OnModelCreating(modelBuilder);
+
+        }
+
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var registries = await SaveChangesAsync(true, cancellationToken);
+
+                Debug.WriteLine($"SaveChanges executado com sucesso para {registries} registros, e {this.GetAggregatesChanges()} registros em entidades agregadas");
+
+                return await Task.FromResult(registries);
+            }
+            catch (DbUpdateException ex)
+            {
+                PropertyValues proposedValues;
+                PropertyValues databaseValues;
+                var columnName = string.Empty;
+
+                var baseMessage = new StringBuilder()
+                    .AppendLine($"Houve um erro em SaveChanges, verifique o log de erros: {ex.Message} inner: {ex?.InnerException?.Message}");
+
+                foreach (var entry in ex.Entries)
+                {
+                    proposedValues = entry.CurrentValues;
+                    databaseValues = entry.GetDatabaseValues();
+
+                    foreach (var property in proposedValues.Properties)
+                    {
+                        columnName = property.GetColumnName();
+
+                        baseMessage.AppendLine($"Proposed: {columnName} = {proposedValues[property]}");
+                        if (!(databaseValues?[property] is null))
+                        {
+                            baseMessage.AppendLine($"DataBaseValue: {columnName} = {databaseValues?[property]}");
+                        }
+                    }
+
+                }
+
+                Debug.WriteLine($"{baseMessage}");
+                throw;
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"{ex.Message} inner: {ex?.InnerException?.Message}");
+                throw;
+            }
+
+        }
+
 
     }
 

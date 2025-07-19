@@ -271,7 +271,7 @@ dotnet_naming_symbols.private_internal_fields.applicable_accessibilities = priva
 csharp_prefer_static_anonymous_function = true:suggestion
 
 
-## Code Analysis Quality Rules 
+## Code Analysis Quality Rules
 ### Design rules
 #### Do not declare static members on generic types
 dotnet_diagnostic.CA1000.severity = error
@@ -286,7 +286,7 @@ dotnet_diagnostic.CA1005.severity = warning
 #### Enums should have zero (default/none) value
 dotnet_diagnostic.CA1008.severity = warning
 #### Collections should implement generic interface
-dotnet_diagnostic.CA1010.severity = suggestion
+dotnet_diagnostic.CA1010.severity = warning
 #### Abstract types should not have public constructors
 dotnet_diagnostic.CA1012.severity = error
 #### Mark attributes with AttributeUsageAttribute
@@ -296,7 +296,7 @@ dotnet_diagnostic.CA1019.severity = warning
 #### Avoid out parameters
 dotnet_diagnostic.CA1021.severity = suggestion
 #### Use properties where appropriate
-dotnet_diagnostic.CA1024.severity = suggestion
+dotnet_diagnostic.CA1024.severity = none
 #### Do not catch general exception types
 dotnet_diagnostic.CA1031.severity = warning
 #### Implement standard exception constructors
@@ -320,7 +320,7 @@ dotnet_diagnostic.CA1054.severity = suggestion
 #### URI return values should not be strings
 dotnet_diagnostic.CA1055.severity = suggestion
 #### URI properties should not be strings
-dotnet_diagnostic.CA1056.severity = suggestion
+dotnet_diagnostic.CA1056.severity = none
 #### Types should not extend certain base types
 dotnet_diagnostic.CA1058.severity = error
 #### Do not hide base class methods
@@ -408,7 +408,7 @@ dotnet_diagnostic.CA1727.severity = warning
 #### Use literals where appropriate
 dotnet_diagnostic.CA1802.severity = warning
 #### Avoid uninstantiated internal classes
-dotnet_diagnostic.CA1812.severity = warning
+dotnet_diagnostic.CA1812.severity = none
 #### Avoid unsealed attributes
 dotnet_diagnostic.CA1813.severity = suggestion
 #### Prefer jagged arrays over multidimensional
@@ -432,7 +432,7 @@ dotnet_diagnostic.CA1835.severity = warning
 #### Prefer Dictionary Contains methods
 dotnet_diagnostic.CA1841.severity = warning
 #### Use the LoggerMessage delegates
-dotnet_diagnostic.CA1848.severity = suggestion
+dotnet_diagnostic.CA1848.severity = none
 #### Call async methods when in an async method
 dotnet_diagnostic.CA1849.severity = warning
 #### Possible multiple enumerations of IEnumerable collection
@@ -503,7 +503,7 @@ dotnet_diagnostic.CA2213.severity = error
 #### Dispose methods should call base class dispose
 dotnet_diagnostic.CA2215.severity = error
 #### Collection properties should be read only
-dotnet_diagnostic.CA2227.severity = warning
+dotnet_diagnostic.CA2227.severity = none
 #### Provide correct arguments to formatting methods
 dotnet_diagnostic.CA2241.severity = warning
 #### Do not assign a property to itself
@@ -513,9 +513,9 @@ dotnet_diagnostic.CA2248.severity = warning
 #### Use ThrowIfCancellationRequested
 dotnet_diagnostic.CA2250.severity = warning
 #### Named placeholders should not be numeric values
-dotnet_diagnostic.CA2253.severity = warning
+dotnet_diagnostic.CA2253.severity = suggestion
 #### Template should be a static expression
-dotnet_diagnostic.CA2254.severity = warning
+dotnet_diagnostic.CA2254.severity = none
 #### Prefer generic overload when type is known
 dotnet_diagnostic.CA2263.severity = warning
 

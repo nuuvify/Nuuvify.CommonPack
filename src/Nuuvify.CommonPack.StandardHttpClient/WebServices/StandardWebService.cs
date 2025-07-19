@@ -7,7 +7,6 @@ using Nuuvify.CommonPack.StandardHttpClient.Results;
 
 namespace Nuuvify.CommonPack.StandardHttpClient.WebServices;
 
-
 public partial class StandardWebService : IStandardWebService, IDisposable
 {
 
@@ -18,6 +17,7 @@ public partial class StandardWebService : IStandardWebService, IDisposable
     private readonly Dictionary<string, object> _headerStandard;
     private string _queryString;
     private HttpStandardXmlReturn _returnMessage;
+    private bool _disposed = false;
 
     ///<inheritdoc/>
     public Uri FullUrl { get; private set; }
@@ -92,8 +92,7 @@ public partial class StandardWebService : IStandardWebService, IDisposable
         if (!builder.ToString().Equals("?", StringComparison.Ordinal))
             _ = builder.Append("&");
 
-        _ = builder.Append($"{key}={value}");
-
+        _ = builder.Append(System.Globalization.CultureInfo.InvariantCulture, $"{key}={value}");
         _queryString = builder.ToString();
 
         return this;
@@ -141,12 +140,15 @@ public partial class StandardWebService : IStandardWebService, IDisposable
 
         _ = _httpClient.CustomRequestHeader(_headerStandard);
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(accept));
-
         return await StandardGetRequestStreamAsync(url, soapEnvelopeXml, accept);
 
     }
 
-    private bool _disposed = false;
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
 
     protected virtual void Dispose(bool disposing)
     {
@@ -156,19 +158,9 @@ public partial class StandardWebService : IStandardWebService, IDisposable
             {
                 _httpClient?.Dispose();
             }
-
             _disposed = true;
         }
     }
 
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    ~StandardWebService()
-    {
-        Dispose(false);
-    }
 }
+

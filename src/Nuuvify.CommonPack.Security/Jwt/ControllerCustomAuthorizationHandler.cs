@@ -1,43 +1,48 @@
-using Microsoft.AspNetCore.Authorization;
+using System.Linq;
+using System.Threading.Tasks;
 using Nuuvify.CommonPack.Extensions.Implementation;
+using Microsoft.AspNetCore.Authorization;
 
-namespace Nuuvify.CommonPack.Security.Jwt;
-
-public class ControllerCustomAuthorizationHandler : AuthorizationHandler<ControllerCustomAuthorizationRequirement>
+namespace Nuuvify.CommonPack.Security.Jwt
 {
-    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context,
-                                                   ControllerCustomAuthorizationRequirement requirement)
+    public class ControllerCustomAuthorizationHandler : AuthorizationHandler<ControllerCustomAuthorizationRequirement>
     {
-
-        var isAuthenticated = false;
-
-        if (context.HasSucceeded)
-        {
-            isAuthenticated = true;
-        }
-        else
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context,
+                                                       ControllerCustomAuthorizationRequirement requirement)
         {
 
-            if (requirement.ClaimType.Equals(Constants.UserClaimHeader, System.StringComparison.OrdinalIgnoreCase))
+            var isAuthenticated = false;
+
+            if (context.HasSucceeded)
             {
-                isAuthenticated = false;
+                isAuthenticated = true;
             }
             else
             {
-                var claims = context.User.Claims
-                    .Where(x => x.Type.Equals(requirement.ClaimType, StringComparison.Ordinal))?
-                    .ToList();
 
-                isAuthenticated = claims?.Count > 0;
+                if (requirement.ClaimType.Equals(Constants.UserClaimHeader, System.StringComparison.InvariantCultureIgnoreCase))
+                {
+                    isAuthenticated = false;
+                }
+                else
+                {
+                    var claims = context.User.Claims
+                        .Where(x => x.Type.Equals(requirement.ClaimType))?
+                        .ToList();
+
+                    isAuthenticated = claims?.Count > 0;
+                }
+
             }
 
+
+            if (isAuthenticated)
+                context.Succeed(requirement);
+            else
+                context.Fail();
+
+
+            return Task.CompletedTask;
         }
-
-        if (isAuthenticated)
-            context.Succeed(requirement);
-        else
-            context.Fail();
-
-        return Task.CompletedTask;
     }
 }

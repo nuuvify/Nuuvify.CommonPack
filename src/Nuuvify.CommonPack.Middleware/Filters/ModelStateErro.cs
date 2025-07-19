@@ -1,43 +1,44 @@
-namespace Nuuvify.CommonPack.Middleware.Filters;
-
-public class ModelStateErro
+﻿namespace Nuuvify.CommonPack.Middleware.Filters
 {
-    public string ErroHost
+    public class ModelStateErro
     {
-        get
+        public string ErroHost
         {
-            return ErrorHost;
+            get
+            {
+                return ErrorHost;
+            }
+            set
+            {
+                ErrorHost = value;
+            }
         }
-        set
+        public string ErroPath
         {
-            ErrorHost = value;
+            get
+            {
+                return ErrorPath;
+            }
+            set
+            {
+                ErrorPath = value;
+            }
         }
-    }
-    public string ErroPath
-    {
-        get
+        public object ErroMensagem
         {
-            return ErrorPath;
+            get
+            {
+                return ErrorMessage;
+            }
+            set
+            {
+                ErrorMessage = value;
+            }
         }
-        set
-        {
-            ErrorPath = value;
-        }
-    }
-    public object ErroMensagem
-    {
-        get
-        {
-            return ErrorMessage;
-        }
-        set
-        {
-            ErrorMessage = value;
-        }
-    }
 
-    public string ErrorHost { get; set; }
-    public string ErrorPath { get; set; }
-    public object ErrorMessage { get; set; }
+        public string ErrorHost { get; set; }
+        public string ErrorPath { get; set; }
+        public object ErrorMessage { get; set; }
 
+    }
 }

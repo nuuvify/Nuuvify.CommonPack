@@ -68,7 +68,10 @@ public class JwtBuilder : IJwtBuilder
     /// <returns></returns>
     public virtual IJwtBuilder WithJwtClaims()
     {
-        _jwtClaims ??= new List<Claim>();
+        if (_jwtClaims is null)
+        {
+            _jwtClaims = new List<Claim>();
+        }
 
         _jwtClaims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
         _jwtClaims.Add(new Claim(JwtRegisteredClaimNames.Nbf, ToUnixEpochDate(DateTime.Now).ToString()));

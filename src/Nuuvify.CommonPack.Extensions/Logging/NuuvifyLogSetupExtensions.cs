@@ -26,11 +26,12 @@ public static class NuuvifyLogSetupExtensions
         this ILoggingBuilder builder,
         Action<NuuvifyLogColorConfiguration> configureColor)
     {
-        _ = builder.AddColorConsoleLogger();
-        _ = builder.Services.Configure(configureColor);
+        builder.AddColorConsoleLogger();
+        builder.Services.Configure(configureColor);
 
         return builder;
     }
+
 
     public static ILoggingBuilder AddCustomFormatter(
         this ILoggingBuilder builder,
@@ -38,9 +39,9 @@ public static class NuuvifyLogSetupExtensions
         Action<NuuvifyLogColorConfiguration> configureColor = default)
     {
         if (configureColor != null)
-            _ = builder.Services.Configure(configureColor);
+            builder.Services.Configure(configureColor);
 
-        _ = builder.AddConsole(options => options.FormatterName = nameof(NuuvifyLogFormatter))
+        builder.AddConsole(options => options.FormatterName = nameof(NuuvifyLogFormatter))
                .AddConsoleFormatter<NuuvifyLogFormatter, NuuvifyLogFormatterOptions>(configureFormatter);
 
         return builder;

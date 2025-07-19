@@ -1,7 +1,10 @@
-namespace Nuuvify.CommonPack.Middleware.Abstraction.Results;
+﻿using System.Collections.Generic;
 
-public class ReturnStandardErrors<TNotification> where TNotification : class
+namespace Nuuvify.CommonPack.Middleware.Abstraction.Results
 {
-    public bool Success { get; set; }
-    public IEnumerable<TNotification> Errors { get; set; }
+    public class ReturnStandardErrors<TNotification> where TNotification : class
+    {
+        public bool Success { get; set; }
+        public IEnumerable<TNotification> Errors { get; set; }
+    }
 }

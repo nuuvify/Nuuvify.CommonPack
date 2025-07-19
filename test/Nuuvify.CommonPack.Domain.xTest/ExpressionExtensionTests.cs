@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Linq.Expressions;
 using Nuuvify.CommonPack.Extensions;
 using Nuuvify.CommonPack.Extensions.Implementation;
@@ -40,16 +41,84 @@ public class ExpressionExtensionTests
     }
 
     [Fact]
-    [Trait("CommonPack.Extensions", nameof(CacheTimeService))]
-    public void CacheTimeService_ComHoraComoString_DeveRetornarDateEHoraLocal()
+    [Trait("CommonPack.Extensions", nameof(CacheTimeServiceExtension))]
+    public void CacheTimeService_ComHoraComoString_DeveRetornarTimeSpanAteHoraEspecifica()
     {
-        const string time = "22:00:00";
+        // Arrange
+        const string timeString = "23:59:59";
+        var now = DateTimeOffset.Now;
+        var targetTime = DateTimeOffset.Parse($"{now:yyyy-MM-dd} {timeString}", CultureInfo.InvariantCulture);
 
-        var dateTimeLocal = CacheTimeService.ExpireAt(time);
-        var actual = dateTimeLocal.ToString("HH:mm:ss");
+        // Se a hora já passou hoje, será para amanhã
+        if (targetTime <= now)
+        {
+            targetTime = targetTime.AddDays(1);
+        }
 
-        Assert.Equal(expected: time, actual: actual);
+        // Act
+        var result = CacheTimeServiceExtension.ExpireAt(timeString);
 
+        // Assert
+        var expectedTimeSpan = targetTime - now;
+
+        // Tolerância de 1 segundo para diferenças de execução
+        var tolerance = TimeSpan.FromSeconds(1);
+        var difference = Math.Abs((result - expectedTimeSpan).TotalSeconds);
+
+        Assert.True(difference <= tolerance.TotalSeconds,
+            $"Esperado aproximadamente {expectedTimeSpan}, mas obteve {result}. Diferença: {difference} segundos");
+
+        // Verifica se o resultado é positivo (sempre no futuro)
+        Assert.True(result > TimeSpan.Zero, "O TimeSpan retornado deve ser positivo (no futuro)");
+    }
+
+    [Fact]
+    [Trait("CommonPack.Extensions", nameof(CacheTimeServiceExtension))]
+    public void CacheTimeService_ComHoraPassada_DeveRetornarProximoDia()
+    {
+        // Arrange
+        var now = DateTimeOffset.Now;
+        var pastTime = now.AddHours(-1); // Uma hora atrás
+        var timeString = pastTime.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
+
+        var expectedTargetTime = DateTimeOffset.Parse($"{now.AddDays(1):yyyy-MM-dd} {timeString}", CultureInfo.InvariantCulture);
+
+        // Act
+        var result = CacheTimeServiceExtension.ExpireAt(timeString);
+
+        // Assert
+        var expectedTimeSpan = expectedTargetTime - now;
+
+        // Tolerância de 1 segundo para diferenças de execução
+        var tolerance = TimeSpan.FromSeconds(1);
+        var difference = Math.Abs((result - expectedTimeSpan).TotalSeconds);
+
+        Assert.True(difference <= tolerance.TotalSeconds,
+            $"Esperado aproximadamente {expectedTimeSpan}, mas obteve {result}. Diferença: {difference} segundos");
+
+        // Verifica se o resultado é para o próximo dia (mais de 22 horas no futuro)
+        Assert.True(result.TotalHours > 22,
+            $"Para uma hora que já passou, deve retornar um TimeSpan para o próximo dia. Obteve: {result.TotalHours} horas");
+    }
+
+    [Fact]
+    [Trait("CommonPack.Extensions", nameof(CacheTimeServiceExtension))]
+    public void CacheTimeService_FormatacaoTimeSpan_DeveRetornarFormatoCorreto()
+    {
+        // Arrange
+        const string timeString = "14:30:45";
+
+        // Act
+        var timeSpanResult = CacheTimeServiceExtension.ExpireAt(timeString);
+        var formattedResult = timeSpanResult.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture);
+
+        // Assert
+        Assert.NotNull(formattedResult);
+        Assert.Matches(@"^\d{2}:\d{2}:\d{2}$", formattedResult); // Formato HH:mm:ss
+
+        // Verifica se o TimeSpan é válido e positivo
+        Assert.True(timeSpanResult > TimeSpan.Zero, "O TimeSpan deve ser positivo");
+        Assert.True(timeSpanResult <= TimeSpan.FromDays(1), "O TimeSpan não deve exceder 24 horas");
     }
 
     public string Id { get; set; }

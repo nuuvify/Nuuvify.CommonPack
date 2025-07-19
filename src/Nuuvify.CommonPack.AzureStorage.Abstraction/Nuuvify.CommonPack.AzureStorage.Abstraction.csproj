@@ -7,11 +7,13 @@
         <RootNamespace>Nuuvify.CommonPack.AzureStorage.Abstraction</RootNamespace>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
-        <PackageTags>EntityFramework;EF;EFCore;Database;IBM;DB2</PackageTags>
+        <PackageTags>Azure;Storage</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>
         <None Include="README.md" Pack="true" PackagePath="\" />
         <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
     </ItemGroup>
+
+
 </Project>

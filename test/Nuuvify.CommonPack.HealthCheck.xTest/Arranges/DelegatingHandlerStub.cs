@@ -1,16 +1,23 @@
-namespace Nuuvify.CommonPack.HealthCheck.xTest;
+﻿using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
-public class DelegatingHandlerStub : DelegatingHandler
+namespace Nuuvify.CommonPack.HealthCheck.xTest
 {
-    private readonly HttpResponseMessage _fakeResponse;
-
-    public DelegatingHandlerStub(HttpResponseMessage responseMessage)
+    public class DelegatingHandlerStub : DelegatingHandler
     {
-        _fakeResponse = responseMessage;
-    }
+        private readonly HttpResponseMessage _fakeResponse;
 
-    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-    {
-        return await Task.FromResult(_fakeResponse);
+        public DelegatingHandlerStub(HttpResponseMessage responseMessage)
+        {
+            _fakeResponse = responseMessage;
+        }
+
+
+
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            return await Task.FromResult(_fakeResponse);
+        }
     }
 }

@@ -1,7 +1,11 @@
-namespace Nuuvify.CommonPack.Security.Abstraction;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
-public interface IUserAccountRepository
+namespace Nuuvify.CommonPack.Security.Abstraction
 {
-    Task<IEnumerable<PersonRoleQueryResult>> GetUserRoles(string login);
-    Task<bool> PersonIsMemberOf(string login, string claimType);
+    public interface IUserAccountRepository
+    {
+        Task<IEnumerable<PersonRoleQueryResult>> GetUserRoles(string login);
+        Task<bool> PersonIsMemberOf(string login, string claimType);
+    }
 }

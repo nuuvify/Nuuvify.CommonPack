@@ -6,6 +6,7 @@ namespace Microsoft.Extensions.Configuration;
 public static class ConfigurationBuilderExtensions
 {
 
+
     /// <summary>
     /// Adiciona as variaveis de ambiente com o prefixo informado, como collection imMemory, para ser usado com
     /// GetSection() ou GetValue() do IConfiguration
@@ -22,8 +23,10 @@ public static class ConfigurationBuilderExtensions
         ILogger logger = null)
     {
 
+
         if (string.IsNullOrWhiteSpace(prefix))
             return builder;
+
 
         var environmentVariables = Environment.GetEnvironmentVariables()
             .Cast<System.Collections.DictionaryEntry>()
@@ -33,7 +36,8 @@ public static class ConfigurationBuilderExtensions
         if (environmentVariables == null || environmentVariables.Count == 0)
             return builder;
 
-        logger?.LogDebug("Variaveis de ambiente {className} com prefixo {prefix} encontradas: {environmentVariables}", nameof(AddEnvironmentVariablesToMemoryCollection), prefix, environmentVariables.Count);
+        if (logger != null)
+            logger.LogDebug("Variaveis de ambiente {className} com prefixo {prefix} encontradas: {environmentVariables}", nameof(AddEnvironmentVariablesToMemoryCollection), prefix, environmentVariables.Count);
 
         var environmentVariablesDictionary = new Dictionary<string, string>();
 
@@ -48,7 +52,8 @@ public static class ConfigurationBuilderExtensions
             environmentVariablesDictionary[keyWithoutPrefix] = kvp.Value;
         }
 
-        _ = builder.AddInMemoryCollection(environmentVariablesDictionary);
+
+        builder.AddInMemoryCollection(environmentVariablesDictionary);
         return builder;
 
     }
@@ -68,8 +73,10 @@ public static class ConfigurationBuilderExtensions
         ILogger logger = null)
     {
 
+
         if (string.IsNullOrWhiteSpace(prefix))
             return builder;
+
 
         var environmentVariables = Environment.GetEnvironmentVariables()
             .Cast<System.Collections.DictionaryEntry>()
@@ -79,7 +86,9 @@ public static class ConfigurationBuilderExtensions
         if (environmentVariables == null || environmentVariables.Count == 0)
             return builder;
 
-        logger?.LogDebug("Variaveis de ambiente {className} com prefixo {prefix} encontradas: {environmentVariables}", nameof(AddEnvironmentVariablesToKeyPerFile), prefix, environmentVariables.Count);
+
+        if (logger != null)
+            logger.LogDebug("Variaveis de ambiente {className} com prefixo {prefix} encontradas: {environmentVariables}", nameof(AddEnvironmentVariablesToKeyPerFile), prefix, environmentVariables.Count);
 
         var tempPathAndFile = Path.Combine(
             Path.GetTempPath(),
@@ -91,7 +100,7 @@ public static class ConfigurationBuilderExtensions
         if (Directory.Exists(tempPathAndFile))
             Directory.Delete(tempPathAndFile, true);
 
-        _ = Directory.CreateDirectory(tempPathAndFile);
+        Directory.CreateDirectory(tempPathAndFile);
 
         foreach (var kpf in environmentVariables)
         {
@@ -103,12 +112,13 @@ public static class ConfigurationBuilderExtensions
 
         }
 
-        _ = builder.AddKeyPerFile(tempPathAndFile, optional: true);
+        builder.AddKeyPerFile(tempPathAndFile, optional: true);
         Directory.Delete(tempPathAndFile, true);
 
         return builder;
 
     }
+
 
 }
 

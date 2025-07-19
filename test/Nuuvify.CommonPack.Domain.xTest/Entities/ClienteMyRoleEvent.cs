@@ -1,13 +1,14 @@
-namespace Nuuvify.CommonPack.Domain.xTest.Entities;
-
-public class ClienteMyRoleEvent : DomainEvent<Cliente>
+namespace Nuuvify.CommonPack.Domain.xTest.Entities
 {
-    public ClienteMyRoleEvent(Cliente sourceId, string version, Cliente newCliente)
-        : base(sourceId, version)
+    public class ClienteMyRoleEvent : DomainEvent<Cliente>
     {
-        NewCliente = newCliente;
+        public ClienteMyRoleEvent(Cliente sourceId, string version, Cliente newCliente) 
+            : base(sourceId, version)
+        {
+            NewCliente = newCliente;
+        }
+
+        public Cliente NewCliente { get; set; }
+
     }
-
-    public Cliente NewCliente { get; set; }
-
 }

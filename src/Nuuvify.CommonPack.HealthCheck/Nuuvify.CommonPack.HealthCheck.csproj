@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Description>
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Description>
       HealthChecks - Setup e configuracao do endpoint /hc-ui e /hc
-    </Description>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
-    <PackageTags>Nuuvify</PackageTags>
-  </PropertyGroup>
+        </Description>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
+        <PackageTags>Nuuvify</PackageTags>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <None Include="README.md" Pack="true" PackagePath="\" />
-    <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="AspNetCore.HealthChecks.UI" Version="8.0.2" />
-		<PackageReference Include="AspnetCore.HealthChecks.UI.Client" Version="8.0.1" />
-    <PackageReference Include="AspNetCore.HealthChecks.UI.SQLite.Storage" Version="8.0.1" />
-    <PackageReference Include="AspNetCore.HealthChecks.UI.SqlServer.Storage" Version="8.0.1" />
-    <PackageReference Include="AspNetCore.HealthChecks.AzureKeyVault" Version="8.0.1" />
-    <PackageReference Include="AspNetCore.HealthChecks.Azure.Storage.Blobs" Version="8.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.1" />
-  </ItemGroup>
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\" />
+        <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
 
-  <ItemGroup Label="Packaging">
-    <Content Include="./HealthChecks/dotnet.css;./HealthChecks/dotnet.png;">
-      <Pack>true</Pack>
-      <PackagePath>$(ContentTargetFolders)</PackagePath>
-      <flatten>false</flatten>
-    </Content>
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="AspNetCore.HealthChecks.UI" Version="8.0.2" />
+        <PackageReference Include="AspnetCore.HealthChecks.UI.Client" Version="8.0.1" />
+        <PackageReference Include="AspNetCore.HealthChecks.UI.SQLite.Storage" Version="8.0.1" />
+        <PackageReference Include="AspNetCore.HealthChecks.UI.SqlServer.Storage" Version="8.0.1" />
+        <PackageReference Include="AspNetCore.HealthChecks.AzureKeyVault" Version="8.0.1" />
+        <PackageReference Include="AspNetCore.HealthChecks.Azure.Storage.Blobs" Version="8.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.1" />
+    </ItemGroup>
+
+    <ItemGroup Label="Packaging">
+        <Content Include="./HealthChecks/dotnet.css;./HealthChecks/dotnet.png;">
+            <Pack>true</Pack>
+            <PackagePath>$(ContentTargetFolders)</PackagePath>
+            <flatten>false</flatten>
+        </Content>
+    </ItemGroup>
 
 </Project>

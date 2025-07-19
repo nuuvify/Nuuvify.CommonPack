@@ -6,12 +6,9 @@
 
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Nuuvify.CommonPack.Mediator\Nuuvify.CommonPack.Mediator.csproj" />
-    <ProjectReference Include="..\..\src\Nuuvify.CommonPack.Extensions\Nuuvify.CommonPack.Extensions.csproj" />
-    <ProjectReference Include="..\..\src\Nuuvify.CommonPack.Extensions.Brazil\Nuuvify.CommonPack.Extensions.Brazil.csproj" />
     <ProjectReference Include="..\..\src\Nuuvify.CommonPack.Domain\Nuuvify.CommonPack.Domain.csproj" />
     <ProjectReference Include="..\..\src\Nuuvify.CommonPack.Security.Abstraction\Nuuvify.CommonPack.Security.Abstraction.csproj" />
   </ItemGroup>
 
-
+  
 </Project>

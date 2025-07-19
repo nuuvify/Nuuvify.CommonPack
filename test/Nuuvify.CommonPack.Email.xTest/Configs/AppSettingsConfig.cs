@@ -1,6 +1,4 @@
-using Microsoft.Extensions.Configuration;
-
-namespace Nuuvify.CommonPack.Email.xTest.Configs;
+﻿namespace Nuuvify.CommonPack.Email.xTest.Configs;
 
 public static class AppSettingsConfig
 {

@@ -1,57 +1,60 @@
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace EntityFramework.Exceptions.Common;
-
-public static class ExceptionExtension
+namespace EntityFramework.Exceptions.Common
 {
-
-    public static IDictionary<string, string> CustomMessage(this CustomDbUpdateException exception)
+    public static class ExceptionExtension
     {
-        return CustomMessage((DbUpdateException)exception);
-    }
 
-    public static IDictionary<string, string> CustomMessage(this DbUpdateException exception)
-    {
-        var currentAndProposed = new Dictionary<string, string>();
 
-        PropertyValues proposedValues;
-        PropertyValues databaseValues;
-        string columnName;
-        string currentValue;
-        string databaseValue;
-
-        foreach (var entry in exception.Entries)
+        public static IDictionary<string, string> CustomMessage(this CustomDbUpdateException exception)
         {
-            proposedValues = entry.CurrentValues;
-            databaseValues = entry.GetDatabaseValues();
+            return CustomMessage((DbUpdateException)exception);
+        }
 
-            foreach (var property in proposedValues.Properties)
+        public static IDictionary<string, string> CustomMessage(this DbUpdateException exception)
+        {
+            var currentAndProposed = new Dictionary<string, string>();
+
+            PropertyValues proposedValues;
+            PropertyValues databaseValues;
+            string columnName;
+            string currentValue;
+            string databaseValue;
+
+            foreach (var entry in exception.Entries)
             {
-                columnName = property.Name;
+                proposedValues = entry.CurrentValues;
+                databaseValues = entry.GetDatabaseValues();
 
-                currentValue = $"Proposed: {columnName} = {proposedValues[property]}";
-                if (databaseValues?[property] is null)
+                foreach (var property in proposedValues.Properties)
                 {
-                    databaseValue = string.Empty;
-                }
-                else
-                {
-                    databaseValue = $"DataBaseValue: {columnName} = {databaseValues?[property]}";
-                }
+                    columnName = property.Name;
 
-                //TODO: Quando atualizar para netstandard2.1 ou .net60, substituir esse codigo
-                //por essa linha "TryAdd"
-                //currentAndProposed.TryAdd(currentValue, databaseValue);
-                if (!currentAndProposed.ContainsKey(currentValue))
-                    currentAndProposed.Add(currentValue, databaseValue);
+                    currentValue = $"Proposed: {columnName} = {proposedValues[property]}";
+                    if (databaseValues?[property] is null)
+                    {
+                        databaseValue = string.Empty;
+                    }
+                    else
+                    {
+                        databaseValue = $"DataBaseValue: {columnName} = {databaseValues?[property]}";
+                    }
+
+                    //TODO: Quando atualizar para netstandard2.1 ou .net60, substituir esse codigo
+                    //por essa linha "TryAdd"
+                    //currentAndProposed.TryAdd(currentValue, databaseValue);
+                    if (!currentAndProposed.ContainsKey(currentValue))
+                        currentAndProposed.Add(currentValue, databaseValue);
+                        
+                }
 
             }
 
+            return currentAndProposed;
+
         }
 
-        return currentAndProposed;
-
     }
-
 }

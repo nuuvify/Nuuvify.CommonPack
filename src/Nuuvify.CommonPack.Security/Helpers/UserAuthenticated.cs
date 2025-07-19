@@ -1,106 +1,114 @@
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Nuuvify.CommonPack.Security.Abstraction;
 
-namespace Nuuvify.CommonPack.Security.Helpers;
-
-
-public class UserAuthenticated : IUserAuthenticated
+namespace Nuuvify.CommonPack.Security.Helpers
 {
 
-    protected readonly IHttpContextAccessor _accessor;
-
-    public UserAuthenticated(IHttpContextAccessor accessor)
+    public class UserAuthenticated : IUserAuthenticated
     {
-        _accessor = accessor;
 
-    }
+        protected readonly IHttpContextAccessor _accessor;
 
-    public virtual string Username()
-    {
-        var username = string.Empty;
 
-        if (IsAuthenticated())
+        public UserAuthenticated(IHttpContextAccessor accessor)
         {
-            username = _accessor.HttpContext.User.GetLogin();
+            _accessor = accessor;
+
         }
 
-        username = string.IsNullOrWhiteSpace(username) ? "Anonymous" : username;
-        return username;
 
-    }
-
-    public virtual bool IsAuthenticated()
-    {
-        if (_accessor.HttpContext == null) return false;
-        return _accessor.HttpContext.User.Identity.IsAuthenticated;
-    }
-    public virtual bool IsAuthenticated(out string token)
-    {
-        token = "";
-        if (_accessor.HttpContext == null) return false;
-        var esquemaAutenticacao = _accessor.HttpContext.Request.Headers
-            .FirstOrDefault(x => x.Key.Equals("Authorization", StringComparison.Ordinal)).Value;
-
-        foreach (var item in esquemaAutenticacao)
+        public virtual string Username()
         {
-            token = item?.Replace("bearer", "").Replace("Bearer", "").Trim();
+            var username = string.Empty;
+
+            if (IsAuthenticated())
+            {
+                username = _accessor.HttpContext.User.GetLogin();
+            }
+
+            username = string.IsNullOrWhiteSpace(username) ? "Anonymous" : username;
+            return username;
+
         }
 
-        return IsAuthenticated();
-    }
-
-    public virtual bool IsAuthorized(params string[] groups)
-    {
-        var authorized = false;
-
-        if (_accessor.HttpContext == null) return false;
-        var currentUser = _accessor.HttpContext.User.GetLogin();
-
-        if (groups?.Length == 0 || string.IsNullOrWhiteSpace(currentUser))
+        public virtual bool IsAuthenticated()
         {
+            if (_accessor.HttpContext == null) return false;
+            return _accessor.HttpContext.User.Identity.IsAuthenticated;
+        }
+        public virtual bool IsAuthenticated(out string token)
+        {
+            token = "";
+            if (_accessor.HttpContext == null) return false;
+            var esquemaAutenticacao = _accessor.HttpContext.Request.Headers
+                .FirstOrDefault(x => x.Key.Equals("Authorization")).Value;
+
+            foreach (var item in esquemaAutenticacao)
+            {
+                token = item?.Replace("bearer", "").Replace("Bearer", "").Trim();
+            }
+
+            return IsAuthenticated();
+        }
+
+        public virtual bool IsAuthorized(params string[] groups)
+        {
+            var authorized = false;
+
+            if (_accessor.HttpContext == null) return false;
+            var currentUser = _accessor.HttpContext.User.GetLogin();
+
+            if (groups?.Count() == 0 || string.IsNullOrWhiteSpace(currentUser))
+            {
+                return authorized;
+            }
+
+            string item = null;
+            Claim claim;
+
+            for (int i = 0; i < groups?.Length; i++)
+            {
+                item = groups[i];
+
+                claim = _accessor.HttpContext.User.Claims
+                    .FirstOrDefault(c => c.Type.Equals(item, System.StringComparison.InvariantCultureIgnoreCase));
+
+                authorized = claim != null;
+
+                if (authorized) break;
+            }
+
             return authorized;
         }
 
-        string item = null;
-        Claim claim;
 
-        for (int i = 0; i < groups?.Length; i++)
+        public virtual string GetClaimValue(string claimName)
         {
-            item = groups[i];
+            if (string.IsNullOrWhiteSpace(claimName)) return string.Empty;
 
-            claim = _accessor.HttpContext.User.Claims
-                .FirstOrDefault(c => c.Type.Equals(item, System.StringComparison.OrdinalIgnoreCase));
+            if (_accessor.HttpContext == null) return string.Empty;
+            var claim = _accessor.HttpContext.User.Claims
+                .FirstOrDefault(c => c.Type.Equals(claimName, System.StringComparison.InvariantCultureIgnoreCase));
 
-            authorized = claim != null;
-
-            if (authorized) break;
+            return claim?.Value;
         }
 
-        return authorized;
+        public virtual IEnumerable<Claim> GetClaims()
+        {
+            if (_accessor.HttpContext == null) return null;
+            return _accessor.HttpContext.User.Claims;
+        }
+
+        public virtual bool IsInRole(string role)
+        {
+            if (_accessor.HttpContext == null) return false;
+            return _accessor.HttpContext.User.IsInRole(role);
+        }
+
+
+
     }
-
-    public virtual string GetClaimValue(string claimName)
-    {
-        if (string.IsNullOrWhiteSpace(claimName)) return string.Empty;
-
-        if (_accessor.HttpContext == null) return string.Empty;
-        var claim = _accessor.HttpContext.User.Claims
-            .FirstOrDefault(c => c.Type.Equals(claimName, System.StringComparison.OrdinalIgnoreCase));
-
-        return claim?.Value;
-    }
-
-    public virtual IEnumerable<Claim> GetClaims()
-    {
-        if (_accessor.HttpContext == null) return null;
-        return _accessor.HttpContext.User.Claims;
-    }
-
-    public virtual bool IsInRole(string role)
-    {
-        if (_accessor.HttpContext == null) return false;
-        return _accessor.HttpContext.User.IsInRole(role);
-    }
-
 }

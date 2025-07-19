@@ -1,15 +1,17 @@
-namespace Nuuvify.CommonPack.Security.Abstraction;
-
-public class PersonRoleQueryResult
+﻿namespace Nuuvify.CommonPack.Security.Abstraction
 {
-    /// <summary>
-    /// Login do usuario
-    /// </summary>
-    /// <example>fulangi</example>
-    public string Login { get; set; }
-    /// <summary>
-    /// Nome do grupo
-    /// </summary>
-    /// <example>Contabilidade-Users</example>
-    public string Group { get; set; }
+    public class PersonRoleQueryResult
+    {
+        /// <summary>
+        /// Login do usuario
+        /// </summary>
+        /// <example>fulangi</example>
+        public string Login { get; set; }
+        /// <summary>
+        /// Nome do grupo
+        /// </summary>
+        /// <example>Contabilidade-Users</example>
+        public string Group { get; set; }
+    }
+
 }

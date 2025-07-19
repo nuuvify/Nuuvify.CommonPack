@@ -13,14 +13,17 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Nuuvify.CommonPack.HealthCheck.Helpers;
 
+
 namespace Nuuvify.CommonPack.HealthCheck;
+
 
 public static class HealthCheckExtensions
 {
 
+
     /// <summary>
     /// Esse metodo utiliza as configurações do appsettings.json para configurar o HealthCheck
-    ///
+    /// 
     /// </summary>
     /// <code>
     /// <example>
@@ -62,23 +65,25 @@ public static class HealthCheckExtensions
         var enableChecksStandard = builder.Configuration.GetValue<bool>("HealthCheckCustomConfiguration:EnableChecksStandard");
         if (!enableChecksStandard) return builder.Services.AddHealthChecks();
 
+
         var uriHc = builder.Configuration.GetSection("HealthCheckCustomConfiguration:UrlHealthCheck")?.Value;
         var setEvaluationTimeInSeconds = builder.Configuration.GetValue<int>("HealthCheckCustomConfiguration:EvaluationTimeInSeconds");
         var webPRoxy = builder.Services.BuildServiceProvider().GetService<IWebProxy>();
 
+
         var healthChecksUIBuilder = builder.Services.AddHealthChecksUI(s =>
         {
-            _ = s.AddHealthCheckEndpoint(
+            s.AddHealthCheckEndpoint(
                 name: AssemblyExtension.GetApplicationNameByAssembly,
                 uri: uriHc);
 
-            _ = s.MaximumHistoryEntriesPerEndpoint(builder.Configuration.GetValue<int>("HealthCheckCustomConfiguration:MaximumHistoryEntriesPerEndpoint"));
-            _ = s.SetEvaluationTimeInSeconds(setEvaluationTimeInSeconds);
-            _ = s.SetMinimumSecondsBetweenFailureNotifications(builder.Configuration.GetValue<int>("HealthCheckCustomConfiguration:MinimumSecondsBetweenFailureNotifications"));
-            _ = s.SetApiMaxActiveRequests(builder.Configuration.GetValue<int>("HealthCheckCustomConfiguration:SetApiMaxActiveRequests"));
+            s.MaximumHistoryEntriesPerEndpoint(builder.Configuration.GetValue<int>("HealthCheckCustomConfiguration:MaximumHistoryEntriesPerEndpoint"));
+            s.SetEvaluationTimeInSeconds(setEvaluationTimeInSeconds);
+            s.SetMinimumSecondsBetweenFailureNotifications(builder.Configuration.GetValue<int>("HealthCheckCustomConfiguration:MinimumSecondsBetweenFailureNotifications"));
+            s.SetApiMaxActiveRequests(builder.Configuration.GetValue<int>("HealthCheckCustomConfiguration:SetApiMaxActiveRequests"));
             if (webPRoxy != null)
             {
-                _ = s.UseApiEndpointHttpMessageHandler(sp =>
+                s.UseApiEndpointHttpMessageHandler(sp =>
                 {
                     return new HttpClientHandler
                     {
@@ -88,73 +93,84 @@ public static class HealthCheckExtensions
             }
         });
 
+
         var providerStorage = builder.Configuration.GetSection("HealthCheckCustomConfiguration:ProviderStorage")?.Value;
         var historySchema = builder.Configuration.GetSection("HealthCheckCustomConfiguration:HistorySchema")?.Value;
         var historyTable = builder.Configuration.GetSection("HealthCheckCustomConfiguration:HistoryTable")?.Value;
 
+
+
         historySchema ??= "hc";
         historyTable ??= "HealthCheckHistory";
+
 
         if (loggerFactory is null)
         {
             var logLevelSection = builder.Configuration.GetSection("Logging:LogLevel:HealthChecks")?.Value;
-            _ = Enum.TryParse<LogLevel>(logLevelSection ?? "None", true, out var logLevel);
+            Enum.TryParse<LogLevel>(logLevelSection ?? "None", true, out var logLevel);
 
             loggerFactory = LoggerFactory.Create(opt =>
             {
-                _ = opt.AddSimpleConsole(configureFormatter =>
+                opt.AddSimpleConsole(configureFormatter =>
                 {
                     configureFormatter.IncludeScopes = true;
                     configureFormatter.TimestampFormat = "yyyy-MM-dd HH:mm:ss zzz";
                 });
-                _ = opt.AddFilter(level => level >= logLevel);
+                opt.AddFilter(level => level >= logLevel);
             });
         }
 
+
         if (string.IsNullOrWhiteSpace(providerStorage) ||
-            providerStorage.Equals("sqlite", StringComparison.OrdinalIgnoreCase))
+            providerStorage.Equals("sqlite", StringComparison.InvariantCultureIgnoreCase))
         {
 
             var pathSqlite = Path.Combine(Path.GetTempPath(), $"{AssemblyExtension.GetApplicationNameByAssembly}_healthchecks.db");
             var sqLiteData = $"Data Source = {pathSqlite}";
-            _ = healthChecksUIBuilder.AddSqliteStorage(sqLiteData, options =>
+            healthChecksUIBuilder.AddSqliteStorage(sqLiteData, options =>
             {
-                _ = options.EnableDetailedErrors(true);
-                _ = options.EnableSensitiveDataLogging(false);
-                _ = options.UseLoggerFactory(loggerFactory);
+                options.EnableDetailedErrors(true);
+                options.EnableSensitiveDataLogging(false);
+                options.UseLoggerFactory(loggerFactory);
 
             }, configureSqliteOptions =>
             {
-                _ = configureSqliteOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-                _ = configureSqliteOptions.MigrationsHistoryTable(historyTable, historySchema);
+                configureSqliteOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                configureSqliteOptions.MigrationsHistoryTable(historyTable, historySchema);
             });
 
             return healthChecksUIBuilder.Services.AddHealthChecks();
         }
 
-        var cnnHealthCheck = builder.Configuration.GetConnectionString("HealthCheck")! ?? throw new ArgumentException("appsettings or your Vault properties ConnectionString--HealthCheck is null");
-        _ = healthChecksUIBuilder.AddSqlServerStorage(cnnHealthCheck, options =>
+
+        var cnnHealthCheck = builder.Configuration.GetConnectionString("HealthCheck")!;
+        if (cnnHealthCheck is null)
         {
-            _ = options.EnableDetailedErrors(true);
-            _ = options.EnableSensitiveDataLogging(false);
-            _ = options.UseLoggerFactory(loggerFactory);
+            throw new ArgumentException("appsettings or your Vault properties ConnectionString--HealthCheck is null");
+        }
+
+        healthChecksUIBuilder.AddSqlServerStorage(cnnHealthCheck, options =>
+        {
+            options.EnableDetailedErrors(true);
+            options.EnableSensitiveDataLogging(false);
+            options.UseLoggerFactory(loggerFactory);
 
         }, configureSqlServerOptions =>
         {
-            _ = configureSqlServerOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-            _ = configureSqlServerOptions.MigrationsHistoryTable(historyTable, historySchema);
+            configureSqlServerOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+            configureSqlServerOptions.MigrationsHistoryTable(historyTable, historySchema);
         });
+
 
         return healthChecksUIBuilder.Services.AddHealthChecks();
 
     }
 
-    private static readonly string[] s_tags = new[] { "api" };
 
     /// <summary>
     /// Adiciona um health check para a api de credenciais "CredentialApi"
     /// <p>AzureKeyVault para AzureAdOpenID--cc--ClientSecret</p>
-    /// <p>AzureBlobStorage para BlobDotnetDataProtection</p>
+    /// <p>AzureBlobStorage para BlobDotnetDataProtection</p> 
     /// </summary>
     /// <param name="builder"></param>
     /// <param name="configuration"></param>
@@ -178,6 +194,7 @@ public static class HealthCheckExtensions
         var enableChecksStandard = configuration.GetValue<bool>("HealthCheckCustomConfiguration:EnableChecksStandard");
         if (!enableChecksStandard) return builder;
 
+
         var tokenCredential = azureTokenCredential.Invoke(builder.Services.BuildServiceProvider());
         if (!timeout.HasValue)
         {
@@ -189,11 +206,11 @@ public static class HealthCheckExtensions
 
             uriCredential ??= new Uri(configuration.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value);
 
-            _ = builder.Services.AddHealthChecks()
+            builder.Services.AddHealthChecks()
                 .AddTypeActivatedCheck<HttpCustomHealthCheck>(
                     name: "CredentialApi",
                     failureStatus: null,
-                    tags: s_tags,
+                    tags: new[] { "api" },
                     timeout: timeout.Value,
                     args: new object[]
                     {
@@ -205,17 +222,18 @@ public static class HealthCheckExtensions
                     });
         }
 
-        _ = builder.Services.AddHealthChecks()
+
+        builder.Services.AddHealthChecks()
             .AddAzureKeyVault(
                 name: $"AzureKeyVault",
                 keyVaultServiceUri: new Uri(configuration.GetSection("AzureKeyVault:Dns")?.Value),
                 credential: tokenCredential,
                 setup: options =>
                 {
-                    _ = options.AddSecret("AzureAdOpenID--cc--ClientSecret");
+                    options.AddSecret("AzureAdOpenID--cc--ClientSecret");
                 },
                 failureStatus: HealthStatus.Unhealthy,
-                tags: ["azure", "keyvault"],
+                tags: new[] { "azure", "keyvault" },
                 timeout: timeout.Value)
             .AddAzureBlobStorage(
                 name: "BlobDotnetDataProtection",
@@ -231,8 +249,9 @@ public static class HealthCheckExtensions
                     };
                 },
                 failureStatus: HealthStatus.Degraded,
-                tags: ["azure", "blob", "dotnetdataprotection"],
+                tags: new[] { "azure", "blob", "dotnetdataprotection" },
                 timeout: timeout.Value);
+
 
         return builder;
 
@@ -250,19 +269,22 @@ public static class HealthCheckExtensions
         var enableChecksStandard = configuration.GetValue<bool>("HealthCheckCustomConfiguration:EnableChecksStandard");
         if (!enableChecksStandard) return builder;
 
-        _ = builder.Services.AddHealthChecks()
+        builder.Services.AddHealthChecks()
             .AddCheck<MemoryHealthCheck>(
                 name: "host-memory",
-                tags: ["memory"])
+                tags: new[] { "memory" })
             .AddCheck<LocalStorageHealthCheck>(
                 name: "host-storage",
-                tags: ["storage"]);
+                tags: new[] { "storage" });
 
         return builder;
     }
 
+
+
+
     /// <summary>
-    /// Esse metodo usa os parametros do appsettings.json
+    /// Esse metodo usa os parametros do appsettings.json 
     /// <p>HealthCheckCustomConfiguration:UrlHealthCheck</p>
     /// <p>HealthCheckCustomConfiguration:UrlHealthCheckUI</p>
     /// <p>HealthCheckCustomConfiguration:UrlHealthCheckApiData</p>
@@ -276,6 +298,7 @@ public static class HealthCheckExtensions
 
         if (!enableChecksStandard) return;
 
+
         var uriHc = configuration.GetSection("HealthCheckCustomConfiguration:UrlHealthCheck")?.Value;
         var uriHcUi = configuration.GetSection("HealthCheckCustomConfiguration:UrlHealthCheckUI")?.Value;
         var uriHcApiData = configuration.GetSection("HealthCheckCustomConfiguration:UrlHealthCheckApiData")?.Value;
@@ -287,19 +310,20 @@ public static class HealthCheckExtensions
             throw new ArgumentException("appsettings properties HealthCheckCustomConfiguration:UrlHealthCheck, HealthCheckCustomConfiguration:UrlHealthCheckUI, HealthCheckCustomConfiguration:UrlHealthCheckApiData is null");
         }
 
-        _ = app.UseEndpoints(endpoints =>
+
+        app.UseEndpoints(endpoints =>
         {
-            _ = endpoints.MapHealthChecks(uriHc, new HealthCheckOptions()
+            endpoints.MapHealthChecks(uriHc, new HealthCheckOptions()
             {
                 Predicate = _ => true,
                 ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
             });
 
-            _ = endpoints.MapHealthChecksUI(options =>
+            endpoints.MapHealthChecksUI(options =>
             {
                 options.UIPath = uriHcUi;
                 options.ApiPath = uriHcApiData;
-                _ = options.AddCustomStylesheet("dotnet.css");
+                options.AddCustomStylesheet("dotnet.css");
             });
 
         });

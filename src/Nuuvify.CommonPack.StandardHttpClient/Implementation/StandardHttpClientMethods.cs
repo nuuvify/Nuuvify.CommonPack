@@ -1,21 +1,20 @@
+﻿using System.Globalization;
 using System.Text;
-using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 
 namespace Nuuvify.CommonPack.StandardHttpClient;
 
-public partial class StandardHttpClient
+public partial class StandardHttpClientService
 {
 
     private void LogRequestMessage(HttpRequestMessage message)
     {
-
         var logString = new StringBuilder("==== REQUEST ==========================================================")
             .AppendLine()
-            .AppendLine($"Verb: {message.Method.Method}")
-            .AppendLine($"Uri:  {message.RequestUri.AbsoluteUri}");
+            .AppendLine(CultureInfo.InvariantCulture, $"Verb: {message.Method.Method}")
+            .AppendLine(CultureInfo.InvariantCulture, $"Uri:  {message.RequestUri.AbsoluteUri}");
 
         string recurseValue;
         foreach (var item in message.Headers)
@@ -26,16 +25,14 @@ public partial class StandardHttpClient
                 recurseValue += $",{itemValue}";
             }
             recurseValue = recurseValue.SubstringNotNull(1, recurseValue.Length - 1);
-
-            _ = logString.AppendLine($"{item.Key} : {recurseValue}");
+            _ = logString.AppendLine(CultureInfo.InvariantCulture, $"{item.Key} : {recurseValue}");
 
             if (item.Key.StartsWith("authorization", StringComparison.InvariantCultureIgnoreCase))
                 AuthorizationLog = recurseValue;
 
         }
-
-        _ = logString.AppendLine($"Content: {message.Content}")
-            .AppendLine($"=======================================================================");
+        _ = logString.AppendLine(CultureInfo.InvariantCulture, $"Content: {message.Content}")
+            .AppendLine("=======================================================================");
 
         _logger.LogInformation(logString.ToString());
 
@@ -46,9 +43,9 @@ public partial class StandardHttpClient
         HttpRequestMessage message,
         CancellationToken cancellationToken = default)
     {
-        _logger.LogDebug("Url and message before config: {message} url: {url}", message, url);
+        _logger.LogDebug("Url and message before config: {Message} url: {Url}", message, url);
 
-        if (url.EndsWith("&") || url.EndsWith("?"))
+        if (url.EndsWith("&", StringComparison.Ordinal) || url.EndsWith("?", StringComparison.Ordinal))
             url = url[..^1];
 
         if (!string.IsNullOrWhiteSpace(_httpClient?.BaseAddress?.AbsoluteUri) &&
@@ -112,7 +109,7 @@ public partial class StandardHttpClient
     {
         _logger.LogDebug("Url and message before config: {Message} url: {Url}", message, url);
 
-        if (url.EndsWith("&") || url.EndsWith("?"))
+        if (url.EndsWith("&", StringComparison.Ordinal) || url.EndsWith("?", StringComparison.Ordinal))
             url = url[..^1];
 
         if (!string.IsNullOrWhiteSpace(_httpClient?.BaseAddress?.AbsoluteUri) &&
@@ -179,6 +176,7 @@ public partial class StandardHttpClient
         CustomHttpResponseMessage = response;
 
         var resultNumber = (int)response.StatusCode;
+
         returnMessage.ReturnCode = resultNumber.ToString(CultureInfo.InvariantCulture);
         returnMessage.Success = response.IsSuccessStatusCode;
 

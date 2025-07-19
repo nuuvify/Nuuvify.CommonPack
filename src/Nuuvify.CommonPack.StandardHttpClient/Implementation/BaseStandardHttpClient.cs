@@ -1,12 +1,14 @@
-using System.Net;
+﻿using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.Extensions.JsonConverter;
-using Nuuvify.CommonPack.Mediator.Implementation;
+using Nuuvify.CommonPack.Extensions.Notificator;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 
+
 namespace Nuuvify.CommonPack.StandardHttpClient;
+
 
 public abstract partial class BaseStandardHttpClient
 {
@@ -20,6 +22,9 @@ public abstract partial class BaseStandardHttpClient
     protected JsonSerializerOptions JsonSettings { get; set; }
 
     protected List<NotificationR> Notifications { get; set; }
+
+
+
 
     protected BaseStandardHttpClient(
         IStandardHttpClient standardHttpClient,
@@ -44,6 +49,9 @@ public abstract partial class BaseStandardHttpClient
 
     }
 
+
+
+
     ///<inheritdoc cref="ITokenService.GetTokenAcessor"/>
     public virtual string GetTokenAcessor()
     {
@@ -60,7 +68,7 @@ public abstract partial class BaseStandardHttpClient
     /// <summary>
     /// Essa classe retorna um tipo generico (pode ser List ou Classe) para qualquer chamada Http <br/>
     /// Para deserializar XML, use a classe do dotnet conforme documentação aqui: <br/>
-    /// <seealso href="https://learn.microsoft.com/en-us/dotnet/standard/serialization/examples-of-xml-serialization"></seealso>
+    /// <seealso href="https://learn.microsoft.com/en-us/dotnet/standard/serialization/examples-of-xml-serialization"></seealso> 
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public virtual T ReturnGenericClass<T>(string standardReturn, string api, bool removeStartSpace = false) where T : class
@@ -107,7 +115,7 @@ public abstract partial class BaseStandardHttpClient
             {
                 return DeserealizeObject<T>(messageClean);
             }
-            else if (standardReturn.ReturnCode.Equals(HttpStatusCode.NoContent.GetHashCode().ToString(), StringComparison.Ordinal))
+            else if (standardReturn.ReturnCode.Equals(HttpStatusCode.NoContent.GetHashCode().ToString()))
             {
                 return (T)Convert.ChangeType(null, typeof(T));
             }
@@ -122,6 +130,7 @@ public abstract partial class BaseStandardHttpClient
                 aggregatorId: api,
                 type: "origin-message",
                 originNotification: null));
+
 
             return (T)Convert.ChangeType(null, typeof(T));
         }
@@ -140,6 +149,7 @@ public abstract partial class BaseStandardHttpClient
                     type: "origin-message",
                     originNotification: null));
         }
+
 
         ReturnNotificationApi(standardReturn, api);
         return (T)Convert.ChangeType(null, typeof(T));
@@ -160,7 +170,7 @@ public abstract partial class BaseStandardHttpClient
             {
                 return DeserealizeList<T>(messageClean);
             }
-            else if (standardReturn.ReturnCode.Equals(HttpStatusCode.NoContent.GetHashCode().ToString(), StringComparison.Ordinal))
+            else if (standardReturn.ReturnCode.Equals(HttpStatusCode.NoContent.GetHashCode().ToString()))
             {
                 return new List<T>();
             }
@@ -196,6 +206,7 @@ public abstract partial class BaseStandardHttpClient
         ReturnNotificationApi(standardReturn, api);
         return new List<T>();
     }
+
 
     public bool IsValid()
     {

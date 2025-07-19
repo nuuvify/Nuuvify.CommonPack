@@ -1,11 +1,11 @@
-using System.Net.Http.Headers;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
+using System.Net.Http.Headers;
 
 namespace Nuuvify.CommonPack.StandardHttpClient;
 
-public partial class StandardHttpClient
+public partial class StandardHttpClientService
 {
 
     public async Task<HttpStandardReturn> Patch(
@@ -42,7 +42,7 @@ public partial class StandardHttpClient
         var content = new FormUrlEncodedContent(enumerable);
 
         message.Content = content;
-        _ = message.CustomRequestHeader(_headerStandard)
+        message.CustomRequestHeader(_headerStandard)
                .AddAuthorizationHeader(_headerAuthorization);
 
         return await StandardSendAsync(url, message, cancellationToken);

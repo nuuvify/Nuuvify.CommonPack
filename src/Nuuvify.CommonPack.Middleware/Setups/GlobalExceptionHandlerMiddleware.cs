@@ -1,43 +1,49 @@
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 
-namespace Nuuvify.CommonPack.Middleware.Handle;
-
-public class GlobalExceptionHandlerMiddleware
+namespace Nuuvify.CommonPack.Middleware.Handle
 {
-
-    private readonly RequestDelegate _next;
-    private readonly IGlobalHandleException _globalHandleException;
-
-    public GlobalExceptionHandlerMiddleware(RequestDelegate next, IGlobalHandleException globalHandleException)
+    public class GlobalExceptionHandlerMiddleware
     {
-        _next = next;
 
-        _globalHandleException = globalHandleException;
-    }
+        private readonly RequestDelegate _next;
+        private readonly IGlobalHandleException _globalHandleException;
 
-    public async Task Invoke(HttpContext context)
-    {
-        try
+        public GlobalExceptionHandlerMiddleware(RequestDelegate next, IGlobalHandleException globalHandleException)
         {
-            await _next(context);
+            _next = next;
 
+            _globalHandleException = globalHandleException;
         }
-        catch (Exception ex)
+
+
+
+        public async Task Invoke(HttpContext context)
         {
+            try
+            {
+                await _next(context);
 
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            }
+            catch (Exception ex)
+            {
 
-            await _globalHandleException.HandleException(ex, context);
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+
+                await _globalHandleException.HandleException(ex, context);
+            }
+        }
+
+    }
+
+
+    public static class GlobalExceptionHandlerMiddlewareExtensions
+    {
+        public static IApplicationBuilder UseGlobalExceptionHandlerMiddleware(this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<GlobalExceptionHandlerMiddleware>();
         }
     }
 
-}
 
-public static class GlobalExceptionHandlerMiddlewareExtensions
-{
-    public static IApplicationBuilder UseGlobalExceptionHandlerMiddleware(this IApplicationBuilder builder)
-    {
-        return builder.UseMiddleware<GlobalExceptionHandlerMiddleware>();
-    }
 }

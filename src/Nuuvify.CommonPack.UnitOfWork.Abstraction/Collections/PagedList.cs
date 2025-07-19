@@ -1,4 +1,4 @@
-using Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
+﻿using Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 
 namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Collections;
 
@@ -52,6 +52,8 @@ public class PagedList<T> : IPagedList<T>
     /// <value>The has next page.</value>
     public bool HasNextPage => PageIndex - IndexFrom + 1 < TotalPages;
 
+
+
     /// <summary>
     /// Initializes a new instance of the <see cref="PagedList{T}" /> class.
     /// </summary>
@@ -101,6 +103,7 @@ public class PagedList<T> : IPagedList<T>
     /// Initializes a new instance of the <see cref="PagedList{T}" /> class.
     /// </summary>
     public PagedList() => Items = new T[0];
+
 
 }
 

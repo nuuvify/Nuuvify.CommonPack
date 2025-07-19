@@ -1,51 +1,56 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest.Entities.StubDbContext;
-
-public class FaturaConfig : EntityConfiguration<Fatura>
+namespace Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest.Entities.StubDbContext
 {
-
-    public override void Configure(EntityTypeBuilder<Fatura> builder)
+    public class FaturaConfig : EntityConfiguration<Fatura>
     {
 
-        DefaultConfig(builder, "FATURAS", "FATURA");
+        public override void Configure(EntityTypeBuilder<Fatura> builder)
+        {
 
-        _ = builder.Property(e => e.NumeroFatura)
-            .IsRequired()
-            .HasColumnName($"NUMERO_FATURA")
-            .HasColumnType("NUMERIC(8)");
 
-        _ = builder.OwnsOne(
-            o => o.EnderecoEntrega,
-            pp =>
-            {
-                _ = pp.Property(p => p.Cidade)
-                    .HasColumnName("EntregaCidade")
-                    .HasColumnType($"varchar({Endereco.MaxCidade})");
+            DefaultConfig(builder, "FATURAS", "FATURA");
 
-                _ = pp.Property(p => p.Logradouro)
-                    .HasColumnName("EntregaLogradouro")
-                    .HasColumnType($"varchar({Endereco.MaxLogradouro})");
+            builder.Property(e => e.NumeroFatura)
+                .IsRequired()
+                .HasColumnName($"NUMERO_FATURA")
+                .HasColumnType("NUMERIC(8)");
 
-            });
 
-        _ = builder.OwnsOne(
-            o => o.EnderecoFatura,
-            pp =>
-            {
-                _ = pp.Property(p => p.Cidade)
-                    .HasColumnName("FaturaCidade")
-                    .HasColumnType($"varchar({Endereco.MaxCidade})");
+            builder.OwnsOne(
+                o => o.EnderecoEntrega,
+                pp =>
+                {
+                    pp.Property(p => p.Cidade)
+                        .HasColumnName("EntregaCidade")
+                        .HasColumnType($"varchar({Endereco.MaxCidade})");
 
-                _ = pp.Property(p => p.Logradouro)
-                    .HasColumnName("FaturaLogradouro")
-                    .HasColumnType($"varchar({Endereco.MaxLogradouro})");
+                    pp.Property(p => p.Logradouro)
+                        .HasColumnName("EntregaLogradouro")
+                        .HasColumnType($"varchar({Endereco.MaxLogradouro})");
 
-            });
+                });
 
-        AuditConfig(builder);
-        AuditUserIdIgnore(builder);
+            builder.OwnsOne(
+                o => o.EnderecoFatura,
+                pp =>
+                {
+                    pp.Property(p => p.Cidade)
+                        .HasColumnName("FaturaCidade")
+                        .HasColumnType($"varchar({Endereco.MaxCidade})");
 
+                    pp.Property(p => p.Logradouro)
+                        .HasColumnName("FaturaLogradouro")
+                        .HasColumnType($"varchar({Endereco.MaxLogradouro})");
+
+                });
+
+
+                AuditConfig(builder);
+                AuditUserIdIgnore(builder);
+
+
+        }
     }
 }

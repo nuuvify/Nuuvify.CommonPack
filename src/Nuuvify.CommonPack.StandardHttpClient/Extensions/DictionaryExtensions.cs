@@ -1,5 +1,6 @@
 using System.Text;
 
+
 namespace System.Collections.Generic;
 
 public static class CustomDictionaryExtensions
@@ -20,18 +21,20 @@ public static class CustomDictionaryExtensions
             _query.Capacity = 128;
         }
 
+
         if (_query.Length == 0 || _query[0] != '?')
         {
-            _ = _query.Insert(0, '?');
+            _query.Insert(0, '?');
         }
 
         for (int i = 0; i < dic.Count; i++)
         {
-            _ = _query.Append($"{dic.ElementAtOrDefault(i).Key}={dic.ElementAtOrDefault(i).Value}&");
+            _query.Append($"{dic.ElementAtOrDefault(i).Key}={dic.ElementAtOrDefault(i).Value}&");
 
         }
 
         return QueryString(_query.ToString());
+
 
     }
 

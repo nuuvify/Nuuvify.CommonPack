@@ -1,23 +1,18 @@
-using System.Net;
-using System.Net.Http.Headers;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
-using Nuuvify.CommonPack.StandardHttpClient.Results;
-using Nuuvify.CommonPack.StandardHttpClient.xTest.Fixtures;
-using Xunit;
+﻿using Nuuvify.CommonPack.StandardHttpClient.Results;
 
-namespace Nuuvify.CommonPack.StandardHttpClient.xTest;
+namespace Nuuvify.CommonPack.StandardHttpClientService.xTest;
 
-public class StandardHttpClientStreamTests
+public class StandardHttpClientServiceStreamTests
 {
 
     private readonly Mock<IHttpClientFactory> mockFactory;
+    private readonly IConfiguration Config;
 
-    public StandardHttpClientStreamTests()
+    public StandardHttpClientServiceStreamTests()
     {
         mockFactory = new Mock<IHttpClientFactory>();
 
+        Config = AppSettingsConfig.GetConfig();
     }
 
     [Fact]
@@ -30,12 +25,12 @@ public class StandardHttpClientStreamTests
 
         var uri = new Uri(api);
 
-        var clientHandlerStub = new DelegatingHandlerStub(new HttpResponseMessage()
+        using var clientHandlerStub = new DelegatingHandlerStub(new HttpResponseMessage()
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent("Testando retorno")
         });
-        var client = new HttpClient(clientHandlerStub, true)
+        using var client = new HttpClient(clientHandlerStub, true)
         {
             BaseAddress = uri
         };
@@ -45,7 +40,9 @@ public class StandardHttpClientStreamTests
 
         var url = $"{api}v1/Anexos";
 
-        var standardClient = new StandardHttpClient(mockFactory.Object, new NullLogger<StandardHttpClient>());
+        using var standardClient = new StandardHttpClient.StandardHttpClientService(
+            mockFactory.Object,
+            new NullLogger<StandardHttpClient.StandardHttpClientService>());
         standardClient.CreateClient();
         standardClient.ResetStandardHttpClient();
 

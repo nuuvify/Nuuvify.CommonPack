@@ -4,13 +4,44 @@
         {
             "name": "commit-message-linter",
             "command": "dotnet",
-            "args": [ "husky", "exec", ".husky/csx/commit-lint.csx", "--args", "${args}" ]
+            "args": [
+                "husky",
+                "exec",
+                ".husky/csx/commit-lint.csx",
+                "--args",
+                "${args}"
+            ]
         },
         {
             "name": "dotnet-format-staged-files",
             "command": "dotnet",
-            "args": [ "format", "--verify-no-changes", "--verbosity", "diagnostic", "--include", "${staged}" ],
-            "include": [ "**/*.cs" ]
+            "args": [
+                "format",
+                "--no-restore",
+                "--verbosity",
+                "diagnostic",
+                "--include",
+                "${staged}"
+            ],
+            "include": [
+                "**/*.cs"
+            ]
+        },
+        {
+            "name": "dotnet-check-staged-files",
+            "command": "dotnet",
+            "args": [
+                "format",
+                "--no-restore",
+                "--verify-no-changes",
+                "--verbosity",
+                "diagnostic",
+                "--include",
+                "${staged}"
+            ],
+            "include": [
+                "**/*.cs"
+            ]
         }
     ]
 }

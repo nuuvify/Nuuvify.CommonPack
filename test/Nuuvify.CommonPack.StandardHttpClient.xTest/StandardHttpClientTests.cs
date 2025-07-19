@@ -1,16 +1,4 @@
-using System.Net;
-using System.Text;
-using System.Text.Json;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
-using Moq;
-using Nuuvify.CommonPack.Security.Abstraction;
-using Nuuvify.CommonPack.StandardHttpClient.Polly;
-using Nuuvify.CommonPack.StandardHttpClient.Results;
-using Nuuvify.CommonPack.StandardHttpClient.xTest.Configs;
-using Xunit;
-using Xunit.Extensions.Ordering;
+﻿using Nuuvify.CommonPack.StandardHttpClient.Results;
 
 namespace Nuuvify.CommonPack.StandardHttpClient.xTest;
 
@@ -46,13 +34,13 @@ public class StandardHttpClientTests
             Success = true
         };
 
-        var clientHandlerStub = new DelegatingHandlerStub(new HttpResponseMessage()
+        using var clientHandlerStub = new DelegatingHandlerStub(new HttpResponseMessage()
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(jsonConverted, Encoding.UTF8, "application/json")
         });
 
-        var client = new HttpClient(clientHandlerStub, true)
+        using var client = new HttpClient(clientHandlerStub, true)
         {
             BaseAddress = new Uri("https://meuteste/")
         };
@@ -62,7 +50,9 @@ public class StandardHttpClientTests
 
         var url = "api/externafake";
 
-        var standardClient = new StandardHttpClient(mockFactory.Object, new NullLogger<StandardHttpClient>());
+        using var standardClient = new StandardHttpClient.StandardHttpClientService(
+            mockFactory.Object,
+            new NullLogger<StandardHttpClient.StandardHttpClientService>());
         standardClient.CreateClient();
 
         var result = await standardClient
@@ -88,7 +78,7 @@ public class StandardHttpClientTests
             password: config.GetSection("AzureAdOpenID:cc:ClientSecret")?.Value
         ).Result;
 
-        var notification = tokenFactory?.Notifications.LastOrDefault();
+        var notification = tokenFactory.Notifications.LastOrDefault();
         var expected = false;
         var actual = string.IsNullOrWhiteSpace(tokenValido);
 
@@ -109,13 +99,13 @@ public class StandardHttpClientTests
 
         var jsonConverted = JsonSerializer.Serialize(resultDefault);
 
-        var clientHandlerStub = new DelegatingHandlerStub(new HttpResponseMessage()
+        using var clientHandlerStub = new DelegatingHandlerStub(new HttpResponseMessage()
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(jsonConverted, Encoding.UTF8, "application/json")
         });
 
-        var client = new HttpClient(clientHandlerStub, true)
+        using var client = new HttpClient(clientHandlerStub, true)
         {
             BaseAddress = new Uri("https://meuteste/")
         };
@@ -125,7 +115,9 @@ public class StandardHttpClientTests
 
         var url = "api/cliente";
 
-        var standardClient = new StandardHttpClient(mockFactory.Object, new NullLogger<StandardHttpClient>());
+        using var standardClient = new StandardHttpClient.StandardHttpClientService(
+            mockFactory.Object,
+            new NullLogger<StandardHttpClient.StandardHttpClientService>());
         standardClient.CreateClient();
         standardClient.ResetStandardHttpClient();
 
@@ -151,13 +143,13 @@ public class StandardHttpClientTests
 
         var jsonConverted = JsonSerializer.Serialize(resultDefault);
 
-        var clientHandlerStub = new DelegatingHandlerStub(new HttpResponseMessage()
+        using var clientHandlerStub = new DelegatingHandlerStub(new HttpResponseMessage()
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(jsonConverted, Encoding.UTF8, "application/json")
         });
 
-        var client = new HttpClient(clientHandlerStub, true)
+        using var client = new HttpClient(clientHandlerStub, true)
         {
             BaseAddress = new Uri("https://meuteste/")
         };
@@ -167,7 +159,9 @@ public class StandardHttpClientTests
 
         var url = "api/cliente";
 
-        var standardClient = new StandardHttpClient(mockFactory.Object, new NullLogger<StandardHttpClient>());
+        using var standardClient = new StandardHttpClient.StandardHttpClientService(
+            mockFactory.Object,
+            new NullLogger<StandardHttpClient.StandardHttpClientService>());
         standardClient.CreateClient();
         standardClient.ResetStandardHttpClient();
         var fakeClass = new FakeClasseRetorno
@@ -323,12 +317,12 @@ public class StandardHttpClientTests
             ReturnMessage = jsonConverted,
             Success = true
         };
-        var clientHandlerStub = new DelegatingHandlerStub(new HttpResponseMessage()
+        using var clientHandlerStub = new DelegatingHandlerStub(new HttpResponseMessage()
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(jsonConverted, Encoding.UTF8, "application/json")
         });
-        var client = new HttpClient(clientHandlerStub, true)
+        using var client = new HttpClient(clientHandlerStub, true)
         {
             BaseAddress = new Uri($"{urlLogin}/{urlToken}")
         };
@@ -336,7 +330,9 @@ public class StandardHttpClientTests
         _ = mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>()))
             .Returns(client);
 
-        var standardClient = new StandardHttpClient(mockFactory.Object, new NullLogger<StandardHttpClient>());
+        using var standardClient = new StandardHttpClient.StandardHttpClientService(
+            mockFactory.Object,
+            new NullLogger<StandardHttpClient.StandardHttpClientService>());
 
         var tokenService = new TokenService(mockCredentialToken.Object, standardClient, mockConfiguration.Object, new NullLogger<TokenService>(), null);
         var newToken = await tokenService.GetToken();
@@ -369,13 +365,13 @@ public class StandardHttpClientTests
 
         var jsonConverted = JsonSerializer.Serialize(resultDefault);
 
-        var clientHandlerStub = new DelegatingHandlerStub(new HttpResponseMessage()
+        using var clientHandlerStub = new DelegatingHandlerStub(new HttpResponseMessage()
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(jsonConverted, Encoding.UTF8, "application/json")
         });
 
-        var client = new HttpClient(clientHandlerStub, true)
+        using var client = new HttpClient(clientHandlerStub, true)
         {
             BaseAddress = new Uri("https://meuteste/")
         };
@@ -385,7 +381,9 @@ public class StandardHttpClientTests
 
         var url = "api/cliente";
 
-        var standardClient = new StandardHttpClient(mockFactory.Object, new NullLogger<StandardHttpClient>());
+        using var standardClient = new StandardHttpClient.StandardHttpClientService(
+            mockFactory.Object,
+            new NullLogger<StandardHttpClient.StandardHttpClientService>());
         standardClient.CreateClient();
         standardClient.ResetStandardHttpClient();
         standardClient.LogRequest = true;
@@ -419,13 +417,13 @@ public class StandardHttpClientTests
 
         var jsonConverted = JsonSerializer.Serialize(resultDefault);
 
-        var clientHandlerStub = new DelegatingHandlerStub(new HttpResponseMessage()
+        using var clientHandlerStub = new DelegatingHandlerStub(new HttpResponseMessage()
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(jsonConverted, Encoding.UTF8, "application/json")
         });
 
-        var client = new HttpClient(clientHandlerStub, true)
+        using var client = new HttpClient(clientHandlerStub, true)
         {
             BaseAddress = new Uri("https://meuteste/")
         };
@@ -435,7 +433,9 @@ public class StandardHttpClientTests
 
         var url = "api/cliente";
 
-        var standardClient = new StandardHttpClient(mockFactory.Object, new NullLogger<StandardHttpClient>());
+        using var standardClient = new StandardHttpClient.StandardHttpClientService(
+            mockFactory.Object,
+            new NullLogger<StandardHttpClient.StandardHttpClientService>());
         standardClient.CreateClient();
         standardClient.ResetStandardHttpClient();
         standardClient.LogRequest = true;

@@ -1,10 +1,11 @@
+﻿using System.Collections.Generic;
+using Nuuvify.CommonPack.Extensions.Notificator;
 
-using Nuuvify.CommonPack.Mediator.Implementation;
-
-namespace Nuuvify.CommonPack.Domain.Interfaces;
-
-public interface IBaseDomain
+namespace Nuuvify.CommonPack.Domain.Interfaces
 {
-    IList<NotificationR> ValidationResult();
+    public interface IBaseDomain
+    {
+        IList<NotificationR> ValidationResult();
 
+    }
 }

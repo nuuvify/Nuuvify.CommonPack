@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Nuuvify.CommonPack.Extensions;
 using Nuuvify.CommonPack.Extensions.Implementation;
+using Nuuvify.CommonPack.Extensions.Interfaces;
 
 namespace Nuuvify.CommonPack.UnitOfWork;
 
@@ -13,7 +13,7 @@ public static partial class ModelBuilderExtensions
     /// Essa extenção mapeia as propriedades esquecidas pelo desenvolvedor, atribuindo
     /// a elas tamanho 50 ao invés de serem mapeadas como max
     /// Use o metodo abaixo para informar o ProviderName desse contexto
-    /// <para>
+    /// <para> 
     /// <c>
     /// protected override void OnModelCreating(ModelBuilder modelBuilder)
     /// {
@@ -26,6 +26,7 @@ public static partial class ModelBuilderExtensions
     public static void MappingPropertiesForgotten(this ModelBuilder modelBuilder)
     {
         ProviderNameException(modelBuilder.GetDatabaseProviderName());
+
 
         var entities = modelBuilder.Model.GetEntityTypes()
             .Where(e => !(typeof(INotPersistingAsTable).IsAssignableFrom(e.ClrType) && !e.IsOwned()))
@@ -64,6 +65,7 @@ public static partial class ModelBuilderExtensions
         }
 
     }
+
 
 }
 

@@ -1,8 +1,4 @@
-using MailKit.Net.Smtp;
-using Moq;
-using Nuuvify.CommonPack.Email.Abstraction;
-
-namespace Nuuvify.CommonPack.Email.xTest;
+﻿namespace Nuuvify.CommonPack.Email.xTest;
 
 public class EmailService : Email
 {

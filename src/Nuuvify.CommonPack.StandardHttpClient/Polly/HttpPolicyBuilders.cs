@@ -1,12 +1,13 @@
 using Polly;
 using Polly.Extensions.Http;
 
-namespace Nuuvify.CommonPack.StandardHttpClient.Polly;
-
-public static class HttpPolicyBuilders
+namespace Nuuvify.CommonPack.StandardHttpClient.Polly
 {
-    public static PolicyBuilder<HttpResponseMessage> GetBaseBuilder()
+    public static class HttpPolicyBuilders
     {
-        return HttpPolicyExtensions.HandleTransientHttpError();
+        public static PolicyBuilder<HttpResponseMessage> GetBaseBuilder()
+        {
+            return HttpPolicyExtensions.HandleTransientHttpError();
+        }
     }
 }

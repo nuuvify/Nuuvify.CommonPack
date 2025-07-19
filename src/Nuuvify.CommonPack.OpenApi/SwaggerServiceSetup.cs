@@ -1,20 +1,22 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Nuuvify.CommonPack.OpenApi;
-
-public static class SwaggerServiceSetup
+namespace Nuuvify.CommonPack.OpenApi
 {
-
-    public static void AddSwaggerSetup(this IServiceCollection services)
+    public static class SwaggerServiceSetup
     {
 
-        _ = services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerGenOptionsConfigure>();
+        public static void AddSwaggerSetup(this IServiceCollection services)
+        {
 
-        SwaggerGenXmlComments.Configuration(services);
-        SwaggerGenSecurity.Configuration(services);
-        SwaggerGenJsonIgnore.Configuration(services);
+            services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerGenOptionsConfigure>();
 
+
+            SwaggerGenXmlComments.Configuration(services);
+            SwaggerGenSecurity.Configuration(services);
+            SwaggerGenJsonIgnore.Configuration(services);
+
+        }
     }
 }
