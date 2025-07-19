@@ -1,6 +1,23 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
+echo 'Checking editorconfig...'
+dotnet husky run --name dotnet-format-staged-files
+
+echo 'Cleaning...'
+dotnet clean
+
+echo 'Building...'
+dotnet build --no-restore
+
+echo 'Testing...'
+dotnet test --no-restore --no-build
+
+echo 'Starting commit...'
+
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
 echo 'Enforcing Format...'
 dotnet husky run --name dotnet-format-staged-files
 
