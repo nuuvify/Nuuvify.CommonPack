@@ -1,4 +1,8 @@
+﻿using System;
 using System.Globalization;
+using Nuuvify.CommonPack.Security.Abstraction;
+using Nuuvify.CommonPack.Security.Helpers;
+using Nuuvify.CommonPack.Security.Resources;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -6,82 +10,90 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
-using Nuuvify.CommonPack.Security.Abstraction;
-using Nuuvify.CommonPack.Security.Helpers;
-using Nuuvify.CommonPack.Security.Resources;
 
-namespace Nuuvify.CommonPack.Security.Jwt;
-
-public static class UserSecuritySetup
+namespace Nuuvify.CommonPack.Security.Jwt
 {
-
-    /// <summary>
-    /// IMPORTANTE: É recomendado que você inclua os parametros do JwtTokenOptions em um arquivo ou serviço de Secret/Vault
-    /// A classe JwtTokenOptions esta injetada e pode ser recuperada a qualquer momento no projeto
-    /// Esse setup já injeta a interface IUserAuthenticated automaticamente
-    /// </summary>
-    /// <param name="services"></param>
-    /// <param name="configuration"></param>
-    /// <param name="jwtAppSettingsKey"></param>
-    public static void AddSecuritySetup(this IServiceCollection services, IConfiguration configuration, string jwtAppSettingsKey = null)
+    public static class UserSecuritySetup
     {
 
-        if (services is null)
-            throw new ArgumentNullException(nameof(services), MsgSecurityJwt.ResourceManager.GetString("ServiceNull", CultureInfo.CurrentCulture));
-
-        if (configuration is null)
-            throw new ArgumentNullException(MsgSecurityJwt.ResourceManager.GetString("ConfigurationNull", CultureInfo.CurrentCulture));
-
-        var appSettingsSection = configuration.GetSection(jwtAppSettingsKey ?? "JwtTokenOptions");
-        if (appSettingsSection?.Key is null)
-        {
-            throw new ArgumentNullException(MsgSecurityJwt.ResourceManager.GetString("ConfigurationNull", CultureInfo.CurrentCulture));
-        }
-        else
-        {
-            _ = services.Configure<JwtTokenOptions>(appSettingsSection);
-        }
-
-        var appSettings = appSettingsSection.Get<JwtTokenOptions>() ?? throw new ArgumentNullException(MsgSecurityJwt.ResourceManager.GetString("ConfigurationNull", CultureInfo.CurrentCulture));
-        services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-        _ = services.AddSingleton<IAuthorizationHandler, ControllerCustomAuthorizationHandler>();
-        services.TryAddScoped<IUserAuthenticated, UserAuthenticated>();
-
-        _ = services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        }).AddJwtBearer(bearerOptions =>
+        /// <summary>
+        /// IMPORTANTE: É recomendado que você inclua os parametros do JwtTokenOptions em um arquivo ou serviço de Secret/Vault
+        /// A classe JwtTokenOptions esta injetada e pode ser recuperada a qualquer momento no projeto
+        /// Esse setup já injeta a interface IUserAuthenticated automaticamente
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="configuration"></param>
+        /// <param name="jwtAppSettingsKey"></param>
+        public static void AddSecuritySetup(this IServiceCollection services, IConfiguration configuration, string jwtAppSettingsKey = null)
         {
 
-            bearerOptions.RequireHttpsMetadata = true;
-            bearerOptions.SaveToken = true;
+            if (services is null)
+                throw new ArgumentNullException(nameof(services), MsgSecurityJwt.ResourceManager.GetString("ServiceNull", CultureInfo.CurrentCulture));
 
-            bearerOptions.TokenValidationParameters = new TokenValidationParameters
+            if (configuration is null)
+                throw new ArgumentNullException(MsgSecurityJwt.ResourceManager.GetString("ConfigurationNull", CultureInfo.CurrentCulture));
+
+
+            var appSettingsSection = configuration.GetSection(jwtAppSettingsKey ?? "JwtTokenOptions");
+            if (appSettingsSection?.Key is null)
+            {
+                throw new ArgumentNullException(MsgSecurityJwt.ResourceManager.GetString("ConfigurationNull", CultureInfo.CurrentCulture));
+            }
+            else
+            {
+                services.Configure<JwtTokenOptions>(appSettingsSection);
+            }
+
+            var appSettings = appSettingsSection.Get<JwtTokenOptions>();
+            if (appSettings is null)
+            {
+                throw new ArgumentNullException(MsgSecurityJwt.ResourceManager.GetString("ConfigurationNull", CultureInfo.CurrentCulture));
+            }
+
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IAuthorizationHandler, ControllerCustomAuthorizationHandler>();
+            services.TryAddScoped<IUserAuthenticated, UserAuthenticated>();
+
+
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(bearerOptions =>
             {
 
-                ValidateIssuer = true,
-                ValidIssuer = appSettings.Issuer,
+                bearerOptions.RequireHttpsMetadata = true;
+                bearerOptions.SaveToken = true;
 
-                ValidateAudience = true,
-                ValidAudience = appSettings.Audience,
+                bearerOptions.TokenValidationParameters = new TokenValidationParameters
+                {
 
-                // Valida a assinatura de um token recebido
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = appSettings.GetSymmetricSecurityKey(),
+                    ValidateIssuer = true,
+                    ValidIssuer = appSettings.Issuer,
 
-                // Verifica se um token recebido ainda é válido
-                RequireExpirationTime = true,
-                ValidateLifetime = true,
+                    ValidateAudience = true,
+                    ValidAudience = appSettings.Audience,
 
-                // Tempo de tolerância para a expiração de um token (utilizado
-                // caso haja problemas de sincronismo de horário entre diferentes
-                // computadores envolvidos no processo de comunicação)
-                ClockSkew = TimeSpan.Zero
-            };
+                    // Valida a assinatura de um token recebido
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = appSettings.GetSymmetricSecurityKey(),
 
-        });
+                    // Verifica se um token recebido ainda é válido
+                    RequireExpirationTime = true,
+                    ValidateLifetime = true,
+
+                    // Tempo de tolerância para a expiração de um token (utilizado
+                    // caso haja problemas de sincronismo de horário entre diferentes
+                    // computadores envolvidos no processo de comunicação)
+                    ClockSkew = TimeSpan.Zero
+                };
+
+
+            });
+
+
+        }
 
     }
-
 }

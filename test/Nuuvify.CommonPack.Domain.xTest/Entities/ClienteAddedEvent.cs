@@ -1,16 +1,19 @@
-namespace Nuuvify.CommonPack.Domain.xTest.Entities;
+using System.Collections.Generic;
 
-public class ClienteAddedEvent : DomainEvent<string>
+namespace Nuuvify.CommonPack.Domain.xTest.Entities
 {
-
-    public ClienteAddedEvent(Cliente newCliente, string version)
-        : base(newCliente?.Id, version)
+    public class ClienteAddedEvent : DomainEvent<string>
     {
-        NewCliente = newCliente;
+
+        public ClienteAddedEvent(Cliente newCliente, string version)
+            : base(newCliente?.Id, version)
+        {
+            NewCliente = newCliente;
+        }
+
+        public Cliente NewCliente { get; }
+        public string InformacaoQueEuQuero { get; set; }
+        public IEnumerable<string> MinhaLista { get; set; }
+        
     }
-
-    public Cliente NewCliente { get; }
-    public string InformacaoQueEuQuero { get; set; }
-    public IEnumerable<string> MinhaLista { get; set; }
-
 }

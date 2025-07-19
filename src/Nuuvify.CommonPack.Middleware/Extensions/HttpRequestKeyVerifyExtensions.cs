@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Http;
-using Nuuvify.CommonPack.Middleware.Handle;
+using Nuuvify.CommonPack.Extensions.Notificator;
+
 
 namespace Microsoft.AspNetCore.Builder;
+
 
 public class UseHttpRequestKeyVerifyMiddleware
 {
@@ -9,6 +11,8 @@ public class UseHttpRequestKeyVerifyMiddleware
     private readonly string _headerKey;
     private readonly int _failureStatusCode;
     private List<NotificationR> _notificationsMiddleware;
+
+
 
     public UseHttpRequestKeyVerifyMiddleware(
         RequestDelegate next,
@@ -27,11 +31,7 @@ public class UseHttpRequestKeyVerifyMiddleware
             context.Response.StatusCode = _failureStatusCode;
             _notificationsMiddleware =
             [
-                new NotificationR
-                {
-                    Property = "Chave não informada no Header",
-                    Message = $"Informe a chave '{_headerKey}' no header da request"
-                }
+                new NotificationR("Chave não informada no Header", $"Informe a chave '{_headerKey}' no header da request"),
             ];
             await context.Response.WriteAsJsonAsync(_notificationsMiddleware);
             return;
@@ -44,8 +44,9 @@ public class UseHttpRequestKeyVerifyMiddleware
 public static class UseHttpRequestKeyVerifyExtensions
 {
 
+
     /// <summary>
-    /// Esse middleware verifica se foi enviado uma determinada chave no header da request,
+    /// Esse middleware verifica se foi enviado uma determinada chave no header da request, 
     /// caso não tenha sido enviado, ele retorna um status code de erro e uma mensagem de erro.
     /// </summary>
     /// <param name="builder"></param>

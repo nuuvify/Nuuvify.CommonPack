@@ -1,9 +1,9 @@
+﻿using Nuuvify.CommonPack.StandardHttpClient.Results;
 using System.Net.Http.Headers;
-using Nuuvify.CommonPack.StandardHttpClient.Results;
 
 namespace Nuuvify.CommonPack.StandardHttpClient;
 
-public partial class StandardHttpClient
+public partial class StandardHttpClientService
 {
 
     public async Task<HttpStandardReturn> Delete(

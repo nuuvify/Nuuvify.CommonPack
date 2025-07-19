@@ -1,15 +1,16 @@
 using Nuuvify.CommonPack.Domain;
 
-namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest;
-
-public class FaturaUpdatedEvent : DomainEvent<Fatura>
+namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest
 {
-    public FaturaUpdatedEvent(Fatura sourceId, string version, Fatura newFatura)
-        : base(sourceId, version)
+    public class FaturaUpdatedEvent : DomainEvent<Fatura>
     {
-        NewFatura = newFatura;
+        public FaturaUpdatedEvent(Fatura sourceId, string version, Fatura newFatura)
+            : base(sourceId, version)
+        {
+            NewFatura = newFatura;
+        }
+
+        public Fatura NewFatura { get; set; }
+
     }
-
-    public Fatura NewFatura { get; set; }
-
 }

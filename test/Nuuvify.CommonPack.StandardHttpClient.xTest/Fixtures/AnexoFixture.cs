@@ -1,14 +1,18 @@
-namespace Nuuvify.CommonPack.StandardHttpClient.xTest.Fixtures;
+using System;
 
-public class AnexoFixture
+namespace Nuuvify.CommonPack.StandardHttpClient.xTest.Fixtures
 {
-    public AnexoFixture(string aggregateId, string tipoAnexo)
+    public class AnexoFixture
     {
-        AggregateId = aggregateId;
-        TipoAnexo = tipoAnexo;
+        public AnexoFixture(string aggregateId, string tipoAnexo)
+        {
+            AggregateId = aggregateId;
+            TipoAnexo = tipoAnexo;
+        }
+
+        public string AggregateId { get; set; }
+        public string TipoAnexo { get; set; }
+
+
     }
-
-    public string AggregateId { get; set; }
-    public string TipoAnexo { get; set; }
-
 }

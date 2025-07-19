@@ -1,8 +1,14 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
-using Nuuvify.CommonPack.Extensions;
-using Nuuvify.CommonPack.Mediator.Implementation;
+using System.Threading;
+using System.Threading.Tasks;
+using Nuuvify.CommonPack.Extensions.Interfaces;
+using Nuuvify.CommonPack.Extensions.Notificator;
 
 namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
+
 
 /// <summary>
 /// Example use:
@@ -26,12 +32,15 @@ public interface IRepositoryReadOnly<TEntity> : IRepositoryValidation where TEnt
 
     IList<NotificationR> GetNotifications();
 
+
     /// <summary>
     /// Specifies the names of the navigation properties which should be eagerly loaded only in the subsequent query results.
     /// </summary>
     /// <param name="navigationProperties">The navigation properties to be eagerly loaded in the query results.</param>
     /// <returns>An <see cref="IRepositoryReadOnly{TEntity}"/> containing the navigation properties specified in ths method and in the Includes property.</returns>
     IRepositoryReadOnly<TEntity> Include(params string[] navigationProperties);
+
+
 
     /// <summary>
     /// Gets the <see cref="IPagedList{TResult}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
@@ -58,6 +67,7 @@ public interface IRepositoryReadOnly<TEntity> : IRepositoryValidation where TEnt
         int indexFrom = 0,
         bool disableTracking = true,
         bool ignoreQueryFilters = false) where TResult : class;
+
 
     /// <summary>
     /// Gets the <see cref="IPagedList{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
@@ -231,6 +241,7 @@ public interface IRepositoryReadOnly<TEntity> : IRepositoryValidation where TEnt
     /// <returns>A <see cref="Task{TEntity}"/> that represents the asynchronous find operation. The task result contains the found entity or null.</returns>
     Task<TEntity> FindAsync(object[] keyValues, CancellationToken cancellationToken);
 
+
     /// <summary>
     /// Gets all entities. This method is not recommended, use GetAll With predicate:
     /// </summary>
@@ -255,8 +266,10 @@ public interface IRepositoryReadOnly<TEntity> : IRepositoryValidation where TEnt
         int skip = 0,
         int take = 25);
 
+
+
     /// <summary>
-    /// Gets all entities based on a predicate, with only the properties you choose with selector
+    /// Gets all entities based on a predicate, with only the properties you choose with selector 
     /// <example>
     /// var items = _repository.GetAllAsync(selector: b => new MyClassQueryResult { Name = b.Title, Link = b.Url });
     /// </example>
@@ -432,5 +445,7 @@ public interface IRepositoryReadOnly<TEntity> : IRepositoryValidation where TEnt
     Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate = null,
         CancellationToken cancellationToken = default);
 
+
 }
+
 

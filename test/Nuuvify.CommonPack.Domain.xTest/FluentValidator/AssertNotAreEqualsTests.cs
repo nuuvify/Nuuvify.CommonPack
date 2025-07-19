@@ -1,66 +1,76 @@
-using System.Globalization;
-using Nuuvify.CommonPack.Mediator.Implementation;
+﻿using System.Globalization;
+using Nuuvify.CommonPack.Extensions.Notificator;
 using Xunit;
 using Xunit.Extensions.Ordering;
 
-namespace Nuuvify.CommonPack.Domain.xTest.FluentValidator;
-
-[Order(5)]
-public class AssertNotAreEqualsTests : NotifiableR
+namespace Nuuvify.CommonPack.Domain.xTest.FluentValidator
 {
-
-    public AssertNotAreEqualsTests()
+    [Order(5)]
+    public class AssertNotAreEqualsTests : NotifiableR
     {
-        CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("pt-BR");
-        CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("pt-BR");
 
-        CultureInfo.CurrentCulture = new CultureInfo("pt-BR");
-        CultureInfo.CurrentUICulture = new CultureInfo("pt-BR");
 
-        RemoveNotifications();
-    }
-
-    [Fact]
-    public void AssertNotAreEqualsObjectNull()
-    {
-        Customer customer = null;
-
-        var valido = new ValidationConcernR<Customer>(customer)
-            .AssertNotAreEquals(x => x.Name == "João", true);
-
-        Assert.Null(customer);
-        Assert.True(valido.Errors.Count > 0);
-    }
-
-    [Fact]
-    public void AssertNotAreEqualsObjectNotNull()
-    {
-        Customer customer = new Customer
+        public AssertNotAreEqualsTests()
         {
-            Name = "João"
-        };
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("pt-BR");
+            CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("pt-BR");
 
-        _ = new ValidationConcernR<Customer>(customer)
-            .AssertNotAreEquals(x => x.Name == "João", true);
+            CultureInfo.CurrentCulture = new CultureInfo("pt-BR");
+            CultureInfo.CurrentUICulture = new CultureInfo("pt-BR");
 
-        Assert.NotNull(customer);
-        Assert.True(customer.Notifications.Count > 0);
-    }
+            RemoveNotifications();
+        }
 
-    [Fact]
-    public void ObjectNaoNuloComPropriedadeNaoIgualDeveRetornarErros()
-    {
-        Customer customer = new Customer
+        [Fact]
+        public void AssertNotAreEqualsObjectNull()
         {
-            Name = "Pedro"
-        };
+            Customer customer = null;
 
-        _ = new ValidationConcernR<Customer>(customer)
-            .AssertNotAreEquals(x => x.Name == "João", false)
-            .AssertNotDateTimeNull(x => customer.Birthdate);
+            var valido = new ValidationConcernR<Customer>(customer)
+                .AssertNotAreEquals(x => x.Name == "João", true);
 
-        Assert.NotNull(customer);
-        Assert.True(customer.Notifications.Count > 0);
+
+
+            Assert.Null(customer);
+            Assert.True(valido.Errors.Count > 0);
+        }
+
+        [Fact]
+        public void AssertNotAreEqualsObjectNotNull()
+        {
+            Customer customer = new Customer
+            {
+                Name = "João"
+            };
+
+            new ValidationConcernR<Customer>(customer)
+                .AssertNotAreEquals(x => x.Name == "João", true);
+
+
+
+            Assert.NotNull(customer);
+            Assert.True(customer.Notifications.Count > 0);
+        }
+
+        [Fact]
+        public void ObjectNaoNuloComPropriedadeNaoIgualDeveRetornarErros()
+        {
+            Customer customer = new Customer
+            {
+                Name = "Pedro"
+            };
+
+
+            new ValidationConcernR<Customer>(customer)
+                .AssertNotAreEquals(x => x.Name == "João", false)
+                .AssertNotDateTimeNull(x => customer.Birthdate);
+
+
+
+            Assert.NotNull(customer);
+            Assert.True(customer.Notifications.Count > 0);
+        }
+
+
     }
-
 }

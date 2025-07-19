@@ -1,7 +1,8 @@
-namespace Nuuvify.CommonPack.StandardHttpClient.Results;
-
-internal class DeserializeListSuccess<ClasseCommandResult> where ClasseCommandResult : class
+﻿namespace Nuuvify.CommonPack.StandardHttpClient.Results
 {
-    public bool Success { get; set; }
-    public IEnumerable<ClasseCommandResult> Data { get; set; }
+    internal class DeserializeListSuccess<ClasseCommandResult> where ClasseCommandResult : class
+    {
+        public bool Success { get; set; }
+        public IEnumerable<ClasseCommandResult> Data { get; set; }
+    }
 }

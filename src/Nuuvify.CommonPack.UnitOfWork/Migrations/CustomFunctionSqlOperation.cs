@@ -1,28 +1,30 @@
 using System.Text;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 
-namespace Nuuvify.CommonPack.UnitOfWork.Migrations;
-
-public abstract class CustomFunctionSqlOperation : SqlOperation
+namespace Nuuvify.CommonPack.UnitOfWork.Migrations
 {
-
-    public abstract string FunctionName { get; }
-    public abstract string Schema { get; }
-    public abstract string UserGrant { get; }
-
-    public override string ToString()
+    public abstract class CustomFunctionSqlOperation : SqlOperation
     {
-        if (string.IsNullOrWhiteSpace(Schema))
+
+        public abstract string FunctionName { get; }
+        public abstract string Schema { get; }
+        public abstract string UserGrant { get; }
+
+
+        public override string ToString()
         {
-            return FunctionName;
+            if (string.IsNullOrWhiteSpace(Schema))
+            {
+                return FunctionName;
+            }
+            else
+            {
+                return $"{Schema}.{FunctionName}";
+            }
         }
-        else
-        {
-            return $"{Schema}.{FunctionName}";
-        }
+
+        public abstract StringBuilder GetFunctionBuilder();
+        public abstract StringBuilder Grant();
+
     }
-
-    public abstract StringBuilder GetFunctionBuilder();
-    public abstract StringBuilder Grant();
-
 }

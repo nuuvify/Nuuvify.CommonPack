@@ -1,17 +1,4 @@
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
-using Moq;
-using Nuuvify.CommonPack.Mediator.Implementation;
-using Nuuvify.CommonPack.Security.Abstraction;
-using Nuuvify.CommonPack.StandardHttpClient.Polly;
-using Nuuvify.CommonPack.StandardHttpClient.xTest.Configs;
-using Nuuvify.CommonPack.StandardHttpClient.xTest.Fixtures;
-using Xunit;
-using Xunit.Extensions.Ordering;
-
-namespace Nuuvify.CommonPack.StandardHttpClient.xTest;
+﻿namespace Nuuvify.CommonPack.StandardHttpClientService.xTest;
 
 [Order(2)]
 public class BaseHttpCustomTests : NotifiableR
@@ -35,8 +22,8 @@ public class BaseHttpCustomTests : NotifiableR
     public async Task QuandoObterTokenRetornarErroNotificationDeveSerLancada()
     {
 
-        var handler = new HttpClientHandler();
-        var client = new HttpClient(handler, true)
+        using var handler = new HttpClientHandler();
+        using var client = new HttpClient(handler, true)
         {
             BaseAddress = new Uri(Config.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value)
         };
@@ -45,7 +32,9 @@ public class BaseHttpCustomTests : NotifiableR
         _ = mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>()))
             .Returns(client);
 
-        var standardClient = new StandardHttpClient(mockFactory.Object, new NullLogger<StandardHttpClient>());
+        using var standardClient = new StandardHttpClient.StandardHttpClientService(
+            mockFactory.Object,
+            new NullLogger<StandardHttpClient.StandardHttpClientService>());
 
         var username = Config.GetSection("AzureAdOpenID:cc:ClientId")?.Value;
         var password = Config.GetSection("AzureAdOpenID:cc:ClientSecret")?.Value;
@@ -74,7 +63,12 @@ public class BaseHttpCustomTests : NotifiableR
         _ = mockUserAuthenticated.Setup(_ => _.HttpContext.User)
             .Returns(user);
 
-        var tokenService = new TokenService(mockCredentialToken.Object, standardClient, mockConfiguration.Object, new NullLogger<TokenService>(), mockUserAuthenticated.Object);
+        var tokenService = new TokenService(
+            mockCredentialToken.Object,
+            standardClient,
+            mockConfiguration.Object,
+            new NullLogger<TokenService>(),
+            mockUserAuthenticated.Object);
         var retorno = await tokenService.GetToken();
 
         Assert.Null(tokenService.GetActualToken()?.Token);
@@ -93,13 +87,13 @@ public class BaseHttpCustomTests : NotifiableR
             password: config.GetSection("AzureAdOpenID:cc:ClientSecret")?.Value
         );
 
-        var notification = tokenFactory?.Notifications.LastOrDefault();
+        var notification = tokenFactory.Notifications.LastOrDefault();
         Assert.True(string.IsNullOrWhiteSpace(notification?.Message), notification?.Message);
 
         var urlSynchro = config.GetSection("AppConfig:AppURLs:UrlPessoasApi")?.Value;
 
-        var handler = new HttpClientHandler();
-        var client = new HttpClient(handler, true)
+        using var handler = new HttpClientHandler();
+        using var client = new HttpClient(handler, true)
         {
             BaseAddress = new Uri(urlSynchro)
         };
@@ -110,7 +104,9 @@ public class BaseHttpCustomTests : NotifiableR
 
         var url = $"api/v2/Pessoas/cpfcnpj";
 
-        var standardClientSynchro = new StandardHttpClient(mockFactory.Object, new NullLogger<StandardHttpClient>());
+        using var standardClientSynchro = new StandardHttpClient.StandardHttpClientService(
+            mockFactory.Object,
+            new NullLogger<StandardHttpClient.StandardHttpClientService>());
         standardClientSynchro.CreateClient();
         standardClientSynchro.ResetStandardHttpClient();
 

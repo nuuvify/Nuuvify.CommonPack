@@ -1,14 +1,4 @@
-using MailKit.Net.Smtp;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using Moq;
-using Nuuvify.CommonPack.Email.Abstraction;
-using Nuuvify.CommonPack.Email.xTest.Configs;
-using Nuuvify.CommonPack.Email.xTest.Fixtures;
-using Xunit;
-using Xunit.Abstractions;
-
-namespace Nuuvify.CommonPack.Email.xTest;
+﻿namespace Nuuvify.CommonPack.Email.xTest;
 
 [Collection(nameof(DataCollection))]
 public class EmailTemplateTests
@@ -98,7 +88,7 @@ public class EmailTemplateTests
 
     }
 
-    [Fact]
+    [LocalTestFact]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
     public async Task EnviaEmailComTemplateComAnexoReal()
     {
@@ -140,9 +130,12 @@ public class EmailTemplateTests
             { "@fornecedor", $"Supplier Code: G666M1" }
         };
         var message = testarEnvio.GetEmailTemplate(variables, Path.Combine(AppSettingsConfig.TemplatePath, "template-email.html"));
+        var attach1 = Path.Combine(AppSettingsConfig.TemplatePath, "BB - Layout - CNAB240.pdf");
+        var attach2 = Path.Combine(AppSettingsConfig.TemplatePath, "SOLID.jpeg");
 
-        _ = testarEnvio.WithAttachment(Path.Combine(AppSettingsConfig.TemplatePath, "BB - Layout - CNAB240.pdf"), EmailMidiaType.Application, EmailMidiaSubType.Pdf)
-                   .WithAttachment(Path.Combine(AppSettingsConfig.TemplatePath, "SOLID.jpeg"), EmailMidiaType.Image, EmailMidiaSubType.Jpg);
+        _ = testarEnvio
+            .WithAttachment(attach1, EmailMidiaType.Application, EmailMidiaSubType.Pdf)
+            .WithAttachment(attach2, EmailMidiaType.Image, EmailMidiaSubType.Jpg);
 
         var emailEnviado = await testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, message);
 
@@ -151,7 +144,7 @@ public class EmailTemplateTests
 
     }
 
-    [Fact]
+    [LocalTestFact]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
     public async Task EnviaEmailComTemplateStreamComAnexoReal()
     {
@@ -194,8 +187,8 @@ public class EmailTemplateTests
         };
         var message = testarEnvio.GetEmailTemplate(variables, Path.Combine(AppSettingsConfig.TemplatePath, "template-email.html"));
 
-        var file1Stream = new FileStream(Path.Combine(AppSettingsConfig.TemplatePath, "BB - Layout - CNAB240.pdf"), FileMode.OpenOrCreate);
-        var file2Stream = new FileStream(Path.Combine(AppSettingsConfig.TemplatePath, "SOLID.jpeg"), FileMode.OpenOrCreate);
+        using var file1Stream = new FileStream(Path.Combine(AppSettingsConfig.TemplatePath, "BB - Layout - CNAB240.pdf"), FileMode.OpenOrCreate);
+        using var file2Stream = new FileStream(Path.Combine(AppSettingsConfig.TemplatePath, "SOLID.jpeg"), FileMode.OpenOrCreate);
 
         _ = testarEnvio.WithAttachment(file1Stream, EmailMidiaType.Application, EmailMidiaSubType.Pdf, "BB - Layout - CNAB240.pdf")
                    .WithAttachment(file2Stream, EmailMidiaType.Image, EmailMidiaSubType.Jpg, "SOLID.jpeg");

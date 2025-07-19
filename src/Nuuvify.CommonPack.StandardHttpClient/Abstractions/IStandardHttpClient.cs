@@ -1,4 +1,4 @@
-using Nuuvify.CommonPack.Extensions.Implementation;
+﻿using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 
 namespace Nuuvify.CommonPack.StandardHttpClient;

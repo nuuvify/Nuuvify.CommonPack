@@ -1,12 +1,15 @@
-namespace Nuuvify.CommonPack.Security.Abstraction;
+﻿using System.Collections.Generic;
 
-public class PersonWithRolesQueryResult : PersonQueryResult
+namespace Nuuvify.CommonPack.Security.Abstraction
 {
-
-    public PersonWithRolesQueryResult()
+    public class PersonWithRolesQueryResult : PersonQueryResult
     {
-        Groups = new List<PersonRoleQueryResult>();
-    }
 
-    public virtual IEnumerable<PersonRoleQueryResult> Groups { get; set; }
+        public PersonWithRolesQueryResult()
+        {
+            Groups = new List<PersonRoleQueryResult>();
+        }
+
+        public virtual IEnumerable<PersonRoleQueryResult> Groups { get; set; }
+    }
 }

@@ -1,21 +1,26 @@
+﻿using System;
+using System.Linq;
 using System.Reflection;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Nuuvify.CommonPack.OpenApi;
-
-
-public class SwaggerDefaultValues : IOperationFilter
+namespace Nuuvify.CommonPack.OpenApi
 {
 
-    public void Apply(OpenApiOperation operation, OperationFilterContext context)
+    public class SwaggerDefaultValues : IOperationFilter
     {
-        if (operation.Deprecated)
-        {
-            var obsoleteActions = context.MethodInfo.GetCustomAttributes<ObsoleteAttribute>();
 
-            operation.Description = obsoleteActions.FirstOrDefault()?.Message;
+        public void Apply(OpenApiOperation operation, OperationFilterContext context)
+        {
+            if (operation.Deprecated)
+            {
+                var obsoleteActions = context.MethodInfo.GetCustomAttributes<ObsoleteAttribute>();
+
+                operation.Description = obsoleteActions.FirstOrDefault()?.Message;
+            }
         }
+
+
     }
 
 }

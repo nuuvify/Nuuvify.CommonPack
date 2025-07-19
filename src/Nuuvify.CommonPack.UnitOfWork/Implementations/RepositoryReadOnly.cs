@@ -1,6 +1,6 @@
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-using Nuuvify.CommonPack.Mediator.Implementation;
+using Nuuvify.CommonPack.Extensions.Notificator;
 using Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 
 namespace Nuuvify.CommonPack.UnitOfWork;
@@ -12,8 +12,10 @@ namespace Nuuvify.CommonPack.UnitOfWork;
 public partial class RepositoryReadOnly<TEntity> : NotifiableR, IRepositoryReadOnly<TEntity> where TEntity : class
 {
 
-    protected readonly DbContext _dbContext;
-    protected readonly DbSet<TEntity> _dbSet;
+    private readonly DbContext _dbContext;
+    private readonly DbSet<TEntity> _dbSet;
+    protected DbContext DbContext => _dbContext;
+    protected DbSet<TEntity> DbSet => _dbSet;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RepositoryReadOnly{TEntity}"/> class.
@@ -40,7 +42,7 @@ public partial class RepositoryReadOnly<TEntity> : NotifiableR, IRepositoryReadO
     }
     private IList<string> Includes { get; set; }
 
-    public IRepositoryReadOnly<TEntity> Include(params string[] navigationProperties)
+    public virtual IRepositoryReadOnly<TEntity> Include(params string[] navigationProperties)
     {
         foreach (string navigationProperty in navigationProperties)
         {

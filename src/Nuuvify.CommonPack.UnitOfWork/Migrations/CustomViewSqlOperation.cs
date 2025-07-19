@@ -1,38 +1,41 @@
 using System.Text;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 
-namespace Nuuvify.CommonPack.UnitOfWork.Migrations;
-
-public abstract class CustomViewSqlOperation : SqlOperation
+namespace Nuuvify.CommonPack.UnitOfWork.Migrations
 {
-
-    /// <summary>
-    /// Crie uma constante para usar em:
-    /// <para>
-    /// <c>
-    /// builder.ToView($"{SuaViewOperation.ViewName}");
-    /// </c>
-    /// </para>
-    /// </summary>
-    /// <value></value>
-    public abstract string ViewName { get; }
-    public abstract string Schema { get; }
-    public abstract string UserGrant { get; }
-
-    public override string ToString()
+    public abstract class CustomViewSqlOperation : SqlOperation
     {
-        if (string.IsNullOrWhiteSpace(Schema))
+
+        /// <summary>
+        /// Crie uma constante para usar em:
+        /// <para>
+        /// <c>
+        /// builder.ToView($"{SuaViewOperation.ViewName}");
+        /// </c>
+        /// </para>
+        /// </summary>
+        /// <value></value>
+        public abstract string ViewName { get; }
+        public abstract string Schema { get; }
+        public abstract string UserGrant { get; }
+
+
+        public override string ToString()
         {
-            return ViewName;
+            if (string.IsNullOrWhiteSpace(Schema))
+            {
+                return ViewName;
+            }
+            else
+            {
+                return $"{Schema}.{ViewName}";
+            }
         }
-        else
-        {
-            return $"{Schema}.{ViewName}";
-        }
+
+        public abstract StringBuilder GetViewBuilder();
+
+        public abstract StringBuilder Grant();
+
+
     }
-
-    public abstract StringBuilder GetViewBuilder();
-
-    public abstract StringBuilder Grant();
-
 }

@@ -1,51 +1,55 @@
 using System.Reflection;
 using System.Text;
 
-namespace Nuuvify.CommonPack.Middleware.Extensions;
-
-internal static class AssemblyExtension
+namespace Nuuvify.CommonPack.Middleware.Extensions
 {
-
-    public static string GetApplicationNameByAssembly
+    internal static class AssemblyExtension
     {
 
-        get
+
+        public static string GetApplicationNameByAssembly
         {
-            var entryAssembly = Assembly.GetEntryAssembly().GetName().Name;
 
-            var appCustomName = entryAssembly?
-                .Replace("Nuuvify.", "")
-                .Replace(".WebApi", "")
-                .Replace(".", "");
+            get
+            {
+                var entryAssembly = Assembly.GetEntryAssembly().GetName().Name;
 
-            return appCustomName;
+                var appCustomName = entryAssembly?
+                    .Replace("Nuuvify.", "")
+                    .Replace(".WebApi", "")
+                    .Replace(".", "");
 
+
+                return appCustomName;
+
+            }
         }
-    }
 
-    public static string GetApplicationBuildNumber
-    {
-        get
+        public static string GetApplicationBuildNumber
         {
-            var buildNumber = Assembly.GetEntryAssembly()
-                .GetCustomAttribute<AssemblyFileVersionAttribute>()
-                .Version;
+            get
+            {
+                var buildNumber = Assembly.GetEntryAssembly()
+                    .GetCustomAttribute<AssemblyFileVersionAttribute>()
+                    .Version;
 
-            return buildNumber;
+                return buildNumber;
+            }
         }
-    }
-    public static string GetApplicationVersion
-    {
-
-        get
+        public static string GetApplicationVersion
         {
-            var applicationVersion = new StringBuilder()
-                .Append($"{Assembly.GetEntryAssembly().GetName().Version.Major}.")
-                .Append($"{Assembly.GetEntryAssembly().GetName().Version.Minor}.")
-                .Append($"{Assembly.GetEntryAssembly().GetName().Version.Build}");
 
-            return applicationVersion.ToString();
+            get
+            {
+                var applicationVersion = new StringBuilder()
+                    .Append($"{Assembly.GetEntryAssembly().GetName().Version.Major}.")
+                    .Append($"{Assembly.GetEntryAssembly().GetName().Version.Minor}.")
+                    .Append($"{Assembly.GetEntryAssembly().GetName().Version.Build}");
+
+
+                return applicationVersion.ToString();
+            }
         }
-    }
 
+    }
 }

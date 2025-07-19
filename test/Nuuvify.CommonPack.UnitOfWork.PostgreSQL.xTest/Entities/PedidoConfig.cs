@@ -1,54 +1,61 @@
+﻿using Nuuvify.CommonPack.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Nuuvify.CommonPack.Domain.Implementations;
 
-namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Entities.StubDbContext;
-
-public class PedidoConfig : EntityConfiguration<Pedido>
+namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Entities.StubDbContext
 {
-
-    public override void Configure(EntityTypeBuilder<Pedido> builder)
+    public class PedidoConfig : EntityConfiguration<Pedido>
     {
 
-        // DefaultConfig(builder, "pedidos", "pedido", "_id");
-        // DefaultConfig(builder, "pedidos", "pedido");
+        public override void Configure(EntityTypeBuilder<Pedido> builder)
+        {
 
-        _ = builder.ToTable("pedidos");
+            // DefaultConfig(builder, "pedidos", "pedido", "_id");
+            // DefaultConfig(builder, "pedidos", "pedido");
 
-        _ = builder.HasKey(x => x.Id)
-            .HasName($"pk_pedido");
+            builder.ToTable("pedidos");
 
-        _ = builder.Property(x => x.Id)
-            .HasColumnName($"PedidoId")
-            .IsUnicode(false)
-            .HasMaxLength(Pedido.MaxId)
-            .IsRequired();
+            builder.HasKey(x => x.Id)
+                .HasName($"pk_pedido");
 
-        _ = builder.Property(e => e.CodigoCliente)
-            .IsRequired()
-            .IsUnicode(false)
-            .HasMaxLength(10);
+            builder.Property(x => x.Id)
+                .HasColumnName($"PedidoId")
+                .IsUnicode(false)
+                .HasMaxLength(Pedido.MaxId)
+                .IsRequired();
 
-        _ = builder.Property(e => e.NumeroPedido)
-            .IsRequired()
-            .HasColumnType("numeric(8)");
 
-        _ = builder.Property(e => e.DataPedido)
-            .IsRequired();
 
-        _ = builder.Property(e => e.FaturaId)
-            .IsRequired()
-            .IsUnicode(false)
-            .HasMaxLength(DomainEntity.MaxId);
 
-        _ = builder.HasOne(d => d.FaturaPedido)
-            .WithMany(p => p.Pedidos)
-            .HasForeignKey(f => f.FaturaId)
-            .OnDelete(DeleteBehavior.Restrict)
-            .HasConstraintName("FK_Pedido_Fatura");
+            builder.Property(e => e.CodigoCliente)
+                .IsRequired()
+                .IsUnicode(false)
+                .HasMaxLength(10);
 
-        AuditConfig(builder);
-        AuditUserIdConfig(builder);
+            builder.Property(e => e.NumeroPedido)
+                .IsRequired()
+                .HasColumnType("numeric(8)");
 
+            builder.Property(e => e.DataPedido)
+                .IsRequired();
+
+
+
+            builder.Property(e => e.FaturaId)
+                .IsRequired()
+                .IsUnicode(false)
+                .HasMaxLength(DomainEntity.MaxId);
+
+
+            builder.HasOne(d => d.FaturaPedido)
+                .WithMany(p => p.Pedidos)
+                .HasForeignKey(f => f.FaturaId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_Pedido_Fatura");
+
+            AuditConfig(builder);
+            AuditUserIdConfig(builder);
+
+        }
     }
 }

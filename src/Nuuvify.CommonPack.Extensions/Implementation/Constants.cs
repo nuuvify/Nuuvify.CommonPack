@@ -1,38 +1,39 @@
-namespace Nuuvify.CommonPack.Extensions.Implementation;
-
-public static class Constants
+namespace Nuuvify.CommonPack.Extensions.Implementation
 {
-    /// <summary>
-    /// </summary>
-    /// <value>CorrelationId</value>
-    public static string CorrelationHeader
+    public static class Constants
     {
-        get
-        {
-            return "CorrelationId";
+        /// <summary>
+        /// </summary>
+        /// <value>CorrelationId</value>
+        public static string CorrelationHeader 
+        { 
+            get
+            {
+                return "CorrelationId";
+            }
         }
-    }
 
-    /// <summary>
-    /// </summary>
-    /// <value>x-user-claim</value>
-    public static string UserClaimHeader
-    {
-        get
-        {
-            return "x-user-claim";
+        /// <summary>
+        /// </summary>
+        /// <value>x-user-claim</value>
+        public static string UserClaimHeader
+        { 
+            get
+            {
+                return "x-user-claim";
+            }
         }
-    }
 
-    /// <summary>
-    /// </summary>
-    /// <value>UserIsValidToApplication</value>
-    public static string UserIsValidToApplication
-    {
-        get
-        {
-            return "UserIsValidToApplication";
+        /// <summary>
+        /// </summary>
+        /// <value>UserIsValidToApplication</value>
+        public static string UserIsValidToApplication
+        { 
+            get
+            {
+                return "UserIsValidToApplication";
+            }
         }
-    }
 
+    }
 }

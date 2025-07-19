@@ -2,6 +2,7 @@ using Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 
 namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Collections;
 
+
 /// <summary>
 /// Provides some help methods for <see cref="IPagedList{T}"/> interface.
 /// </summary>
@@ -13,6 +14,7 @@ public static class PagedList
     /// <typeparam name="T">The type for paging </typeparam>
     /// <returns>An empty instance of <see cref="IPagedList{T}"/>.</returns>
     public static IPagedList<T> Empty<T>() => new PagedList<T>();
+
 
     /// <summary>
     /// Creates a new instance of <see cref="IPagedList{TResult}"/> from source of <see cref="IPagedList{TSource}"/> instance.

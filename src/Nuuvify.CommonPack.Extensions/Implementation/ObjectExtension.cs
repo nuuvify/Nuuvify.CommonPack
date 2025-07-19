@@ -1,16 +1,17 @@
-namespace Nuuvify.CommonPack.Extensions.Implementation;
-
-public static class ObjectExtension
+﻿namespace Nuuvify.CommonPack.Extensions.Implementation
 {
-    public static bool EqualsObjectNotNull(this object obj, object obj1)
+    public static class ObjectExtension
     {
-        if (ValidatedNotNullExtensionMethods.NotNull<object>(obj) &&
-            ValidatedNotNullExtensionMethods.NotNull<object>(obj1))
+        public static bool EqualsObjectNotNull(this object obj, object obj1)
         {
-            return obj.Equals(obj1);
+            if (ValidatedNotNullExtensionMethods.NotNull<object>(obj) &&
+                ValidatedNotNullExtensionMethods.NotNull<object>(obj1))
+            {
+                return obj.Equals(obj1);
+            }
+
+            return false;
         }
 
-        return false;
     }
-
 }

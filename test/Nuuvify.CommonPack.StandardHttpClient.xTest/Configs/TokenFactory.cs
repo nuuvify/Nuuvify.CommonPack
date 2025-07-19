@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
-using Nuuvify.CommonPack.Mediator.Implementation;
+using Nuuvify.CommonPack.Extensions.Notificator;
 using Nuuvify.CommonPack.Security.Abstraction;
 using Nuuvify.CommonPack.StandardHttpClient.Polly;
 using Nuuvify.CommonPack.StandardHttpClient.xTest.Fixtures;
@@ -46,7 +46,7 @@ public class TokenFactory : NotifiableR
         {
             LoginId = loginId,
             Password = password,
-            Expires = DateTimeOffset.Now.AddMinutes(-10)
+            Expires = DateTimeOffset.Now.AddMinutes(10)
         };
         var mockCredentialToken = new Mock<IOptions<CredentialToken>>();
         _ = mockCredentialToken.Setup(ap => ap.Value)
@@ -56,8 +56,8 @@ public class TokenFactory : NotifiableR
         _ = mockUserAuthenticated.Setup(_ => _.HttpContext.User)
             .Returns(user);
 
-        var handler = new HttpClientHandler();
-        var client = new HttpClient(handler, true)
+        using var handler = new HttpClientHandler();
+        using var client = new HttpClient(handler, true)
         {
             BaseAddress = new Uri(Config.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value)
         };
@@ -65,12 +65,12 @@ public class TokenFactory : NotifiableR
 
         _ = mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>()))
             .Returns(client);
-        var standardClient = new StandardHttpClient(mockFactory.Object, new NullLogger<StandardHttpClient>());
+        using var standardClient = new StandardHttpClientService(mockFactory.Object, new NullLogger<StandardHttpClientService>());
 
         var tokenService = new TokenService(mockCredentialToken.Object, standardClient, mockConfiguration.Object, new NullLogger<TokenService>(), mockUserAuthenticated.Object);
         _ = await tokenService.GetToken();
 
-        foreach (var item in tokenService?.Notifications)
+        foreach (var item in tokenService.Notifications)
         {
             AddNotification(item.Property, item.Message);
         }

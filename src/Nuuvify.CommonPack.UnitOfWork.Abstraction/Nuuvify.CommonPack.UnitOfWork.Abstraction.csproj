@@ -20,7 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Nuuvify.CommonPack.Mediator\Nuuvify.CommonPack.Mediator.csproj" />
+        <ProjectReference Include="..\Nuuvify.CommonPack.Extensions\Nuuvify.CommonPack.Extensions.csproj" />
     </ItemGroup>
 
 </Project>

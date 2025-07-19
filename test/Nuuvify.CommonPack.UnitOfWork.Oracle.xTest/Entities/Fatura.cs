@@ -1,42 +1,46 @@
+﻿using System.Collections.Generic;
 using Nuuvify.CommonPack.Domain;
 
-namespace Nuuvify.CommonPack.UnitOfWork.Oracle.xTest;
-
-public class Fatura : AggregateRoot
+namespace Nuuvify.CommonPack.UnitOfWork.Oracle.xTest
 {
-    protected Fatura() { }
-    public Fatura(int numeroFatura, Endereco enderecoFatura, Endereco enderecoEntrega)
+    public class Fatura : AggregateRoot
     {
-        NumeroFatura = numeroFatura;
-        EnderecoFatura = enderecoFatura;
-        EnderecoEntrega = enderecoEntrega;
-
-        Pedidos = new List<Pedido>();
-    }
-
-    public int NumeroFatura { get; private set; }
-    public string Observacao { get; private set; }
-    public virtual Endereco EnderecoFatura { get; private set; }
-    public virtual Endereco EnderecoEntrega { get; private set; }
-
-    public virtual ICollection<Pedido> Pedidos { get; private set; }
-
-    public void Update(string observacao)
-    {
-        Observacao = observacao;
-    }
-
-    public void AdicionarPedido(Pedido pedido)
-    {
-        pedido.DefinirFatura(this);
-        Pedidos.Add(pedido);
-    }
-    public void AdicionarPedido(IList<Pedido> pedidos)
-    {
-        foreach (var pedido in pedidos)
+        protected Fatura() { }
+        public Fatura(int numeroFatura, Endereco enderecoFatura, Endereco enderecoEntrega)
         {
-            AdicionarPedido(pedido);
+            NumeroFatura = numeroFatura;
+            EnderecoFatura = enderecoFatura;
+            EnderecoEntrega = enderecoEntrega;
+
+            Pedidos = new List<Pedido>();
         }
 
+        public int NumeroFatura { get; private set; }
+        public string Observacao { get; private set; }
+        public virtual Endereco EnderecoFatura { get; private set; }
+        public virtual Endereco EnderecoEntrega { get; private set; }
+
+        public virtual ICollection<Pedido> Pedidos { get; private set; }
+
+
+        public void Update(string observacao)
+        {
+            Observacao = observacao;
+        }
+
+
+        public void AdicionarPedido(Pedido pedido)
+        {
+            pedido.DefinirFatura(this);
+            Pedidos.Add(pedido);
+        }
+        public void AdicionarPedido(IList<Pedido> pedidos)
+        {
+            foreach (var pedido in pedidos)
+            {
+                AdicionarPedido(pedido);
+            }
+
+        }
     }
 }

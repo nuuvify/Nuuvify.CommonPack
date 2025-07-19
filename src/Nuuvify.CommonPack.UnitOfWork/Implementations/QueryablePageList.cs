@@ -1,4 +1,4 @@
-
+﻿
 using Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 
 namespace Nuuvify.CommonPack.UnitOfWork;

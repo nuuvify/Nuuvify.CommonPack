@@ -1,4 +1,4 @@
-
+﻿
 namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 
 /// <summary>

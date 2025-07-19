@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Caching.Distributed;
+﻿using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.SqlServer;
 using Nuuvify.CommonPack.Security.JwtCredentials;
 using Nuuvify.CommonPack.Security.JwtCredentials.Interfaces;
@@ -18,11 +18,11 @@ public static class JwkSetManagerDependencyInjection
         Action<JwksOptions> action = null)
     {
         if (action != null)
-            _ = services.Configure(action);
+            services.Configure(action);
 
-        _ = services.AddScoped<IJwkService, JwkService>();
-        _ = services.AddScoped<IJwkSetService, JwkSetService>();
-        _ = services.AddSingleton<IJwkStore, InMemoryStore>();
+        services.AddScoped<IJwkService, JwkService>();
+        services.AddScoped<IJwkSetService, JwkSetService>();
+        services.AddSingleton<IJwkStore, InMemoryStore>();
 
         return new JwksBuilder(services);
     }
@@ -33,10 +33,11 @@ public static class JwkSetManagerDependencyInjection
     /// <returns></returns>
     public static IJwksBuilder PersistKeysInCache(this IJwksBuilder builder)
     {
-        _ = builder.Services.AddSingleton<IJwkStore, InMemoryStore>();
+        builder.Services.AddSingleton<IJwkStore, InMemoryStore>();
 
         return builder;
     }
+
 
     /// <summary>
     /// Configura AddDistributedSqlServerCache para armazenamento de tokens, a tabela deve ser criada
@@ -65,9 +66,9 @@ public static class JwkSetManagerDependencyInjection
         string tableName = "Tokens")
     {
 
-        _ = builder.Services.AddScoped<IJwtSetService, JwtSetService>();
+        builder.Services.AddScoped<IJwtSetService, JwtSetService>();
 
-        _ = builder.Services.AddKeyedScoped<IDistributedCache>("SqlServerCache", (serviceProvider, key) =>
+        builder.Services.AddKeyedScoped<IDistributedCache>("SqlServerCache", (serviceProvider, key) =>
         {
             var options = new SqlServerCacheOptions
             {
@@ -78,8 +79,11 @@ public static class JwkSetManagerDependencyInjection
             return new SqlServerCache(options);
         });
 
+
         return builder;
 
+
     }
+
 
 }

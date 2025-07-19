@@ -1,16 +1,19 @@
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Nuuvify.CommonPack.Security.Jwt;
-
-public class ControllerCustomAuthorizationRequirement : IAuthorizationRequirement
+namespace Nuuvify.CommonPack.Security.Jwt
 {
-    public string ClaimType { get; protected set; }
-    public IEnumerable<string> ClaimValues { get; protected set; }
-
-    public ControllerCustomAuthorizationRequirement(string claimType, params string[] claimValues)
+    public class ControllerCustomAuthorizationRequirement : IAuthorizationRequirement
     {
-        ClaimType = claimType;
-        ClaimValues = claimValues;
-    }
+        public string ClaimType { get; protected set; }
+        public IEnumerable<string> ClaimValues { get; protected set; }
 
+
+        public ControllerCustomAuthorizationRequirement(string claimType, params string[] claimValues)
+        {
+            ClaimType = claimType;
+            ClaimValues = claimValues;
+        }
+
+    }
 }

@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 
 namespace Nuuvify.CommonPack.UnitOfWork.Abstraction;
 
@@ -12,6 +12,7 @@ public static class ProviderSelected
     public static readonly string SqLite = "SqLite";
     public static readonly string[] SuportedProviders = { Oracle, Db2, SqlServer, PostgreSQL, SqLite };
 
+
     /// <summary>
     /// Retorna uma string, separado por virgula, com todos os prividers suportados pelos metodos de extenção
     /// </summary>
@@ -22,7 +23,7 @@ public static class ProviderSelected
 
         foreach (var item in SuportedProviders)
         {
-            _ = message.Append($"{item},");
+            message.Append($"{item},");
         }
 
         return message.ToString();

@@ -1,9 +1,11 @@
-using Nuuvify.CommonPack.Mediator.Implementation;
+﻿using System.Collections.Generic;
+using Nuuvify.CommonPack.Extensions.Notificator;
 
-namespace Nuuvify.CommonPack.StandardHttpClient.Results;
-
-internal class ReturnStandardErrors
+namespace Nuuvify.CommonPack.StandardHttpClient.Results
 {
-    public bool Success { get; set; }
-    public IEnumerable<NotificationR> Errors { get; set; }
+    internal class ReturnStandardErrors
+    {
+        public bool Success { get; set; }
+        public IEnumerable<NotificationR> Errors { get; set; }
+    }
 }

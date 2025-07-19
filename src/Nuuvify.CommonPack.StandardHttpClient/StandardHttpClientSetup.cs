@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nuuvify.CommonPack.Security.Abstraction;
@@ -36,7 +36,7 @@ public static class StandardHttpClientSetup
     public static void AddStandardHttpClientSetup(this IServiceCollection services,
         IConfiguration configuration, bool registerCredential = true)
     {
-        _ = services.AddScoped<IStandardHttpClient, StandardHttpClient>();
+        _ = services.AddScoped<IStandardHttpClient, StandardHttpClientService>();
         _ = services.AddScoped<ITokenService, TokenService>();
         _ = services.AddTransient<CredentialToken>();
 
@@ -50,7 +50,7 @@ public static class StandardHttpClientSetup
         IConfiguration configuration, bool registerCredential = true)
     {
 
-        _ = services.AddSingleton<IStandardHttpClient, StandardHttpClient>();
+        _ = services.AddSingleton<IStandardHttpClient, StandardHttpClientService>();
         _ = services.AddSingleton<ITokenService, TokenService>();
         _ = services.AddSingleton<CredentialToken>();
 
@@ -64,7 +64,7 @@ public static class StandardHttpClientSetup
         IConfiguration configuration, bool registerCredential = true)
     {
 
-        _ = services.AddTransient<IStandardHttpClient, StandardHttpClient>();
+        _ = services.AddTransient<IStandardHttpClient, StandardHttpClientService>();
         _ = services.AddTransient<ITokenService, TokenService>();
         _ = services.AddTransient<CredentialToken>();
 
@@ -78,7 +78,7 @@ public static class StandardHttpClientSetup
     /// Use .ConfigurePrimaryHttpMessageHandler para registro com proxy e demais parametros do HttpClient
     /// Você precisa incluir as tags no seu arquivo appsettings.json <br/>
     ///     "AppConfig:AppURLs:UrlLoginApi" <br/>
-    ///     "AppConfig:AppURLs:UrlLoginApiToken" 
+    ///     "AppConfig:AppURLs:UrlLoginApiToken"
     /// </summary>
     /// <param name="services"></param>
     /// <param name="configuration"></param>

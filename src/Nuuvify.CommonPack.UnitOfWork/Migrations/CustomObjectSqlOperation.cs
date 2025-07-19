@@ -1,31 +1,33 @@
 using System.Text;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 
-namespace Nuuvify.CommonPack.UnitOfWork.Migrations;
-
-public abstract class CustomObjectSqlOperation : SqlOperation
+namespace Nuuvify.CommonPack.UnitOfWork.Migrations
 {
-
-    /// <summary>
-    /// Objects são utilizados dentro das functions ou procedures
-    /// </summary>
-    /// <value></value>
-    public abstract string ObjectName { get; }
-    public abstract string Schema { get; }
-    public abstract string UserGrant { get; }
-
-    public override string ToString()
+    public abstract class CustomObjectSqlOperation : SqlOperation
     {
-        if (string.IsNullOrWhiteSpace(Schema))
+
+        /// <summary>
+        /// Objects são utilizados dentro das functions ou procedures
+        /// </summary>
+        /// <value></value>
+        public abstract string ObjectName { get; }
+        public abstract string Schema { get; }
+        public abstract string UserGrant { get; }
+
+
+        public override string ToString()
         {
-            return ObjectName;
+            if (string.IsNullOrWhiteSpace(Schema))
+            {
+                return ObjectName;
+            }
+            else
+            {
+                return $"{Schema}.{ObjectName}";
+            }
         }
-        else
-        {
-            return $"{Schema}.{ObjectName}";
-        }
+
+        public abstract StringBuilder GetObjectBuilder();
+
     }
-
-    public abstract StringBuilder GetObjectBuilder();
-
 }

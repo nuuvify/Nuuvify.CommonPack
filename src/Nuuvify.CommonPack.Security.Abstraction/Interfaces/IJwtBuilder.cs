@@ -4,7 +4,7 @@ namespace Nuuvify.CommonPack.Security.Abstraction;
 
 public interface IJwtBuilder
 {
-    long ToUnixEpochDate(DateTime date);
+    long ToUnixEpochDate(DateTime dateTime);
     IJwtBuilder WithJwtClaims();
 
     IJwtBuilder WithJwtUserClaims(PersonWithRolesQueryResult personGroups);

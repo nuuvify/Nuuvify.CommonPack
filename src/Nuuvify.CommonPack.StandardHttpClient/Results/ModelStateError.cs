@@ -1,42 +1,43 @@
-namespace Nuuvify.CommonPack.StandardHttpClient.Results;
-
-internal class ModelStateError
+﻿namespace Nuuvify.CommonPack.StandardHttpClient.Results
 {
-    public string ErroHost
+    internal class ModelStateError
     {
-        get
+        public string ErroHost
         {
-            return ErrorHost;
+            get
+            {
+                return ErrorHost;
+            }
+            set
+            {
+                ErrorHost = value;
+            }
         }
-        set
+        public string ErroPath
         {
-            ErrorHost = value;
+            get
+            {
+                return ErrorPath;
+            }
+            set
+            {
+                ErrorPath = value;
+            }
         }
+        public object ErroMensagem
+        {
+            get
+            {
+                return ErrorMessage;
+            }
+            set
+            {
+                ErrorMessage = value;
+            }
+        }
+        
+        public string ErrorHost { get; set; }
+        public string ErrorPath { get; set; }
+        public object ErrorMessage { get; set; }
     }
-    public string ErroPath
-    {
-        get
-        {
-            return ErrorPath;
-        }
-        set
-        {
-            ErrorPath = value;
-        }
-    }
-    public object ErroMensagem
-    {
-        get
-        {
-            return ErrorMessage;
-        }
-        set
-        {
-            ErrorMessage = value;
-        }
-    }
-
-    public string ErrorHost { get; set; }
-    public string ErrorPath { get; set; }
-    public object ErrorMessage { get; set; }
 }

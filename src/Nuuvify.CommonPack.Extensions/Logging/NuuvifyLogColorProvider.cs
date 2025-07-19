@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 
 namespace Nuuvify.CommonPack.Logging;
 
+
 // [UnsupportedOSPlatform("browser")]
 [ProviderAlias("ColorConsole")]
 public sealed class NuuvifyLogColorProvider : ILoggerProvider
@@ -12,6 +13,8 @@ public sealed class NuuvifyLogColorProvider : ILoggerProvider
     private NuuvifyLogColorConfiguration _currentConfig;
     private readonly ConcurrentDictionary<string, NuuvifyLogColor> _loggers =
         new(StringComparer.OrdinalIgnoreCase);
+
+
 
     public NuuvifyLogColorProvider(
         IOptionsMonitor<NuuvifyLogColorConfiguration> config)
@@ -23,7 +26,7 @@ public sealed class NuuvifyLogColorProvider : ILoggerProvider
 
     public ILogger CreateLogger(string categoryName)
     {
-        _ = _loggers.GetOrAdd(categoryName, name =>
+        _loggers.GetOrAdd(categoryName, name =>
             new NuuvifyLogColor(
                 name,
                 GetCurrentConfig));
@@ -38,5 +41,6 @@ public sealed class NuuvifyLogColorProvider : ILoggerProvider
         _loggers.Clear();
         _onChangeToken?.Dispose();
     }
+
 
 }

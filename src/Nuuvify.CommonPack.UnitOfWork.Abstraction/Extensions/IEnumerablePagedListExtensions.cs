@@ -1,7 +1,8 @@
-using Nuuvify.CommonPack.UnitOfWork.Abstraction.Collections;
+﻿using Nuuvify.CommonPack.UnitOfWork.Abstraction.Collections;
 using Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 
 namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Extensions;
+
 
 /// <summary>
 /// Provides some extension methods for <see cref="IEnumerable{T}"/> to provide paging capability.
@@ -23,6 +24,7 @@ public static class IEnumerablePagedListExtensions
         int indexFrom)
         => new PagedList<T>(source, pageIndex, pageSize, indexFrom);
 
+
     /// <summary>
     /// Converts the specified source to <see cref="IPagedList{T}"/> by the specified <paramref name="converter"/>, <paramref name="pageIndex"/> and <paramref name="pageSize"/>
     /// </summary>
@@ -40,6 +42,7 @@ public static class IEnumerablePagedListExtensions
         int pageSize,
         int indexFrom)
         => new PagedList<TSource, TResult>(source, converter, pageIndex, pageSize, indexFrom);
+
 
 }
 

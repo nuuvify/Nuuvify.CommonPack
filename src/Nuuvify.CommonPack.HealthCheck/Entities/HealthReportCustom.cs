@@ -1,6 +1,7 @@
 
 namespace Nuuvify.CommonPack.HealthCheck;
 
+
 public class HealthReportCustom
 {
 
@@ -13,6 +14,7 @@ public class HealthReportCustom
     public List<HealthReportEntryCustom> Entries { get; set; }
     public string DiscoveryService { get; set; }
 
+
     public Dictionary<string, object> DataEntries()
     {
         var entries = new Dictionary<string, object>();
@@ -23,12 +25,12 @@ public class HealthReportCustom
             {
                 foreach (var data in item?.Data)
                 {
-                    _ = entries.TryAdd(data.Key, data.Value);
+                    entries.TryAdd(data.Key, data.Value);
                 }
             }
             else
             {
-                _ = entries.TryAdd(item?.Name, $"{item?.Status} {item?.Description} {item?.ExceptionMessage}");
+                entries.TryAdd(item?.Name, $"{item?.Status} {item?.Description} {item?.ExceptionMessage}");
             }
 
         }

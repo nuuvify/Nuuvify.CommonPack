@@ -1,28 +1,35 @@
-namespace Nuuvify.CommonPack.Extensions.Implementation;
+using System;
+using System.Collections.Generic;
 
-/// <summary>
-/// Exemplo de uso com Distinct <see cref="DistinctExtension.Distinct"/>
-/// </summary>
-/// <typeparam name="T"></typeparam>
-public class CustomGenericComparer<T> : IEqualityComparer<T>
+namespace Nuuvify.CommonPack.Extensions.Implementation
 {
-    public Func<T, T, bool> ComparerEquals { get; }
-    public Func<T, int> ComparerGetHashCode { get; }
-    public CustomGenericComparer(
-        Func<T, T, bool> comparerEquals,
-        Func<T, int> comparerGetHashCode)
+    /// <summary>
+    /// Exemplo de uso com Distinct <see cref="DistinctExtension.Distinct"/>
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class CustomGenericComparer<T> : IEqualityComparer<T>
     {
-        ComparerEquals = comparerEquals;
-        ComparerGetHashCode = comparerGetHashCode;
-    }
+        public Func<T, T, bool> ComparerEquals { get; }
+        public Func<T, int> ComparerGetHashCode { get; }
+        public CustomGenericComparer(
+            Func<T, T, bool> comparerEquals,
+            Func<T, int> comparerGetHashCode)
+        {
+            ComparerEquals = comparerEquals;
+            ComparerGetHashCode = comparerGetHashCode;
+        }
 
-    public bool Equals(T x, T y)
-        => ComparerEquals(x, y);
 
-    public int GetHashCode(T obj)
-    {
-        _ = ComparerGetHashCode(obj);
-        return 0;
+        public bool Equals(T x, T y)
+            => ComparerEquals(x, y);
+
+        public int GetHashCode(T obj)
+        {
+            ComparerGetHashCode(obj);
+            return 0;
+        }
+
+
     }
 
 }

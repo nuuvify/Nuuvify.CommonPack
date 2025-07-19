@@ -1,28 +1,35 @@
-using Nuuvify.CommonPack.Domain.Implementations;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Nuuvify.CommonPack.Domain.Interfaces;
-using Nuuvify.CommonPack.Extensions;
-using Nuuvify.CommonPack.Mediator.Implementation;
+using Nuuvify.CommonPack.Extensions.Interfaces;
+using Nuuvify.CommonPack.Extensions.Notificator;
 
-namespace Nuuvify.CommonPack.Domain;
-
-public abstract class BaseSpecification<TEntity> : NotifiableR,
-    ISpecification<TEntity> where TEntity : DomainEntity
+namespace Nuuvify.CommonPack.Domain
 {
-
-    /// <summary>
-    /// Apenas um repositorio deve ser utilizado, se estiver precisando mais de um
-    /// muito provavelmente você precisa quebrar sua especificação, ou melhorar o
-    /// repositorio
-    /// </summary>
-    /// <param name="repository"></param>
-    protected BaseSpecification(IRepositoryValidation repository)
+    public abstract class BaseSpecification<TEntity> : NotifiableR,
+        ISpecification<TEntity> where TEntity : DomainEntity
     {
-    }
 
-    public abstract Task IsSatisfactory(TEntity entity);
+        /// <summary>
+        /// Apenas um repositorio deve ser utilizado, se estiver precisando mais de um
+        /// muito provavelmente você precisa quebrar sua especificação, ou melhorar o 
+        /// repositorio
+        /// </summary>
+        /// <param name="repository"></param>
+        protected BaseSpecification(IRepositoryValidation repository)
+        {
+        }
 
-    public IList<NotificationR> ValidationResult()
-    {
-        return Notifications.ToList();
+
+
+        public abstract Task IsSatisfactory(TEntity entity);
+
+
+
+        public IList<NotificationR> ValidationResult()
+        {
+            return (IList<NotificationR>)Notifications.ToList();
+        }
     }
 }

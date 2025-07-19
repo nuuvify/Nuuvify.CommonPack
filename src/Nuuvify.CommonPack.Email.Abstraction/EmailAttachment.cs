@@ -1,13 +1,14 @@
-namespace Nuuvify.CommonPack.Email.Abstraction;
-
-public class EmailAttachment
+namespace Nuuvify.CommonPack.Email.Abstraction
 {
-    public EmailAttachment(EmailMidia emailMidia, string fullFileName)
+    public class EmailAttachment
     {
-        EmailMidia = emailMidia;
-        FullFileName = fullFileName;
-    }
+        public EmailAttachment(EmailMidia emailMidia, string fullFileName)
+        {
+            EmailMidia = emailMidia;
+            FullFileName = fullFileName;
+        }
 
-    public EmailMidia EmailMidia { get; set; }
-    public string FullFileName { get; set; }
+        public EmailMidia EmailMidia { get; set; }
+        public string FullFileName { get; set; }
+    }
 }

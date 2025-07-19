@@ -1,4 +1,4 @@
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Nuuvify.CommonPack.Security.JwtCredentials.Model;
@@ -154,6 +154,7 @@ public class PublicJwk
     [JsonPropertyName("y")]
     public string Y { get; }
 
+
     /// <summary>
     /// The "n" (modulus) parameter contains the modulus value for the RSA public key.
     /// It is represented as a Base64urlUInt-encoded value.
@@ -168,12 +169,14 @@ public class PublicJwk
     [JsonPropertyName("e")]
     public string Exponent { get; set; }
 
+
     /// <summary>
     /// The "k" (key value) parameter contains the value of the symmetric (or other single-valued) key.
     /// It is represented as the base64url encoding of the octet sequence containing the key value.
     /// </summary>
     [JsonPropertyName("k")]
     public string Key { get; set; }
+
 
     public static PublicJwk FromJwk(JsonWebKey jwk)
     {

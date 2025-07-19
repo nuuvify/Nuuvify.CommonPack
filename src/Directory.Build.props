@@ -1,49 +1,48 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project>
-  <PropertyGroup>
-    <OsPlatform Condition="$(OsPlatform) == '' AND '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">Windows</OsPlatform>
-    <OsPlatform Condition="$(OsPlatform) == '' AND '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">Linux</OsPlatform>
-    <OsPlatform Condition="$(OsPlatform) == '' AND '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'">OSX</OsPlatform>
-    <LangVersion>latest</LangVersion>
-    <IsPackable>true</IsPackable>
-    <Authors>Lincoln Zocateli</Authors>
-    <Company>Lincoln Zocateli</Company>
-    <Copyright>Copyright (c) $([System.DateTime]::Now.Year) $(Company)</Copyright>
-    <!-- <PackageLicenseFile>LICENSE</PackageLicenseFile> -->
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/lzocateli/Nuuvify.CommonPack</PackageProjectUrl>
-    <PackageIcon>logonuuvify.jpg</PackageIcon>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Version>3.0.0</Version>
-    <FileVersion>1520</FileVersion>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>1701;1702;1705;1591</NoWarn>
-    <DocumentationFile>Docs\$(MSBuildProjectName).xml</DocumentationFile>
-    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
-    <Nullable>disable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OsPlatform Condition="$(OsPlatform) == '' AND '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">Windows</OsPlatform>
+        <OsPlatform Condition="$(OsPlatform) == '' AND '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">Linux</OsPlatform>
+        <OsPlatform Condition="$(OsPlatform) == '' AND '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'">OSX</OsPlatform>
+        <LangVersion>latest</LangVersion>
+        <IsPackable>true</IsPackable>
+        <Authors>Lincoln Zocateli</Authors>
+        <Company>Lincoln Zocateli</Company>
+        <Copyright>Copyright (c) $([System.DateTime]::Now.Year) $(Company)</Copyright>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/lzocateli/Nuuvify.CommonPack</PackageProjectUrl>
+        <PackageIcon>logonuuvify.jpg</PackageIcon>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <Version>2.1.0</Version>
+        <FileVersion>1520</FileVersion>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>1701;1702;1705;1591</NoWarn>
+        <DocumentationFile>Docs\$(MSBuildProjectName).xml</DocumentationFile>
+        <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+        <Nullable>disable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="$(OsPlatform) == 'Linux'">
-    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(OsPlatform) == 'Windows'">
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-  </PropertyGroup>
+    <PropertyGroup Condition="$(OsPlatform) == 'Linux'">
+        <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+    </PropertyGroup>
+    <PropertyGroup Condition="$(OsPlatform) == 'Windows'">
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <None Include="../../LICENSE" Pack="true" PackagePath="" />
-    <None Include="../../Images/logonuuvify.jpg" Pack="true" PackagePath="" />
-  </ItemGroup>
+    <ItemGroup>
+        <None Include="../../LICENSE" Pack="true" PackagePath="" />
+        <None Include="../../Images/logonuuvify.jpg" Pack="true" PackagePath="" />
+    </ItemGroup>
 
-  <ItemGroup Label="Packaging">
-    <Content Include="./$(MSBuildProjectName).targets" PackagePath="build\$(MSBuildProjectName).targets" />
+    <ItemGroup Label="Packaging">
+        <Content Include="./$(MSBuildProjectName).targets" PackagePath="build\$(MSBuildProjectName).targets" />
 
-    <Content Include="./Docs/$(MSBuildProjectName).xml">
-      <Pack>true</Pack>
-      <PackagePath>$(ContentTargetFolders)</PackagePath>
-      <flatten>false</flatten>
-    </Content>
-  </ItemGroup>
+        <Content Include="./Docs/$(MSBuildProjectName).xml">
+            <Pack>true</Pack>
+            <PackagePath>$(ContentTargetFolders)</PackagePath>
+            <flatten>false</flatten>
+        </Content>
+    </ItemGroup>
 
 </Project>

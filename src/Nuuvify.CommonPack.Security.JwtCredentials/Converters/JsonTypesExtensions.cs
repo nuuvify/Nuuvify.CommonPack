@@ -1,39 +1,45 @@
+using System;
 using System.Text.Json;
 
-namespace Nuuvify.CommonPack.Security.JwtCredentials.Converters;
 
-public static class JsonTypesExtensions
+namespace Nuuvify.CommonPack.Security.JwtCredentials.Converters
 {
-
-    public static object ConvertJsonTypeCustom(this ref Utf8JsonReader reader, Type propertyType)
+    public static class JsonTypesExtensions
     {
-        object itemValue;
 
-        _ = reader.Read();
-        if (reader.TokenType == JsonTokenType.PropertyName)
+
+        public static object ConvertJsonTypeCustom(this ref Utf8JsonReader reader, Type propertyType)
         {
-            throw new JsonException($"Nao era esperado uma propriedade, e sim um valor do tipo: {propertyType.Name}");
+            object itemValue;
+
+
+            reader.Read();
+            if (reader.TokenType == JsonTokenType.PropertyName)
+            {
+                throw new JsonException($"Nao era esperado uma propriedade, e sim um valor do tipo: {propertyType.Name}");
+            }
+
+            object propertyValue = propertyType.Name.ToLowerInvariant() switch
+            {
+                "string" => reader.GetString(),
+                "datetimeoffset" => reader.GetDateTimeOffset(),
+                "datetime" => reader.GetDateTime(),
+                "decimal" => reader.GetDecimal(),
+                "double" => reader.GetDouble(),
+                "float" => reader.GetSingle(),
+                "byte" => reader.GetByte(),
+                "short" => reader.GetInt16(),
+                "int" => reader.GetInt32(),
+                "long" => reader.GetInt64(),
+                "guid" => reader.GetGuid(),
+                "bool" => reader.GetBoolean(),
+                "byte[]" => reader.GetBytesFromBase64(),
+                _ => reader.GetComment(),
+            };
+            itemValue = Convert.ChangeType(propertyValue, propertyType);
+            return itemValue;
+
         }
-
-        object propertyValue = propertyType.Name.ToLowerInvariant() switch
-        {
-            "string" => reader.GetString(),
-            "datetimeoffset" => reader.GetDateTimeOffset(),
-            "datetime" => reader.GetDateTime(),
-            "decimal" => reader.GetDecimal(),
-            "double" => reader.GetDouble(),
-            "float" => reader.GetSingle(),
-            "byte" => reader.GetByte(),
-            "short" => reader.GetInt16(),
-            "int" => reader.GetInt32(),
-            "long" => reader.GetInt64(),
-            "guid" => reader.GetGuid(),
-            "bool" => reader.GetBoolean(),
-            "byte[]" => reader.GetBytesFromBase64(),
-            _ => reader.GetComment(),
-        };
-        itemValue = Convert.ChangeType(propertyValue, propertyType);
-        return itemValue;
 
     }
 

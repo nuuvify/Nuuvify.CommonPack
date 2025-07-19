@@ -1,8 +1,8 @@
-using Nuuvify.CommonPack.StandardHttpClient.Results;
+﻿using Nuuvify.CommonPack.StandardHttpClient.Results;
 
 namespace Nuuvify.CommonPack.StandardHttpClient;
 
-public partial class StandardHttpClient
+public partial class StandardHttpClientService
 {
 
     ///<inheritdoc/>

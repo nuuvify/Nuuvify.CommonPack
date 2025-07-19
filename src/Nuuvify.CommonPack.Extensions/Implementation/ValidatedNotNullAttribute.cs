@@ -1,35 +1,40 @@
-namespace Nuuvify.CommonPack.Extensions.Implementation;
+﻿using System.Collections.Generic;
+using System.Linq;
 
-
-public static class ValidatedNotNullExtensionMethods
+namespace Nuuvify.CommonPack.Extensions.Implementation
 {
 
-    public static bool NotNull<T>(this T value) where T : class
+    public static class ValidatedNotNullExtensionMethods
     {
-        return !(value is null);
-    }
 
-    public static bool NotNullOrZero<T>(this T value) where T : IEnumerable<object>
-    {
-        var isNull = value != null;
-
-        var isZero = value?.Count() != 0;
-
-        return isZero && isNull;
-    }
-    public static bool NotNullOrZero(this System.Collections.IEnumerable value)
-    {
-        var isNull = value == null;
-        if (isNull) return false;
-
-        var notNullOrZero = false;
-        var enumerator = value.GetEnumerator();
-        if (enumerator != null)
+        public static bool NotNull<T>(this T value) where T : class
         {
-            notNullOrZero = enumerator.MoveNext();
+            return !(value is null);
         }
 
-        return notNullOrZero;
+        public static bool NotNullOrZero<T>(this T value) where T : IEnumerable<object>
+        {
+            var isNull = value != null;
 
+            var isZero = value?.Count() != 0;
+
+            return isZero && isNull;
+        }
+        public static bool NotNullOrZero(this System.Collections.IEnumerable value)
+        {
+            var isNull = value == null;
+            if (isNull) return false;
+
+            var notNullOrZero = false;
+            var enumerator = value.GetEnumerator();
+            if (enumerator != null)
+            {
+                notNullOrZero = enumerator.MoveNext();
+            }
+
+            return notNullOrZero;
+
+        }
     }
+
 }

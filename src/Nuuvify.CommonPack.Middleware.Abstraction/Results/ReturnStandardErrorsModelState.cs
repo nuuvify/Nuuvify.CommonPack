@@ -1,7 +1,10 @@
-namespace Nuuvify.CommonPack.Middleware.Abstraction.Results;
+﻿using System.Collections.Generic;
 
-public class ReturnStandardErrorsModelState
+namespace Nuuvify.CommonPack.Middleware.Abstraction.Results
 {
-    public bool Success { get; set; }
-    public IEnumerable<ModelStateError> Errors { get; set; }
+    public class ReturnStandardErrorsModelState
+    {
+        public bool Success { get; set; }
+        public IEnumerable<ModelStateError> Errors { get; set; }
+    }
 }
