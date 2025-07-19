@@ -271,7 +271,7 @@ dotnet_naming_symbols.private_internal_fields.applicable_accessibilities = priva
 csharp_prefer_static_anonymous_function = true:suggestion
 
 
-## Code Analysis Quality Rules 
+## Code Analysis Quality Rules
 ### Design rules
 #### Do not declare static members on generic types
 dotnet_diagnostic.CA1000.severity = error
