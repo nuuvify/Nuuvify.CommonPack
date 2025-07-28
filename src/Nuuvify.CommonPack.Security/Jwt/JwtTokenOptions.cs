@@ -6,8 +6,6 @@ namespace Nuuvify.CommonPack.Security.Jwt;
 public class JwtTokenOptions
 {
 
-
-
     public string Subject { get; set; }
     public string Issuer { get; set; }
     public IList<string> Issuers { get; set; }
@@ -17,12 +15,12 @@ public class JwtTokenOptions
 
     /// <summary>
     /// Data da Criacao do token.
-    /// Não expirar antes de 
+    /// Não expirar antes de
     /// </summary>
     public DateTimeOffset NotBefore { get; set; } = DateTimeOffset.Now;
 
 
-    private TimeSpan _validFor;
+    private TimeSpan _validFor = TimeSpan.FromHours(8);
 
     /// <summary>
     /// Valido por n horas
@@ -36,16 +34,12 @@ public class JwtTokenOptions
         set
         {
             if (value.TotalSeconds <= 0)
-                value = new TimeSpan(ValidatedAt.Hour, ValidatedAt.Minute, ValidatedAt.Second);
-
-            if (value.TotalSeconds <= 0)
             {
                 value = TimeSpan.FromHours(8);
             }
             _validFor = value;
         }
     }
-
 
     /// <summary>
     /// Data/Hora de expiracao, NotBefore + ValidFor
