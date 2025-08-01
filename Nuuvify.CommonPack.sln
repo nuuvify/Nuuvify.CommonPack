@@ -74,6 +74,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nuuvify.CommonPack.UnitOfWo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nuuvify.CommonPack.BackgroundService.xTest", "test\Nuuvify.CommonPack.BackgroundService.xTest\Nuuvify.CommonPack.BackgroundService.xTest.csproj", "{91C73C3F-553E-4978-ACF1-16E6D4F0B4D8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nuuvify.CommonPack.Extensions.xTest", "test\Nuuvify.CommonPack.Extensions.xTest\Nuuvify.CommonPack.Extensions.xTest.csproj", "{AE0BAD61-5CBE-418C-8627-FF18B2FB4A31}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -216,6 +218,10 @@ Global
 		{91C73C3F-553E-4978-ACF1-16E6D4F0B4D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91C73C3F-553E-4978-ACF1-16E6D4F0B4D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{91C73C3F-553E-4978-ACF1-16E6D4F0B4D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE0BAD61-5CBE-418C-8627-FF18B2FB4A31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE0BAD61-5CBE-418C-8627-FF18B2FB4A31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE0BAD61-5CBE-418C-8627-FF18B2FB4A31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE0BAD61-5CBE-418C-8627-FF18B2FB4A31}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -254,6 +260,7 @@ Global
 		{A479936A-BA66-41F1-81FE-48755E788163} = {0C88DD14-F956-CE84-757C-A364CCF449FC}
 		{7C734547-83BC-74CB-D84D-45F9BBF91EC3} = {0C88DD14-F956-CE84-757C-A364CCF449FC}
 		{91C73C3F-553E-4978-ACF1-16E6D4F0B4D8} = {0C88DD14-F956-CE84-757C-A364CCF449FC}
+		{AE0BAD61-5CBE-418C-8627-FF18B2FB4A31} = {0C88DD14-F956-CE84-757C-A364CCF449FC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {41A1DBC1-D175-4A1C-8E44-BF14E885E244}

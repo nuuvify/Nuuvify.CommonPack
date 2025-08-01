@@ -1,14 +1,13 @@
 ﻿using System.ComponentModel;
 
-namespace Nuuvify.CommonPack.Domain.ValueObjects
+namespace Nuuvify.CommonPack.Domain.ValueObjects;
+
+public enum EnumEmitidoRecebido
 {
-    public enum EnumEmitidoRecebido
-    {
 
-        [Description("E")]
-        Emitido = 0,
-        [Description("R")]
-        Recebido = 1,
+    [Description("E")]
+    Emitido = 0,
+    [Description("R")]
+    Recebido = 1,
 
-    }
 }
