@@ -56,7 +56,6 @@ public abstract partial class BackgroundServiceAbstract<T> : Microsoft.Extension
 
     }
 
-
     /// <summary>
     /// Configura o Service Bus com string de conexão
     /// </summary>
@@ -244,6 +243,13 @@ public abstract partial class BackgroundServiceAbstract<T> : Microsoft.Extension
                 _logger.LogError(ex, "Erro específico do Service Bus durante a execução do Worker: {Reason}", ex.Reason);
                 await args.DeadLetterMessageAsync(args.Message, cancellationToken: cancellationToken);
             }
+            catch (ServiceBusException ex) when (ex.Reason == ServiceBusFailureReason.ServiceCommunicationProblem)
+            {
+                _logger.LogError(ex, "Erro de comunicação no Service Bus. Verifique as configurações de rede. Reason: {Reason}, Resource: {EntityPath}",
+                    ex.Reason, args.Message?.Subject ?? "Unknown");
+                await args.DeadLetterMessageAsync(args.Message, cancellationToken: cancellationToken);
+                throw;
+            }
             catch (OperationCanceledException ex)
             {
                 _logger.LogWarning(ex, "Operação cancelada durante a execução do Worker");
@@ -272,7 +278,8 @@ public abstract partial class BackgroundServiceAbstract<T> : Microsoft.Extension
     /// <returns>Task representando a operação assíncrona</returns>
     private Task ProcessErrorAsync(ProcessErrorEventArgs args)
     {
-        _logger.LogError(args.Exception, "Erro ao processar a mensagem");
+        _logger.LogError(args.Exception, "Erro ao processar a mensagem. Source: {Source}, EntityPath: {EntityPath}, FullyQualifiedNamespace: {FullyQualifiedNamespace}",
+            args.ErrorSource, args.EntityPath, args.FullyQualifiedNamespace);
 
         return Task.CompletedTask;
     }
