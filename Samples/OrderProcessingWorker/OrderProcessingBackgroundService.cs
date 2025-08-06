@@ -1,11 +1,10 @@
 using Azure.Messaging.ServiceBus;
-using Microsoft.Extensions.Logging;
 using Nuuvify.CommonPack.BackgroundService.Abstraction;
 using Nuuvify.CommonPack.Middleware.Abstraction;
 using System.Diagnostics;
 using System.Text.Json;
 
-namespace Nuuvify.CommonPack.BackgroundService.Examples;
+namespace OrderProcessingWorker;
 
 /// <summary>
 /// Exemplo de implementação concreta da classe BackgroundServiceAbstract

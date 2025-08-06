@@ -1,3 +1,4 @@
+using Azure.Core;
 using Azure.Messaging.ServiceBus;
 using Bogus;
 using Moq;
@@ -33,6 +34,62 @@ public static class ServiceBusBackgroundServiceFaker
             .Returns("Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=testkey");
 
         return mockConfiguration;
+    }
+
+    /// <summary>
+    /// Gera um mock de TokenCredential para testes
+    /// </summary>
+    /// <returns>Mock de TokenCredential</returns>
+    public static Mock<TokenCredential> GenerateTokenCredentialMock()
+    {
+        var mockCredential = new Mock<TokenCredential>();
+        return mockCredential;
+    }
+
+    /// <summary>
+    /// Gera um mock de ServiceBusReceiver para testes
+    /// </summary>
+    /// <returns>Mock de ServiceBusReceiver</returns>
+    public static Mock<ServiceBusReceiver> GenerateServiceBusReceiverMock()
+    {
+        var mockReceiver = new Mock<ServiceBusReceiver>();
+        return mockReceiver;
+    }
+
+    /// <summary>
+    /// Gera um mock de ProcessMessageEventArgs para testes
+    /// </summary>
+    /// <param name="receiver">Mock do ServiceBusReceiver</param>
+    /// <param name="abandon">Se deve abandonar a mensagem em caso de falha</param>
+    /// <returns>Mock de ProcessMessageEventArgs</returns>
+    public static Mock<ProcessMessageEventArgs> GenerateProcessMessageEventArgsMock(ServiceBusReceiver receiver, bool abandon = false)
+    {
+        var mockArgs = new Mock<ProcessMessageEventArgs>();
+
+        // Como ServiceBusReceivedMessage é sealed, não podemos mocká-lo
+        // Vamos apenas configurar os métodos que são chamados nos testes
+        _ = mockArgs.Setup(x => x.CompleteMessageAsync(It.IsAny<ServiceBusReceivedMessage>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        _ = mockArgs.Setup(x => x.AbandonMessageAsync(It.IsAny<ServiceBusReceivedMessage>(), It.IsAny<IDictionary<string, object>>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        _ = mockArgs.Setup(x => x.DeadLetterMessageAsync(It.IsAny<ServiceBusReceivedMessage>(), It.IsAny<IDictionary<string, object>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        return mockArgs;
+    }
+
+    /// <summary>
+    /// Gera um mock de ProcessErrorEventArgs para testes
+    /// Nota: Esta classe é sealed, então não pode ser mockada diretamente
+    /// </summary>
+    /// <returns>Instância real de ProcessErrorEventArgs (pode ser null nos testes)</returns>
+    public static ProcessErrorEventArgs? GenerateProcessErrorEventArgsReal()
+    {
+        // ProcessErrorEventArgs é sealed e não pode ser mockado
+        // Em testes reais, retornaríamos null ou usaríamos reflection para criar instâncias
+        return null;
     }
 
     /// <summary>
@@ -81,32 +138,5 @@ public static class ServiceBusBackgroundServiceFaker
         var faker = new Faker();
         return Enumerable.Range(0, count)
             .Select(_ => new ActivitySource($"Test-{faker.Random.AlphaNumeric(8)}"));
-    }
-
-    /// <summary>
-    /// Gera um mock de ServiceBusReceivedMessage para testes
-    /// </summary>
-    /// <returns>Mock de ServiceBusReceivedMessage</returns>
-    public static Mock<ServiceBusReceivedMessage> GenerateServiceBusReceivedMessageMock()
-    {
-        var faker = new Faker();
-        var mockMessage = new Mock<ServiceBusReceivedMessage>();
-
-        _ = mockMessage.Setup(m => m.MessageId).Returns(faker.Random.Guid().ToString());
-        _ = mockMessage.Setup(m => m.Subject).Returns(faker.Lorem.Word());
-        _ = mockMessage.Setup(m => m.Body).Returns(BinaryData.FromString(faker.Lorem.Sentence()));
-
-        return mockMessage;
-    }
-
-    /// <summary>
-    /// Gera uma collection de mocks de ServiceBusReceivedMessage para testes
-    /// </summary>
-    /// <param name="count">Quantidade de mocks a serem gerados</param>
-    /// <returns>Coleção de mocks de ServiceBusReceivedMessage</returns>
-    public static IEnumerable<Mock<ServiceBusReceivedMessage>> GenerateServiceBusReceivedMessageMocks(int count)
-    {
-        return Enumerable.Range(0, count)
-            .Select(_ => GenerateServiceBusReceivedMessageMock());
     }
 }
