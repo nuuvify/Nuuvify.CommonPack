@@ -1,6 +1,6 @@
 using Azure.Messaging.ServiceBus;
 using Microsoft.Extensions.Logging;
-using Nuuvify.CommonPack.BackgroundService;
+using Nuuvify.CommonPack.BackgroundService.Abstraction;
 using Nuuvify.CommonPack.Middleware.Abstraction;
 using System.Diagnostics;
 using System.Text.Json;
@@ -11,21 +11,31 @@ namespace Nuuvify.CommonPack.BackgroundService.Examples;
 /// Exemplo de implementação concreta da classe BackgroundServiceAbstract
 /// Este exemplo processa mensagens de pedidos de e-commerce
 /// </summary>
-public class OrderProcessingBackgroundService : BackgroundServiceAbstract<OrderProcessingBackgroundService>
+public class OrderProcessingBackgroundService : ServiceBusBackgroundService<OrderProcessingBackgroundService>
 {
     public OrderProcessingBackgroundService(
         ILogger<OrderProcessingBackgroundService> logger,
         IConfigurationCustom configurationCustom,
-        RequestConfiguration requestConfiguration,
-        ActivitySource activitySourceCustom)
+        RequestConfiguration requestConfiguration)
         : base(
             logger,
             configurationCustom,
-            requestConfiguration,
-            activitySourceCustom)
+            requestConfiguration)
     {
         // Configurar para abandonar mensagens em caso de falha em vez de enviá-las para dead letter
         AbandonMessageIfFailed = true;
+        ActivitySourceCustom = new ActivitySource("OrderProcessingService");
+
+        // Configurar o Service Bus com parâmetros do appsettings.json ou variáveis de ambiente
+
+        ConfigureServiceBus(
+            cnnName: configurationCustom.GetSectionValue("ServiceBus:CnnName"),
+            topicName: configurationCustom.GetSectionValue("ServiceBus:Topic:Name"),
+            subscription: configurationCustom.GetSectionValue("ServiceBus:Topic:Subscription"),
+            serviceBusClientOptions: new ServiceBusClientOptions(),
+            serviceBusProcessorOptions: new ServiceBusProcessorOptions()
+        );
+
     }
 
     /// <summary>
@@ -35,7 +45,7 @@ public class OrderProcessingBackgroundService : BackgroundServiceAbstract<OrderP
     /// <param name="activitySource">Source para telemetria</param>
     /// <param name="cancellationToken">Token de cancelamento</param>
     /// <returns>True se o processamento foi bem-sucedido</returns>
-    public override async Task<bool> ExecuteRule(
+    protected override async Task<bool> ExecuteRule(
         ServiceBusReceivedMessage message,
         ActivitySource activitySource,
         CancellationToken cancellationToken)
