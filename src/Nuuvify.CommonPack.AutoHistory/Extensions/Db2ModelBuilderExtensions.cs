@@ -11,17 +11,16 @@ internal static class Db2ModelBuilderExtensions
         var options = AutoHistoryOptions.Instance;
         configure?.Invoke(options);
 
-
-        modelBuilder.Entity<TAutoHistory>(b =>
+        _ = modelBuilder.Entity<TAutoHistory>(b =>
         {
 
-            b.ToTable(b.Metadata.ClrType.Name.ToUpper());
+            _ = b.ToTable(b.Metadata.ClrType.Name.ToUpper());
 
-            b.HasKey(c => c.Id).HasName("PK_AUTOHISTORY_ID");
-            b.Property(c => c.Id).IsRequired().HasColumnName("ID").IsUnicode(false).HasMaxLength(36);
-            b.Property(c => c.RowId).IsRequired().HasColumnName("ROW_ID").IsUnicode(false).HasMaxLength(options.RowIdMaxLength); //.HasColumnType($"CHAR({options.RowIdMaxLength})");
-            b.Property(c => c.CorrelationId).HasColumnName("CORRELATION_ID").IsUnicode(false).HasMaxLength(options.CorrelationIdMaxLength);
-            b.Property(c => c.TableName).IsRequired().HasColumnName("TABLE_NAME").IsUnicode(false).HasMaxLength(options.TableMaxLength);
+            _ = b.HasKey(c => c.Id).HasName("PK_AUTOHISTORY_ID");
+            _ = b.Property(c => c.Id).IsRequired().HasColumnName("ID").IsUnicode(false).HasMaxLength(36);
+            _ = b.Property(c => c.RowId).IsRequired().HasColumnName("ROW_ID").IsUnicode(false).HasMaxLength(options.RowIdMaxLength); //.HasColumnType($"CHAR({options.RowIdMaxLength})");
+            _ = b.Property(c => c.CorrelationId).HasColumnName("CORRELATION_ID").IsUnicode(false).HasMaxLength(options.CorrelationIdMaxLength);
+            _ = b.Property(c => c.TableName).IsRequired().HasColumnName("TABLE_NAME").IsUnicode(false).HasMaxLength(options.TableMaxLength);
 
             var max = 0;
             if (options.LimitChangedLength)
@@ -34,14 +33,13 @@ internal static class Db2ModelBuilderExtensions
                 max = ModelBuilderExtensions.DefaultChangedMaxLength;
             }
 
-            b.Property(c => c.Before).HasColumnName("BEFORE")
+            _ = b.Property(c => c.Before).HasColumnName("BEFORE")
                 .IsUnicode(false).HasMaxLength(max);
 
-            b.Property(c => c.After).HasColumnName("AFTER")
+            _ = b.Property(c => c.After).HasColumnName("AFTER")
                 .IsUnicode(false).HasMaxLength(max);
 
-
-            b.Property(c => c.Kind)
+            _ = b.Property(c => c.Kind)
                 .IsRequired()
                 .HasColumnName("KIND")
                 .IsUnicode(false)
@@ -49,9 +47,9 @@ internal static class Db2ModelBuilderExtensions
                 .HasConversion(v => v.ToString(),
                                v => (EntityState)Enum.Parse(typeof(EntityState), v));
 
-            b.Property(c => c.Created).IsRequired().HasColumnName("CREATED");
-            b.Property(c => c.Username).HasColumnName("USERNAME").IsUnicode(false).HasMaxLength(36);
-            b.Property(c => c.PersistInDatabase).HasColumnName("PERSIST").IsUnicode(false).HasMaxLength(10);
+            _ = b.Property(c => c.Created).IsRequired().HasColumnName("CREATED");
+            _ = b.Property(c => c.Username).HasColumnName("USERNAME").IsUnicode(false).HasMaxLength(36);
+            _ = b.Property(c => c.PersistInDatabase).HasColumnName("PERSIST").IsUnicode(false).HasMaxLength(10);
 
         });
 

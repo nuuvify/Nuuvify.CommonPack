@@ -19,8 +19,6 @@ public class StubDbContext : DbContext
     public readonly IConfigurationCustom Configuration;
     public readonly string ownerDB;
 
-
-
     public StubDbContext(DbContextOptions<StubDbContext> options,
         IConfigurationCustom configuration)
         : base(options)
@@ -30,7 +28,6 @@ public class StubDbContext : DbContext
 
         ownerDB = Configuration.GetSectionValue("AppConfig:OwnerDB");
 
-
         try
         {
             var databaseCreator = Database.GetService<IDatabaseCreator>() as RelationalDatabaseCreator;
@@ -38,12 +35,11 @@ public class StubDbContext : DbContext
             var script = Database.GenerateCreateScript();
             Debug.WriteLine(script);
 
-
             if (!Database.EnsureCreated())
             {
                 var dropSchema = $"DROP SCHEMA IF EXISTS {ownerDB} CASCADE";
 
-                Database.ExecuteSqlRaw(dropSchema);
+                _ = Database.ExecuteSqlRaw(dropSchema);
                 databaseCreator.CreateTables();
 
             }
@@ -56,7 +52,6 @@ public class StubDbContext : DbContext
 
     }
 
-
     public virtual DbSet<PedidoItem> PedidoItens { get; set; }
     public virtual DbSet<Pedido> Pedidos { get; set; }
     public virtual DbSet<Fatura> Faturas { get; set; }
@@ -68,7 +63,7 @@ public class StubDbContext : DbContext
 
             var cnn = Configuration.GetConnectionString(ownerDB);
 
-            optionsBuilder
+            _ = optionsBuilder
                 .UseNpgsql(cnn)
                 .UseSnakeCaseNamingConvention()
                 .UseLazyLoadingProxies()
@@ -77,34 +72,30 @@ public class StubDbContext : DbContext
 
             Console.WriteLine($"EF OnConfiguring: {cnn.SubstringNotNull(0, cnn.IndexOf("User"))}");
 
-
         }
 
     }
-
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.SetDatabaseProviderName(Database);
 
-        modelBuilder.HasDefaultSchema(ownerDB);
+        _ = modelBuilder.HasDefaultSchema(ownerDB);
 
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(StubDbContext).Assembly);
+        _ = modelBuilder.ApplyConfigurationsFromAssembly(typeof(StubDbContext).Assembly);
 
         modelBuilder.IgnoreValueObject();
 
         modelBuilder.MappingPropertiesForgotten();
 
-        modelBuilder.EnableAutoHistory<Nuuvify.CommonPack.AutoHistory.AutoHistory>(o =>
+        _ = modelBuilder.EnableAutoHistory<Nuuvify.CommonPack.AutoHistory.AutoHistory>(o =>
         {
             o.ProviderName = Database.ProviderName;
         });
 
-
         base.OnModelCreating(modelBuilder);
 
     }
-
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
@@ -134,10 +125,10 @@ public class StubDbContext : DbContext
                 {
                     columnName = property.GetColumnName();
 
-                    baseMessage.AppendLine($"Proposed: {columnName} = {proposedValues[property]}");
+                    _ = baseMessage.AppendLine($"Proposed: {columnName} = {proposedValues[property]}");
                     if (!(databaseValues?[property] is null))
                     {
-                        baseMessage.AppendLine($"DataBaseValue: {columnName} = {databaseValues?[property]}");
+                        _ = baseMessage.AppendLine($"DataBaseValue: {columnName} = {databaseValues?[property]}");
                     }
                 }
 
@@ -154,6 +145,5 @@ public class StubDbContext : DbContext
         }
 
     }
-
 
 }

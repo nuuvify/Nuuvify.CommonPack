@@ -16,7 +16,7 @@ public static class EmailSetup
     /// <param name="configuration"></param>
     public static void AddEmailSetup(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<IEmail, Email>();
+        _ = services.AddScoped<IEmail, Email>();
 
         AddEmailServerConfiguration(services, configuration);
     }
@@ -29,7 +29,7 @@ public static class EmailSetup
     /// <param name="configuration"></param>
     public static void AddEmailSetupSingleton(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton<IEmail, Email>();
+        _ = services.AddSingleton<IEmail, Email>();
 
         AddEmailServerConfiguration(services, configuration);
 
@@ -43,7 +43,7 @@ public static class EmailSetup
     /// <param name="configuration"></param>
     public static void AddEmailSetupAddTransient(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddTransient<IEmail, Email>();
+        _ = services.AddTransient<IEmail, Email>();
 
         AddEmailServerConfiguration(services, configuration);
 
@@ -57,7 +57,7 @@ public static class EmailSetup
                 configuration.GetSection("EmailConfig:EmailServerConfiguration"))
                     .Configure(emailServerConfiguration);
 
-        services.AddSingleton(emailServerConfiguration);
+        _ = services.AddSingleton(emailServerConfiguration);
 
     }
 

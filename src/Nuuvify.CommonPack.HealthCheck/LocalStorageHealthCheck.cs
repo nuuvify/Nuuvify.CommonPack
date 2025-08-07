@@ -9,10 +9,8 @@ public class LocalStorageHealthCheck : IHealthCheck
     {
         var metrics = new StorageMetrics();
 
-
         var allDrives = DriveInfo.GetDrives()
                                  .Where(x => x.DriveType == DriveType.Fixed);
-
 
         foreach (var d in allDrives)
         {
@@ -27,7 +25,6 @@ public class LocalStorageHealthCheck : IHealthCheck
         metrics.Total = Math.Round(metrics.Total / 1024 / 1024 / 1024, 0);
         metrics.Used = metrics.Total - metrics.Free;
         var percentUsed = 100 * metrics.Used / metrics.Total;
-
 
         var status = HealthStatus.Healthy;
         var description = $"Storage used is normal: {metrics.Used} GB";

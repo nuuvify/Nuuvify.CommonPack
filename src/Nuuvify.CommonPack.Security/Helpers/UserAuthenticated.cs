@@ -6,19 +6,16 @@ using Nuuvify.CommonPack.Security.Abstraction;
 
 namespace Nuuvify.CommonPack.Security.Helpers;
 
-
 public class UserAuthenticated : IUserAuthenticated
 {
 
     protected readonly IHttpContextAccessor _accessor;
-
 
     public UserAuthenticated(IHttpContextAccessor accessor)
     {
         _accessor = accessor;
 
     }
-
 
     public virtual string Username()
     {
@@ -84,7 +81,6 @@ public class UserAuthenticated : IUserAuthenticated
         return authorized;
     }
 
-
     public virtual string GetClaimValue(string claimName)
     {
         if (string.IsNullOrWhiteSpace(claimName)) return string.Empty;
@@ -107,7 +103,5 @@ public class UserAuthenticated : IUserAuthenticated
         if (_accessor.HttpContext == null) return false;
         return _accessor.HttpContext.User.IsInRole(role);
     }
-
-
 
 }

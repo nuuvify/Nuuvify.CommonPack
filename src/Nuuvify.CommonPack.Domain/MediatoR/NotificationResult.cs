@@ -4,7 +4,6 @@ using Nuuvify.CommonPack.Extensions.Notificator;
 
 namespace Nuuvify.CommonPack.Domain;
 
-
 /// <summary>
 /// Essa clase deve ser utilizada para manipular informações entre camadas "projetos", 
 /// que não tenha o intuito de Erro, ou inconsistencia de dados, apenas mensagens para avisar

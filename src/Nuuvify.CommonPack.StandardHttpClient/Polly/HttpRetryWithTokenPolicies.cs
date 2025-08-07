@@ -48,22 +48,21 @@ public static class HttpRetryWithTokenPolicies
         context.SetServiceName(serviceBreak);
         request.SetPolicyExecutionContext(context);
 
-
         if (message?.Result?.StatusCode == HttpStatusCode.Unauthorized)
         {
             logger.LogWarning("{messageLog} - Before ITokenService.GetToken", messageLog);
 
             if (retryNum == 1)
             {
-                tokenService.GetTokenAcessor();
+                _ = tokenService.GetTokenAcessor();
             }
 
             if (string.IsNullOrWhiteSpace(tokenService.GetActualToken()?.Token) || retryNum != 1)
             {
-                await tokenService.GetToken();
+                _ = await tokenService.GetToken();
             }
 
-            request.AddAuthorizationHeader("bearer", tokenService.GetActualToken()?.Token);
+            _ = request.AddAuthorizationHeader("bearer", tokenService.GetActualToken()?.Token);
 
             logger.LogWarning("{messageLog} - After ITokenService.GetToken", messageLog);
         }
@@ -79,6 +78,5 @@ public static class HttpRetryWithTokenPolicies
 
         await Task.CompletedTask;
     }
-
 
 }

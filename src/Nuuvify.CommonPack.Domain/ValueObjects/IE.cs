@@ -5,13 +5,11 @@ using Nuuvify.CommonPack.Extensions.Notificator;
 
 namespace Nuuvify.CommonPack.Domain.ValueObjects;
 
-
 /// <summary>
 /// Valida Inscrição Estadual por estado
 /// </summary>
 public class IE : NotifiableR
 {
-
 
     protected IE() { }
 
@@ -22,7 +20,6 @@ public class IE : NotifiableR
 
     }
 
-
     public string Codigo { get; private set; }
     public string UF { get; private set; }
 
@@ -30,7 +27,6 @@ public class IE : NotifiableR
     {
         return Codigo?.ToString();
     }
-
 
     private void Validar(string ie, string uf)
     {
@@ -40,11 +36,10 @@ public class IE : NotifiableR
 
         uf = uf?.Trim().ToUpper();
 
-        new ValidationConcernR<IE>(this)
+        _ = new ValidationConcernR<IE>(this)
             .AssertNotIsNullOrWhiteSpace(x => ie, ie)
             .AssertHasMaxLength(x => ie, maxIE)
             .AssertFixedLength(x => uf, maxUF);
-
 
         var valido = IsValid();
 
@@ -55,15 +50,12 @@ public class IE : NotifiableR
             return;
         }
 
-
         if (ie.Equals("ISENTO"))
         {
             Codigo = ie;
             UF = uf;
             return;
         }
-
-
 
         valido = uf switch
         {
@@ -112,8 +104,6 @@ public class IE : NotifiableR
 
     }
 
-
-
     private static bool ValidaAC(string inscricaoEstadual)
     {
 
@@ -132,7 +122,7 @@ public class IE : NotifiableR
         for (var intPos = 1; (intPos <= 11); intPos++)
         {
 
-            int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
+            _ = int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
 
             if (intPeso == 1) intPeso = 9;
 
@@ -141,14 +131,13 @@ public class IE : NotifiableR
             intPeso--;
         }
 
-
         intSoma = 0;
         strBase = (strOrigem.Trim() + "000000000000").Substring(0, 12);
         intPeso = 5;
 
         for (var intPos = 1; (intPos <= 12); intPos++)
         {
-            int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
+            _ = int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
 
             if (intPeso == 1) intPeso = 9;
 
@@ -180,7 +169,7 @@ public class IE : NotifiableR
 
         for (var intPos = 1; (intPos <= 8); intPos++)
         {
-            int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
+            _ = int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
 
             intSoma += intValor * intPeso;
             intPeso--;
@@ -209,7 +198,7 @@ public class IE : NotifiableR
 
         for (var intPos = 1; (intPos <= 8); intPos++)
         {
-            int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
+            _ = int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
 
             intSoma += intValor * intPeso;
             intPeso--;
@@ -241,7 +230,7 @@ public class IE : NotifiableR
         int intValor;
         for (var intPos = 1; (intPos <= 8); intPos++)
         {
-            int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
+            _ = int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
 
             intSoma += intValor * intPeso;
             intPeso--;
@@ -292,7 +281,6 @@ public class IE : NotifiableR
         var strDigito2 = "";
         var strBase2 = "";
 
-
         #region Validação 8 dígitos
         if (strBase.Length == 8)
         {
@@ -302,7 +290,7 @@ public class IE : NotifiableR
 
                 for (var intPos = 1; (intPos <= 6); intPos++)
                 {
-                    int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
+                    _ = int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
 
                     if (intPos == 1) intPeso = 7;
 
@@ -310,10 +298,8 @@ public class IE : NotifiableR
                     intPeso--;
                 }
 
-
                 intResto = (intSoma % 10);
                 strDigito2 = ((intResto == 0) ? "0" : Convert.ToString((10 - intResto))).Substring((((intResto == 0) ? "0" : Convert.ToString((10 - intResto))).Length - 1));
-
 
                 strBase2 = strBase.Substring(0, 7) + strDigito2;
 
@@ -325,17 +311,16 @@ public class IE : NotifiableR
 
                     for (var intPos = 1; (intPos <= 7); intPos++)
                     {
-                        int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
+                        _ = int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
 
                         if (intPos == 7)
-                            int.TryParse(strBase.Substring((intPos), 1), out intValor);
+                            _ = int.TryParse(strBase.Substring((intPos), 1), out intValor);
 
                         if (intPos == 1) intPeso = 8;
 
                         intSoma += intValor * intPeso;
                         intPeso--;
                     }
-
 
                     intResto = (intSoma % 10);
                     strDigito1 = ((intResto == 0) ? "0" : Convert.ToString((10 - intResto))).Substring((((intResto == 0) ? "0" : Convert.ToString((10 - intResto))).Length - 1));
@@ -348,9 +333,7 @@ public class IE : NotifiableR
 
                 return false;
 
-
             }
-
 
             if ((("679".IndexOf(strBase.Substring(0, 1), 0, StringComparison.OrdinalIgnoreCase) + 1) > 0))
             {
@@ -359,7 +342,7 @@ public class IE : NotifiableR
 
                 for (var intPos = 1; (intPos <= 6); intPos++)
                 {
-                    int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
+                    _ = int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
 
                     if (intPos == 1) intPeso = 7;
 
@@ -367,10 +350,8 @@ public class IE : NotifiableR
                     intPeso--;
                 }
 
-
                 intResto = (intSoma % 11);
                 strDigito2 = ((intResto == 0) ? "0" : Convert.ToString((11 - intResto))).Substring((((intResto == 0) ? "0" : Convert.ToString((11 - intResto))).Length - 1));
-
 
                 strBase2 = strBase.Substring(0, 7) + strDigito2;
 
@@ -382,17 +363,16 @@ public class IE : NotifiableR
 
                     for (var intPos = 1; (intPos <= 7); intPos++)
                     {
-                        int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
+                        _ = int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
 
                         if (intPos == 7)
-                            int.TryParse(strBase.Substring((intPos), 1), out intValor);
+                            _ = int.TryParse(strBase.Substring((intPos), 1), out intValor);
 
                         if (intPos == 1) intPeso = 8;
 
                         intSoma += intValor * intPeso;
                         intPeso--;
                     }
-
 
                     intResto = (intSoma % 11);
                     strDigito1 = ((intResto == 0) ? "0" : Convert.ToString((11 - intResto))).Substring((((intResto == 0) ? "0" : Convert.ToString((11 - intResto))).Length - 1));
@@ -410,20 +390,17 @@ public class IE : NotifiableR
         }
         #endregion
 
-
         #region Validação 9 dígitos
         if (strBase.Length == 9)
         {
 
             var modulo = (("0123458".IndexOf(strBase.Substring(1, 1), 0, StringComparison.OrdinalIgnoreCase) + 1) > 0) ? 10 : 11;
 
-
             intSoma = 0;
-
 
             for (var intPos = 1; (intPos <= 7); intPos++)
             {
-                int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
+                _ = int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
 
                 if (intPos == 1) intPeso = 8;
 
@@ -435,7 +412,6 @@ public class IE : NotifiableR
 
             strDigito2 = modulo == 11 ? ((intResto == 0 || intResto == 1) ? "0" : Convert.ToString((modulo - intResto))).Substring((((intResto == 0 || intResto == 1) ? "0" : Convert.ToString((modulo - intResto))).Length - 1)) : ((intResto == 0) ? "0" : Convert.ToString((modulo - intResto))).Substring((((intResto == 0) ? "0" : Convert.ToString((modulo - intResto))).Length - 1));
 
-
             strBase2 = strBase.Substring(0, 8) + strDigito2;
 
             if (strBase2 == strOrigem)
@@ -446,17 +422,16 @@ public class IE : NotifiableR
 
                 for (var intPos = 1; (intPos <= 8); intPos++)
                 {
-                    int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
+                    _ = int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
 
                     if (intPos == 8)
-                        int.TryParse(strBase.Substring((intPos), 1), out intValor);
+                        _ = int.TryParse(strBase.Substring((intPos), 1), out intValor);
 
                     if (intPos == 1) intPeso = 9;
 
                     intSoma += intValor * intPeso;
                     intPeso--;
                 }
-
 
                 intResto = (intSoma % modulo);
 
@@ -466,7 +441,6 @@ public class IE : NotifiableR
                     ? "0" : Convert.ToString((modulo - intResto))).Substring((((intResto == 0)
                     ? "0" : Convert.ToString((modulo - intResto))).Length - 1));
 
-
                 strBase2 = (strBase.Substring(0, 7) + strDigito1 + strDigito2);
 
                 return strBase2 == strOrigem;
@@ -475,14 +449,12 @@ public class IE : NotifiableR
 
             return false;
 
-
         }
         #endregion
 
         return false;
 
     }
-
 
     private static bool ValidaCE(string inscricaoEstadual)
     {
@@ -500,7 +472,7 @@ public class IE : NotifiableR
 
         for (var intPos = 1; (intPos <= 8); intPos++)
         {
-            int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
+            _ = int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
             intValor = (intValor * (10 - intPos));
             intSoma = (intSoma + intValor);
         }
@@ -545,13 +517,12 @@ public class IE : NotifiableR
         //var intResto = (intSoma % 11);
         //var strDigito1 = ((intResto < 2) ? "0" : Convert.ToString((11 - intResto))).Substring((((intResto < 2) ? "0" : Convert.ToString((11 - intResto))).Length - 1));
 
-
         var intSoma = 0;
         var intPeso = 2;
 
         for (var intPos = 12; (intPos >= 1); intPos = (intPos + -1))
         {
-            int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
+            _ = int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
             intValor = (intValor * intPeso);
             intSoma = (intSoma + intValor);
             intPeso = (intPeso + 1);
@@ -579,7 +550,7 @@ public class IE : NotifiableR
 
         for (var intPos = 1; (intPos <= 8); intPos++)
         {
-            int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
+            _ = int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
             intValor = (intValor * (10 - intPos));
             intSoma = (intSoma + intValor);
         }
@@ -609,7 +580,7 @@ public class IE : NotifiableR
 
         for (var intPos = 1; (intPos <= 8); intPos++)
         {
-            int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
+            _ = int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
             intValor = (intValor * (10 - intPos));
             intSoma = (intSoma + intValor);
         }
@@ -624,7 +595,7 @@ public class IE : NotifiableR
                 break;
 
             case 1:
-                int.TryParse(strBase.Substring(0, 8), out intNumero);
+                _ = int.TryParse(strBase.Substring(0, 8), out intNumero);
                 strDigito1 = (((intNumero >= 10103105) && (intNumero <= 10119997)) ? "1" : "0").Substring(((((intNumero >= 10103105) && (intNumero <= 10119997)) ? "1" : "0").Length - 1));
                 break;
 
@@ -650,7 +621,7 @@ public class IE : NotifiableR
 
         for (var intPos = 1; (intPos <= 8); intPos++)
         {
-            int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
+            _ = int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
             intValor = (intValor * (10 - intPos));
             intSoma = (intSoma + intValor);
         }
@@ -672,7 +643,6 @@ public class IE : NotifiableR
 
         while (strOrigem.Length < 11)
             strOrigem = "0" + strOrigem;
-
 
         var strBase = (strOrigem.Trim() + "000000000").Substring(0, 11);
         var d01 = Convert.ToInt32(strBase.Substring(0, 1));
@@ -697,7 +667,6 @@ public class IE : NotifiableR
         int digVerificador;
         digVerificador = aux2 == 0 || aux2 == 1 ? 0 : 11 - aux2;
 
-
         return (dfinal == digVerificador);
     }
 
@@ -713,7 +682,7 @@ public class IE : NotifiableR
 
         for (var intPos = 1; (intPos <= 8); intPos++)
         {
-            int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
+            _ = int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
             intValor = (intValor * (10 - intPos));
             intSoma = (intSoma + intValor);
         }
@@ -736,7 +705,6 @@ public class IE : NotifiableR
         if (strOrigem.Substring(0, 2).ToUpper() == "PR")
             return true;
 
-
         var strBase = (strOrigem.Trim() + "0000000000000").Substring(0, 13);
         var strBase2 = strBase.Substring(0, 3) + "0" + strBase.Substring(3, 9);
         var intNumero = 1;
@@ -746,15 +714,15 @@ public class IE : NotifiableR
 
         for (var intPos = 0; intPos < 12; intPos++)
         {
-            int.TryParse(strBase2.Substring(intPos, 1), out intValor);
+            _ = int.TryParse(strBase2.Substring(intPos, 1), out intValor);
             if (intValor * intNumero >= 10)
             {
-                int.TryParse(strBase2.Substring(intPos, 1), out intValor);
+                _ = int.TryParse(strBase2.Substring(intPos, 1), out intValor);
                 intSoma += (intValor * intNumero) - 9;
             }
             else
             {
-                int.TryParse(strBase2.Substring(intPos, 1), out intValor);
+                _ = int.TryParse(strBase2.Substring(intPos, 1), out intValor);
                 intSoma += intValor * intNumero;
             }
 
@@ -772,13 +740,12 @@ public class IE : NotifiableR
         if (intNumero != Convert.ToInt32(strOrigem.Substring(11, 1)))
             return false;
 
-
         intNumero = 3;
         intSoma = 0;
 
         for (var intPos = 0; intPos < 12; intPos++)
         {
-            int.TryParse(strOrigem.Substring(intPos, 1), out intValor);
+            _ = int.TryParse(strOrigem.Substring(intPos, 1), out intValor);
             intSoma += intValor * intNumero;
 
             intNumero = intNumero - 1;
@@ -790,7 +757,6 @@ public class IE : NotifiableR
         intNumero = 11 - (intSoma % 11);
         if (intNumero >= 10)
             intNumero = 0;
-
 
         return intNumero == Convert.ToInt32(strOrigem.Substring(12, 1));
 
@@ -808,7 +774,7 @@ public class IE : NotifiableR
 
         for (var intPos = 1; (intPos <= 8); intPos++)
         {
-            int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
+            _ = int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
             intValor = (intValor * (10 - intPos));
             intSoma = (intSoma + intValor);
         }
@@ -834,7 +800,7 @@ public class IE : NotifiableR
 
         for (var intPos = 1; (intPos <= 8); intPos++)
         {
-            int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
+            _ = int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
             intValor = (intValor * (10 - intPos));
             intSoma = (intSoma + intValor);
         }
@@ -866,7 +832,7 @@ public class IE : NotifiableR
 
         for (var intPos = 7; (intPos >= 1); intPos = (intPos + -1))
         {
-            int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
+            _ = int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
             intValor = (intValor * intPeso);
             intSoma = (intSoma + intValor);
             intPeso = (intPeso + 1);
@@ -895,7 +861,7 @@ public class IE : NotifiableR
 
         for (var intPos = 8; (intPos >= 1); intPos = (intPos + -1))
         {
-            int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
+            _ = int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
             intValor = (intValor * intPeso);
             intSoma = (intSoma + intValor);
             intPeso = (intPeso + 1);
@@ -909,7 +875,6 @@ public class IE : NotifiableR
 
         if ((intValor >= 10))
             intValor = 0;
-
 
         return intValor.ToString() == strOrigem.Substring(8, 1);
 
@@ -927,7 +892,7 @@ public class IE : NotifiableR
 
         for (var intPos = 1; (intPos <= 8); intPos++)
         {
-            int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
+            _ = int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
             intValor = (intValor * (10 - intPos));
             intSoma = (intSoma + intValor);
         }
@@ -953,7 +918,7 @@ public class IE : NotifiableR
 
         for (var intPos = 8; (intPos >= 1); intPos = (intPos + -1))
         {
-            int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
+            _ = int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
             intValor = (intValor * intPeso);
             intSoma = (intSoma + intValor);
             intPeso = (intPeso + 1);
@@ -970,7 +935,7 @@ public class IE : NotifiableR
 
         for (var intPos = 9; (intPos >= 1); intPos = (intPos + -1))
         {
-            int.TryParse(strBase2.Substring((intPos - 1), 1), out intValor);
+            _ = int.TryParse(strBase2.Substring((intPos - 1), 1), out intValor);
             intValor = (intValor * intPeso);
             intSoma = (intSoma + intValor);
             intPeso = (intPeso + 1);
@@ -1000,7 +965,7 @@ public class IE : NotifiableR
 
         for (var intPos = 7; (intPos >= 1); intPos = (intPos + -1))
         {
-            int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
+            _ = int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
             intValor = (intValor * intPeso);
             intSoma = (intSoma + intValor);
             intPeso = (intPeso + 1);
@@ -1047,7 +1012,7 @@ public class IE : NotifiableR
 
             for (var intPos = 1; (intPos <= 8); intPos++)
             {
-                int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
+                _ = int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
                 intValor = (intValor * (10 - intPos));
                 intSoma = (intSoma + intValor);
             }
@@ -1061,14 +1026,13 @@ public class IE : NotifiableR
 
         }
 
-
         if (strBase.Length == 10)
         {
             intSoma = 0;
 
             for (var intPos = 1; (intPos <= 9); intPos++)
             {
-                int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
+                _ = int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
                 intValor = (intValor * (11 - intPos));
                 intSoma = (intSoma + intValor);
             }
@@ -1121,7 +1085,6 @@ public class IE : NotifiableR
         int resto_do_calculo;
         resto_do_calculo = digVerificador > 9 ? digVerificador - 10 : digVerificador;
 
-
         return dfinal.Equals(resto_do_calculo);
     }
 
@@ -1137,7 +1100,7 @@ public class IE : NotifiableR
 
         for (var intPos = 1; (intPos <= 8); intPos++)
         {
-            int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
+            _ = int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
             intValor = intValor * intPos;
             intSoma += intValor;
         }
@@ -1157,7 +1120,6 @@ public class IE : NotifiableR
         if (strOrigem.Length != 10)
             return false;
 
-
         var strBase = (strOrigem.Trim() + "0000000000").Substring(0, 10);
         var intSoma = 0;
         var intPeso = 2;
@@ -1165,7 +1127,7 @@ public class IE : NotifiableR
 
         for (var intPos = 9; (intPos >= 1); intPos = (intPos + -1))
         {
-            int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
+            _ = int.TryParse(strBase.Substring((intPos - 1), 1), out intValor);
             intValor = (intValor * intPeso);
             intSoma = (intSoma + intValor);
             intPeso = (intPeso + 1);
@@ -1215,7 +1177,7 @@ public class IE : NotifiableR
 
             for (var intPos = 1; (intPos <= 8); intPos++)
             {
-                int.TryParse(strBase.Substring((intPos), 1), out int intValor);
+                _ = int.TryParse(strBase.Substring((intPos), 1), out int intValor);
                 intValor = (intValor * intPeso);
                 intSoma = (intSoma + intValor);
                 intPeso = (intPeso + 1);
@@ -1239,7 +1201,7 @@ public class IE : NotifiableR
 
             for (var intPos = 1; (intPos <= 8); intPos++)
             {
-                int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
+                _ = int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
                 intValor = (intValor * intPeso);
                 intSoma = (intSoma + intValor);
                 intPeso = (intPeso + 1);
@@ -1259,7 +1221,7 @@ public class IE : NotifiableR
 
             for (var intPos = 11; (intPos >= 1); intPos = (intPos + -1))
             {
-                int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
+                _ = int.TryParse(strBase.Substring((intPos - 1), 1), out int intValor);
                 intValor = (intValor * intPeso);
                 intSoma = (intSoma + intValor);
                 intPeso = (intPeso + 1);
@@ -1290,7 +1252,7 @@ public class IE : NotifiableR
 
         for (var intPos = 1; (intPos <= 8); intPos++)
         {
-            int.TryParse(strBase2.Substring((intPos - 1), 1), out int intValor);
+            _ = int.TryParse(strBase2.Substring((intPos - 1), 1), out int intValor);
             intValor = (intValor * (10 - intPos));
             intSoma = (intSoma + intValor);
         }
@@ -1302,7 +1264,6 @@ public class IE : NotifiableR
         return strBase2 == strOrigem;
 
     }
-
 
     public const int maxIE = 14;
     public const int maxUF = 2;

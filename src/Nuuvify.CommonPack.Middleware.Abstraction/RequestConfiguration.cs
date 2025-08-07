@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Nuuvify.CommonPack.Middleware.Abstraction.Extensions;
 
-
 namespace Nuuvify.CommonPack.Middleware.Abstraction;
 
 /// <summary>
@@ -31,7 +30,6 @@ public class RequestConfiguration
         }
     }
 
-
     /// <summary>
     /// Captura a chave "CorrelationId" enviada no Header de uma request
     /// ou cria um Guid caso esteja null. Essa propriedade é populada por 
@@ -45,7 +43,6 @@ public class RequestConfiguration
     public string LocalPort { get; set; }
     public string BasePath { get; set; }
     public string HostName { get; set; }
-
 
     public void SetAppVersion()
     {

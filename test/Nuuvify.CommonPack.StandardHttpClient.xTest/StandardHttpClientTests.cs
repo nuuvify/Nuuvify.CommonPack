@@ -1,4 +1,4 @@
-ï»¿using Nuuvify.CommonPack.StandardHttpClient.Results;
+using Nuuvify.CommonPack.StandardHttpClient.Results;
 
 namespace Nuuvify.CommonPack.StandardHttpClient.xTest;
 
@@ -15,14 +15,14 @@ public class StandardHttpClientTests
         Config = AppSettingsConfig.GetConfig();
     }
 
-    [Fact, Order(1)]
+    [Fact]
     public async Task GetEmApiMockDeveRetornarMensagemOK()
     {
         var fakeClassReturn = new FakeClasseRetorno
         {
             Codigo = 123456,
             DataCadastro = DateTime.Now,
-            Descricao = "Isso Ã© um teste"
+            Descricao = "Isso é um teste"
         };
 
         var jsonConverted = JsonSerializer.Serialize(fakeClassReturn);
@@ -68,7 +68,7 @@ public class StandardHttpClientTests
 
     }
 
-    [LocalTestFact, Order(2)]
+    [LocalTestFact]
     public void PostApiRealDeveRetornarMensagemComSucesso()
     {
         var config = AppSettingsConfig.GetConfig();
@@ -87,7 +87,7 @@ public class StandardHttpClientTests
 
     }
 
-    [Fact, Order(3)]
+    [Fact]
     public void DeleteApiRealDeveRetornarMensagemComSucesso()
     {
         var resultDefault = new HttpStandardReturn
@@ -131,7 +131,7 @@ public class StandardHttpClientTests
 
     }
 
-    [Fact, Order(4)]
+    [Fact]
     public void PatchApiRealDeveRetornarMensagemComSucesso()
     {
         var resultDefault = new HttpStandardReturn
@@ -168,7 +168,7 @@ public class StandardHttpClientTests
         {
             Codigo = 123456,
             DataCadastro = DateTime.Now,
-            Descricao = "Isso Ã© um teste"
+            Descricao = "Isso é um teste"
         };
 
         var result = standardClient

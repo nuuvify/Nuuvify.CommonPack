@@ -14,20 +14,16 @@ public class EmpresaFilial : NotifiableR
 
     }
 
-
     public string CodigoEmpresa { get; private set; }
     public string CodigoFilial { get; private set; }
-
 
     private void DefinirEmpresa(string empresa)
     {
         var validacao = Notifications.Count;
 
-
-        new ValidationConcernR<EmpresaFilial>(this)
+        _ = new ValidationConcernR<EmpresaFilial>(this)
             .AssertHasMinLength(x => empresa, minEmpresa)
             .AssertHasMaxLength(x => empresa, maxEmpresa);
-
 
         if (validacao.Equals(Notifications.Count))
             CodigoEmpresa = empresa;
@@ -37,16 +33,13 @@ public class EmpresaFilial : NotifiableR
     {
         var validacao = Notifications.Count;
 
-
-        new ValidationConcernR<EmpresaFilial>(this)
+        _ = new ValidationConcernR<EmpresaFilial>(this)
             .AssertHasMinLength(x => filial, minFilial)
             .AssertHasMaxLength(x => filial, maxFilial);
-
 
         if (validacao.Equals(Notifications.Count))
             CodigoFilial = filial;
     }
-
 
     public const int minEmpresa = 0;
     public const int maxEmpresa = 5;

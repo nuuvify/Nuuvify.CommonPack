@@ -12,7 +12,6 @@ public class GerarValidarTokenUsuarioTests
     private JwtTokenOptions _jwtOptions;
     private readonly IConfiguration config;
 
-
     public GerarValidarTokenUsuarioTests()
     {
         string projectPath = AppDomain.CurrentDomain.BaseDirectory.Split(new String[] { @"bin\" }, StringSplitOptions.None)[0];
@@ -22,7 +21,6 @@ public class GerarValidarTokenUsuarioTests
            .AddJsonFile("configTest.json")
            .Build();
 
-
         _jwtOptions = new JwtTokenOptions
         {
             SecretKey = config.GetSection("JwtTokenOptions:SECRET_KEY")?.Value,
@@ -31,7 +29,6 @@ public class GerarValidarTokenUsuarioTests
         };
 
     }
-
 
     [Fact]
     [Trait("Nuuvify.CommonPack.Security", nameof(JwtBuilder))]
@@ -45,7 +42,6 @@ public class GerarValidarTokenUsuarioTests
             Name = "Fulano de Tal"
         };
 
-
         var jwtBuilder = new JwtBuilder()
             .WithJwtOptions(_jwtOptions)
             .WithJwtUserClaims(fakeCws);
@@ -55,7 +51,5 @@ public class GerarValidarTokenUsuarioTests
         Assert.NotNull(userToken);
 
     }
-
-
 
 }

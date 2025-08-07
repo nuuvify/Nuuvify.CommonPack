@@ -10,8 +10,7 @@ public static class SwaggerServiceSetup
     public static void AddSwaggerSetup(this IServiceCollection services)
     {
 
-        services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerGenOptionsConfigure>();
-
+        _ = services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerGenOptionsConfigure>();
 
         SwaggerGenXmlComments.Configuration(services);
         SwaggerGenSecurity.Configuration(services);

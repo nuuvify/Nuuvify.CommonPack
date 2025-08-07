@@ -12,7 +12,7 @@ public static class StandardWebServiceSetup
     public static void AddStandardWebServiceSetup(this IServiceCollection services)
     {
 
-        services.AddScoped<IStandardWebService, StandardWebService>();
+        _ = services.AddScoped<IStandardWebService, StandardWebService>();
 
     }
 
@@ -25,7 +25,7 @@ public static class StandardWebServiceSetup
     public static void AddStandardWebServiceSetupSingleton(this IServiceCollection services)
     {
 
-        services.AddSingleton<IStandardWebService, StandardWebService>();
+        _ = services.AddSingleton<IStandardWebService, StandardWebService>();
     }
 
     /// <summary>
@@ -36,8 +36,7 @@ public static class StandardWebServiceSetup
     public static void AddStandardWebServiceSetupTransient(this IServiceCollection services)
     {
 
-        services.AddTransient<IStandardWebService, StandardWebService>();
+        _ = services.AddTransient<IStandardWebService, StandardWebService>();
     }
-
 
 }

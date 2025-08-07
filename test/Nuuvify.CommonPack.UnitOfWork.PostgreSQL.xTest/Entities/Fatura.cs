@@ -22,12 +22,10 @@ public class Fatura : AggregateRoot
 
     public virtual ICollection<Pedido> Pedidos { get; private set; }
 
-
     public void Update(string observacao)
     {
         Observacao = observacao;
     }
-
 
     public void AdicionarPedido(Pedido pedido)
     {

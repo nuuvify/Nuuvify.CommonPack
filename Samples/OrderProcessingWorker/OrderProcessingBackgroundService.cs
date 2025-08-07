@@ -2,6 +2,7 @@ using Azure.Messaging.ServiceBus;
 using Nuuvify.CommonPack.BackgroundService.Abstraction;
 using Nuuvify.CommonPack.Middleware.Abstraction;
 using System.Diagnostics;
+using System.Net;
 using System.Text.Json;
 
 namespace OrderProcessingWorker;
@@ -21,18 +22,34 @@ public class OrderProcessingBackgroundService : ServiceBusBackgroundService<Orde
             configurationCustom,
             requestConfiguration)
     {
-        // Configurar para abandonar mensagens em caso de falha em vez de enviá-las para dead letter
         AbandonMessageIfFailed = true;
-        ActivitySourceCustom = new ActivitySource("OrderProcessingService");
+        ActivitySourceCustom = new ActivitySource("BackgroundWorkerBus");
 
-        // Configurar o Service Bus com parâmetros do appsettings.json ou variáveis de ambiente
+        var serviceBusClientOptions = new ServiceBusClientOptions
+        {
+            WebProxy = WebRequest.DefaultWebProxy,
+            TransportType = ServiceBusTransportType.AmqpWebSockets
+        };
+        var serviceBusProcessorOptions = new ServiceBusProcessorOptions
+        {
+            MaxConcurrentCalls = 1,
+            AutoCompleteMessages = false,
+            MaxAutoLockRenewalDuration = TimeSpan.FromMinutes(5)
+        };
+
+        var cnnName = configurationCustom.GetSectionValue("ServiceBus:CnnName");
+        var topicName = configurationCustom.GetSectionValue("ServiceBus:Topic:Name");
+        var subscription = configurationCustom.GetSectionValue("ServiceBus:Topic:Subscription");
+
+        logger.LogInformation("Configurando Service Bus - Topic: {Topic}, Subscription: {Subscription}",
+            topicName, subscription);
 
         ConfigureServiceBus(
-            cnnName: configurationCustom.GetSectionValue("ServiceBus:CnnName"),
-            topicName: configurationCustom.GetSectionValue("ServiceBus:Topic:Name"),
-            subscription: configurationCustom.GetSectionValue("ServiceBus:Topic:Subscription"),
-            serviceBusClientOptions: new ServiceBusClientOptions(),
-            serviceBusProcessorOptions: new ServiceBusProcessorOptions()
+            cnnName: cnnName,
+            topicName: topicName,
+            subscription: subscription,
+            serviceBusClientOptions: serviceBusClientOptions,
+            serviceBusProcessorOptions: serviceBusProcessorOptions
         );
 
     }
@@ -44,7 +61,7 @@ public class OrderProcessingBackgroundService : ServiceBusBackgroundService<Orde
     /// <param name="activitySource">Source para telemetria</param>
     /// <param name="cancellationToken">Token de cancelamento</param>
     /// <returns>True se o processamento foi bem-sucedido</returns>
-    protected override async Task<bool> ExecuteRule(
+    protected override async Task<bool> ExecuteReceivedMessageAsync(
         ServiceBusReceivedMessage message,
         ActivitySource activitySource,
         CancellationToken cancellationToken)

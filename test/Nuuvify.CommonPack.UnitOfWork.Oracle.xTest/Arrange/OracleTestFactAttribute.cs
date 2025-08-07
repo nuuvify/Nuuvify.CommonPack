@@ -25,8 +25,6 @@ public sealed class OracleTestFactAttribute : FactAttribute
             database = config.GetSection("TestOptions:DataBaseTesteOracle")?.Value;
         }
 
-
-
         return database.Equals("true", StringComparison.InvariantCultureIgnoreCase);
     }
 }

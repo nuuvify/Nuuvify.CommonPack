@@ -14,12 +14,8 @@ public class ProdutorRural : NotifiableR
 
     }
 
-
-
     public string IndicadorProdutorRural { get; private set; }
     public string CeiDoProdutorRural { get; private set; }
-
-
 
     private void DefinirIndicador(EnumSimNao simNao)
     {
@@ -37,10 +33,9 @@ public class ProdutorRural : NotifiableR
         {
             var validacao = Notifications.Count;
 
-            new ValidationConcernR<ProdutorRural>(this)
+            _ = new ValidationConcernR<ProdutorRural>(this)
                 .AssertHasMinLength(x => cei, minCei)
                 .AssertHasMaxLength(x => cei, maxCei);
-
 
             if (validacao.Equals(Notifications.Count))
                 CeiDoProdutorRural = cei;
@@ -48,9 +43,6 @@ public class ProdutorRural : NotifiableR
         }
 
     }
-
-
-
 
     public const int minCei = 0;
     public const int maxCei = 12;

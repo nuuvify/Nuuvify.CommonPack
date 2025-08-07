@@ -5,10 +5,8 @@ using Nuuvify.CommonPack.Extensions.Notificator;
 
 namespace Nuuvify.CommonPack.Domain.ValueObjects;
 
-
 public class CodigoSistemaVo : NotifiableR
 {
-
 
     protected CodigoSistemaVo() { }
 
@@ -23,7 +21,6 @@ public class CodigoSistemaVo : NotifiableR
         }
 
     }
-
 
     public string Codigo { get; private set; }
 
@@ -56,8 +53,6 @@ public class CodigoSistemaVo : NotifiableR
 
         return ehValido;
     }
-
-
 
     public const int maxCodigo = 5;
 

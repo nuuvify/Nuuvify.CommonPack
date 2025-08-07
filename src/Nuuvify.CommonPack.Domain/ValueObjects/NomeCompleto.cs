@@ -10,7 +10,7 @@ public class NomeCompleto : NotifiableR
     public NomeCompleto(string nome, string sobrenome)
     {
 
-        new ValidationConcernR<NomeCompleto>(this)
+        _ = new ValidationConcernR<NomeCompleto>(this)
             .AssertNotIsNullOrWhiteSpace(x => nome, nome)
             .AssertHasMinLength(x => nome, minNome)
             .AssertHasMaxLength(x => nome, maxNome)
@@ -31,11 +31,8 @@ public class NomeCompleto : NotifiableR
         }
     }
 
-
     public string Nome { get; private set; }
     public string SobreNome { get; private set; }
-
-
 
     public const int minNome = 3;
     public const int maxNome = 60;

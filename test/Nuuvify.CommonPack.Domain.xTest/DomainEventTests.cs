@@ -16,7 +16,6 @@ public class DomainEventTests
 
         var clienteEvent = new ClienteMyRoleEvent(cliente, VersionEvent, cliente);
 
-
         Assert.NotNull(clienteEvent.SourceId);
         Assert.Equal(VersionEvent, clienteEvent.Version);
         Assert.Equal(0, clienteEvent.Notifications.Count);
@@ -33,7 +32,6 @@ public class DomainEventTests
         {
             InformacaoQueEuQuero = "Teste"
         };
-
 
         Assert.NotNull(clienteAddedEvent.SourceId);
         Assert.Equal(VersionEvent, clienteAddedEvent.Version);
@@ -52,7 +50,6 @@ public class DomainEventTests
         {
             InformacaoQueEuQuero = "Teste"
         };
-
 
         Assert.Null(clienteAddedEvent.SourceId);
         Assert.NotEqual(VersionEvent, clienteAddedEvent.Version);
@@ -73,7 +70,6 @@ public class DomainEventTests
                 InformacaoQueEuQuero = "Teste"
             }
         );
-
 
         Assert.Equal("Object reference not set to an instance of an object.", exception.Message);
     }

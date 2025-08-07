@@ -10,6 +10,4 @@ public class HttpStandardStreamReturn
     public string ReturnCode { get; set; }
     public Stream ReturnMessage { get; set; }
 
-
-
 }

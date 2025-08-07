@@ -28,23 +28,17 @@ public class DocumentoPessoaEstrangeiro : NotifiableR
 
     }
 
-
-
-
     public string CodigoInfBeneficiarioRendimento { get; private set; }
     public string NumeroIdentificacaoFiscal { get; private set; }
     public string Provincia { get; private set; }
     public string Nacionalidade { get; private set; }
 
-
-
     private void DefinirCodigoInfBeneficiarioRendimento(string codigoInfBeneficiario)
     {
         var validacao = Notifications.Count;
 
-        new ValidationConcernR<DocumentoPessoaEstrangeiro>(this)
+        _ = new ValidationConcernR<DocumentoPessoaEstrangeiro>(this)
             .AssertHasMaxLength(x => codigoInfBeneficiario, maxCodigoInfBeneficiarioRendimento);
-
 
         if (validacao.Equals(Notifications.Count))
             CodigoInfBeneficiarioRendimento = codigoInfBeneficiario;
@@ -54,9 +48,8 @@ public class DocumentoPessoaEstrangeiro : NotifiableR
     {
         var validacao = Notifications.Count;
 
-        new ValidationConcernR<DocumentoPessoaEstrangeiro>(this)
+        _ = new ValidationConcernR<DocumentoPessoaEstrangeiro>(this)
             .AssertHasMaxLength(x => numeroIdentificacaoFiscal, maxNumeroIdentificacaoFiscal);
-
 
         if (validacao.Equals(Notifications.Count))
             NumeroIdentificacaoFiscal = numeroIdentificacaoFiscal;
@@ -68,9 +61,8 @@ public class DocumentoPessoaEstrangeiro : NotifiableR
 
         var provinciaContribuinte = provincia?.ToUpper();
 
-        new ValidationConcernR<DocumentoPessoaEstrangeiro>(this)
+        _ = new ValidationConcernR<DocumentoPessoaEstrangeiro>(this)
             .AssertHasMaxLength(x => provinciaContribuinte, maxProvincia);
-
 
         if (validacao.Equals(Notifications.Count))
             Provincia = provinciaContribuinte;
@@ -84,7 +76,6 @@ public class DocumentoPessoaEstrangeiro : NotifiableR
             AddNotifications(nacionalidade.Notifications);
     }
 
-
     public const int minCodigoInfBeneficiarioRendimento = 0;
     public const int maxCodigoInfBeneficiarioRendimento = 3;
 
@@ -93,6 +84,5 @@ public class DocumentoPessoaEstrangeiro : NotifiableR
 
     public const int minProvincia = 0;
     public const int maxProvincia = 40;
-
 
 }

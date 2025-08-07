@@ -23,7 +23,6 @@ public static class AppSettingsConfig
            .AddJsonFile(fileConfig)
            .Build();
 
-
         return config;
     }
 

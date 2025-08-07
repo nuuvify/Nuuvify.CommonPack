@@ -11,12 +11,10 @@ namespace Nuuvify.CommonPack.AutoHistory;
 public sealed class AutoHistoryOptions
 {
 
-
     /// <summary>
     /// The shared instance of the AutoHistoryOptions.
     /// </summary>
     internal static AutoHistoryOptions Instance { get; } = new AutoHistoryOptions();
-
 
     /// <summary>
     /// Prevent constructor from being called eternally.
@@ -43,7 +41,6 @@ public sealed class AutoHistoryOptions
             LimitChangedLength = value > 0;
         }
     }
-
 
     private bool _limitChangedLength;
 
@@ -96,7 +93,6 @@ public sealed class AutoHistoryOptions
     /// Suported: <see cref="ProviderSelected.SuportedProviders" />
     /// </summary>
     public string ProviderName { get; set; }
-
 
     public JsonSerializerOptions JsonSerializerOptions(JsonSerializerOptions options = null)
     {

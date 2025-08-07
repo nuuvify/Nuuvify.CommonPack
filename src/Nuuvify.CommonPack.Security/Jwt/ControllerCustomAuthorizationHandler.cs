@@ -35,12 +35,10 @@ public class ControllerCustomAuthorizationHandler : AuthorizationHandler<Control
 
         }
 
-
         if (isAuthenticated)
             context.Succeed(requirement);
         else
             context.Fail();
-
 
         return Task.CompletedTask;
     }

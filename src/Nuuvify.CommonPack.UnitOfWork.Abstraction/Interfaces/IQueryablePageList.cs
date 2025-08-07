@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-
 namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 
 public interface IIQueryablePageList

@@ -22,5 +22,4 @@ public enum TipoContaBancaria
     [Description("C")]
     ContaConjunta = 3,
 
-
 }

@@ -1,11 +1,10 @@
 ﻿using System.Linq;
 using Nuuvify.CommonPack.Extensions.Notificator;
 using Xunit;
-using Xunit.Extensions.Ordering;
 
 namespace Nuuvify.CommonPack.Domain.xTest.FluentValidator;
 
-[Order(6)]
+[Trait("Category", "Unit")]
 public class AssertIsNullTests : NotifiableR
 {
 
@@ -13,7 +12,6 @@ public class AssertIsNullTests : NotifiableR
     {
         RemoveNotifications();
     }
-
 
     [Fact]
     public void Para_AssertIsNull_ObjetoNuloConsultandoOutrasPropriedadesDeveGerarError()
@@ -23,7 +21,6 @@ public class AssertIsNullTests : NotifiableR
         var valido = new ValidationConcernR<Customer>(customer)
             .AssertIsNull(customer)
             .AssertIsTelephone(x => x.Telephone);
-
 
         Assert.Null(customer);
         Assert.True(valido.Errors.Count > 0);
@@ -52,7 +49,6 @@ public class AssertIsNullTests : NotifiableR
         var valido = new ValidationConcernR<Customer>(customer)
             .AssertIsNull(customer);
 
-
         Assert.Null(customer);
         Assert.True(valido.Errors.Count == 0);
     }
@@ -63,11 +59,9 @@ public class AssertIsNullTests : NotifiableR
         Customer customer = new Customer();
         customer.Telephone = "19-98199-9977";
 
-        new ValidationConcernR<Customer>(customer)
+        _ = new ValidationConcernR<Customer>(customer)
             .AssertIsNull(customer)
             .AssertIsTelephone(x => x.Telephone);
-
-
 
         Assert.NotNull(customer);
         Assert.True(customer.Notifications.Count > 0);
@@ -79,12 +73,9 @@ public class AssertIsNullTests : NotifiableR
         Customer customer = new Customer();
         customer.Telephone = "19-98199-9977";
 
-
-        new ValidationConcernR<Customer>(customer)
+        _ = new ValidationConcernR<Customer>(customer)
            .AssertIsTelephone(x => x.Telephone)
            .AssertIsNull(customer);
-
-
 
         Assert.NotNull(customer);
         Assert.True(customer.Notifications.Count > 0);
@@ -99,12 +90,9 @@ public class AssertIsNullTests : NotifiableR
 
         OtherClass otherClass = null;
 
-
-
-        new ValidationConcernR<Customer>(customer)
+        _ = new ValidationConcernR<Customer>(customer)
             .AssertIsTelephone(x => x.Telephone)
             .AssertNotIsNull(otherClass);
-
 
         Assert.Null(otherClass);
         Assert.True(customer.Notifications.Count == 1);
@@ -119,12 +107,9 @@ public class AssertIsNullTests : NotifiableR
 
         OtherClass otherClass = null;
 
-
-
-        new ValidationConcernR<AssertIsNullTests>(this)
+        _ = new ValidationConcernR<AssertIsNullTests>(this)
             .AssertIsTelephone(x => customer.Telephone)
             .AssertNotIsNull(otherClass);
-
 
         Assert.Null(otherClass);
         Assert.True(customer.Notifications.Count == 0);
@@ -138,11 +123,8 @@ public class AssertIsNullTests : NotifiableR
         var messageExpected = "Pedido não cadastrado";
         OtherClass otherClass = null;
 
-
-
-        new ValidationConcernR<AssertIsNullTests>(this)
+        _ = new ValidationConcernR<AssertIsNullTests>(this)
             .AssertNotIsNull(otherClass, messageExpected);
-
 
         Assert.Null(otherClass);
         Assert.True(Notifications.Count == 1);
@@ -156,11 +138,8 @@ public class AssertIsNullTests : NotifiableR
         var messageExpected = "Pedido não cadastrado";
         OtherClass otherClass = null;
 
-
-
         var valid = new ValidationConcernR<OtherClass>(otherClass)
             .AssertNotIsNull(otherClass, messageExpected);
-
 
         Assert.Null(otherClass);
         Assert.True(Notifications.Count == 0);
@@ -176,11 +155,8 @@ public class AssertIsNullTests : NotifiableR
             Name = "Lincoln Zocateli"
         };
 
-
-
-        new ValidationConcernR<AssertIsNullTests>(this)
+        _ = new ValidationConcernR<AssertIsNullTests>(this)
             .AssertIsNull(otherClass, messageExpected);
-
 
         Assert.NotNull(otherClass);
         Assert.True(Notifications.Count == 1);
@@ -206,9 +182,7 @@ public class AssertIsNullTests : NotifiableR
             .AssertIsGreaterOrEqualsThan(x => customer.Height, 10D)
             .RemoveSelectorMessage();
 
-
         var messageActual = otherClass.Notifications.FirstOrDefault(x => x.Message.Equals(messageExpected)).Message;
-
 
         Assert.NotNull(otherClass);
         Assert.True(otherClass.Notifications.Count == 2);
@@ -223,12 +197,9 @@ public class AssertIsNullTests : NotifiableR
 
         OtherClass otherClass = null;
 
-
-
-        new ValidationConcernR<Customer>(customer)
+        _ = new ValidationConcernR<Customer>(customer)
             .AssertIsTelephone(x => x.Telephone)
             .AssertIsNull(otherClass);
-
 
         Assert.Null(otherClass);
         Assert.True(customer.Notifications.Count == 0);
@@ -246,10 +217,9 @@ public class AssertIsNullTests : NotifiableR
             Name = "Lincoln Zocateli"
         };
 
-        new ValidationConcernR<Customer>(customer)
+        _ = new ValidationConcernR<Customer>(customer)
             .AssertIsTelephone(x => x.Telephone)
             .AssertIsNull(otherClass);
-
 
         Assert.NotNull(otherClass);
         Assert.True(customer.Notifications.Count > 0);
@@ -267,12 +237,9 @@ public class AssertIsNullTests : NotifiableR
             Name = "Lincoln Zocateli"
         };
 
-
-
-        new ValidationConcernR<Customer>(customer)
+        _ = new ValidationConcernR<Customer>(customer)
             .AssertIsTelephone(x => x.Telephone)
             .AssertNotIsNull(otherClass);
-
 
         Assert.NotNull(otherClass);
         Assert.True(customer.Notifications.Count == 0);

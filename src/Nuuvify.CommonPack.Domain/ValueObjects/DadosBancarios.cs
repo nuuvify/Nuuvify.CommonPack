@@ -22,13 +22,11 @@ public class DadosBancarios : NotifiableR
 
     }
 
-
     public string BancoNumero { get; private set; }
     public string AgenciaNumero { get; private set; }
     public string AgenciaNome { get; private set; }
     public string ContaCorrente { get; private set; }
     public string TipoDaConta { get; private set; }
-
 
     private void DefinirBancoNumero(string bancoNumero)
     {
@@ -36,11 +34,9 @@ public class DadosBancarios : NotifiableR
 
         var _bancoNumero = bancoNumero.GetNumbers();
 
-        new ValidationConcernR<DadosBancarios>(this)
+        _ = new ValidationConcernR<DadosBancarios>(this)
             .AssertHasMinLength(x => _bancoNumero, minBancoNumero)
             .AssertHasMaxLength(x => _bancoNumero, maxBancoNumero);
-
-
 
         if (validacao.Equals(Notifications.Count))
             BancoNumero = _bancoNumero;
@@ -50,11 +46,9 @@ public class DadosBancarios : NotifiableR
     {
         var validacao = Notifications.Count;
 
-
-        new ValidationConcernR<DadosBancarios>(this)
+        _ = new ValidationConcernR<DadosBancarios>(this)
             .AssertHasMinLength(x => agenciaNumero, minAgenciaNumero)
             .AssertHasMaxLength(x => agenciaNumero, maxAgenciaNumero);
-
 
         if (validacao.Equals(Notifications.Count))
             AgenciaNumero = agenciaNumero;
@@ -66,10 +60,9 @@ public class DadosBancarios : NotifiableR
 
         var _nome = StringExtensionMethods.ToTitleCase(agenciaNome);
 
-        new ValidationConcernR<DadosBancarios>(this)
+        _ = new ValidationConcernR<DadosBancarios>(this)
             .AssertHasMinLength(x => _nome, minAgenciaNome)
             .AssertHasMaxLength(x => _nome, maxAgenciaNome);
-
 
         if (validacao.Equals(Notifications.Count))
             AgenciaNome = _nome;
@@ -79,16 +72,13 @@ public class DadosBancarios : NotifiableR
     {
         var validacao = Notifications.Count;
 
-
-        new ValidationConcernR<DadosBancarios>(this)
+        _ = new ValidationConcernR<DadosBancarios>(this)
             .AssertHasMinLength(x => cc, minContaCorrente)
             .AssertHasMaxLength(x => cc, maxContaCorrente);
-
 
         if (validacao.Equals(Notifications.Count))
             ContaCorrente = cc;
     }
-
 
     private void DefinirTipoConta(TipoContaBancaria tipoConta)
     {
@@ -97,7 +87,7 @@ public class DadosBancarios : NotifiableR
 
         if (tipoConta.GetHashCode().Equals(TipoContaBancaria.NaoPossuiConta.GetHashCode()))
         {
-            new ValidationConcernR<DadosBancarios>(this)
+            _ = new ValidationConcernR<DadosBancarios>(this)
                 .AssertIsNullOrWhiteSpace(x => x.BancoNumero)
                 .AssertIsNullOrWhiteSpace(x => x.AgenciaNumero)
                 .AssertIsNullOrWhiteSpace(x => x.AgenciaNome)
@@ -105,9 +95,6 @@ public class DadosBancarios : NotifiableR
         }
 
     }
-
-
-
 
     public const int minBancoNumero = 0;
     public const int maxBancoNumero = 3;

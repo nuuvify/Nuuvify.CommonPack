@@ -12,36 +12,28 @@ public class EmailPessoa : NotifiableR
         Validate(endereco);
     }
 
-
     public string Endereco { get; private set; }
-
 
     private void Validate(string endereco)
     {
 
-        new ValidationConcernR<EmailPessoa>(this)
+        _ = new ValidationConcernR<EmailPessoa>(this)
             .AssertIsEmail(x => endereco)
             .AssertHasMaxLength(x => endereco, maxEndereco);
-
 
         if (!IsValid())
         {
             Endereco = null;
         }
 
-
         Endereco = endereco;
     }
 
-
     public const int maxEndereco = 256;
-
-
 
     public override string ToString()
     {
         return Endereco?.ToString();
     }
-
 
 }

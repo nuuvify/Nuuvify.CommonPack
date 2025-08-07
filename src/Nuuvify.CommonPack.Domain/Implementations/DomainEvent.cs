@@ -21,7 +21,6 @@ public abstract class DomainEvent<TSourceId> : NotifiableR, ICommandResultR
     /// <example>Daf_AAAAA-BBBBB-CCCC</example>
     public string Version { get; private set; }
 
-
     protected DomainEvent(TSourceId sourceId, string version)
     {
         if (sourceId == null)
@@ -30,7 +29,7 @@ public abstract class DomainEvent<TSourceId> : NotifiableR, ICommandResultR
                 "Não pode ser nulo");
         }
 
-        new ValidationConcernR<DomainEvent<TSourceId>>(this)
+        _ = new ValidationConcernR<DomainEvent<TSourceId>>(this)
             .AssertIsRequired(x => version)
             .AssertHasMaxLength(x => version, MaxVersion);
 

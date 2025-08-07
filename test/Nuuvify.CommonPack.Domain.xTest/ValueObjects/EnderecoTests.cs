@@ -21,7 +21,6 @@ public class EnderecoTests
             "casa",
             "BR");
 
-
         Assert.True(endereco.IsValid());
 
     }

@@ -3,7 +3,6 @@ using Nuuvify.CommonPack.Extensions.Notificator;
 
 namespace Nuuvify.CommonPack.Domain.ValueObjects;
 
-
 public class TipoOperacaoExecutadaVo : NotifiableR
 {
 
@@ -16,9 +15,7 @@ public class TipoOperacaoExecutadaVo : NotifiableR
             AddNotification(typeof(TipoOperacaoExecutadaVo).Name, "Tipo da Operacao Executada invalido");
     }
 
-
     public int Codigo { get; private set; }
-
 
     private bool Validar(int numero)
     {
@@ -37,7 +34,6 @@ public class TipoOperacaoExecutadaVo : NotifiableR
 
         return false;
     }
-
 
     public const int maxTipoOperacaoExecutada = 1;
 }

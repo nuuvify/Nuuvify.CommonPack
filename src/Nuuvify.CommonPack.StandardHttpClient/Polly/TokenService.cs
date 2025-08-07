@@ -9,7 +9,6 @@ using Nuuvify.CommonPack.Extensions.Notificator;
 using Nuuvify.CommonPack.Security.Abstraction;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 
-
 namespace Nuuvify.CommonPack.StandardHttpClient.Polly;
 
 public class TokenService : ITokenService
@@ -21,10 +20,8 @@ public class TokenService : ITokenService
     protected readonly IHttpContextAccessor _accessor;
     private CredentialToken _credentialToken;
 
-
     ///<inheritdoc/>
     public List<NotificationR> Notifications { get; set; }
-
 
     public TokenService(
         IOptions<CredentialToken> credentialToken,
@@ -42,7 +39,6 @@ public class TokenService : ITokenService
 
         Notifications = new List<NotificationR>();
     }
-
 
     private string GetHttpClientTokenName { get; set; }
 
@@ -66,7 +62,6 @@ public class TokenService : ITokenService
         return _credentialToken;
     }
 
-
     public async Task<bool> GetNewToken(string urlToken, string login, string password, string userClaim = null)
     {
         var messageLog = $"{nameof(TokenService.GetNewToken)}";
@@ -86,15 +81,11 @@ public class TokenService : ITokenService
         if (!string.IsNullOrWhiteSpace(userClaim))
             _ = _standardHttpClient.WithHeader(Constants.UserClaimHeader, userClaim);
 
-
-
         _logger.LogDebug("{MessageLog} - User Claim: {UserClaim}", messageLog, userClaim);
-
 
         var response = await _standardHttpClient.Post(urlRoute: urlToken, messageBody: messageBody);
 
         _credentialToken = ReturnClass<CredentialToken>(response);
-
 
         if (_credentialToken is null || string.IsNullOrWhiteSpace(_credentialToken.Token))
         {
@@ -118,7 +109,6 @@ public class TokenService : ITokenService
 
         return true;
     }
-
 
     ///<inheritdoc/>
     public async Task<CredentialToken> GetToken(string login = null, string password = null, string userClaim = null)
@@ -145,9 +135,6 @@ public class TokenService : ITokenService
 
         _logger.LogDebug("{MessageLog} - urlToken: {UrlToken}", messageLog, urlToken);
 
-
-
-
         if (string.IsNullOrWhiteSpace(login) ||
             string.IsNullOrWhiteSpace(password) ||
             string.IsNullOrWhiteSpace(urlLogin) ||
@@ -160,9 +147,7 @@ public class TokenService : ITokenService
             return null;
         }
 
-
         _ = await GetNewToken(urlToken, login, password, userClaim);
-
 
         if (_credentialToken != null && !string.IsNullOrWhiteSpace(_credentialToken.Token))
         {
@@ -173,11 +158,9 @@ public class TokenService : ITokenService
             _logger.LogDebug("{MessageLog} - Final", messageLog);
         }
 
-
         return _credentialToken;
 
     }
-
 
     ///<inheritdoc/>
     public string GetTokenAcessor()
@@ -185,13 +168,11 @@ public class TokenService : ITokenService
         var messageLog = $"{nameof(TokenService.GetTokenAcessor)}";
         _logger.LogDebug($"{messageLog} - Inicio");
 
-
         if (!IsAuthenticated(out string token))
         {
             _logger.LogWarning("{MessageLog} - Não foi encontrado Authorization no HttpContextAccessor, usuario não esta logado com um token", messageLog);
             return string.Empty;
         }
-
 
         _logger.LogDebug("{MessageLog} - Final", messageLog);
 
@@ -244,14 +225,12 @@ public class TokenService : ITokenService
 
         };
 
-
         var jsonData = JsonSerializer.Deserialize<DeserializeObjectSuccess<T>>(message, JsonSettings);
         if (!(jsonData is null) && jsonData.Data != null)
         {
             var returnData = jsonData.Data;
             return returnData;
         }
-
 
         return (T)Convert.ChangeType(null, typeof(T));
     }

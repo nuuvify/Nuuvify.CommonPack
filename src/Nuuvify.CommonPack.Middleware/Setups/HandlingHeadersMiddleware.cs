@@ -38,7 +38,6 @@ public class HandlingHeadersMiddleware
         var guid12char = guidStr.Substring(guidStr.Length - 12);
         var correlationLocal = $"{requestConfiguration.AppName}_{requestConfiguration.HostName}_{guid12char}";
 
-
         if (context.Request.Headers.TryGetValue(Constants.CorrelationHeader, out StringValues value))
         {
             requestConfiguration.CorrelationId = value.FirstOrDefault() ?? correlationLocal;
@@ -56,14 +55,11 @@ public class HandlingHeadersMiddleware
         context.Response.Headers.Append("X-BuildNumber", requestConfiguration.BuildNumber);
         context.Response.Headers.Append(Constants.CorrelationHeader, requestConfiguration.CorrelationId);
 
-
         SetRequestConfiguration(context);
-
 
         _logger.LogInformation("### LOG DE ENTRADA DA REQUEST ###");
         await _next(context);
         _logger.LogInformation("### LOG DE SAIDA DA REQUEST ###");
-
 
     }
 
@@ -87,7 +83,6 @@ public class HandlingHeadersMiddleware
     private void SetRequestConfiguration(HttpContext httpContext)
     {
 
-
         var executablePath = Environment.ProcessPath;
         var executable = Path.GetFileNameWithoutExtension(executablePath);
         string basePath;
@@ -104,12 +99,11 @@ public class HandlingHeadersMiddleware
         var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ??
             Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
 
-
         requestConfiguration.SetAppVersion();
         requestConfiguration.Environment = environment ?? "Production";
         requestConfiguration.BasePath = basePath;
 
-        httpContext.Request.Headers.TryGetValue(Constants.UserClaimHeader, out StringValues userClaimHeader);
+        _ = httpContext.Request.Headers.TryGetValue(Constants.UserClaimHeader, out StringValues userClaimHeader);
         requestConfiguration.UserClaim = userClaimHeader.FirstOrDefault() ?? string.Empty;
 
         requestConfiguration.SetRequestData(
@@ -119,11 +113,9 @@ public class HandlingHeadersMiddleware
             httpContext?.Connection?.LocalPort.ToString(),
             hostName: Dns.GetHostName());
 
-
     }
 
 }
-
 
 public static class HandlingHeadersMiddlewareExtensions
 {

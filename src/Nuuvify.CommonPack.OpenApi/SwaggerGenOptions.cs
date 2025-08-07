@@ -18,7 +18,6 @@ public class SwaggerGenOptionsConfigure : IConfigureOptions<SwaggerGenOptions>
         _provider = provider;
         _config = config;
 
-
         _swaggerInfoModel = new SwaggerInfoModel(
             developerName: _config.GetSection("SwaggerInfo:DesenvolvedorNome").Value,
             developerEmail: _config.GetSection("SwaggerInfo:DesenvolvedorEmail").Value,
@@ -28,9 +27,7 @@ public class SwaggerGenOptionsConfigure : IConfigureOptions<SwaggerGenOptions>
             urlLicense: _config.GetSection("SwaggerInfo:LicencaUrl").Value
         );
 
-
     }
-
 
     public void Configure(SwaggerGenOptions options)
     {
@@ -39,13 +36,10 @@ public class SwaggerGenOptionsConfigure : IConfigureOptions<SwaggerGenOptions>
         {
             _swaggerInfoModel.VersionName = description.GroupName;
 
-
             options.SwaggerDoc(name: _swaggerInfoModel.VersionName,
                 info: _swaggerInfoModel.CreateInfoForApiVersion());
         }
 
-
     }
-
 
 }

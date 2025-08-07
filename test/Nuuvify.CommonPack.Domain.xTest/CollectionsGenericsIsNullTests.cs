@@ -28,7 +28,6 @@ public class CollectionsGenericsIsNullTests
 
         IEnumerable ienumerable = Enumerable.Empty<string>();
 
-
         var isNotNull = ienumerable.NotNullOrZero();
 
         Assert.False(isNotNull, "IEnumerable deveria ser null, mas renornou NotNulll");
@@ -138,6 +137,5 @@ public class CollectionsGenericsIsNullTests
         Assert.True(isNotZero, "Array não deveria ser null, mas retornou Null");
 
     }
-
 
 }

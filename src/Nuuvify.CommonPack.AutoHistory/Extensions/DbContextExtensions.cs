@@ -24,7 +24,6 @@ public static class DbContextExtensions
         AutoHistoryCorrelationId = correlationId;
     }
 
-
     /// <summary>
     /// Ensures the automatic history
     /// <para>This method is used by UnitOfWork, where it is possible to use a parameter in SaveChanges() to record the history</para>
@@ -70,7 +69,7 @@ public static class DbContextExtensions
 
             foreach (var entry in entries)
             {
-                context.Add<TAutoHistory>(entry.AutoHistory(createHistoryFactory,
+                _ = context.Add<TAutoHistory>(entry.AutoHistory(createHistoryFactory,
                     usernameContext: usernameContext,
                     toSave: toSave));
             }
@@ -79,7 +78,6 @@ public static class DbContextExtensions
         }
 
     }
-
 
     internal static void SetUsernameContext(string usernameContext = null)
     {
@@ -91,14 +89,12 @@ public static class DbContextExtensions
         bool toSave = true) where TAutoHistory : AutoHistory
     {
 
-
         SetUsernameContext(usernameContext);
 
         var options = AutoHistoryOptions.Instance;
 
         if (string.IsNullOrWhiteSpace(options.ProviderName))
             throw new ArgumentException("Ohhh !! You need to configure AutoHistory in OnModelCreating", options.ProviderName);
-
 
         var formatting = options.JsonSerializerOptions();
 
@@ -173,7 +169,6 @@ public static class DbContextExtensions
                         aft[prop.Metadata.Name] = prop.CurrentValue ?? null;
                     }
                 }
-
 
                 history.Id = Guid.NewGuid().ToString();
                 history.RowId = entry.PrimaryKey();

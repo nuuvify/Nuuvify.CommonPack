@@ -22,9 +22,8 @@ public class FuncaoOpcaoTests
         var testResult = codigo.IsEnum<FuncaoOpcao>(out int resultEnum);
 
         Assert.Equal(result, testResult);
-        Assert.IsType<int>(resultEnum);
+        _ = Assert.IsType<int>(resultEnum);
     }
-
 
     [Theory]
     [Trait("CommonApi.Domain-ValueObjects", nameof(FuncaoOpcao))]
@@ -37,7 +36,7 @@ public class FuncaoOpcaoTests
     public void FuncaoOpcaoCodigoValido(string codigo, int hashCodigo)
     {
 
-        codigo.IsEnum<FuncaoOpcao>(out int resultEnum);
+        _ = codigo.IsEnum<FuncaoOpcao>(out int resultEnum);
 
         Assert.Equal(hashCodigo, resultEnum);
     }

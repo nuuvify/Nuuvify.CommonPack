@@ -8,18 +8,16 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Nuuvify.CommonPack.OpenApi;
 
-
 public static class SwaggerGenJsonIgnore
 {
     public static void Configuration(this IServiceCollection services)
     {
-        services.AddSwaggerGen(options =>
+        _ = services.AddSwaggerGen(options =>
         {
             options.OperationFilter<SwaggerJsonIgnore>();
         });
     }
 }
-
 
 public class SwaggerJsonIgnore : IOperationFilter
 {

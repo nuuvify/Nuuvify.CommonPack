@@ -15,9 +15,6 @@ public abstract class NotifiableR
         _notifications = new List<NotificationR>();
     }
 
-
-
-
     [JsonIgnore]
     public virtual IReadOnlyCollection<NotificationR> Notifications => _notifications;
 
@@ -50,27 +47,25 @@ public abstract class NotifiableR
 
     }
 
-
     public void RemoveNotification(string property)
     {
         if (!(property is null))
-            _notifications.RemoveAll(x => x.Property.Equals(property));
+            _ = _notifications.RemoveAll(x => x.Property.Equals(property));
 
     }
     public void RemoveNotifications(IList<NotificationR> notifications)
     {
         notifications?.ToList().ForEach(delegate (NotificationR notificationR)
         {
-            _notifications.Remove(notificationR);
+            _ = _notifications.Remove(notificationR);
         });
-
 
     }
     public void RemoveNotifications(bool removeAll = true)
     {
         if (removeAll && !(_notifications is null))
         {
-            _notifications.RemoveAll(x => x.Property != null);
+            _ = _notifications.RemoveAll(x => x.Property != null);
 
         }
 

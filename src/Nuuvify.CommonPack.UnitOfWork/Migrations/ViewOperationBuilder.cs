@@ -16,7 +16,7 @@ public static class ViewOperationBuilder
         var view = new TView();
 
         var sql = view.GetViewBuilder();
-        sql.Append(view.Grant());
+        _ = sql.Append(view.Grant());
 
         return migrationBuilder.Sql(sql.ToString());
 

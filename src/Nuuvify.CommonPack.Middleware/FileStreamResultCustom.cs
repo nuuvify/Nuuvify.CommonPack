@@ -13,7 +13,6 @@ public class FileStreamResultCustom
         _blobFiles = blobFiles;
     }
 
-
     /// <summary>
     /// Retorna o ContentType do arquivo informado, ou retorna o default
     /// </summary>
@@ -38,7 +37,6 @@ public class FileStreamResultCustom
         return defaultContentType;
 
     }
-
 
     /// <summary>
     /// Informe o nome do arquivo que sera utilizado no download, ou mantenha null <br/>

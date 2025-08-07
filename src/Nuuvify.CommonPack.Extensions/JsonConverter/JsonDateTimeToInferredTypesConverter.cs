@@ -2,7 +2,6 @@ using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-
 namespace Nuuvify.CommonPack.Extensions.JsonConverter;
 
 public class JsonDateTimeToInferredTypesConverter : JsonConverter<DateTime>
@@ -19,7 +18,7 @@ public class JsonDateTimeToInferredTypesConverter : JsonConverter<DateTime>
         JsonSerializerOptions options)
     {
 
-        DateTime.TryParse(reader.GetString(), out DateTime result);
+        _ = DateTime.TryParse(reader.GetString(), out DateTime result);
         return result;
     }
 
@@ -28,7 +27,7 @@ public class JsonDateTimeToInferredTypesConverter : JsonConverter<DateTime>
         DateTime value,
         JsonSerializerOptions options)
     {
-        DateTime.TryParse(value.ToString(), out DateTime result);
+        _ = DateTime.TryParse(value.ToString(), out DateTime result);
         writer.WriteStringValue(result);
 
     }

@@ -13,41 +13,35 @@ public class PedidoConfig : EntityConfiguration<Pedido>
         // DefaultConfig(builder, "pedidos", "pedido", "_id");
         // DefaultConfig(builder, "pedidos", "pedido");
 
-        builder.ToTable("pedidos");
+        _ = builder.ToTable("pedidos");
 
-        builder.HasKey(x => x.Id)
+        _ = builder.HasKey(x => x.Id)
             .HasName($"pk_pedido");
 
-        builder.Property(x => x.Id)
+        _ = builder.Property(x => x.Id)
             .HasColumnName($"PedidoId")
             .IsUnicode(false)
             .HasMaxLength(Pedido.MaxId)
             .IsRequired();
 
-
-
-
-        builder.Property(e => e.CodigoCliente)
+        _ = builder.Property(e => e.CodigoCliente)
             .IsRequired()
             .IsUnicode(false)
             .HasMaxLength(10);
 
-        builder.Property(e => e.NumeroPedido)
+        _ = builder.Property(e => e.NumeroPedido)
             .IsRequired()
             .HasColumnType("numeric(8)");
 
-        builder.Property(e => e.DataPedido)
+        _ = builder.Property(e => e.DataPedido)
             .IsRequired();
 
-
-
-        builder.Property(e => e.FaturaId)
+        _ = builder.Property(e => e.FaturaId)
             .IsRequired()
             .IsUnicode(false)
             .HasMaxLength(DomainEntity.MaxId);
 
-
-        builder.HasOne(d => d.FaturaPedido)
+        _ = builder.HasOne(d => d.FaturaPedido)
             .WithMany(p => p.Pedidos)
             .HasForeignKey(f => f.FaturaId)
             .OnDelete(DeleteBehavior.Restrict)

@@ -14,4 +14,3 @@ global using Nuuvify.CommonPack.StandardHttpClient.xTest;
 global using Nuuvify.CommonPack.StandardHttpClient.xTest.Configs;
 global using Nuuvify.CommonPack.StandardHttpClient.xTest.Fixtures;
 global using Xunit;
-global using Xunit.Extensions.Ordering;

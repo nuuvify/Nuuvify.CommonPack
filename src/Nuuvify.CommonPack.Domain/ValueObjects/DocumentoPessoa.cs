@@ -4,18 +4,15 @@ using Nuuvify.CommonPack.Extensions.Notificator;
 
 namespace Nuuvify.CommonPack.Domain.ValueObjects;
 
-
 public class DocumentoPessoa : NotifiableR
 {
-
 
     protected DocumentoPessoa() { }
 
     public DocumentoPessoa(Cpf cpf, Cnpj cnpj, TipoPessoa tipoPessoa)
     {
-        Validar(cpf, cnpj, tipoPessoa);
+        _ = Validar(cpf, cnpj, tipoPessoa);
     }
-
 
     public string Cpf { get; private set; }
     public string Cnpj { get; private set; }
@@ -28,8 +25,6 @@ public class DocumentoPessoa : NotifiableR
         return Cpf ?? Cnpj;
     }
 
-
-
     public bool Validar(Cpf cpf, Cnpj cnpj, TipoPessoa tipoPessoa)
     {
 
@@ -40,7 +35,6 @@ public class DocumentoPessoa : NotifiableR
             AddNotifications(tipoPessoa.Notifications);
             return false;
         }
-
 
         if (!tipoPessoa.IsValid())
         {
@@ -64,7 +58,6 @@ public class DocumentoPessoa : NotifiableR
             }
         }
 
-
         if (tipoPessoa.Codigo == "J")
         {
             if (cnpj.IsValid())
@@ -83,7 +76,6 @@ public class DocumentoPessoa : NotifiableR
         return false;
 
     }
-
 
     public const int maxCodigo = 14;
 

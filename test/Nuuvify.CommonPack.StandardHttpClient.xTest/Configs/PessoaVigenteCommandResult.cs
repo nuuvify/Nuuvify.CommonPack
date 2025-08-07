@@ -75,7 +75,6 @@ internal class PessoaVigenteCommandResult : ICommandResultR
     public string VL_INSS_DEDUCAO { get; set; }
     public string VL_PENSAO { get; set; }
 
-
     public DateTime DT_INICIO_PESSOA_VIGENCIA { get; set; }
     public DateTime? DT_FIM_PESSOA_VIGENCIA { get; set; }
     public DateTime DT_INICIO_LOCALIDADE_PESSOA { get; set; }

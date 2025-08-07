@@ -6,7 +6,6 @@ namespace Nuuvify.CommonPack.AzureStorage;
 public static class AzureStorageSetup
 {
 
-
     /// <summary>
     /// É necessario ter as seguintes tags em seu arquivo appsettings.json
     /// <code>
@@ -21,16 +20,15 @@ public static class AzureStorageSetup
     public static void AddAzureStorageSetup(this IServiceCollection services)
     {
 
-        services.AddScoped<IStorageService, StorageService>();
+        _ = services.AddScoped<IStorageService, StorageService>();
 
     }
-
 
     ///<inheritdoc cref="AddAzureStorageSetup"/>
     public static void AddAzureStorageSetupSingleton(this IServiceCollection services)
     {
 
-        services.AddSingleton<IStorageService, StorageService>();
+        _ = services.AddSingleton<IStorageService, StorageService>();
 
     }
 
@@ -38,9 +36,8 @@ public static class AzureStorageSetup
     public static void AddAzureStorageSetupTransient(this IServiceCollection services)
     {
 
-        services.AddTransient<IStorageService, StorageService>();
+        _ = services.AddTransient<IStorageService, StorageService>();
 
     }
-
 
 }

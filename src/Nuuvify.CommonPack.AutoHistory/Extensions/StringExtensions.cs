@@ -14,13 +14,11 @@ internal static class StringExtensions
         var newValue = string.Empty;
         var qtdCut = 0;
 
-
         if (string.IsNullOrWhiteSpace(valor))
             return newValue;
 
         if (start < 0 || length < 0)
             return newValue;
-
 
         qtdCut = start + length;
 
@@ -36,7 +34,6 @@ internal static class StringExtensions
         {
             newValue = valor.Substring(start, length);
         }
-
 
         return newValue;
     }

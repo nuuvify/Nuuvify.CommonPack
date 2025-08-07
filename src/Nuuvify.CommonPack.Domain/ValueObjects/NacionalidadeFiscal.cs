@@ -5,8 +5,6 @@ using Nuuvify.CommonPack.Extensions.Notificator;
 
 namespace Nuuvify.CommonPack.Domain.ValueObjects;
 
-
-
 public class NacionalidadeFiscal : NotifiableR
 {
 
@@ -24,7 +22,6 @@ public class NacionalidadeFiscal : NotifiableR
         }
 
     }
-
 
     public string Codigo { get; private set; }
 
@@ -61,7 +58,6 @@ public class NacionalidadeFiscal : NotifiableR
     }
 
     public const int maxCodigo = 1;
-
 
     public override string ToString()
     {

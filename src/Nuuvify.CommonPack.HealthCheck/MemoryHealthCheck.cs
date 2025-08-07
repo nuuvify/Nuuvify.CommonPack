@@ -13,7 +13,6 @@ public class MemoryHealthCheck : IHealthCheck
         var percentUsed = 100 * metrics.Used / metrics.Total;
         percentUsed = Math.Round(percentUsed, 2);
 
-
         var status = HealthStatus.Healthy;
         var description = $"Memory used is normal: {percentUsed}";
 

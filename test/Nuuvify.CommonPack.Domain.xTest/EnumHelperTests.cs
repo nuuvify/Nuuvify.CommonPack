@@ -4,7 +4,6 @@ using Xunit;
 
 namespace Nuuvify.CommonPack.Domain.xTest;
 
-
 public class EnumHelperTests
 {
     [Fact]
@@ -18,7 +17,6 @@ public class EnumHelperTests
         var codigo = descricao.GetCodeEnumByDescription<EnumAtivoInativo>();
         var numero = codigo.ToEnumNumero<EnumAtivoInativo>();
         var literal = numero.ToEnumCodigo<EnumAtivoInativo>();
-
 
         Assert.NotEqual(codigo, descricao);
         Assert.NotEqual(numero.ToString(), codigo);
@@ -43,7 +41,6 @@ public class EnumHelperTests
         var numero = codigo.ToEnumNumero<EnumAtivoInativo>();
         var literal = numero.ToEnumCodigo<EnumAtivoInativo>();
 
-
         Assert.NotEqual(codigo, descricao);
         Assert.NotEqual(numero.ToString(), codigo);
         Assert.NotEqual(descricao, literal);
@@ -54,7 +51,6 @@ public class EnumHelperTests
         Assert.Equal("Inativo", literal);
 
     }
-
 
     [Fact]
     [Trait("CommonPack.Extensions", nameof(EnumExtensionMethods))]
@@ -68,7 +64,6 @@ public class EnumHelperTests
         var numero = codigo.ToEnumNumero<EnumAtivoInativo>();
         var literal = numero.ToEnumCodigo<EnumAtivoInativo>();
 
-
         Assert.NotEqual(codigo, descricao);
         Assert.NotEqual(numero.ToString(), codigo);
         Assert.NotEqual(descricao, literal);
@@ -79,6 +74,5 @@ public class EnumHelperTests
         Assert.Equal("Ambos", literal);
 
     }
-
 
 }

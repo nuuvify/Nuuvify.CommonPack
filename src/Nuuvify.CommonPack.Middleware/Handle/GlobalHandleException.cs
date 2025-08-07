@@ -14,9 +14,6 @@ public class GlobalHandleException : IGlobalHandleException
 
     }
 
-
-
-
     public async Task HandleException(Exception ex, HttpContext context)
     {
 
@@ -26,7 +23,6 @@ public class GlobalHandleException : IGlobalHandleException
             Errors = new List<NotificationR> { new NotificationR { Message = " :( Ooops !! Houve uma exceção. There was an exception." } }
         };
         context.Response.ContentType = "application/json";
-
 
         await context.Response.WriteAsync(JsonSerializer.Serialize(mensagemRetorno));
 

@@ -19,8 +19,6 @@ public class StubDbContext : DbContext
     public readonly IConfigurationCustom Configuration;
     public readonly string ownerDB;
 
-
-
     public StubDbContext(DbContextOptions<StubDbContext> options,
         IConfigurationCustom configuration)
         : base(options)
@@ -51,7 +49,6 @@ public class StubDbContext : DbContext
 
     }
 
-
     public virtual DbSet<PedidoItem> PedidoItens { get; set; }
     public virtual DbSet<Pedido> Pedidos { get; set; }
     public virtual DbSet<Fatura> Faturas { get; set; }
@@ -63,7 +60,7 @@ public class StubDbContext : DbContext
 
             var cnn = Configuration.GetConnectionString(ownerDB);
 
-            optionsBuilder
+            _ = optionsBuilder
                .UseLazyLoadingProxies()
                .EnableDetailedErrors()
                .EnableSensitiveDataLogging()
@@ -73,17 +70,16 @@ public class StubDbContext : DbContext
 
         }
 
-        optionsBuilder.UseExceptionProcessor();
+        _ = optionsBuilder.UseExceptionProcessor();
 
     }
-
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.SetDatabaseProviderName(Database);
 
-        modelBuilder.HasDefaultSchema(ownerDB);
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(StubDbContext).Assembly);
+        _ = modelBuilder.HasDefaultSchema(ownerDB);
+        _ = modelBuilder.ApplyConfigurationsFromAssembly(typeof(StubDbContext).Assembly);
         // modelBuilder.ApplyConfigurationsFromAssembly(typeof(StubDbContext).Assembly,
         //     predicate: n => n.Namespace.EndsWith(nameof(StubDbContext)));
 
@@ -91,18 +87,14 @@ public class StubDbContext : DbContext
 
         modelBuilder.MappingPropertiesForgotten();
 
-
-
-        modelBuilder.EnableAutoHistory<Nuuvify.CommonPack.AutoHistory.AutoHistory>(o =>
+        _ = modelBuilder.EnableAutoHistory<Nuuvify.CommonPack.AutoHistory.AutoHistory>(o =>
         {
             o.ProviderName = Database.ProviderName;
         });
 
-
         base.OnModelCreating(modelBuilder);
 
     }
-
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

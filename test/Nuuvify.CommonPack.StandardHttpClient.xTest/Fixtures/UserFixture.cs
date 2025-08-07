@@ -5,7 +5,6 @@ namespace Nuuvify.CommonPack.StandardHttpClient.xTest.Fixtures;
 public class UserFixture
 {
 
-
     public ClaimsPrincipal GetUserPrincipalFake(string nameIdentifier = "cwsFake", string name = "Lincoln Zocateli")
     {
 
@@ -18,7 +17,5 @@ public class UserFixture
         return user;
 
     }
-
-
 
 }

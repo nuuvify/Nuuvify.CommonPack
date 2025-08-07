@@ -73,7 +73,6 @@ public partial class ValidationConcernR<T> where T : NotifiableR
     {
         ConfigConcern(selector);
 
-
         if (!string.IsNullOrWhiteSpace(SelectorNull))
         {
             ConfigConcernMenssage("SelectorNull", typeof(T), aggregateId: aggregateId);
@@ -87,7 +86,6 @@ public partial class ValidationConcernR<T> where T : NotifiableR
         {
             AssertValid = true;
         }
-
 
         return this;
     }

@@ -43,5 +43,4 @@ public static class DataAnnotationExtension
         return _notifications.Count == 0;
     }
 
-
 }

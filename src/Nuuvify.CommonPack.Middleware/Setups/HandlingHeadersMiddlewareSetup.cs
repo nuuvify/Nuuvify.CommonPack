@@ -8,15 +8,15 @@ public static class HandlingHeadersMiddlewareSetup
 
     public static void AddHandlingHeadersMiddlewareSetup(this IServiceCollection services)
     {
-        services.AddScoped<RequestConfiguration>();
+        _ = services.AddScoped<RequestConfiguration>();
     }
     public static void AddHandlingHeadersMiddlewareSingletonSetup(this IServiceCollection services)
     {
-        services.AddSingleton<RequestConfiguration>();
+        _ = services.AddSingleton<RequestConfiguration>();
     }
     public static void AddHandlingHeadersMiddlewareTransientSetup(this IServiceCollection services)
     {
-        services.AddTransient<RequestConfiguration>();
+        _ = services.AddTransient<RequestConfiguration>();
     }
 
 }

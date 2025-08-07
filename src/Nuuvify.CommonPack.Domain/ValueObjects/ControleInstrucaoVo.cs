@@ -5,10 +5,8 @@ using System.Globalization;
 
 namespace Nuuvify.CommonPack.Domain.ValueObjects;
 
-
 public class ControleInstrucao : NotifiableR
 {
-
 
     protected ControleInstrucao() { }
 
@@ -17,9 +15,7 @@ public class ControleInstrucao : NotifiableR
         Validar(situacao);
     }
 
-
     public string Codigo { get; private set; }
-
 
     private void Validar(string situacao)
     {
@@ -35,7 +31,6 @@ public class ControleInstrucao : NotifiableR
 
         Codigo = situacao;
     }
-
 
     public const int maxCodigo = 1;
 

@@ -6,7 +6,6 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Nuuvify.CommonPack.OpenApi;
 
-
 public class SwaggerDefaultValues : IOperationFilter
 {
 
@@ -19,6 +18,5 @@ public class SwaggerDefaultValues : IOperationFilter
             operation.Description = obsoleteActions.FirstOrDefault()?.Message;
         }
     }
-
 
 }

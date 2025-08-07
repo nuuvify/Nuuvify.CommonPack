@@ -80,7 +80,6 @@ public class CustomDbException : DbException
 
     public IDictionary<string, string> CustomErrors { get; set; }
 
-
 }
 
 public class CustomException : Exception
@@ -112,6 +111,5 @@ public class CustomException : Exception
     // }
 
     public IDictionary<string, string> CustomErrors { get; set; }
-
 
 }

@@ -19,6 +19,10 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
     protected ILogger<ServiceBusBackgroundService<T>> Logger => _logger;
     protected IConfigurationCustom ConfigurationCustom => _configurationCustom;
     protected ActivitySource ActivitySourceCustom { get; set; }
+
+    /// <summary>
+    /// Configurar para abandonar mensagens em caso de falha em vez de enviá-las para dead letter
+    /// </summary>
     protected bool AbandonMessageIfFailed { get; set; } = false;
 
     protected ServiceBusBackgroundService(
@@ -210,7 +214,7 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
     /// <param name="activitySource">Source para criação de atividades de telemetria</param>
     /// <param name="cancellationToken">Token de cancelamento</param>
     /// <returns>True se o processamento foi bem-sucedido, false caso contrário</returns>
-    protected abstract Task<bool> ExecuteRule(
+    protected abstract Task<bool> ExecuteReceivedMessageAsync(
         ServiceBusReceivedMessage message,
         ActivitySource activitySource,
         CancellationToken cancellationToken);
@@ -270,7 +274,7 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
 
             _logger.LogInformation("Iniciando {ClassName} Worker: {Data}", nameof(HandleMessageAsync), DateTimeOffset.Now);
 
-            var result = await ExecuteRule(args.Message, ActivitySourceCustom, cancellationToken);
+            var result = await ExecuteReceivedMessageAsync(args.Message, ActivitySourceCustom, cancellationToken);
 
             _logger.LogInformation("Finalizando {ClassName} Worker: {Data}", nameof(HandleMessageAsync), DateTimeOffset.Now);
 
@@ -280,8 +284,8 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
             }
             else
             {
-                _logger.LogWarning("ExecuteRule retornou false para a mensagem {MessageId}. Verificando comportamento de falha.",
-                    args.Message.MessageId);
+                _logger.LogWarning("{MethodName} retornou false para a mensagem {MessageId}. Verificando comportamento de falha.",
+                    nameof(ExecuteReceivedMessageAsync), args.Message.MessageId);
 
                 if (AbandonMessageIfFailed)
                 {

@@ -91,7 +91,6 @@ public partial class ValidationConcernR<T> where T : NotifiableR
         return this;
     }
 
-
     public ValidationConcernR<T> AssertIsNullOrWhiteSpace(Expression<Func<T, string>> selector, string message = "", string aggregateId = null)
     {
         ConfigConcern(selector);
@@ -183,7 +182,6 @@ public partial class ValidationConcernR<T> where T : NotifiableR
         return this;
     }
 
-
     public ValidationConcernR<T> AssertAreEquals(Expression<Func<T, string>> selector, string text, string message = "", string aggregateId = null)
     {
         ConfigConcern(selector);
@@ -224,11 +222,9 @@ public partial class ValidationConcernR<T> where T : NotifiableR
         return this;
     }
 
-
     public ValidationConcernR<T> AssertFixedLength(Expression<Func<T, string>> selector, int length, string message = "", string aggregateId = null)
     {
         ConfigConcern(selector);
-
 
         if (!string.IsNullOrWhiteSpace(SelectorNull))
         {

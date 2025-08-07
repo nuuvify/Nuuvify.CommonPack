@@ -29,7 +29,6 @@ public partial class Email
 
                 logText = $"Anexando: {attachment.Key}";
 
-
                 if (attachment.Value.EmailMidia.EmailMidiaFile.Key == EmailMidiaType.Image)
                 {
                     logText += $" EmailMidiaType: {EmailMidiaType.Image}";
@@ -49,7 +48,6 @@ public partial class Email
                 else if (attachment.Value.EmailMidia.EmailMidiaFile.Key == EmailMidiaType.Text)
                 {
                     logText += $" EmailMidiaType: {EmailMidiaType.Text}";
-
 
                     var attachmentMime = new MimePart(EmailMidiaType.Text.ToString().ToLower(), attachment.Value.EmailMidia.EmailMidiaFile.Value.ToString().ToLower())
                     {

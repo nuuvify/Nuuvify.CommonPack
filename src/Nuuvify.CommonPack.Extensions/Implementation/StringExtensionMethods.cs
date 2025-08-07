@@ -18,8 +18,17 @@ public static partial class StringExtensionMethods
     /// <returns></returns>
     public static string RemoveSpecialChars(this string text)
     {
-        var newText = Regex.Replace(text, "[^\x20-\x5F\x61-\x7E]+", "");
-        return newText;
+        if (text is null)
+        {
+            return string.Empty;
+        }
+
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return string.Empty;
+        }
+
+        return Regex.Replace(text, "[^\x20-\x5F\x61-\x7E]+", "");
     }
 
     public static string GetLettersAndNumbersOnly(this string text)
@@ -185,27 +194,34 @@ public static partial class StringExtensionMethods
             message = message.Replace(otherCharToRemove, "");
         }
 
-        int intEnd;
-
         var initSuccess = message.IndexOf(value: "\"success\":", startIndex: 0, comparisonType: StringComparison.InvariantCultureIgnoreCase);
+        var colonIndex = -1;
+
         if (initSuccess < 0)
         {
             initSuccess = message.IndexOf(value: "\"sucesso\":", startIndex: 0, comparisonType: StringComparison.InvariantCultureIgnoreCase);
-            intEnd = initSuccess + 10;
+            if (initSuccess >= 0)
+            {
+                colonIndex = initSuccess + 9; // Position of colon after "sucesso"
+            }
         }
         else
         {
-            intEnd = initSuccess + 11;
+            colonIndex = initSuccess + 9; // Position of colon after "success"
         }
 
-        if (initSuccess < 0)
+        if (initSuccess < 0 || colonIndex < 0)
         {
             return message;
         }
 
-        var messageStart = message.Substring(0, intEnd).Replace(" ", "");
+        // Check if there's a space after the colon and remove it
+        if (colonIndex + 1 < message.Length && message[colonIndex + 1] == ' ')
+        {
+            return message.Remove(colonIndex + 1, 1);
+        }
 
-        return $"{messageStart}{message.Substring(intEnd)}";
+        return message;
     }
 
 }

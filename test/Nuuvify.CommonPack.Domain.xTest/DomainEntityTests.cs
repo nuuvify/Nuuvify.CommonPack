@@ -16,7 +16,6 @@ public class DomainEntityTests
 
         var isNotEqual = cliente1.Equals(cliente2);
 
-
         Assert.False(isNotEqual);
 
     }
@@ -49,6 +48,5 @@ public class DomainEntityTests
         Assert.True(isEqual);
 
     }
-
 
 }

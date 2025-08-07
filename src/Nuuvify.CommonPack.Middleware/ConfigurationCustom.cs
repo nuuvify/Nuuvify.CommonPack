@@ -6,7 +6,6 @@ using Microsoft.Extensions.Options;
 
 namespace Nuuvify.CommonPack.Middleware;
 
-
 ///<inheritdoc/>
 public partial class ConfigurationCustom : IConfigurationCustom
 {
@@ -25,7 +24,6 @@ public partial class ConfigurationCustom : IConfigurationCustom
             return _requestConfiguration.BuildNumber;
         }
     }
-
 
     public string ApplicationRelease
     {
@@ -74,8 +72,6 @@ public partial class ConfigurationCustom : IConfigurationCustom
     private readonly IHostEnvironment _hostEnvironment;
     private readonly RequestConfiguration _requestConfiguration;
 
-
-
     public ConfigurationCustom(IConfiguration configuration,
         IHostEnvironment hostEnvironment,
         IOptions<RequestConfiguration> options)
@@ -84,7 +80,6 @@ public partial class ConfigurationCustom : IConfigurationCustom
         _hostEnvironment = hostEnvironment;
         _requestConfiguration = options?.Value;
     }
-
 
     public string GetCorrelationId()
     {
@@ -115,12 +110,10 @@ public partial class ConfigurationCustom : IConfigurationCustom
         var configurationInstance = Activator.CreateInstance(typeInfo, false);
         var classConfiguration = (TConfiguration)configurationInstance;
 
-
         var options = new ConfigureFromConfigurationOptions<TConfiguration>(
              _configuration.GetSection(getSection));
 
         options.Configure(classConfiguration);
-
 
         return classConfiguration;
     }

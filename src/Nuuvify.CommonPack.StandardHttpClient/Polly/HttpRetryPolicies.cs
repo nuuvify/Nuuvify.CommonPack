@@ -38,7 +38,6 @@ public static class HttpRetryPolicies
         context.SetServiceName(serviceBreak);
         request.SetPolicyExecutionContext(context);
 
-
         if (message?.Exception?.Message != null)
         {
 
@@ -51,7 +50,5 @@ public static class HttpRetryPolicies
 
         await Task.CompletedTask;
     }
-
-
 
 }

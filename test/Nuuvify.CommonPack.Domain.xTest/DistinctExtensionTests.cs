@@ -5,7 +5,6 @@ using Xunit;
 
 namespace Nuuvify.CommonPack.Domain.xTest;
 
-
 public class DistinctExtensionTests
 {
     [Fact]
@@ -29,7 +28,6 @@ public class DistinctExtensionTests
             p1.Codigo == p2.Codigo &&
             p1.Nome == p2.Nome,
             p1 => p1.GetHashCode()).ToList();
-
 
         Assert.Equal(expected: DistinctExpected, distinct.Count());
 

@@ -10,7 +10,6 @@ using NuGet.Common;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 
-
 try
 {
     var builder = Host.CreateApplicationBuilder(args);
@@ -31,13 +30,10 @@ try
 
     logger.LogInformation("**** Environment: {EnvironmentName} ****", builder.Environment.EnvironmentName);
 
-
     var nugetCustomManagementPackage = new NugetCustomManagementPackage();
     await nugetCustomManagementPackage.DeletePackage(logger, default);
 
-
     var host = builder.Build();
-
 
     // await host.StartAsync();
     // await host.WaitForShutdownAsync();
@@ -61,14 +57,12 @@ catch (Exception ex)
     }
 }
 
-
 /// <summary>
 /// Documentação; https://github.com/NuGet/Samples/blob/main/NuGetProtocolSamples/Program.cs
 /// <p>https://learn.microsoft.com/en-us/nuget/reference/nuget-client-sdk</p>
 /// </summary>
 public class NugetCustomManagementPackage
 {
-
 
     public IDictionary<string, string> Packages { get; set; }
 
@@ -108,7 +102,6 @@ public class NugetCustomManagementPackage
 
         var nugetConfig = new NuGet.Configuration.PackageSource("https://api.nuget.org/v3/index.json");
 
-
         SourceCacheContext cacheNuget = new SourceCacheContext();
         SourceRepository repository = Repository.Factory.GetCoreV3(nugetConfig);
         PackageUpdateResource resource = await repository.GetResourceAsync<PackageUpdateResource>();
@@ -137,7 +130,6 @@ public class NugetCustomManagementPackage
         }
 
         logger.LogInformation("===========> Completed delete packages");
-
 
     }
 

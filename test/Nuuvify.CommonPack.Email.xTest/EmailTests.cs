@@ -270,7 +270,7 @@ public class EmailTests
 
     [Fact]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
-    public void EmailComHostIncorretoDeveGerarException()
+    public async Task EmailComHostIncorretoDeveGerarException()
     {
         var destinatarios = new Dictionary<string, string>
         {
@@ -292,8 +292,10 @@ public class EmailTests
 
         var emailEnviado = testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, mensagem);
 
-        Assert.True(emailEnviado.Result.Equals(teste));
-        _ = Assert.ThrowsAsync<Exception>(() => Task.FromResult(teste));
+        var emailResult = await emailEnviado;
+
+        Assert.True(emailResult.Equals(teste));
+        var exception = await Assert.ThrowsAsync<Exception>(() => Task.FromResult(teste));
 
     }
 

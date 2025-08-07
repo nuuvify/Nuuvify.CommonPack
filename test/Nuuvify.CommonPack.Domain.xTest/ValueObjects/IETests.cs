@@ -36,7 +36,6 @@ public class IETests
         Assert.Equal(uf.ToUpper(), _ie.UF);
     }
 
-
     [Theory]
     [Trait("CommonApi.Domain-ValueObjects", nameof(IE))]
     [InlineData("01133113333311", "sp")]
@@ -48,7 +47,6 @@ public class IETests
         Assert.NotNull(_ie.Notifications.FirstOrDefault(x => x.Message != null));
         Assert.Null(_ie.UF);
     }
-
 
     [Theory]
     [Trait("CommonApi.Domain-ValueObjects", nameof(IE))]

@@ -6,9 +6,7 @@ using Nuuvify.CommonPack.Extensions.JsonConverter;
 using Nuuvify.CommonPack.Extensions.Notificator;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 
-
 namespace Nuuvify.CommonPack.StandardHttpClient;
-
 
 public abstract partial class BaseStandardHttpClient
 {
@@ -22,9 +20,6 @@ public abstract partial class BaseStandardHttpClient
     protected JsonSerializerOptions JsonSettings { get; set; }
 
     protected List<NotificationR> Notifications { get; set; }
-
-
-
 
     protected BaseStandardHttpClient(
         IStandardHttpClient standardHttpClient,
@@ -48,9 +43,6 @@ public abstract partial class BaseStandardHttpClient
         _tokenService = tokenService;
 
     }
-
-
-
 
     ///<inheritdoc cref="ITokenService.GetTokenAcessor"/>
     public virtual string GetTokenAcessor()
@@ -131,7 +123,6 @@ public abstract partial class BaseStandardHttpClient
                 type: "origin-message",
                 originNotification: null));
 
-
             return (T)Convert.ChangeType(null, typeof(T));
         }
         else if (standardReturn?.ReturnCode != "422")
@@ -149,7 +140,6 @@ public abstract partial class BaseStandardHttpClient
                     type: "origin-message",
                     originNotification: null));
         }
-
 
         ReturnNotificationApi(standardReturn, api);
         return (T)Convert.ChangeType(null, typeof(T));
@@ -206,7 +196,6 @@ public abstract partial class BaseStandardHttpClient
         ReturnNotificationApi(standardReturn, api);
         return new List<T>();
     }
-
 
     public bool IsValid()
     {

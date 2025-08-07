@@ -41,18 +41,14 @@ public static class HttpClientBuilderExtensions
             throw new TypeLoadException("A interface ITokenService não foi injetada no conteiner DI, a injeção dessa interface deve ocorrer antes da chamada desse metodo, veja o metodo AddStandardHttpClientSetup");
         }
 
-
         var policyConfig = new PolicyConfig
         {
             RetryCount = retryTotal,
             BreakDurationMilliSeconds = breakDurationMilliSeconds
         };
 
-
         var circuitBreakerPolicyConfig = (ICircuitBreakerPolicyConfig)policyConfig;
         var retryPolicyConfig = (IRetryPolicyConfig)policyConfig;
-
-
 
         return httpClientBuilder.AddRetryPolicyHandler(logger, tokenService, retryPolicyConfig)
             .AddCircuitBreakerFallBackHandler(logger)
@@ -83,18 +79,14 @@ public static class HttpClientBuilderExtensions
             BreakDurationMilliSeconds = breakDurationMilliSeconds
         };
 
-
         var circuitBreakerPolicyConfig = (ICircuitBreakerPolicyConfig)policyConfig;
         var retryPolicyConfig = (IRetryPolicyConfig)policyConfig;
-
-
 
         return httpClientBuilder.AddRetryPolicyHandler(logger, retryPolicyConfig)
             .AddCircuitBreakerFallBackHandler(logger)
             .AddCircuitBreakerHandler(logger, circuitBreakerPolicyConfig);
 
     }
-
 
     public static IHttpClientBuilder AddRetryPolicyHandler(this IHttpClientBuilder httpClientBuilder, ILogger logger, IRetryPolicyConfig retryPolicyConfig)
     {

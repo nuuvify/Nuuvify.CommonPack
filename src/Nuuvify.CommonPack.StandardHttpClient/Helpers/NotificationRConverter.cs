@@ -6,7 +6,6 @@ using System.Text.Json.Serialization;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.Extensions.Notificator;
 
-
 namespace Nuuvify.CommonPack.StandardHttpClient.Helpers;
 
 internal class NotificationRConverter : JsonConverter<NotificationR>
@@ -28,13 +27,11 @@ internal class NotificationRConverter : JsonConverter<NotificationR>
             throw new JsonException();
         }
 
-
         var notification = typeof(NotificationR);
         var result = Activator.CreateInstance(notification, nonPublic: true);
         PropertyInfo propertyInfo;
         object itemValue;
         string propertyName;
-
 
         while (reader.Read())
         {
@@ -71,6 +68,5 @@ internal class NotificationRConverter : JsonConverter<NotificationR>
     {
         throw new NotImplementedException();
     }
-
 
 }

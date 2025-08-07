@@ -1,14 +1,12 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Nuuvify.CommonPack.Extensions.Notificator;
 using Xunit;
-using Xunit.Extensions.Ordering;
 
 namespace Nuuvify.CommonPack.Domain.xTest.FluentValidator;
 
-[Order(5)]
+[Trait("Category", "Unit")]
 public class AssertNotAreEqualsTests : NotifiableR
 {
-
 
     public AssertNotAreEqualsTests()
     {
@@ -27,9 +25,7 @@ public class AssertNotAreEqualsTests : NotifiableR
         Customer customer = null;
 
         var valido = new ValidationConcernR<Customer>(customer)
-            .AssertNotAreEquals(x => x.Name == "João", true);
-
-
+            .AssertNotAreEquals(x => x.Name == "Jo�o", true);
 
         Assert.Null(customer);
         Assert.True(valido.Errors.Count > 0);
@@ -40,13 +36,11 @@ public class AssertNotAreEqualsTests : NotifiableR
     {
         Customer customer = new Customer
         {
-            Name = "João"
+            Name = "Jo�o"
         };
 
-        new ValidationConcernR<Customer>(customer)
-            .AssertNotAreEquals(x => x.Name == "João", true);
-
-
+        _ = new ValidationConcernR<Customer>(customer)
+            .AssertNotAreEquals(x => x.Name == "Jo�o", true);
 
         Assert.NotNull(customer);
         Assert.True(customer.Notifications.Count > 0);
@@ -60,16 +54,12 @@ public class AssertNotAreEqualsTests : NotifiableR
             Name = "Pedro"
         };
 
-
-        new ValidationConcernR<Customer>(customer)
-            .AssertNotAreEquals(x => x.Name == "João", false)
+        _ = new ValidationConcernR<Customer>(customer)
+            .AssertNotAreEquals(x => x.Name == "Jo�o", false)
             .AssertNotDateTimeNull(x => customer.Birthdate);
-
-
 
         Assert.NotNull(customer);
         Assert.True(customer.Notifications.Count > 0);
     }
-
 
 }

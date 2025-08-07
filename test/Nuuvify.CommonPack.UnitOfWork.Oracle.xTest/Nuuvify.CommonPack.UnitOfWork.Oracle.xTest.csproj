@@ -5,27 +5,27 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMoqCore" Version="2.1.0" />
-    <PackageReference Include="Bogus" Version="33.1.1" />
-    <PackageReference Include="CountryData.Bogus" Version="3.61.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.7.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Compilers" Version="4.7.0" />
-    <PackageReference Include="Microsoft.Net.Compilers" Version="4.2.0" Condition="'$(os)' == 'Windows_NT'" >
-    <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    <PackageReference Include="AutoMoqCore" />
+    <PackageReference Include="Bogus" />
+    <PackageReference Include="CountryData.Bogus" />
+    <PackageReference Include="Microsoft.CodeAnalysis" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Compilers" />
+    <PackageReference Include="Microsoft.Net.Compilers" Condition="'$(os)' == 'Windows_NT'">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Oracle.EntityFrameworkCore" Version="8.23.50" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.7" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.7" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.7">
+    <PackageReference Include="Oracle.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
+    <PackageReference Include="Microsoft.Extensions.Http" />
   </ItemGroup>
 
   <ItemGroup>

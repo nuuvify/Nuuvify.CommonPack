@@ -28,7 +28,6 @@ public static class HttpCircuitBreakerPolicies
     {
         var serviceBreak = context.GetServiceName() ?? responseMessage?.Result?.ReasonPhrase;
 
-
         var messageLog = $"{nameof(GetHttpCircuitBreakerPolicy)}";
         logger.LogWarning("{messageLog} Service: {serviceBreak} shutdown during: {breakDuration} after: {retryCount} failed retries.", messageLog, serviceBreak, breakDuration, retryCount);
 
@@ -37,7 +36,7 @@ public static class HttpCircuitBreakerPolicies
     private static void OnHttpReset(Context context, ILogger logger)
     {
         var serviceBreak = context.GetServiceName();
-        context.Remove(PollyCustomExtensions.ServiceNameKey);
+        _ = context.Remove(PollyCustomExtensions.ServiceNameKey);
 
         var messageLog = $"{nameof(GetHttpCircuitBreakerPolicy)}";
         logger.LogInformation("{messageLog} Service restarted: {serviceBreak} ", messageLog, serviceBreak);

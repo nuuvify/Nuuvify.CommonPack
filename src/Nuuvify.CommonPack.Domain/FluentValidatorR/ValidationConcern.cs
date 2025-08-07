@@ -15,14 +15,12 @@ public partial class ValidationConcernR<T> where T : NotifiableR
     public bool AssertValid { get; private set; } = false;
     public IList<NotificationR> Errors { get; private set; }
 
-
     public ValidationConcernR(T validatable)
     {
         _validatable = validatable;
         Errors = new List<NotificationR>();
 
     }
-
 
     /// <summary>
     /// Esse metodo remove as mensagens de Selector: nulo. Isso é util quando você personaliza suas mensagens
@@ -45,7 +43,7 @@ public partial class ValidationConcernR<T> where T : NotifiableR
         var errorNull = Errors.Where(x => x.Message.StartsWith("Selector: "));
         foreach (var item in errorNull)
         {
-            Errors.Remove(item);
+            _ = Errors.Remove(item);
         }
 
         if (!(_validatable is null))
@@ -91,7 +89,6 @@ public partial class ValidationConcernR<T> where T : NotifiableR
     private string FieldMax { get; set; }
     private string FieldMin { get; set; }
     private string SelectorNull { get; set; }
-
 
     private void ResetVariables()
     {
@@ -171,7 +168,7 @@ public partial class ValidationConcernR<T> where T : NotifiableR
         var errorNull = Errors.FirstOrDefault(x => x.Property.Equals(nameof(AssertNotIsNull)) || x.Property.Equals(".ctor"));
         if (errorNull != null)
         {
-            Errors.Remove(errorNull);
+            _ = Errors.Remove(errorNull);
         }
         Errors.Add(new NotificationR($"{MethodBaseConcern.Name}", msg, aggregateId, "", TParameter));
     }

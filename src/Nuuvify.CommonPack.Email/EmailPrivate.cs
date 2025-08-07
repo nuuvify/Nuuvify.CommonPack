@@ -14,13 +14,11 @@ using Nuuvify.CommonPack.Extensions.Notificator;
 
 namespace Nuuvify.CommonPack.Email;
 
-
 public partial class Email
 {
 
     private Dictionary<string, EmailMidia> EmailAttachments { get; set; }
     private Multipart MultipartMessage { get; set; }
-
 
     private bool EmailIsvalid(string email)
     {
@@ -61,7 +59,6 @@ public partial class Email
                         var nome = item.Value.Trim();
                         var endereco = itemEmail.Trim();
 
-
                         if (EmailIsvalid(endereco))
                         {
                             addressList.Add(new MailboxAddress(nome, endereco));
@@ -74,7 +71,6 @@ public partial class Email
 
             }
         }
-
 
         if (addressList.Count < 1)
         {
@@ -104,7 +100,6 @@ public partial class Email
 
                 logText = $"Anexando: {attachment.Key}";
 
-
                 if (!File.Exists(attachment.Key))
                 {
                     var textLog = $"Anexo informado não encontrado ou sem acesso {attachment.Key})";
@@ -112,7 +107,6 @@ public partial class Email
 
                     return false;
                 }
-
 
                 if (attachment.Value.EmailMidiaFile.Key == EmailMidiaType.Image)
                 {
@@ -183,24 +177,21 @@ public partial class Email
         CancellationToken cancellationToken = default)
     {
 
-
         if (cancellationToken.IsCancellationRequested)
         {
             return Task.FromCanceled(cancellationToken);
         }
-
 
         var body = new TextPart(TextFormat.Html)
         {
             Text = message
         };
 
-
         emailMessage.From.AddRange(senders);
         emailMessage.To.AddRange(recipients);
 
-        await AddAttachmentsInMessage(body, EmailAttachments, cancellationToken);
-        await AddAttachmentsInMessage(body, EmailStreamAttachments, cancellationToken);
+        _ = await AddAttachmentsInMessage(body, EmailAttachments, cancellationToken);
+        _ = await AddAttachmentsInMessage(body, EmailStreamAttachments, cancellationToken);
 
         if ((EmailAttachments is null || EmailAttachments?.Count == 0) &&
             (EmailStreamAttachments is null || EmailStreamAttachments?.Count == 0))
@@ -211,7 +202,6 @@ public partial class Email
         }
 
         emailMessage.Body = MultipartMessage;
-
 
         if (!IsValid()) return false;
 
@@ -267,7 +257,6 @@ public partial class Email
                         protocol,
                         cancellationToken);
 
-
                     await client.AuthenticateAsync(
                         EmailServerConfiguration.AccountUserName,
                         EmailServerConfiguration.AccountPassword,
@@ -281,13 +270,11 @@ public partial class Email
                 return false;
             }
 
-            await client.SendAsync(
+            _ = await client.SendAsync(
                 emailMessage,
                 cancellationToken: cancellationToken);
 
-
             LogMessage.Add(new NotificationR(nameof(SendEmailCustom), $"Email enviado pelo host {EmailServerConfiguration.ServerHost} {emailMessage.Subject?.ToString()}"));
-
 
             return true;
         }
@@ -304,8 +291,6 @@ public partial class Email
 
     }
 
-
-
     private MimeMessage CreateEmailMessage(string subject)
     {
 
@@ -319,7 +304,6 @@ public partial class Email
         return emailMessage;
     }
 
-
     private StringBuilder ReadTemplate(Stream fs)
     {
         var newHtml = new StringBuilder();
@@ -328,13 +312,10 @@ public partial class Email
 
         while (!reader.EndOfStream)
         {
-            newHtml.AppendLine(reader.ReadLine());
+            _ = newHtml.AppendLine(reader.ReadLine());
         }
 
         return newHtml;
     }
-
-
-
 
 }

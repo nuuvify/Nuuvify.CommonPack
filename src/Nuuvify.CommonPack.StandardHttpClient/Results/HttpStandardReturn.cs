@@ -12,7 +12,6 @@ public class HttpStandardReturn
     public string ReturnCode { get; set; }
     public string ReturnMessage { get; set; }
 
-
     /// <summary>
     /// Esse metodo retorna o conteudo do ReturnMessage sem os caracteres \r\n no json inteiro e espacos no inicio do json
     /// </summary>

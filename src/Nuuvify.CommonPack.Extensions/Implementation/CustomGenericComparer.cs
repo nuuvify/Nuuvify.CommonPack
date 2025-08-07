@@ -19,15 +19,13 @@ public class CustomGenericComparer<T> : IEqualityComparer<T>
         ComparerGetHashCode = comparerGetHashCode;
     }
 
-
     public bool Equals(T x, T y)
         => ComparerEquals(x, y);
 
     public int GetHashCode(T obj)
     {
-        ComparerGetHashCode(obj);
+        _ = ComparerGetHashCode(obj);
         return 0;
     }
-
 
 }

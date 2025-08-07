@@ -1,10 +1,9 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 using Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Abstractions;
-using Xunit.Extensions.Ordering;
 
 namespace Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest.Repositories;
 
@@ -16,10 +15,8 @@ public class RemoveFaturaRepository
     private readonly SeedDbFixture _seedDbFixture;
     private readonly ITestOutputHelper _outputHelper;
 
-
     private readonly Repository<Fatura> _faturaRepository;
     private const string UserRequest = "SqlServerUserTest";
-
 
     public RemoveFaturaRepository(
         AppDbContextFixture dbContext,
@@ -32,7 +29,6 @@ public class RemoveFaturaRepository
         _outputHelper = outputHelper;
         _seedDbFixture = seedDbFixture;
 
-
         var uow = new UnitOfWork<DbContext>(_dbContext.Db)
         {
             UsernameContext = UserRequest
@@ -42,15 +38,10 @@ public class RemoveFaturaRepository
 
     }
 
-
-
-
-
-    [SqlServerTestFact, Order(1)]
+    [SqlServerTestFact]
     [Trait("SqlServer", "Remove Fatura Repository")]
     public async Task DomainEvent_ComClassesIguaisComVersoesDiferentes_DeveGerarEventComAmbasVersoes()
     {
-        _outputHelper.WriteLine($"{this.GetType().Name} - Order(1)");
 
         _seedDbFixture.CreateData(
             _dbContext,
@@ -58,16 +49,13 @@ public class RemoveFaturaRepository
             UserRequest,
             2, 5, true);
 
-
         const int RegistriesSaved = 1;
-
 
         var fatura = await _faturaRepository.GetFirstOrDefaultAsync(predicate:
             x => x.Id == _seedDbFixture.Fatura.Id);
 
         var faturaNewVersion = await _faturaRepository.FindAsync(fatura.Id);
-        faturaNewVersion.Update("Essa é a versão 2 da fatura");
-
+        faturaNewVersion.Update("Essa � a vers�o 2 da fatura");
 
         var registries = await _faturaRepository.SaveChangesAsync();
 
@@ -78,27 +66,22 @@ public class RemoveFaturaRepository
         Assert.False(faturaUpdated.SourceId.Observacao == faturaUpdated.NewFatura.Observacao);
     }
 
-
-    [SqlServerTestFact, Order(2)]
+    [SqlServerTestFact]
     [Trait("SqlServer", "Remove Fatura Repository ")]
     public void FromSqlDeveRetornarEntidadeValida()
     {
-        _outputHelper.WriteLine($"{this.GetType().Name} - Order(2)");
 
         var sql = $"SELECT * FROM {_dbContext.Schema}.FATURAS WHERE NUMERO_FATURA = {_seedDbFixture.Fatura.NumeroFatura}";
 
         var faturaFinded = _faturaRepository.FromSql(sql).ToList();
 
-
         Assert.True(faturaFinded.Count > 0);
     }
 
-    [SqlServerTestFact, Order(3)]
+    [SqlServerTestFact]
     [Trait("SqlServer", "Remove Fatura Repository")]
     public async Task RemoveFaturaPorIdNaoDeveRemoverCasoExistaPedido()
     {
-        _outputHelper.WriteLine($"{this.GetType().Name} - Order(3)");
-
 
         _dbContext.PreventDisposal = false;
 
@@ -109,10 +92,8 @@ public class RemoveFaturaRepository
         var resultException = await Assert.ThrowsAsync<DbUpdateException>(()
             => _faturaRepository.SaveChangesAsync());
 
-
         Assert.Equal(UserRequest, _dbContext.Db.GetDbContextUsername());
         Assert.Contains(messageExpected, resultException.InnerException.Message);
-
 
     }
 }

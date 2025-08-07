@@ -5,10 +5,8 @@ using System.Threading.Tasks;
 
 namespace Nuuvify.CommonPack.AzureStorage.Abstraction;
 
-
 public interface IStorageService
 {
-
 
     /// <summary>
     /// É necessario ter as seguintes tags em seu arquivo appsettings.json
@@ -23,7 +21,6 @@ public interface IStorageService
     /// </summary>
     public string BlobConnectionName { get; set; }
     public string BlobContainerName { get; set; }
-
 
     /// <summary>
     /// Obtem um lista com todos os arquivos de um determinado blob container <br/>
@@ -53,7 +50,6 @@ public interface IStorageService
     /// <returns></returns>
     [Obsolete("Esse metodo esta obsoleto e sera removido em futura versao.")]
     Task<BlobStorageResult> GetBlobById(IEnumerable<string> attachments);
-
 
     /// <summary>
     /// Retorna uma lista de arquivos no formato byte[], esse é o metodo preferencial para baixar arquivos do blob

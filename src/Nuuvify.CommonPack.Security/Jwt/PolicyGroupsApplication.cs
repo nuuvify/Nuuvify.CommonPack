@@ -5,7 +5,6 @@ using Microsoft.Extensions.Configuration;
 
 namespace Nuuvify.CommonPack.Security.Jwt;
 
-
 /// <summary>
 /// Essa classe cria dinamicamente um objeto que fizer parte da seguinte entrada do arquivo appsettings.json
 /// <example>
@@ -22,7 +21,6 @@ namespace Nuuvify.CommonPack.Security.Jwt;
 public class PolicyGroupsApplication : DynamicObject
 {
 
-
     public IDictionary<string, string> PolicyGroups { get; set; }
 
     public PolicyGroupsApplication(IConfiguration configuration)
@@ -32,7 +30,6 @@ public class PolicyGroupsApplication : DynamicObject
             .Where(x => !string.IsNullOrWhiteSpace(x.Value))?
             .ToDictionary(x => x.Key, x => x.Value);
     }
-
 
     public string GetPropertyValue(string propertyName)
     {
@@ -77,6 +74,5 @@ public class PolicyGroupsApplication : DynamicObject
 
         return result != null;
     }
-
 
 }

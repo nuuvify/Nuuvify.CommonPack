@@ -26,12 +26,10 @@ public class NotaFiscal : NotifiableR
         }
     }
 
-
     public string Numero { get; private set; }
     public string Serie { get; private set; }
     public DateTime Emissao { get; private set; }
     public string NotaEletronica { get; private set; }
-
 
     private void DefinirNotaEletronica(EnumSimNao eletronica)
     {
@@ -44,10 +42,9 @@ public class NotaFiscal : NotifiableR
 
         var numeroNota = numero.GetNumbers();
 
-        new ValidationConcernR<NotaFiscal>(this)
+        _ = new ValidationConcernR<NotaFiscal>(this)
             .AssertHasMinLength(x => numeroNota, minNumero)
             .AssertHasMaxLength(x => numeroNota, maxNumero);
-
 
         if (validacao.Equals(Notifications.Count))
             Numero = numeroNota;
@@ -57,8 +54,7 @@ public class NotaFiscal : NotifiableR
     {
         var validacao = Notifications.Count;
 
-
-        new ValidationConcernR<NotaFiscal>(this)
+        _ = new ValidationConcernR<NotaFiscal>(this)
             .AssertHasMinLength(x => serieNota, minSerie)
             .AssertHasMaxLength(x => serieNota, maxSerie);
 
@@ -69,7 +65,7 @@ public class NotaFiscal : NotifiableR
     private void DefinirEmissao(DateTime emissao)
     {
 
-        new ValidationConcernR<NotaFiscal>(this)
+        _ = new ValidationConcernR<NotaFiscal>(this)
             .AssertNotDateTimeNull(x => emissao);
 
         if (IsValid())
@@ -88,6 +84,5 @@ public class NotaFiscal : NotifiableR
 
     public const int minSerie = 1;
     public const int maxSerie = 5;
-
 
 }

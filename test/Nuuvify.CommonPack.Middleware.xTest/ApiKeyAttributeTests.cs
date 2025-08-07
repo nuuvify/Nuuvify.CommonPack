@@ -22,7 +22,6 @@ public class ApiKeyAttributeTests
     private ResourceExecutingContext _resourceExecutingContext;
     private DefaultHttpContext _defaultHttpContext;
 
-
     private void ArrangeResourceExecutingContextTests()
     {
 
@@ -32,7 +31,6 @@ public class ApiKeyAttributeTests
             RouteData = new RouteData(),
             ActionDescriptor = new ActionDescriptor()
         };
-
 
         _resourceExecutingContext = new ResourceExecutingContext(
             _actionContext,
@@ -46,7 +44,6 @@ public class ApiKeyAttributeTests
     {
 
         _defaultHttpContext = defaultHttpContext ?? new DefaultHttpContext();
-
 
         _actionContext = new ActionContext()
         {
@@ -64,7 +61,6 @@ public class ApiKeyAttributeTests
 
     }
 
-
     [Fact]
     public void OnResourceExecuting_ShoultAddASingleLogIfExecuted()
     {
@@ -74,11 +70,10 @@ public class ApiKeyAttributeTests
 
         var mockIConfiguration = new Mock<IConfiguration>();
 
-        mockIConfiguration.Setup(s => s.GetSection(keyNameTest[0]).Value)
+        _ = mockIConfiguration.Setup(s => s.GetSection(keyNameTest[0]).Value)
             .Returns("xxx1234");
 
         ArrangeResourceExecutingContextTests();
-
 
         var apiKeyFilter = new ApiKeyFilter(
             loggerMock.Object,
@@ -86,7 +81,6 @@ public class ApiKeyAttributeTests
             keyNameTest);
 
         apiKeyFilter.OnResourceExecuting(_resourceExecutingContext);
-
 
         loggerMock.Verify(
             m => m.Log(
@@ -97,7 +91,6 @@ public class ApiKeyAttributeTests
                 It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)
             )
         );
-
 
     }
 
@@ -111,12 +104,10 @@ public class ApiKeyAttributeTests
 
         var mockIConfiguration = new Mock<IConfiguration>();
 
-        mockIConfiguration.Setup(s => s.GetSection(keyNameTest[0]).Value)
+        _ = mockIConfiguration.Setup(s => s.GetSection(keyNameTest[0]).Value)
             .Returns(keyValueTest);
 
-
         ArrangeActionExecutingContextTests(new DefaultHttpContext());
-
 
         var apiKeyFilter = new ApiKeyFilter(
             loggerMock.Object,
@@ -127,9 +118,7 @@ public class ApiKeyAttributeTests
 
         var contentResult = (ContentResult)_actionExecutingContext.Result;
 
-
         Assert.Equal(expected: 401, actual: contentResult.StatusCode);
-
 
     }
 
@@ -143,16 +132,14 @@ public class ApiKeyAttributeTests
 
         var mockIConfiguration = new Mock<IConfiguration>();
 
-        mockIConfiguration.Setup(s => s.GetSection(keyNameTest[0]).Value)
+        _ = mockIConfiguration.Setup(s => s.GetSection(keyNameTest[0]).Value)
             .Returns(keyValueTest);
-
 
         var httpContext = new DefaultHttpContext();
         httpContext.Request.Headers.Append("TesteHeader", "1234567");
         httpContext.Request.Headers.Append(keyNameTest[0], "outrovalor");
 
         ArrangeActionExecutingContextTests(httpContext);
-
 
         var apiKeyFilter = new ApiKeyFilter(
             loggerMock.Object,
@@ -163,12 +150,9 @@ public class ApiKeyAttributeTests
 
         var contentResult = (ContentResult)_actionExecutingContext.Result;
 
-
         Assert.Equal(expected: 401, actual: contentResult.StatusCode);
 
-
     }
-
 
     [Fact]
     public void OnActionExecuting_ShoultReturn200IfKeyValueMatchInHttpHeader()
@@ -180,7 +164,7 @@ public class ApiKeyAttributeTests
 
         var mockIConfiguration = new Mock<IConfiguration>();
 
-        mockIConfiguration.Setup(s => s.GetSection(keyNameTest[0]).Value)
+        _ = mockIConfiguration.Setup(s => s.GetSection(keyNameTest[0]).Value)
             .Returns(keyValueTest);
 
         var httpContext = new DefaultHttpContext();
@@ -188,8 +172,6 @@ public class ApiKeyAttributeTests
         httpContext.Request.Headers.Append(keyNameTest[0], keyValueTest);
 
         ArrangeActionExecutingContextTests(httpContext);
-
-
 
         var apiKeyFilter = new ApiKeyFilter(
             loggerMock.Object,
@@ -200,9 +182,7 @@ public class ApiKeyAttributeTests
 
         var contentResult = (ContentResult)_actionExecutingContext.Result;
 
-
         Assert.Null(contentResult);
-
 
     }
 
@@ -218,9 +198,9 @@ public class ApiKeyAttributeTests
 
         var mockIConfiguration = new Mock<IConfiguration>();
 
-        mockIConfiguration.Setup(s => s.GetSection(keyNameTest[0]).Value)
+        _ = mockIConfiguration.Setup(s => s.GetSection(keyNameTest[0]).Value)
             .Returns(keyValueTest);
-        mockIConfiguration.Setup(s => s.GetSection(keyNameTest[1]).Value)
+        _ = mockIConfiguration.Setup(s => s.GetSection(keyNameTest[1]).Value)
             .Returns(keyValueTest1);
 
         var httpContext = new DefaultHttpContext();
@@ -228,8 +208,6 @@ public class ApiKeyAttributeTests
         httpContext.Request.Headers.Append(keyNameTest[1], keyValueTest1);
 
         ArrangeActionExecutingContextTests(httpContext);
-
-
 
         var apiKeyFilter = new ApiKeyFilter(
             loggerMock.Object,
@@ -240,15 +218,11 @@ public class ApiKeyAttributeTests
 
         var contentResult = (ContentResult)_actionExecutingContext.Result;
 
-
-
         Assert.Null(contentResult);
         Assert.True(_actionExecutingContext.HttpContext.User.HasClaim(x =>
             x.Type == ApiKeyFilterConstants.ApiKeyInfo &&
             x.Value == $"{keyNameTest[1]}={keyValueTest1}"));
 
-
     }
-
 
 }

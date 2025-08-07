@@ -19,7 +19,6 @@ public class JwtTokenOptions
     /// </summary>
     public DateTimeOffset NotBefore { get; set; } = DateTimeOffset.Now;
 
-
     private TimeSpan _validFor = TimeSpan.FromHours(8);
 
     /// <summary>
@@ -57,17 +56,13 @@ public class JwtTokenOptions
     public string JtiGenerator { get; set; } = Guid.NewGuid().ToString();
     public string SecretKey { get; set; }
 
-
-
     public SigningCredentials SigningCredentials()
     {
         var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(KeyEncoding()),
             SecurityAlgorithms.HmacSha256);
 
-
         if (signingCredentials.Key.KeySize < 288)
             throw new SecurityTokenInvalidSigningKeyException($"Saltkey deve ter pelo meno 32 digitos = {nameof(SigningCredentials)}");
-
 
         return signingCredentials;
     }
@@ -78,7 +73,6 @@ public class JwtTokenOptions
         {
             throw new ArgumentNullException(SecretKey);
         }
-
 
         return Encoding.ASCII.GetBytes(SecretKey);
     }

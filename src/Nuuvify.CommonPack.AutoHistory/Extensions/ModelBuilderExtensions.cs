@@ -31,7 +31,6 @@ public static class ModelBuilderExtensions
         return EnableAutoHistory<AutoHistory>(modelBuilder, configure);
     }
 
-
     ///<inheritdoc cref="EnableAutoHistory"/>
     public static ModelBuilder EnableAutoHistory<TAutoHistory>(this ModelBuilder modelBuilder,
         Action<AutoHistoryOptions> configure)
@@ -40,8 +39,6 @@ public static class ModelBuilderExtensions
 
         var options = AutoHistoryOptions.Instance;
         configure?.Invoke(options);
-
-
 
         ProviderSelected.ProviderName = options.ProviderName;
 
@@ -69,6 +66,5 @@ public static class ModelBuilderExtensions
         }
 
     }
-
 
 }

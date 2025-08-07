@@ -79,7 +79,6 @@ public abstract class ExceptionProcessorStateManager<T> : StateManager where T :
         }
     }
 
-
     private Exception GetException(DbUpdateException ex)
     {
         if (ex.GetBaseException() is T dbException &&
@@ -101,7 +100,6 @@ public abstract class ExceptionProcessorStateManager<T> : StateManager where T :
 
         return ex;
     }
-
 
     protected abstract DatabaseError? GetDatabaseError(T dbException);
 }

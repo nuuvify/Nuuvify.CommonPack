@@ -67,7 +67,7 @@ public class OracleExceptionProcessorStateManager : ExceptionProcessorStateManag
                 value = $"{exception.Errors[i].Message}";
 
                 CustomErrors.Add(key, value);
-                newMessage.AppendLine($"{key}: {value}");
+                _ = newMessage.AppendLine($"{key}: {value}");
             }
             if (!string.IsNullOrWhiteSpace(exception.Errors[i].DataSource))
             {
@@ -75,7 +75,7 @@ public class OracleExceptionProcessorStateManager : ExceptionProcessorStateManag
                 value = $"{exception.Errors[i].DataSource}";
 
                 CustomErrors.Add(key, value);
-                newMessage.AppendLine($"{key}: {value}");
+                _ = newMessage.AppendLine($"{key}: {value}");
             }
             if (!string.IsNullOrWhiteSpace(exception.Errors[i].Source))
             {
@@ -83,7 +83,7 @@ public class OracleExceptionProcessorStateManager : ExceptionProcessorStateManag
                 value = $"{exception.Errors[i].Source}";
 
                 CustomErrors.Add(key, value);
-                newMessage.AppendLine($"{key}: {value}");
+                _ = newMessage.AppendLine($"{key}: {value}");
             }
             if (!string.IsNullOrWhiteSpace(exception.Errors[i].Number.ToString()))
             {
@@ -91,7 +91,7 @@ public class OracleExceptionProcessorStateManager : ExceptionProcessorStateManag
                 value = $"{exception.Errors[i].Number}";
 
                 CustomErrors.Add(key, value);
-                newMessage.AppendLine($"{key}: {value}");
+                _ = newMessage.AppendLine($"{key}: {value}");
             }
             if (!string.IsNullOrWhiteSpace(exception.Errors[i].ParseErrorOffset.ToString()))
             {
@@ -99,7 +99,7 @@ public class OracleExceptionProcessorStateManager : ExceptionProcessorStateManag
                 value = $"{exception.Errors[i].ParseErrorOffset}";
 
                 CustomErrors.Add(key, value);
-                newMessage.AppendLine($"{key}: {value}");
+                _ = newMessage.AppendLine($"{key}: {value}");
             }
             if (!string.IsNullOrWhiteSpace(exception.Errors[i].Procedure))
             {
@@ -107,7 +107,7 @@ public class OracleExceptionProcessorStateManager : ExceptionProcessorStateManag
                 value = $"{exception.Errors[i].Procedure}";
 
                 CustomErrors.Add(key, value);
-                newMessage.AppendLine($"{key}: {value}");
+                _ = newMessage.AppendLine($"{key}: {value}");
             }
         }
 
@@ -117,11 +117,10 @@ public class OracleExceptionProcessorStateManager : ExceptionProcessorStateManag
             key = $"#inner-{0}-Message";
             value = $"{inner.Message}";
 
-            newMessage.AppendLine($"{key}: {value}");
+            _ = newMessage.AppendLine($"{key}: {value}");
         }
 
         return newMessage.ToString();
     }
-
 
 }

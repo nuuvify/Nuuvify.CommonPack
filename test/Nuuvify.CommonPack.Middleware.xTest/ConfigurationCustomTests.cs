@@ -13,13 +13,11 @@ public class ConfigurationCustomTests
 
     private readonly IConfiguration Config;
 
-
     public ConfigurationCustomTests()
     {
 
         Config = AppSettingsConfig.GetConfig();
     }
-
 
     [Fact]
     public void CasoSectionNaoExistaNaoDeveRetornarException()
@@ -94,7 +92,7 @@ public class ConfigurationCustomTests
 
         var valor = configuration.GetSection("VirtualPath");
 
-        valor.TryGetValue("VirtualPath", out string valorRetorno);
+        _ = valor.TryGetValue("VirtualPath", out string valorRetorno);
 
         Assert.Equal("api", valorRetorno);
 
@@ -120,9 +118,8 @@ public class ConfigurationCustomTests
         };
 
         var mockRequestconfiguration = new Mock<IOptions<RequestConfiguration>>();
-        mockRequestconfiguration.Setup(s => s.Value)
+        _ = mockRequestconfiguration.Setup(s => s.Value)
             .Returns(request);
-
 
         var configuration = new ConfigurationCustom(Config, null, mockRequestconfiguration.Object);
 
@@ -138,9 +135,8 @@ public class ConfigurationCustomTests
         var request = new RequestConfiguration();
 
         var mockRequestconfiguration = new Mock<IOptions<RequestConfiguration>>();
-        mockRequestconfiguration.Setup(s => s.Value)
+        _ = mockRequestconfiguration.Setup(s => s.Value)
             .Returns(request);
-
 
         var configuration = new ConfigurationCustom(Config, null, mockRequestconfiguration.Object);
 
@@ -149,6 +145,5 @@ public class ConfigurationCustomTests
         Assert.Null(valor);
 
     }
-
 
 }

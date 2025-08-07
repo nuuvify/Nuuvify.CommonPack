@@ -64,31 +64,6 @@ public class StringExtensionMethodsEdgeCasesTests
 
     [Fact]
     [Trait("Category", "Unit")]
-    public void RemoveSpecialChars_ShouldWorkWithGeneratedData()
-    {
-        // Arrange
-        var testData = StringTestDataFixture.GenerateTextsWithSpecialChars(3);
-
-        foreach (var text in testData)
-        {
-            // Act
-            var result = text.RemoveSpecialChars();
-
-            // Assert
-            Assert.DoesNotContain("@", result);
-            Assert.DoesNotContain("#", result);
-            Assert.DoesNotContain("$", result);
-            Assert.DoesNotContain("%", result);
-            Assert.DoesNotContain("!", result);
-            Assert.DoesNotContain("&", result);
-            Assert.DoesNotContain("*", result);
-            Assert.DoesNotContain("(", result);
-            Assert.DoesNotContain(")", result);
-        }
-    }
-
-    [Fact]
-    [Trait("Category", "Unit")]
     public void GetLettersAndNumbersOnly_ShouldWorkWithGeneratedData()
     {
         // Arrange

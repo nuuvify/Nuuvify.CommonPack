@@ -33,7 +33,6 @@ public static class UserSecuritySetup
         if (configuration is null)
             throw new ArgumentNullException(MsgSecurityJwt.ResourceManager.GetString("ConfigurationNull", CultureInfo.CurrentCulture));
 
-
         var appSettingsSection = configuration.GetSection(jwtAppSettingsKey ?? "JwtTokenOptions");
         if (appSettingsSection?.Key is null)
         {
@@ -41,7 +40,7 @@ public static class UserSecuritySetup
         }
         else
         {
-            services.Configure<JwtTokenOptions>(appSettingsSection);
+            _ = services.Configure<JwtTokenOptions>(appSettingsSection);
         }
 
         var appSettings = appSettingsSection.Get<JwtTokenOptions>();
@@ -51,12 +50,10 @@ public static class UserSecuritySetup
         }
 
         services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-        services.AddSingleton<IAuthorizationHandler, ControllerCustomAuthorizationHandler>();
+        _ = services.AddSingleton<IAuthorizationHandler, ControllerCustomAuthorizationHandler>();
         services.TryAddScoped<IUserAuthenticated, UserAuthenticated>();
 
-
-
-        services.AddAuthentication(options =>
+        _ = services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -89,9 +86,7 @@ public static class UserSecuritySetup
                 ClockSkew = TimeSpan.Zero
             };
 
-
         });
-
 
     }
 

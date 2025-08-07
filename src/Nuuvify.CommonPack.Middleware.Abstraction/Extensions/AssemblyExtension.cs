@@ -6,7 +6,6 @@ namespace Nuuvify.CommonPack.Middleware.Abstraction.Extensions;
 public static class AssemblyExtension
 {
 
-
     public static string GetApplicationNameByAssembly
     {
 
@@ -17,7 +16,6 @@ public static class AssemblyExtension
             var appCustomName = entryAssembly?
                 .Replace(".", "")
                 .Replace(".WebApi", "");
-
 
             return appCustomName;
 
@@ -43,7 +41,6 @@ public static class AssemblyExtension
                 .Append($"{Assembly.GetEntryAssembly().GetName().Version.Major}.")
                 .Append($"{Assembly.GetEntryAssembly().GetName().Version.Minor}.")
                 .Append($"{Assembly.GetEntryAssembly().GetName().Version.Build}");
-
 
             return applicationVersion.ToString();
         }

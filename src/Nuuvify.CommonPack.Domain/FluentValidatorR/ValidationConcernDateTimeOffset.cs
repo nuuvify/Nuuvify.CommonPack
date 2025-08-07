@@ -73,7 +73,6 @@ public partial class ValidationConcernR<T> where T : NotifiableR
     {
         ConfigConcern(selector);
 
-
         if (DataDtof != val)
         {
             Field = val.ToString();
@@ -260,6 +259,5 @@ public partial class ValidationConcernR<T> where T : NotifiableR
 
         return this;
     }
-
 
 }

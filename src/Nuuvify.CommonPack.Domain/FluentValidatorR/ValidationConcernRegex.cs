@@ -56,7 +56,6 @@ public partial class ValidationConcernR<T> where T : NotifiableR
         return this;
     }
 
-
     public ValidationConcernR<T> AssertIsEmail(Expression<Func<T, string>> selector, string message = "", string aggregateId = null)
     {
         ConfigConcern(selector);
@@ -69,7 +68,6 @@ public partial class ValidationConcernR<T> where T : NotifiableR
         {
             AssertValid = true;
         }
-
 
         return this;
     }

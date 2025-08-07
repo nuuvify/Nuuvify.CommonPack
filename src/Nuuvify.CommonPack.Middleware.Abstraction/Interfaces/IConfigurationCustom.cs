@@ -10,7 +10,6 @@ namespace Nuuvify.CommonPack.Middleware.Abstraction;
 public interface IConfigurationCustom
 {
 
-
     /// <summary>
     /// Para converter um IDictionary em Dictionary, execute:
     /// _configuration.GetSection(path)
@@ -55,7 +54,6 @@ public interface IConfigurationCustom
     /// </summary>
     /// <typeparam name="TConfiguration">Classe da qual deseja obter uma instancia</typeparam>
     TConfiguration ConfigurationOptions<TConfiguration>(string getSection) where TConfiguration : class;
-
 
     string EnvironmentName
     {
