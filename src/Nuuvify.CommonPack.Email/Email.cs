@@ -30,7 +30,7 @@ public partial class Email : IEmail
         get => _emailServerConfiguration;
         set
         {
-            Notifications.RemoveAll(x => x.Property == nameof(EmailServerConfiguration));
+            _ = Notifications.RemoveAll(x => x.Property == nameof(EmailServerConfiguration));
 
             if (string.IsNullOrWhiteSpace(value.ServerHost))
             {
@@ -107,7 +107,7 @@ public partial class Email : IEmail
     ///<inheritdoc/>
     public void ResetMailInstance()
     {
-        RemoveAllAttachments()
+        _ = RemoveAllAttachments()
         .RemoveAllLogMessage()
         .RemoveAllNotifications();
     }

@@ -69,11 +69,9 @@ public partial class ValidationConcernR<T> where T : NotifiableR
         }
     }
 
-
     public ValidationConcernR<T> AssertAreEquals(Expression<Func<T, decimal>> selector, decimal val, string message = "", string aggregateId = null)
     {
         ConfigConcern(selector);
-
 
         if (!string.IsNullOrWhiteSpace(SelectorNull))
         {
@@ -96,7 +94,6 @@ public partial class ValidationConcernR<T> where T : NotifiableR
 
         ConfigConcern(selector);
 
-
         if (!string.IsNullOrWhiteSpace(SelectorNull))
         {
             ConfigConcernMenssage("SelectorNull", typeof(T), aggregateId: aggregateId);
@@ -114,7 +111,6 @@ public partial class ValidationConcernR<T> where T : NotifiableR
         }
         return this;
     }
-
 
     public ValidationConcernR<T> AssertIsGreaterOrEqualsThan(Expression<Func<T, decimal>> selector, decimal number, string message = "", string aggregateId = null)
     {

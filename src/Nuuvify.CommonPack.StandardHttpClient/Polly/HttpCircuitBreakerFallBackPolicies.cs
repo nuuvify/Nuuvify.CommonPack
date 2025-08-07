@@ -49,7 +49,6 @@ public static class HttpCircuitBreakerFallBackPolicies
 
         HttpResponseMessage httpResponseMessage;
 
-
         if (responseToFailedRequest?.Result is null)
         {
             httpResponseMessage = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable)
@@ -66,7 +65,6 @@ public static class HttpCircuitBreakerFallBackPolicies
             };
 
         }
-
 
         return Task.FromResult(httpResponseMessage);
     }

@@ -14,9 +14,7 @@ public class Cpf : NotifiableR
         Validar(numero);
     }
 
-
     public string Codigo { get; private set; }
-
 
     private void Validar(string numero)
     {
@@ -26,18 +24,13 @@ public class Cpf : NotifiableR
             AddNotification(nameof(Cpf), "Codigo invalido");
         }
 
-
-
-        new ValidationConcernR<Cpf>(this)
+        _ = new ValidationConcernR<Cpf>(this)
             .AssertFixedLength(x => x.Codigo, maxCPF);
-
-
 
         if (!IsValid())
             Codigo = null;
 
     }
-
 
     private bool ValidarCodigo(string cpf)
     {
@@ -47,7 +40,6 @@ public class Cpf : NotifiableR
             Codigo = null;
             return false;
         }
-
 
         var multiplicador1 = new int[9] { 10, 9, 8, 7, 6, 5, 4, 3, 2 };
         var multiplicador2 = new int[10] { 11, 10, 9, 8, 7, 6, 5, 4, 3, 2 };
@@ -66,7 +58,6 @@ public class Cpf : NotifiableR
             return false;
         }
 
-
         if (cpf.Substring(0, 1).Equals(cpf.Substring(1, 1)) && cpf.Substring(1, 1).Equals(cpf.Substring(2, 1)) &&
            cpf.Substring(2, 1).Equals(cpf.Substring(3, 1)) && cpf.Substring(3, 1).Equals(cpf.Substring(4, 1)) &&
            cpf.Substring(3, 1).Equals(cpf.Substring(5, 1)) && cpf.Substring(5, 1).Equals(cpf.Substring(6, 1)) &&
@@ -75,7 +66,6 @@ public class Cpf : NotifiableR
         {
             return false;
         }
-
 
         tempCpf = cpf.Substring(0, 9);
         soma = 0;
@@ -93,20 +83,15 @@ public class Cpf : NotifiableR
         resto = resto < 2 ? 0 : 11 - resto;
         digito += resto.ToString();
 
-
         var valido = cpf.EndsWith(digito);
-
 
         if (valido)
             Codigo = cpf;
-
 
         return valido;
     }
 
     public const int maxCPF = 11;
-
-
 
     /// <summary>
     /// Formatar uma string CPF

@@ -8,7 +8,6 @@ public class ControllerOpenIdAuthorizationRequirement : IAuthorizationRequiremen
     public string ClaimType { get; protected set; }
     public IEnumerable<string> ClaimValues { get; protected set; }
 
-
     public ControllerOpenIdAuthorizationRequirement(string claimType, params string[] claimValues)
     {
         ClaimType = claimType;

@@ -4,12 +4,8 @@ using Nuuvify.CommonPack.Extensions.Notificator;
 
 namespace Nuuvify.CommonPack.Domain.ValueObjects;
 
-
 public class Cnpj : NotifiableR
 {
-
-
-
 
     protected Cnpj() { }
 
@@ -24,7 +20,6 @@ public class Cnpj : NotifiableR
     /// <example>61064911000177</example>
     public string Codigo { get; private set; }
 
-
     private void Validar(string numero)
     {
 
@@ -33,15 +28,13 @@ public class Cnpj : NotifiableR
             AddNotification(nameof(Cnpj), "Codigo invalido");
         }
 
-        new ValidationConcernR<Cnpj>(this)
+        _ = new ValidationConcernR<Cnpj>(this)
             .AssertFixedLength(x => x.Codigo, maxCNPJ);
-
 
         if (!IsValid())
             Codigo = null;
 
     }
-
 
     private bool ValidarCodigo(string cnpj)
     {
@@ -90,18 +83,13 @@ public class Cnpj : NotifiableR
 
         var valido = cnpj.EndsWith(digito);
 
-
         if (valido)
             this.Codigo = cnpj;
-
-
 
         return valido;
     }
 
     public const int maxCNPJ = 14;
-
-
 
     /// <summary>
     /// Formatar uma string Cnpj

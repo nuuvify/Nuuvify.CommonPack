@@ -3,7 +3,6 @@ using System.Linq;
 
 namespace Nuuvify.CommonPack.Extensions.Implementation;
 
-
 public static class ValidatedNotNullExtensionMethods
 {
 

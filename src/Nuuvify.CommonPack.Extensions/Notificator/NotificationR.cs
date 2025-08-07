@@ -4,7 +4,6 @@ using Nuuvify.CommonPack.Extensions.Interfaces;
 
 namespace Nuuvify.CommonPack.Extensions.Notificator;
 
-
 public class NotificationR : INotPersistingAsTable
 {
 
@@ -32,7 +31,6 @@ public class NotificationR : INotPersistingAsTable
         DefineOriginNotification(originNotification);
         DefineDateOccurrence(DateTimeOffset.Now);
     }
-
 
     private void DefineProperty(string property)
     {
@@ -68,8 +66,6 @@ public class NotificationR : INotPersistingAsTable
         }
     }
 
-
-
     /// <summary>
     /// Alem de retornar as propriedades, também é adicionado ao seu mecanismo de log
     /// as mesmas propriedades, caso não queira logar, basta informar Null no logger.
@@ -98,13 +94,11 @@ public class NotificationR : INotPersistingAsTable
 
     }
 
-
     public string AggregatorId { get; private set; }
     public string Property { get; private set; }
     public string Message { get; private set; }
     public string Type { get; private set; }
     public string OriginNotification { get; private set; }
     public DateTimeOffset DateOccurrence { get; private set; }
-
 
 }

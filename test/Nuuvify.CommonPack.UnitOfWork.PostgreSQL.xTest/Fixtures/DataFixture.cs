@@ -4,10 +4,8 @@ using Bogus;
 
 namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Fixtures;
 
-
 public class DataFixture
 {
-
 
     public IList<Fatura> GerarFaturaFake(int count = 1)
     {
@@ -28,14 +26,14 @@ public class DataFixture
 
         var fake = new Faker<Pedido>("pt_BR");
 
-        fake.CustomInstantiator(f => new Pedido(
+        _ = fake.CustomInstantiator(f => new Pedido(
             f.Company.Random.AlphaNumeric(10).ToUpper()
             , f.Random.Int(1, 9999999)
             , DateTime.Now)
         );
 
         if (withItens > 0)
-            fake.RuleFor(p => p.Itens, (p, i) => GerarPedidoItemFake(withItens, i.Id));
+            _ = fake.RuleFor(p => p.Itens, (p, i) => GerarPedidoItemFake(withItens, i.Id));
 
         return fake.Generate(count);
     }
@@ -45,15 +43,14 @@ public class DataFixture
 
         var fake = new Faker<PedidoItem>("pt_BR");
 
-        fake.CustomInstantiator(f => new PedidoItem(
+        _ = fake.CustomInstantiator(f => new PedidoItem(
             f.Commerce.Product()
             , Decimal.Round(f.Random.Decimal(0.10M, 9999.9999M), decimals: 4)
             , Convert.ToDecimal(f.Commerce.Price(min: 1, decimals: 4)))
         );
 
         if (!string.IsNullOrWhiteSpace(pedidoId))
-            fake.RuleFor(p => p.PedidoId, pedidoId);
-
+            _ = fake.RuleFor(p => p.PedidoId, pedidoId);
 
         return fake.Generate(count);
     }

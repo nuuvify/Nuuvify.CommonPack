@@ -11,7 +11,6 @@ namespace Nuuvify.CommonPack.Domain.ValueObjects;
 public class TipoPessoa : NotifiableR
 {
 
-
     protected TipoPessoa() { }
 
     public TipoPessoa(string pessoa, DateTime? nascimento)
@@ -39,15 +38,13 @@ public class TipoPessoa : NotifiableR
         }
     }
 
-
     public string Codigo { get; private set; }
     public DateTime DataDeNascimento { get; private set; }
-
 
     private bool ValidarNascimento(DateTime? nascimento)
     {
 
-        new ValidationConcernR<TipoPessoa>(this)
+        _ = new ValidationConcernR<TipoPessoa>(this)
             .AssertNotDateTimeNull(x => nascimento.Value);
 
         if (IsValid())
@@ -60,7 +57,6 @@ public class TipoPessoa : NotifiableR
     }
 
     public const int maxCodigo = 1;
-
 
     public override string ToString()
     {

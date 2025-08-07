@@ -3,7 +3,7 @@ using Nuuvify.CommonPack.StandardHttpClient.Results;
 
 namespace Nuuvify.CommonPack.StandardHttpClient.xTest;
 
-[Order(1)]
+[Trait("Category", "Unit")]
 public class BaseStandardHttpClientTests
 {
 
@@ -20,7 +20,7 @@ public class BaseStandardHttpClientTests
 
     }
 
-    [Fact, Order(1)]
+    [Fact]
     public void Deserializa_Retorno_Com_Propriedade_Success()
     {
 
@@ -31,19 +31,16 @@ public class BaseStandardHttpClientTests
             ReturnMessage = "{\r\n  \"success\": true,\r\n  \"data\": [\r\n    {\r\n      \"pfJ_CODIGO\": \"Q141606\",\r\n      \"razaO_SOCIAL\": \"COMPANHIA DE GAS DE SAO PAULO COMGAS\",\r\n      \"cpF_CGC\": \"61.856.571/0006-21\",\r\n      \"inD_FISICA_JURIDICA\": \"J\",\r\n      \"inD_NACIONAL_ESTRANGEIRA\": \"N\",\r\n      \"dT_INICIO\": \"2005-04-27T00:00:00\"\r\n    }\r\n  ]\r\n}"
         };
 
-        mockBaseHttp.Setup(x => x.ReturnList<PessoaVigenteCommandResult>(httpReturnResult, "urlHttp"))
+        _ = mockBaseHttp.Setup(x => x.ReturnList<PessoaVigenteCommandResult>(httpReturnResult, "urlHttp"))
                     .CallBase();
 
-
         var returnClass = mockBaseHttp.Object.ReturnList<PessoaVigenteCommandResult>(httpReturnResult, "urlHttp");
-
-
 
         Assert.True(returnClass.Count > 0);
         Assert.False(string.IsNullOrWhiteSpace(returnClass.FirstOrDefault().PFJ_CODIGO));
     }
 
-    [Fact, Order(2)]
+    [Fact]
     public void Deserializa_Retorno_Com_Erro()
     {
 
@@ -69,7 +66,6 @@ public class BaseStandardHttpClientTests
             Errors = errors
         };
 
-
         var httpReturnResult = new HttpStandardReturn
         {
             Success = false,
@@ -77,62 +73,51 @@ public class BaseStandardHttpClientTests
             ReturnMessage = JsonSerializer.Serialize(httpReturnErrors)
         };
 
-
-        mockBaseHttp.Setup(
+        _ = mockBaseHttp.Setup(
             x => x.ReturnList<PessoaVigenteCommandResult>(httpReturnResult, "urlHttp"))
         .CallBase();
 
-
         var returnClass = mockBaseHttp.Object.ReturnList<PessoaVigenteCommandResult>(httpReturnResult, "urlHttp");
         var actualReturn = mockBaseHttp.Object.IsValid();
-
 
         Assert.True(returnClass.Count == 0);
         Assert.False(actualReturn);
 
     }
 
-    [Fact, Order(3)]
+    [Fact]
     public void Deserializa_Retorno_Generic_Com_Propriedade_Success()
     {
 
         var httpReturnResult = "{\r\n  \"Fornecedores\": [\r\n    {\r\n      \"pfJ_CODIGO\": \"Q141606\",\r\n      \"razaO_SOCIAL\": \"COMPANHIA DE GAS DE SAO PAULO COMGAS\",\r\n      \"cpF_CGC\": \"61.856.571/0006-21\",\r\n      \"inD_FISICA_JURIDICA\": \"J\",\r\n      \"inD_NACIONAL_ESTRANGEIRA\": \"N\",\r\n      \"dT_INICIO\": \"2005-04-27T00:00:00\"\r\n    }\r\n  ]\r\n}";
 
-
-        mockBaseHttp.Setup(x => x.ReturnGenericClass<RetornoPessoGenericoFornecedores>(httpReturnResult, "urlHttp", true))
+        _ = mockBaseHttp.Setup(x => x.ReturnGenericClass<RetornoPessoGenericoFornecedores>(httpReturnResult, "urlHttp", true))
                     .CallBase();
 
-
         var returnClass = mockBaseHttp.Object.ReturnGenericClass<RetornoPessoGenericoFornecedores>(httpReturnResult, "urlHttp", true);
-
 
         Assert.True(returnClass.Fornecedores.Count > 0);
         Assert.False(string.IsNullOrWhiteSpace(returnClass.Fornecedores.FirstOrDefault().PFJ_CODIGO));
     }
 
-    [Fact, Order(4)]
+    [Fact]
     public void Deserializa_Retorno_GenericList_Com_Propriedade_Success()
     {
 
         var httpReturnResult = "{\"@odata.context\":\"https://was-p.bcnet.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata$metadata#_CotacaoDolarDia\",\"value\":[{\"cotacaoCompra\":5.30690,\"cotacaoVenda\":5.30750,\"dataHoraCotacao\":\"2020-08-03 13:06:35.557\"}]}";
         var cotacaoCompraExpected = 5.30690M;
 
-
-        mockBaseHttp.Setup(x => x.ReturnGenericClass<CotacaoDolarDia>(httpReturnResult, "urlHttp", true))
+        _ = mockBaseHttp.Setup(x => x.ReturnGenericClass<CotacaoDolarDia>(httpReturnResult, "urlHttp", true))
                     .CallBase();
 
-
         var returnClass = mockBaseHttp.Object.ReturnGenericClass<CotacaoDolarDia>(httpReturnResult, "urlHttp", true);
-
-
 
         Assert.True(returnClass.Value.Count > 0);
         Assert.Equal(returnClass.Value.FirstOrDefault().CotacaoCompra, cotacaoCompraExpected);
 
-
     }
 
-    [Fact, Order(4)]
+    [Fact]
     public void Deserializa_Retorno_Com_Diversos_Tipos_ComSucesso()
     {
 
@@ -155,7 +140,6 @@ public class BaseStandardHttpClientTests
             Data = fakeResult
         };
 
-
         var httpReturnResult = new HttpStandardReturn
         {
             Success = true,
@@ -164,14 +148,10 @@ public class BaseStandardHttpClientTests
 
         };
 
-        mockBaseHttp.Setup(x => x.ReturnClass<FakeReturnNotNull>(httpReturnResult, "urlHttp"))
+        _ = mockBaseHttp.Setup(x => x.ReturnClass<FakeReturnNotNull>(httpReturnResult, "urlHttp"))
                     .CallBase();
 
-
         var returnClass = mockBaseHttp.Object.ReturnClass<FakeReturnNotNull>(httpReturnResult, "urlHttp");
-
-
-
 
         Assert.NotNull(returnClass);
         Assert.Equal(expected: fakeResult.PropBool, actual: returnClass.PropBool);
@@ -186,7 +166,7 @@ public class BaseStandardHttpClientTests
 
     }
 
-    [Fact, Order(4)]
+    [Fact]
     public void Deserializa_Retorno_Com_Diversos_Tipos_Null_ComSucesso()
     {
 
@@ -198,7 +178,6 @@ public class BaseStandardHttpClientTests
             Data = fakeResult
         };
 
-
         var httpReturnResult = new HttpStandardReturn
         {
             Success = true,
@@ -207,12 +186,10 @@ public class BaseStandardHttpClientTests
 
         };
 
-        mockBaseHttp.Setup(x => x.ReturnClass<FakeReturnNotNull>(httpReturnResult, "urlHttp"))
+        _ = mockBaseHttp.Setup(x => x.ReturnClass<FakeReturnNotNull>(httpReturnResult, "urlHttp"))
                     .CallBase();
 
-
         var returnClass = mockBaseHttp.Object.ReturnClass<FakeReturnNotNull>(httpReturnResult, "urlHttp");
-
 
         Assert.NotNull(returnClass);
         Assert.Equal(expected: fakeResult.PropBool, actual: returnClass.PropBool);
@@ -227,7 +204,7 @@ public class BaseStandardHttpClientTests
 
     }
 
-    [Fact, Order(4)]
+    [Fact]
     public void Deserializa_Retorno_Com_Diversos_Tipos_Nulaveis_ComSucesso()
     {
 
@@ -239,7 +216,6 @@ public class BaseStandardHttpClientTests
             Data = fakeResult
         };
 
-
         var httpReturnResult = new HttpStandardReturn
         {
             Success = true,
@@ -248,12 +224,10 @@ public class BaseStandardHttpClientTests
 
         };
 
-        mockBaseHttp.Setup(x => x.ReturnClass<FakeReturnNull>(httpReturnResult, "urlHttp"))
+        _ = mockBaseHttp.Setup(x => x.ReturnClass<FakeReturnNull>(httpReturnResult, "urlHttp"))
                     .CallBase();
 
-
         var returnClass = mockBaseHttp.Object.ReturnClass<FakeReturnNull>(httpReturnResult, "urlHttp");
-
 
         Assert.NotNull(returnClass);
         Assert.Equal(expected: fakeResult.PropBool, actual: returnClass.PropBool);
@@ -268,7 +242,7 @@ public class BaseStandardHttpClientTests
 
     }
 
-    [Fact, Order(4)]
+    [Fact]
     public void Deserializa_Retorno_Com_Diversos_Tipos_Nulaveis_ComValor_ComSucesso()
     {
 
@@ -292,7 +266,6 @@ public class BaseStandardHttpClientTests
             Data = fakeResult
         };
 
-
         var httpReturnResult = new HttpStandardReturn
         {
             Success = true,
@@ -301,12 +274,10 @@ public class BaseStandardHttpClientTests
 
         };
 
-        mockBaseHttp.Setup(x => x.ReturnClass<FakeReturnNull>(httpReturnResult, "urlHttp"))
+        _ = mockBaseHttp.Setup(x => x.ReturnClass<FakeReturnNull>(httpReturnResult, "urlHttp"))
                     .CallBase();
 
-
         var returnClass = mockBaseHttp.Object.ReturnClass<FakeReturnNull>(httpReturnResult, "urlHttp");
-
 
         Assert.NotNull(returnClass);
         Assert.Equal(expected: fakeResult.PropBool, actual: returnClass.PropBool);
@@ -321,7 +292,7 @@ public class BaseStandardHttpClientTests
 
     }
 
-    [Fact, Order(4)]
+    [Fact]
     public void Deserializa_RetornoLista_Com_Diversos_Tipos_Nulaveis_ComValor_ComSucesso()
     {
 
@@ -353,13 +324,11 @@ public class BaseStandardHttpClientTests
             }
         };
 
-
         var fakeSucess = new DeserializeListSuccess<FakeReturnNull>
         {
             Success = true,
             Data = fakeListResult
         };
-
 
         var httpReturnResult = new HttpStandardReturn
         {
@@ -369,9 +338,8 @@ public class BaseStandardHttpClientTests
 
         };
 
-        mockBaseHttp.Setup(x => x.ReturnList<FakeReturnNull>(httpReturnResult, "urlHttp"))
+        _ = mockBaseHttp.Setup(x => x.ReturnList<FakeReturnNull>(httpReturnResult, "urlHttp"))
                     .CallBase();
-
 
         var returnClass = mockBaseHttp.Object.ReturnList<FakeReturnNull>(httpReturnResult, "urlHttp");
 
@@ -390,7 +358,5 @@ public class BaseStandardHttpClientTests
         Assert.Equal(expected: fakeResult.PropString, actual: returnClassEntity.PropString);
 
     }
-
-
 
 }

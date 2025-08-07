@@ -5,10 +5,8 @@ using System.Reflection;
 
 namespace Nuuvify.CommonPack.Extensions.Implementation;
 
-
 public static class ReflectionConstantsExtension
 {
-
 
     /// <summary>
     /// Retorna uma lista do tipo FieldInfo contendo os campos "public const" de uma determinada 

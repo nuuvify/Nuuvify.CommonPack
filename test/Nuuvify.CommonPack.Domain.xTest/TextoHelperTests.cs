@@ -16,11 +16,9 @@ public class TextoHelperTests
 
         var textoRetorno = texto.ToTitleCase();
 
-
         Assert.Equal(retorno, textoRetorno);
 
     }
-
 
     [Theory]
     [InlineData("Texto maiúsculo com char especial #$%", "TEXTO MAIÚSCULO COM CHAR ESPECIAL #$%")]
@@ -30,7 +28,6 @@ public class TextoHelperTests
 
         var newText = textActual.ToUpperInvariantNotNull();
 
-
         Assert.Equal(textExpected, newText);
     }
 
@@ -39,7 +36,6 @@ public class TextoHelperTests
     {
         var textExpected = "TEXTO MAIÚSCULO COM CHAR ESPECIAL #$%";
         string textActual = null;
-
 
         var newText = textActual.ToUpperInvariantNotNull();
 
@@ -147,7 +143,6 @@ public class TextoHelperTests
     {
         var text = "França-Brasil-Isso é um teste ação avô avó!?!#@$%^&*()_+\\|}{○<>??/ €$¥£¢ \\^$.|?*+()[{ 0123456789";
 
-
         var newText = text.RemoveCharsKeepChars("(", ")", "¥", "-", "+");
 
         var textExpected = "França-Brasil-Issoéumtesteaçãoavôavó()¥()0123456789";
@@ -185,13 +180,11 @@ public class TextoHelperTests
         var charVerticalTab = char.ConvertFromUtf32(9);
         var charEnter = char.ConvertFromUtf32(13);
 
-
         var text = "França-Brasil-Isso é um teste ação avô avó!?!#@$%^&*()_+\\|}{○<>??/ €$¥£¢ \\^$.|?*+()[{ 0123456789"
             + charNull
             + charEndOfText
             + charVerticalTab
             + charEnter;
-
 
         var newText = text.GetUnicodeChars();
 

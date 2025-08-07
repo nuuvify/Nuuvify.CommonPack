@@ -12,7 +12,6 @@ using Nuuvify.CommonPack.Middleware.Abstraction.Results;
 
 namespace Nuuvify.CommonPack.Middleware.Filters;
 
-
 /// <summary>
 /// [ApiKey(KeyName = new string[] {"MyKeyName")] deve ser utilizado em sua Controller ou Action, se utiliza-lo, não utilize [Authorize] <br/>
 /// O parametro "KeyName" deve corresponder, obrigatoriamente a uma entrada no serviço de VAULT <br/>
@@ -62,7 +61,6 @@ public class ApiKeyFilter : IResourceFilter, IActionFilter, IExceptionFilter
 
     }
 
-
     private void AddNewClaim(ClaimsPrincipal principal, string keyName, string keyValue)
     {
 
@@ -79,7 +77,6 @@ public class ApiKeyFilter : IResourceFilter, IActionFilter, IExceptionFilter
         return principal.HasClaim(x => x.Type == ApiKeyFilterConstants.ApiKeyInfo);
     }
 
-
     public void OnResourceExecuting(ResourceExecutingContext context)
     {
         var logMessage = "Run: [Before] IResourceFilter.OnResourceExecuting.";
@@ -91,7 +88,6 @@ public class ApiKeyFilter : IResourceFilter, IActionFilter, IExceptionFilter
 
     }
 
-
     public void OnResourceExecuted(ResourceExecutedContext context)
     {
         var logMessage = "Run: [After] IResourceFilter.OnResourceExecuting.";
@@ -102,7 +98,6 @@ public class ApiKeyFilter : IResourceFilter, IActionFilter, IExceptionFilter
             _logger.LogDebug($"ILogger: {logMessage}");
 
     }
-
 
     private (bool hasHeader, string apiKeyValue) HasKeyHeader(ActionExecutingContext context, string itemKeyName)
     {
@@ -132,10 +127,7 @@ public class ApiKeyFilter : IResourceFilter, IActionFilter, IExceptionFilter
                 throw new ArgumentException($"{nameof(_keyName)} is null");
             }
 
-
             if (HasClaimApiKey(context.HttpContext.User)) return;
-
-
 
             foreach (var item in _keyName)
             {
@@ -147,8 +139,6 @@ public class ApiKeyFilter : IResourceFilter, IActionFilter, IExceptionFilter
                 }
 
             }
-
-
 
             var notification = new NotificationR(nameof(_keyName), "ApiKey informed in the request header, is not valid, or does not exist in the Vault of this application.");
             var jsonResult = JsonSerializer.Serialize(new ReturnStandardErrors<NotificationR>
@@ -165,16 +155,13 @@ public class ApiKeyFilter : IResourceFilter, IActionFilter, IExceptionFilter
 
             return;
 
-
         }
         catch (Exception)
         {
             throw;
         }
 
-
     }
-
 
     public void OnActionExecuted(ActionExecutedContext context)
     {
@@ -185,7 +172,6 @@ public class ApiKeyFilter : IResourceFilter, IActionFilter, IExceptionFilter
             Debug.WriteLine($"Console: {logMessage}");
         else
             _logger.LogDebug($"ILogger: {logMessage}");
-
 
     }
 

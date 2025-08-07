@@ -5,7 +5,6 @@ using System;
 using System.Threading.Tasks;
 using Xunit;
 
-
 namespace Nuuvify.CommonPack.Middleware.xTest;
 
 public class GlobalHandleExceptionTests
@@ -14,7 +13,6 @@ public class GlobalHandleExceptionTests
     [Fact]
     public async Task ExceptionGlobalDeveLogarException()
     {
-
 
         var exceptionFake = new Exception("Isso é um teste");
 

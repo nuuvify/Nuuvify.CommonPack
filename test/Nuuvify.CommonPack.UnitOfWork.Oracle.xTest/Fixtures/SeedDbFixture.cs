@@ -4,12 +4,9 @@ using Xunit.Abstractions;
 
 namespace Nuuvify.CommonPack.UnitOfWork.Oracle.xTest.Fixtures;
 
-
 public class SeedDbFixture
 {
     public Fatura Fatura { get; private set; }
-
-
 
     public void CreateData(ITestOutputHelper outputHelper,
         BaseAppDbContextFixture dbContextFixture,
@@ -26,16 +23,14 @@ public class SeedDbFixture
             Fatura.AdicionarPedido(pedido[p]);
         }
 
-
-
         dbContextFixture.Db.SetDbContextUsername(usertest);
 
-        dbContextFixture.Db.Add(Fatura);
+        _ = dbContextFixture.Db.Add(Fatura);
 
         var registries = 0;
         if (saveDb)
         {
-            var uow = new UnitOfWork<DbContext>(dbContextFixture.Db)
+            using var uow = new UnitOfWork<DbContext>(dbContextFixture.Db)
             {
                 UsernameContext = usertest
             };

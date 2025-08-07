@@ -16,8 +16,6 @@ public class GlobalExceptionHandlerMiddleware
         _globalHandleException = globalHandleException;
     }
 
-
-
     public async Task Invoke(HttpContext context)
     {
         try
@@ -35,7 +33,6 @@ public class GlobalExceptionHandlerMiddleware
     }
 
 }
-
 
 public static class GlobalExceptionHandlerMiddlewareExtensions
 {

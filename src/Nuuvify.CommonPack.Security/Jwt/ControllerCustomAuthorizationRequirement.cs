@@ -8,7 +8,6 @@ public class ControllerCustomAuthorizationRequirement : IAuthorizationRequiremen
     public string ClaimType { get; protected set; }
     public IEnumerable<string> ClaimValues { get; protected set; }
 
-
     public ControllerCustomAuthorizationRequirement(string claimType, params string[] claimValues)
     {
         ClaimType = claimType;

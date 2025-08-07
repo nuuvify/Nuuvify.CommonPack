@@ -13,21 +13,17 @@ public class StorageTests
 {
     private Mock<IConfiguration> mockIConfigurationCustom;
 
-
     [Fact(Skip = "Executar apenas localmente")]
     // [Fact]
     public async Task DeveGravar_e_RecuperarArquivosNoBlobStorage()
     {
 
-
         const string cnnBlob = "MinhaApp_4e1f0c64-f02e-435a-baa7-c78923ad371a";
         const string blobCnn = "StorageKey";
 
-
         mockIConfigurationCustom = new Mock<IConfiguration>();
-        mockIConfigurationCustom.Setup(x => x.GetConnectionString(blobCnn))
+        _ = mockIConfigurationCustom.Setup(x => x.GetConnectionString(blobCnn))
             .Returns(cnnBlob);
-
 
         var storage = new StorageService(mockIConfigurationCustom.Object)
         {
@@ -45,17 +41,13 @@ public class StorageTests
         fileData.FileToByteArray("./MeuArquivo de teste.txt");
         byteFiles.Add($"{guid}:teste2", fileData.Content);
 
-
         var addResult = await storage.AddOrUpdateBlob(byteFiles, default);
-
 
         var chaves = byteFiles.Keys.AsEnumerable();
         var blobResult = await storage.GetBlobById(chaves);
 
-
         Assert.Equal(expected: 2, actual: blobResult.Blobs.Count());
         Assert.Equal(expected: "File(s) Added success.", actual: addResult);
-
 
     }
 }

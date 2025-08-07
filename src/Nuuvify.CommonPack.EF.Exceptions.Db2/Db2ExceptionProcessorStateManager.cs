@@ -59,7 +59,6 @@ public class Db2ExceptionProcessorStateManager : ExceptionProcessorStateManager<
         if (CustomErrors == null)
             CustomErrors = new Dictionary<string, string>();
 
-
         for (int i = 0; i < exception.Errors.Count; i++)
         {
             if (!string.IsNullOrWhiteSpace(exception.Errors[i].Message))
@@ -68,7 +67,7 @@ public class Db2ExceptionProcessorStateManager : ExceptionProcessorStateManager<
                 value = $"{exception.Errors[i].Message}";
 
                 CustomErrors.Add(key, value);
-                newMessage.AppendLine($"{key}: {value}");
+                _ = newMessage.AppendLine($"{key}: {value}");
             }
             if (!string.IsNullOrWhiteSpace(exception.Errors[i].NativeError.ToString()))
             {
@@ -76,7 +75,7 @@ public class Db2ExceptionProcessorStateManager : ExceptionProcessorStateManager<
                 value = $"{exception.Errors[i].NativeError}";
 
                 CustomErrors.Add(key, value);
-                newMessage.AppendLine($"{key}: {value}");
+                _ = newMessage.AppendLine($"{key}: {value}");
             }
             if (!string.IsNullOrWhiteSpace(exception.Errors[i].Source))
             {
@@ -84,7 +83,7 @@ public class Db2ExceptionProcessorStateManager : ExceptionProcessorStateManager<
                 value = $"{exception.Errors[i].Source}";
 
                 CustomErrors.Add(key, value);
-                newMessage.AppendLine($"{key}: {value}");
+                _ = newMessage.AppendLine($"{key}: {value}");
             }
             if (!string.IsNullOrWhiteSpace(exception.Errors[i].SQLState))
             {
@@ -92,7 +91,7 @@ public class Db2ExceptionProcessorStateManager : ExceptionProcessorStateManager<
                 value = $"{exception.Errors[i].SQLState}";
 
                 CustomErrors.Add(key, value);
-                newMessage.AppendLine($"{key}: {value}");
+                _ = newMessage.AppendLine($"{key}: {value}");
             }
 
         }
@@ -103,11 +102,10 @@ public class Db2ExceptionProcessorStateManager : ExceptionProcessorStateManager<
             key = $"#inner-{0}-Message";
             value = $"{inner.Message}";
 
-            newMessage.AppendLine($"{key}: {value}");
+            _ = newMessage.AppendLine($"{key}: {value}");
         }
 
         return newMessage.ToString();
     }
-
 
 }

@@ -8,7 +8,6 @@ namespace Nuuvify.CommonPack.OpenApi;
 internal class SwaggerInfoModel
 {
 
-
     public string AppName { get; private set; }
     public string AppVersion { get; private set; }
     public string BuildVersion { get; private set; }
@@ -19,7 +18,6 @@ internal class SwaggerInfoModel
     public Uri UrlLicenseValid { get; private set; }
     public Uri UrlTermsValid { get; private set; }
     public Uri UrlAppValid { get; private set; }
-
 
     public string PlatformNameHost()
     {
@@ -46,7 +44,6 @@ internal class SwaggerInfoModel
         DeveloperEmail = developerEmail;
         LicenseType = licenseType;
 
-
         AppName = Assembly.GetEntryAssembly()
             .GetName()
             .Name?
@@ -58,20 +55,17 @@ internal class SwaggerInfoModel
                      $"{Assembly.GetEntryAssembly().GetName().Version.Minor}." +
                      $"{Assembly.GetEntryAssembly().GetName().Version.Build}";
 
-
-        Uri.TryCreate(urlRepository, UriKind.RelativeOrAbsolute, out Uri _urlAppValid);
-        Uri.TryCreate(urlTermService, UriKind.RelativeOrAbsolute, out Uri _urlTermsValid);
-        Uri.TryCreate(urlLicense, UriKind.RelativeOrAbsolute, out Uri _urlLicenseValid);
+        _ = Uri.TryCreate(urlRepository, UriKind.RelativeOrAbsolute, out Uri _urlAppValid);
+        _ = Uri.TryCreate(urlTermService, UriKind.RelativeOrAbsolute, out Uri _urlTermsValid);
+        _ = Uri.TryCreate(urlLicense, UriKind.RelativeOrAbsolute, out Uri _urlLicenseValid);
 
         UrlAppValid = _urlAppValid;
         UrlTermsValid = _urlTermsValid;
         UrlLicenseValid = _urlLicenseValid;
     }
 
-
     public OpenApiInfo CreateInfoForApiVersion()
     {
-
 
         var info = new OpenApiInfo
         {

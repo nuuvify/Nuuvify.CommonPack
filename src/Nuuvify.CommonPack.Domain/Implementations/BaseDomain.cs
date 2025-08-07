@@ -12,7 +12,6 @@ public abstract class BaseDomain : NotifiableR, IBaseDomain
     protected readonly IMediator _mediator;
     protected readonly IMapper _mapper;
 
-
     protected BaseDomain(
         IMediator mediator,
         IMapper mapper)
@@ -21,12 +20,9 @@ public abstract class BaseDomain : NotifiableR, IBaseDomain
         _mapper = mapper;
     }
 
-
-
     public virtual IList<NotificationR> ValidationResult()
     {
         return Notifications.ToList();
     }
-
 
 }

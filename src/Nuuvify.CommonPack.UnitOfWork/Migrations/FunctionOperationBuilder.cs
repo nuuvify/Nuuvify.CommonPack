@@ -16,7 +16,7 @@ public static class FunctionOperationBuilder
         var function = new TFunction();
 
         var sql = function.GetFunctionBuilder();
-        sql.Append(function.Grant());
+        _ = sql.Append(function.Grant());
 
         return migrationBuilder.Sql(sql.ToString());
     }

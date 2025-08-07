@@ -8,7 +8,7 @@ public static class SwaggerGenSecurity
 {
     public static void Configuration(this IServiceCollection services)
     {
-        services.AddSwaggerGen(options =>
+        _ = services.AddSwaggerGen(options =>
         {
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
@@ -39,7 +39,6 @@ public static class SwaggerGenSecurity
                     new List<string>()
                 }
             });
-
 
         });
     }

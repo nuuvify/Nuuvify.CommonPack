@@ -7,7 +7,6 @@ namespace Nuuvify.CommonPack.UnitOfWork.Oracle.xTest;
 public static class AppSettingsConfig
 {
 
-
     private static string ProjectPath { get; set; }
     public static string TemplatePath { get; set; }
 
@@ -23,7 +22,6 @@ public static class AppSettingsConfig
            .SetBasePath(ProjectPath)
            .AddJsonFile(fileConfig)
            .Build();
-
 
         return config;
     }

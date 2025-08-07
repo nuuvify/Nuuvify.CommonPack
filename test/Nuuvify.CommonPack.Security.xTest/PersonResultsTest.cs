@@ -6,7 +6,6 @@ namespace Nuuvify.CommonPack.Security.xTest;
 public class PersonResultTest
 {
 
-
     [Fact]
     [Trait("Nuuvify.CommonPack.Extensions.Implementation", "PersonResult")]
     public void PersonQueryResult_DeveRetornarEmailInformado()
@@ -17,7 +16,6 @@ public class PersonResultTest
         {
             Email = Email
         };
-
 
         Assert.Equal(personResult.Email, Email);
 
@@ -33,7 +31,6 @@ public class PersonResultTest
             Login = "lalalala",
             Name = "Giropopis"
         };
-
 
         Assert.Null(personResult.Email);
 

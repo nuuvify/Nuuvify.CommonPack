@@ -3,7 +3,6 @@ using Xunit;
 
 namespace Nuuvify.CommonPack.Domain.xTest.ValueObjects;
 
-
 public class AtivarFuncaoTests
 {
     [Theory]
@@ -22,7 +21,6 @@ public class AtivarFuncaoTests
         var situacao = new AtivarFuncaoVo(codigo);
         Assert.Equal(result, situacao.IsValid());
     }
-
 
     [Theory]
     [Trait("CommonApi.Domain-ValueObjects", nameof(AtivarFuncaoVo))]

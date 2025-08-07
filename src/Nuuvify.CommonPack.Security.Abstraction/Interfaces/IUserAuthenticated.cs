@@ -50,5 +50,4 @@ public interface IUserAuthenticated
     /// <returns>true if claims principal is in the specified role; otherwise, false</returns>
     bool IsInRole(string role);
 
-
 }

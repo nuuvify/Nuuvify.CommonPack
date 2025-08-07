@@ -28,13 +28,11 @@ public abstract class DomainEntity : NotifiableR
     public virtual string UsuarioIdCadastro { get; protected set; }
     public virtual string UsuarioIdAlteracao { get; protected set; }
 
-
     protected void DefinirId(string Id)
     {
         if (!string.IsNullOrWhiteSpace(Id))
             this.Id = Id;
     }
-
 
     public override bool Equals(object obj)
     {
@@ -51,7 +49,6 @@ public abstract class DomainEntity : NotifiableR
     {
         return GetType().Name + "[Id = " + Id + "]";
     }
-
 
     public const int MaxId = 36;
     public const int MaxUsuarioCadastro = 100;

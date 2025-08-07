@@ -21,7 +21,6 @@ public class DocumentoPessoaEstrangeiroTests
         var nacionalidadeFiscal = new NacionalidadeFiscal(nacionalidade);
         Assert.Equal(nacionalidadeRetorno, nacionalidadeFiscal.Codigo);
 
-
         var _retorno = new DocumentoPessoaEstrangeiro(beneficiario, identificacao, provincia, nacionalidadeFiscal);
 
         Assert.Equal(retorno, _retorno.IsValid());

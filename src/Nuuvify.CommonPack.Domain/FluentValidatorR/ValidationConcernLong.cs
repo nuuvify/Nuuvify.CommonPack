@@ -69,11 +69,9 @@ public partial class ValidationConcernR<T> where T : NotifiableR
         }
     }
 
-
     public ValidationConcernR<T> AssertAreEquals(Expression<Func<T, long>> selector, long val, string message = "", string aggregateId = null)
     {
         ConfigConcern(selector);
-
 
         if (!string.IsNullOrWhiteSpace(SelectorNull))
         {

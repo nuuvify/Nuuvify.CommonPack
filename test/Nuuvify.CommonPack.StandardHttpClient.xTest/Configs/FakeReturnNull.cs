@@ -2,7 +2,6 @@ using System;
 
 namespace Nuuvify.CommonPack.StandardHttpClient.xTest.Configs;
 
-
 internal class FakeReturnNull
 {
 
@@ -15,6 +14,5 @@ internal class FakeReturnNull
     public bool? PropBool { get; set; }
     public DateTime? PropDatetime { get; set; }
     public DateTimeOffset? PropDateTimeOffset { get; set; }
-
 
 }

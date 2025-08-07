@@ -16,7 +16,7 @@ public class NotaFiscalTests
     public void NotaFiscalInvalida(string numero, string serie, string data, EnumSimNao simNao, bool retorno)
     {
 
-        DateTime.TryParse(data, out DateTime emissao);
+        _ = DateTime.TryParse(data, out DateTime emissao);
         var nota = new NotaFiscal(numero, serie, emissao, simNao);
 
         Assert.Equal(retorno, nota.IsValid());
@@ -33,7 +33,7 @@ public class NotaFiscalTests
     [InlineData("1234", "25A", "2017-09-13", "S", true)]
     public void NotaFiscalValida(string numero, string serie, string data, string situacao, bool retorno)
     {
-        DateTime.TryParse(data, out DateTime emissao);
+        _ = DateTime.TryParse(data, out DateTime emissao);
         var retornoDescricao = situacao.GetCodeEnumByDescription<EnumSimNao>();
         var simNao = retornoDescricao.ToUpperInvariantNotNull() == "SIM"
             ? EnumSimNao.Sim

@@ -6,10 +6,8 @@ using Nuuvify.CommonPack.AzureStorage.Abstraction;
 
 namespace Nuuvify.CommonPack.AzureStorage;
 
-
 public class StorageService : IStorageService
 {
-
 
     /// <summary>
     /// No Azure Storage, essa propriedade esta localizada em "Access Key"
@@ -55,8 +53,6 @@ public class StorageService : IStorageService
         }
     }
 
-
-
     private string _blobConnectionName;
     private string _blobContainerName;
     private readonly IConfiguration Configuration;
@@ -65,7 +61,6 @@ public class StorageService : IStorageService
         Configuration = configuration;
 
     }
-
 
     private BlobClient BlobClientInstance(string Id)
     {
@@ -77,25 +72,21 @@ public class StorageService : IStorageService
             Id);
     }
 
-
     public virtual async Task<BlobStorageResult> GetAllBlobs()
     {
 
         var blobCnn = Configuration.GetConnectionString(BlobConnectionName);
-
 
         var blobServiceClient = new BlobServiceClient(blobCnn);
         var blobContainerClient = blobServiceClient.GetBlobContainerClient(BlobContainerName);
 
         var blobs = blobContainerClient.GetBlobs(BlobTraits.All, BlobStates.Version);
 
-
         var blobFiles = new List<string>();
         foreach (var item in blobs)
         {
             blobFiles.Add(item.Name);
         }
-
 
         var files = await GetBlobById(blobFiles);
         return files;
@@ -115,15 +106,13 @@ public class StorageService : IStorageService
 
             using var ms = new MemoryStream(fileBase64.Value);
 
-            await _blobClient.UploadAsync(ms, true, cancellationToken);
+            _ = await _blobClient.UploadAsync(ms, true, cancellationToken);
 
         }
-
 
         return "File(s) Added success.";
 
     }
-
 
     ///<inheritdoc/>
     public virtual async Task<bool> DeleteBlob(string fileId)
@@ -133,7 +122,6 @@ public class StorageService : IStorageService
         return await _blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
 
     }
-
 
     ///<inheritdoc/>
     public virtual async Task<BlobStorageResult> GetBlobById(IEnumerable<string> attachments)
@@ -145,7 +133,6 @@ public class StorageService : IStorageService
         byte[] fileBytes;
         var blobResult = new BlobStorageResult();
         bool blobExists;
-
 
         foreach (var item in attachments)
         {
@@ -167,16 +154,13 @@ public class StorageService : IStorageService
                     blobResult.Blobs.Add(item, fileBytes);
                 }
 
-
             }
 
         }
 
-
         return blobResult;
 
     }
-
 
     ///<inheritdoc/>
     public virtual async Task<BlobStorageResult> DownloadStreamingAsync(IEnumerable<string> attachments, CancellationToken cancellationToken = default)
@@ -188,7 +172,6 @@ public class StorageService : IStorageService
         byte[] fileBytes;
         var blobResult = new BlobStorageResult();
         bool blobExists;
-
 
         foreach (var item in attachments)
         {
@@ -210,11 +193,9 @@ public class StorageService : IStorageService
                     blobResult.Blobs.Add(item, fileBytes);
                 }
 
-
             }
 
         }
-
 
         return blobResult;
 
@@ -230,7 +211,6 @@ public class StorageService : IStorageService
         BlobDownloadResult blobDownloadResult;
         var blobResult = new BlobStorageResult();
         bool blobExists;
-
 
         foreach (var item in attachments)
         {
@@ -251,9 +231,7 @@ public class StorageService : IStorageService
 
         }
 
-
         return blobResult;
-
 
     }
 

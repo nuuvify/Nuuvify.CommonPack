@@ -17,7 +17,7 @@ public static class ProcessorExtensions
     ///         {
     ///             optionsBuilder.UseExceptionProcessor();
     ///         }
-    ///     }   
+    ///     }
     /// </code>
     /// </example>
     /// </summary>
@@ -25,7 +25,7 @@ public static class ProcessorExtensions
     /// <returns></returns>
     public static DbContextOptionsBuilder UseExceptionProcessor(this DbContextOptionsBuilder self)
     {
-        self.ReplaceService<IStateManager, Db2ExceptionProcessorStateManager>();
+        _ = self.ReplaceService<IStateManager, Db2ExceptionProcessorStateManager>();
         return self;
     }
 
@@ -33,7 +33,7 @@ public static class ProcessorExtensions
     public static DbContextOptionsBuilder<TContext> UseExceptionProcessor<TContext>(this DbContextOptionsBuilder<TContext> self)
         where TContext : DbContext
     {
-        self.ReplaceService<IStateManager, Db2ExceptionProcessorStateManager>();
+        _ = self.ReplaceService<IStateManager, Db2ExceptionProcessorStateManager>();
         return self;
     }
 }

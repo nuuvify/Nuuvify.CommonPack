@@ -12,7 +12,6 @@ namespace Nuuvify.CommonPack.Middleware;
 public abstract class BaseCustomController : ControllerBase
 {
 
-
     protected virtual IDictionary<string, string> ObsoleteActionMessage()
     {
         var message = new Dictionary<string, string>();
@@ -53,7 +52,6 @@ public abstract class BaseCustomController : ControllerBase
                 ActionResult {ControllerContext.ActionDescriptor.ActionName}");
     }
 
-
     protected virtual object GetInstanceResponse(Type tipoResponseObject, object result)
     {
 
@@ -65,7 +63,6 @@ public abstract class BaseCustomController : ControllerBase
                 ActionResult {ControllerContext.ActionDescriptor.ActionName}");
         }
 
-
         PropertyInfo successProperty = tipoResponseObject.GetProperties()
             .FirstOrDefault(p => p.Name == "Sucesso" || p.Name == "Success");
         PropertyInfo warningProperty = tipoResponseObject.GetProperties()
@@ -76,11 +73,10 @@ public abstract class BaseCustomController : ControllerBase
         if (IsNull(successProperty))
         {
             throw new TypeAccessException(
-                $@"ProducesResponseType retorno com tipo informado é obrigatorio na 
-                    Controller {ControllerContext.ActionDescriptor.ControllerName} 
+                $@"ProducesResponseType retorno com tipo informado é obrigatorio na
+                    Controller {ControllerContext.ActionDescriptor.ControllerName}
                     ActionResult {ControllerContext.ActionDescriptor.ActionName}");
         }
-
 
         var instanceType = Activator.CreateInstance(tipoResponseObject);
 
@@ -90,7 +86,6 @@ public abstract class BaseCustomController : ControllerBase
         var obsoleteMessage = ObsoleteActionMessage();
         if (obsoleteMessage.Count > 0)
             warningProperty.SetValue(instanceType, obsoleteMessage);
-
 
         return instanceType;
     }

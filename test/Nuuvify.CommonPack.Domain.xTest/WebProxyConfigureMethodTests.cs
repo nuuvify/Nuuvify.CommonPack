@@ -7,7 +7,6 @@ namespace Nuuvify.CommonPack.Domain.xTest;
 public class WebProxyConfigureMethodTests
 {
 
-
     [Fact]
     public void RetornaWebProxyComParametrosInformados()
     {
@@ -16,7 +15,6 @@ public class WebProxyConfigureMethodTests
 
         var webProxy = new WebProxyConfigureMethod(uri.AbsoluteUri, new string[] { meudominio });
         var proxyConfigured = webProxy.GetProxyWithVariable();
-
 
         Assert.NotNull(proxyConfigured);
         Assert.True(proxyConfigured.IsBypassed(uri), $"Url: {uri.AbsoluteUri} é bypass");

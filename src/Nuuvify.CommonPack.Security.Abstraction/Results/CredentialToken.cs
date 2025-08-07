@@ -8,14 +8,12 @@ namespace Nuuvify.CommonPack.Security.Abstraction;
 public class CredentialToken
 {
 
-
     public CredentialToken()
     {
         Warnings = new Dictionary<string, string>();
     }
 
     private string _loginId;
-
 
     /// <summary>
     /// Informar o Login da aplicação ou de um usuario, ao informas essa propriedade, <br/>

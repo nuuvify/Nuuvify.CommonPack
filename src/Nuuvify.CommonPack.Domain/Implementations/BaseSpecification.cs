@@ -21,11 +21,7 @@ public abstract class BaseSpecification<TEntity> : NotifiableR,
     {
     }
 
-
-
     public abstract Task IsSatisfactory(TEntity entity);
-
-
 
     public IList<NotificationR> ValidationResult()
     {

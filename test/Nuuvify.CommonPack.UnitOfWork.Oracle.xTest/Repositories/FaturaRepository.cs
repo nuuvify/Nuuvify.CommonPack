@@ -1,11 +1,10 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 using Nuuvify.CommonPack.UnitOfWork.Oracle.xTest.Fixtures;
 using EntityFramework.Exceptions.Common;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Abstractions;
-using Xunit.Extensions.Ordering;
 
 namespace Nuuvify.CommonPack.UnitOfWork.Oracle.xTest.Repositories;
 
@@ -20,7 +19,6 @@ public class FaturaRepository
     private readonly Repository<Fatura> _faturaRepository;
     private const string UserRequest = "UoWOracleUserTest";
 
-
     public FaturaRepository(
         AppDbContextFixture dbContext,
         DataFixture dataFixture,
@@ -32,8 +30,7 @@ public class FaturaRepository
         _outputHelper = outputHelper;
         _seedDbFixture = seedDbFixture;
 
-
-        var _uow = new UnitOfWork<DbContext>(_dbContext.Db)
+        using var _uow = new UnitOfWork<DbContext>(_dbContext.Db)
         {
             UsernameContext = UserRequest
         };
@@ -42,9 +39,7 @@ public class FaturaRepository
 
     }
 
-
-
-    [OracleTestFact, Order(1)]
+    [OracleTestFact]
     [Trait("Oracle", "Fatura Repository - Write")]
     public async Task DomainEvent_ComClassesIguaisComVersoesDiferentes_DeveGerarEventComAmbasVersoes()
     {
@@ -54,15 +49,13 @@ public class FaturaRepository
             UserRequest,
             2, 5, true);
 
-
         const int RegistriesSaved = 1;
 
         var fatura = await _faturaRepository.GetFirstOrDefaultAsync(predicate:
             x => x.Id == _seedDbFixture.Fatura.Id);
 
         var faturaNewVersion = await _faturaRepository.FindAsync(fatura.Id);
-        faturaNewVersion.Update("Essa é a versão 2 da fatura");
-
+        faturaNewVersion.Update("Essa � a vers�o 2 da fatura");
 
         var registries = await _faturaRepository.SaveChangesAsync();
 
@@ -73,7 +66,7 @@ public class FaturaRepository
         Assert.False(faturaUpdated.SourceId.Observacao == faturaUpdated.NewFatura.Observacao);
     }
 
-    [OracleTestFact, Order(2)]
+    [OracleTestFact]
     [Trait("Oracle", "Fatura Repository - Write")]
     public void FromSqlDeveRetornarEntidadeValida()
     {
@@ -82,11 +75,10 @@ public class FaturaRepository
 
         var faturaFinded = _faturaRepository.FromSql(sql).ToList();
 
-
         Assert.True(faturaFinded.Count > 0);
     }
 
-    [OracleTestFact, Order(3)]
+    [OracleTestFact]
     [Trait("Oracle", "Fatura Repository - Write")]
     public async Task FirstOrDefaultComPredicateComIncludeDeveRetornarEntidadeValida()
     {
@@ -98,14 +90,13 @@ public class FaturaRepository
 
         fatura.AdicionarPedido(pedidos);
 
-        await _faturaRepository.Add(fatura);
+        _ = await _faturaRepository.Add(fatura);
         var registries = await _faturaRepository.SaveChangesAsync();
-
 
         Assert.Equal(22, registries);
     }
 
-    [OracleTestFact, Order(4)]
+    [OracleTestFact]
     [UseCulture("en-US", "en-US")]
     [Trait("Oracle", "Fatura Repository - Write")]
     public async Task RemoveFaturaPorIdNaoDeveRemoverCasoExistaPedido()
@@ -116,16 +107,13 @@ public class FaturaRepository
 
         _faturaRepository.Remove(_seedDbFixture.Fatura.Id);
 
-
         var resultException = await Assert.ThrowsAsync<CustomException>(()
             => _faturaRepository.SaveChangesAsync());
-
 
         Assert.True(resultException.CustomErrors.Count > 0);
         Assert.Equal(UserRequest, _dbContext.Db.GetDbContextUsername());
         Assert.Contains(messageExpected, resultException.Message);
 
     }
-
 
 }

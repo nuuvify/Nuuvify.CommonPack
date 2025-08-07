@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Fixtures;
 
-
 public class SeedDbFixture
 {
     public Fatura Fatura { get; private set; }
@@ -24,11 +23,9 @@ public class SeedDbFixture
             Fatura.AdicionarPedido(pedido[p]);
         }
 
-
-
         dbContextFixture.Db.SetDbContextUsername(usertest);
 
-        dbContextFixture.Db.Add(Fatura);
+        _ = dbContextFixture.Db.Add(Fatura);
 
         var registries = 0;
         if (saveDb)

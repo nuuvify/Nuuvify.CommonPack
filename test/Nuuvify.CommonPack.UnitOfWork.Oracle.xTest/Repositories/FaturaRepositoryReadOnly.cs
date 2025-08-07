@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Nuuvify.CommonPack.Extensions.Implementation;
@@ -6,7 +6,6 @@ using Nuuvify.CommonPack.UnitOfWork.Oracle.xTest.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Abstractions;
-using Xunit.Extensions.Ordering;
 
 namespace Nuuvify.CommonPack.UnitOfWork.Oracle.xTest.Repositories;
 
@@ -18,10 +17,8 @@ public class FaturaRepositoryReadOnly
     private readonly SeedDbFixture _seedDbFixture;
     private readonly ITestOutputHelper _outputHelper;
 
-
     private readonly RepositoryReadOnly<Fatura> _faturaRepository;
     private const string UserRequest = "OracleUserTest";
-
 
     public FaturaRepositoryReadOnly(
         AppDbContextFixture dbContext,
@@ -34,15 +31,11 @@ public class FaturaRepositoryReadOnly
         _outputHelper = outputHelper;
         _seedDbFixture = seedDbFixture;
 
-
-
         _faturaRepository = new RepositoryReadOnly<Fatura>(_dbContext.Db);
 
     }
 
-
-
-    // [OracleTestFact, Order(1)]
+    // [OracleTestFact]
     // [Trait("Oracle","Fatura Repository - ReadOnly")]
     // public async Task FindAsyncDeveRetornarEntidadeValida()
     // {
@@ -53,14 +46,12 @@ public class FaturaRepositoryReadOnly
     //         UserRequest,
     //         1, 2, true);
 
-
     //     var faturaFinded = await _faturaRepository.FindAsync(keyValues: _seedDbFixture.Fatura.Id);
-
 
     //     Assert.NotNull(faturaFinded);
     // }
 
-    [OracleTestFact, Order(2)]
+    [OracleTestFact]
     [Trait("Oracle", "Fatura Repository - ReadOnly")]
     public async Task FindAsyncDeveRetornarEntidadeValidaMesmoSemEncontrarId()
     {
@@ -68,23 +59,20 @@ public class FaturaRepositoryReadOnly
 
         var faturaFinded = await _faturaRepository.FindAsync(keyValues: Guid.NewGuid().ToString());
 
-
         Assert.Null(faturaFinded);
     }
 
-    [OracleTestFact, Order(3)]
+    [OracleTestFact]
     [Trait("Oracle", "Fatura Repository - ReadOnly")]
     public async Task FindAsyncComPredicateDeveRetornarEntidadeValida()
     {
         var faturaFinded = await _faturaRepository.FindAsync(_seedDbFixture.Fatura.Id);
 
-
         Assert.NotNull(faturaFinded);
         Assert.Equal(_seedDbFixture.Fatura.NumeroFatura, faturaFinded.NumeroFatura);
     }
 
-
-    [OracleTestFact, Order(4)]
+    [OracleTestFact]
     [Trait("Oracle", "Fatura Repository - ReadOnly")]
     public async Task FirstOrDefaultComPredicateDeveRetornarEntidadeValida()
     {
@@ -92,15 +80,11 @@ public class FaturaRepositoryReadOnly
         var faturaFinded = await _faturaRepository.GetFirstOrDefaultAsync(predicate: x =>
             x.NumeroFatura == _seedDbFixture.Fatura.NumeroFatura);
 
-
         Assert.NotNull(faturaFinded);
         Assert.Equal(_seedDbFixture.Fatura.NumeroFatura, faturaFinded.NumeroFatura);
     }
 
-
-
-
-    [OracleTestFact, Order(5)]
+    [OracleTestFact]
     [Trait("Oracle", "Fatura Repository - ReadOnly")]
     public async Task GetListComPredicateDeveRetornarEntidadeValida()
     {
@@ -110,13 +94,11 @@ public class FaturaRepositoryReadOnly
             DateTime.Today.Month,
             DateTime.Today.Day);
 
-
         var faturasFinded = await _faturaRepository.GetPagedListAsync(
             predicate: x => x.NumeroFatura == _seedDbFixture.Fatura.NumeroFatura &&
             x.DataCadastro >= hoje,
             disableTracking: false,
             ignoreQueryFilters: true);
-
 
         Assert.NotNull(faturasFinded);
         Assert.True(faturasFinded.Items.NotNullOrZero());

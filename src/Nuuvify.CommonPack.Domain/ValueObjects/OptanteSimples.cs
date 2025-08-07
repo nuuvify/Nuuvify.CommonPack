@@ -5,7 +5,6 @@ using Nuuvify.CommonPack.Extensions.Notificator;
 
 namespace Nuuvify.CommonPack.Domain.ValueObjects;
 
-
 public class OptanteSimples : NotifiableR
 {
 
@@ -16,11 +15,8 @@ public class OptanteSimples : NotifiableR
         DefinirDataDaOpcao(dataEntradaOuSaida);
     }
 
-
-
     public string OptantePeloSimples { get; private set; }
     public DateTime DataOpcaoPeloSimples { get; private set; }
-
 
     private void DefinirIndicador(EnumSimNao simNao)
     {
@@ -35,14 +31,11 @@ public class OptanteSimples : NotifiableR
     {
         var validacao = Notifications.Count;
 
-
-        new ValidationConcernR<OptanteSimples>(this)
+        _ = new ValidationConcernR<OptanteSimples>(this)
             .AssertNotDateTimeNull(x => dataOpcaoPeloSimples);
-
 
         if (validacao.Equals(Notifications.Count))
             DataOpcaoPeloSimples = dataOpcaoPeloSimples;
     }
-
 
 }

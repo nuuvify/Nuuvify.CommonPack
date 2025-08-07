@@ -5,7 +5,6 @@ using Nuuvify.CommonPack.Extensions.Notificator;
 
 namespace Nuuvify.CommonPack.Domain.ValueObjects;
 
-
 public class AtivarFuncaoVo : NotifiableR
 {
 

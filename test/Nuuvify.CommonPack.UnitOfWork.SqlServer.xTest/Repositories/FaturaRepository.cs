@@ -6,23 +6,19 @@ using Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Abstractions;
-using Xunit.Extensions.Ordering;
-
 
 namespace Nuuvify.CommonPack.UnitOfWork.SqlServer.xTest.Repositories;
 
 [Collection(nameof(DataCollection))]
+[Trait("Category", "Integration")]
 public class FaturaRepository
 {
     private readonly AppDbContextFixture _dbContext;
     private readonly DataFixture _dataFixture;
     private readonly SeedDbFixture _seedDbFixture;
-    private readonly ITestOutputHelper _outputHelper;
-
 
     private readonly Repository<Fatura> _faturaRepository;
     private const string UserRequest = "SqlServerUserTest";
-
 
     public FaturaRepository(
         AppDbContextFixture dbContext,
@@ -32,11 +28,9 @@ public class FaturaRepository
     {
         _dbContext = dbContext;
         _dataFixture = dataFixture;
-        _outputHelper = outputHelper;
         _seedDbFixture = seedDbFixture;
 
-
-        var uow = new UnitOfWork<DbContext>(_dbContext.Db)
+        using var uow = new UnitOfWork<DbContext>(_dbContext.Db)
         {
             UsernameContext = UserRequest
         };
@@ -45,35 +39,29 @@ public class FaturaRepository
 
     }
 
-
-
-
-
-    [SqlServerTestFact, Order(1)]
+    [SqlServerTestFact]
     [Trait("SqlServer", "Fatura Repository - Write")]
     public async Task DomainEvent_ComClassesIguaisComVersoesDiferentes_DeveGerarEventComAmbasVersoes()
     {
-        _outputHelper.WriteLine($"{this.GetType().Name} - Order(1)");
-
+        // Arrange - Criar dados específicos para este teste
         _seedDbFixture.CreateData(
             _dbContext,
             _dataFixture,
             UserRequest,
             2, 5, true);
 
-
         const int RegistriesSaved = 1;
 
-
+        // Act
         var fatura = await _faturaRepository.GetFirstOrDefaultAsync(predicate:
             x => x.Id == _seedDbFixture.Fatura.Id);
 
         var faturaNewVersion = await _faturaRepository.FindAsync(fatura.Id);
         faturaNewVersion.Update("Essa é a versão 2 da fatura");
 
-
         var registries = await _faturaRepository.SaveChangesAsync();
 
+        // Assert
         var faturaUpdated = new FaturaUpdatedEvent(fatura, "XYZ", faturaNewVersion);
 
         Assert.Equal(RegistriesSaved, registries);
@@ -81,54 +69,63 @@ public class FaturaRepository
         Assert.False(faturaUpdated.SourceId.Observacao == faturaUpdated.NewFatura.Observacao);
     }
 
-    [SqlServerTestFact, Order(2)]
+    [SqlServerTestFact]
     [Trait("SqlServer", "Fatura Repository - ReadOnly")]
     public async Task FindAsync_DeveRetornarEntidadeNotNull_MesmoSemEncontrarId()
     {
-        _outputHelper.WriteLine($"{this.GetType().Name} - Order(2)");
-
+        // Arrange & Act
         var faturaFinded = await _faturaRepository.FindAsync(keyValues: Guid.NewGuid().ToString());
 
-
+        // Assert
         Assert.Null(faturaFinded);
     }
 
-
-    [SqlServerTestFact, Order(3)]
+    [SqlServerTestFact]
     [Trait("SqlServer", "Fatura Repository - Write")]
     public void FromSqlDeveRetornarEntidadeValida()
     {
-        _outputHelper.WriteLine($"{this.GetType().Name} - Order(3)");
+        // Arrange - Criar dados específicos para este teste
+        _seedDbFixture.CreateData(
+            _dbContext,
+            _dataFixture,
+            UserRequest,
+            2, 5, true);
 
         var sql = $"SELECT * FROM {_dbContext.Schema}.FATURAS WHERE NUMERO_FATURA = {_seedDbFixture.Fatura.NumeroFatura}";
 
+        // Act
         var faturaFinded = _faturaRepository.FromSql(sql).ToList();
 
-
+        // Assert
         Assert.True(faturaFinded.Count > 0);
     }
 
-    [SqlServerTestFact, Order(4)]
+    [SqlServerTestFact]
     [Trait("SqlServer", "Fatura Repository - ReadOnly")]
     public async Task FirstOrDefaultComPredicateDeveRetornarEntidadeValida()
     {
-        _outputHelper.WriteLine($"{this.GetType().Name} - Order(4)");
+        // Arrange - Criar dados específicos para este teste
+        _seedDbFixture.CreateData(
+            _dbContext,
+            _dataFixture,
+            UserRequest,
+            2, 5, true);
 
+        // Act
         var faturaFinded = await _faturaRepository.GetFirstOrDefaultAsync(predicate: x =>
             x.NumeroFatura == _seedDbFixture.Fatura.NumeroFatura,
             disableTracking: false);
 
-
+        // Assert
         Assert.NotNull(faturaFinded);
         Assert.Equal(_seedDbFixture.Fatura.NumeroFatura, faturaFinded.NumeroFatura);
     }
 
-    [SqlServerTestFact, Order(5)]
+    [SqlServerTestFact]
     [Trait("SqlServer", "Fatura Repository - ReadOnly")]
     public async Task FirstOrDefaultComPredicateComIncludeDeveRetornarEntidadeValida()
     {
-        _outputHelper.WriteLine($"{this.GetType().Name} - Order(5)");
-
+        // Arrange
         const int npedido = 3;
 
         var fatura = _dataFixture.GerarFaturaFake().First();
@@ -136,12 +133,10 @@ public class FaturaRepository
 
         fatura.AdicionarPedido(pedidos);
 
-        await _faturaRepository.Add(fatura);
-        await _faturaRepository.SaveChangesAsync();
-
+        var faturaAdded = await _faturaRepository.Add(fatura);
+        var saveChangesResult = await _faturaRepository.SaveChangesAsync();
 
         var numeroPedido = fatura.Pedidos.LastOrDefault().NumeroPedido;
-
 
         var faturaFinded = await _faturaRepository.GetFirstOrDefaultAsync(
             predicate: x => x.NumeroFatura == fatura.NumeroFatura,
@@ -153,24 +148,29 @@ public class FaturaRepository
         Assert.Equal(numeroPedido, faturaPedido.NumeroPedido);
     }
 
-    [SqlServerTestFact, Order(6)]
+    [SqlServerTestFact]
     [Trait("SqlServer", "Fatura Repository - ReadOnly")]
     public async Task GetListComPredicateDeveRetornarEntidadeValida()
     {
-        _outputHelper.WriteLine($"{this.GetType().Name} - Order(6)");
+        // Arrange - Criar dados específicos para este teste
+        _seedDbFixture.CreateData(
+            _dbContext,
+            _dataFixture,
+            UserRequest,
+            2, 5, true);
 
         var hoje = new DateTime(DateTime.Today.Year,
             DateTime.Today.Month,
             DateTime.Today.Day);
 
-
+        // Act
         var faturasFinded = await _faturaRepository.GetPagedListAsync(
             predicate: x => x.NumeroFatura == _seedDbFixture.Fatura.NumeroFatura &&
             x.DataCadastro >= hoje,
             disableTracking: false,
             ignoreQueryFilters: true);
 
-
+        // Assert
         Assert.NotNull(faturasFinded);
         Assert.True(faturasFinded.Items.NotNullOrZero());
     }

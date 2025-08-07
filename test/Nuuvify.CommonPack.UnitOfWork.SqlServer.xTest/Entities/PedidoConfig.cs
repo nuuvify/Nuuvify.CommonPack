@@ -12,33 +12,30 @@ public class PedidoConfig : EntityConfiguration<Pedido>
 
         DefaultConfig(builder, "PEDIDOS", "PEDIDO");
 
-        builder.Property(e => e.CodigoCliente)
+        _ = builder.Property(e => e.CodigoCliente)
             .IsRequired()
             .HasColumnType("varchar(10)");
 
-        builder.Property(e => e.NumeroPedido)
+        _ = builder.Property(e => e.NumeroPedido)
             .IsRequired()
             .HasColumnType("numeric(8)");
 
-        builder.Property(e => e.DataPedido)
+        _ = builder.Property(e => e.DataPedido)
             .IsRequired();
 
         AuditConfig(builder);
         AuditUserIdConfig(builder);
 
-
-        builder.Property(e => e.FaturaId)
+        _ = builder.Property(e => e.FaturaId)
             .IsRequired()
             .HasColumnName($"FaturaId")
             .HasColumnType($"varchar({DomainEntity.MaxId})");
 
-
-        builder.HasOne(d => d.FaturaPedido)
+        _ = builder.HasOne(d => d.FaturaPedido)
             .WithMany(p => p.Pedidos)
             .HasForeignKey(f => f.FaturaId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("FK_Pedido_Fatura");
-
 
     }
 }

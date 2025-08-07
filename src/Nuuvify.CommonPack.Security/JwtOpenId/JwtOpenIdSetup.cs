@@ -33,13 +33,10 @@ public static class UserOpenIdSecuritySetup
         if (configuration is null)
             throw new ArgumentNullException(MsgSecurityJwt.ResourceManager.GetString("ConfigurationNull", CultureInfo.CurrentCulture));
 
-
         services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-        services.AddSingleton<IAuthorizationHandler, ControllerOpenIdAuthorizationHandler>();
+        _ = services.AddSingleton<IAuthorizationHandler, ControllerOpenIdAuthorizationHandler>();
         services.TryAddScoped<IUserAuthenticated, UserAuthenticated>();
-        services.AddScoped<IClaimsTransformation, AddRolesClaimsTransformation>();
-
-
+        _ = services.AddScoped<IClaimsTransformation, AddRolesClaimsTransformation>();
 
     }
 

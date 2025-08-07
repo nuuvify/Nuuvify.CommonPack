@@ -14,17 +14,15 @@ public class OptenteSimplesTests
     [InlineData(EnumSimNao.Nao, null, false)]
     public void OptanteSimplesInvalido(EnumSimNao simNao, string data, bool retorno)
     {
-        DateTime.TryParse(data, out DateTime dataEntradaOuSaida);
+        _ = DateTime.TryParse(data, out DateTime dataEntradaOuSaida);
         var optante = new OptanteSimples(simNao, dataEntradaOuSaida);
 
         var literal = simNao.GetDescription();
-
 
         Assert.Equal(retorno, optante.IsValid());
         Assert.True(literal.Equals(optante.OptantePeloSimples));
         Assert.Equal(dataEntradaOuSaida, optante.DataOpcaoPeloSimples);
 
     }
-
 
 }

@@ -7,7 +7,6 @@ using Nuuvify.CommonPack.Security.Abstraction;
 
 namespace Nuuvify.CommonPack.Security.JwtOpenId;
 
-
 /// <summary>
 /// Essa classe customiza a autorização do Aspnet, para casos que o token não venha com <br/>
 /// com role, assim é possivel pesquisar no repositorio IUserAccountRepository, pelo login <br/>
@@ -59,7 +58,6 @@ public class ControllerOpenIdAuthorizationHandler : AuthorizationHandler<Control
 
             }
 
-
             if (isAuthenticated)
             {
                 foreach (ControllerOpenIdAuthorizationRequirement item in context.Requirements)
@@ -72,9 +70,7 @@ public class ControllerOpenIdAuthorizationHandler : AuthorizationHandler<Control
                 context.Fail();
             }
 
-
         }
-
 
         return Task.CompletedTask;
     }

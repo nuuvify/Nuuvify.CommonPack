@@ -17,8 +17,6 @@ public sealed partial class ValidateModelStateCustomAttribute
             _logger = logger;
         }
 
-
-
         private static ObjectResult GetRetornoPadronizado(StatusCodeResult codigoRetornoModelStateComErro, IEnumerable<ModelStateErro> result)
         {
             var objectResultError = new ObjectResult(new RetornoPadraoComErrosModelState
@@ -30,10 +28,8 @@ public sealed partial class ValidateModelStateCustomAttribute
                 StatusCode = codigoRetornoModelStateComErro.StatusCode
             };
 
-
             return objectResultError;
         }
-
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
@@ -51,17 +47,14 @@ public sealed partial class ValidateModelStateCustomAttribute
 
             var retornoPadronizado = GetRetornoPadronizado(codigoRetornoModelStateComErro, result);
 
-
             _logger.LogError("{erro}", retornoPadronizado);
             return retornoPadronizado;
 
         }
 
-
         protected static IEnumerable<ModelStateErro> NotificarErroModelInvalida(ActionExecutingContext context)
         {
             var errosModelState = new List<ModelStateErro>();
-
 
             var erros = context.ModelState.Values.SelectMany(v => v.Errors);
             foreach (var erro in erros)
@@ -84,6 +77,5 @@ public sealed partial class ValidateModelStateCustomAttribute
             _logger.LogTrace("ValidateModelStateCustomAttribute On Executed");
         }
     }
-
 
 }

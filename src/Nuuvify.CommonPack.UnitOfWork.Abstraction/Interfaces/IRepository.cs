@@ -3,7 +3,6 @@ using Nuuvify.CommonPack.UnitOfWork.Abstraction.ValueObjects;
 
 namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 
-
 /// <summary>
 /// Defines the interfaces for generic repository.
 /// </summary>

@@ -30,7 +30,6 @@ public class CpfTests
 
     }
 
-
     [Theory]
     [Trait("CommonApi.Domain-ValueObjects", nameof(Cpf))]
     [InlineData("419.514.167-24", "41951416724")]
@@ -43,7 +42,6 @@ public class CpfTests
         Assert.Equal(cpfFormatado, _cpf.Codigo);
         Assert.Equal(cpfFormatado, _cpf.ToString());
     }
-
 
     [Theory]
     [Trait("CommonApi.Domain-ValueObjects", nameof(Cpf))]

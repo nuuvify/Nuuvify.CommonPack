@@ -1,19 +1,16 @@
 using System;
 using System.Text.Json;
 
-
 namespace Nuuvify.CommonPack.Security.JwtCredentials.Converters;
 
 public static class JsonTypesExtensions
 {
 
-
     public static object ConvertJsonTypeCustom(this ref Utf8JsonReader reader, Type propertyType)
     {
         object itemValue;
 
-
-        reader.Read();
+        _ = reader.Read();
         if (reader.TokenType == JsonTokenType.PropertyName)
         {
             throw new JsonException($"Nao era esperado uma propriedade, e sim um valor do tipo: {propertyType.Name}");

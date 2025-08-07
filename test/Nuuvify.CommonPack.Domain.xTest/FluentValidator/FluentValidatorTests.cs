@@ -1,17 +1,15 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Linq;
 using Nuuvify.CommonPack.Extensions.Notificator;
 using Xunit;
-using Xunit.Extensions.Ordering;
 
 namespace Nuuvify.CommonPack.Domain.xTest.FluentValidator;
 
-[Order(3)]
+[Trait("Category", "Unit")]
 public class FluentValidatorTests
 {
     private Customer _customer = new Customer();
-
 
     public FluentValidatorTests()
     {
@@ -21,7 +19,6 @@ public class FluentValidatorTests
         CultureInfo.CurrentCulture = new CultureInfo("en-US");
         CultureInfo.CurrentUICulture = new CultureInfo("en-US");
     }
-
 
     [Theory]
     [Trait("CommonApi.Domain-FluentValidator", nameof(FluentValidator))]
@@ -36,7 +33,7 @@ public class FluentValidatorTests
             Birthdate = dataTeste
         };
 
-        new ValidationConcernR<Customer>(_customer)
+        _ = new ValidationConcernR<Customer>(_customer)
             .AssertNotDateTimeNull(x => _customer.Birthdate);
 
         Assert.Equal(resultado, _customer.IsValid());
@@ -50,21 +47,20 @@ public class FluentValidatorTests
     public void DataValidaQuandoForNull(string data, bool resultado)
     {
 
-        DateTime.TryParse(data, out DateTime dataTeste);
+        _ = DateTime.TryParse(data, out DateTime dataTeste);
 
         var _customer = new Customer
         {
             Birthdate = dataTeste
         };
 
-        new ValidationConcernR<Customer>(_customer)
+        _ = new ValidationConcernR<Customer>(_customer)
             .AssertDateTimeNull(x => _customer.Birthdate);
 
         Assert.Equal(resultado, _customer.IsValid());
         Assert.Equal(dataTeste, _customer.Birthdate);
 
     }
-
 
     [Fact]
     [Trait("CommonApi.Domain-FluentValidator", nameof(FluentValidator))]
@@ -76,15 +72,14 @@ public class FluentValidatorTests
             Register = DateTimeOffset.Now
         };
 
-        new ValidationConcernR<Customer>(_customer)
+        _ = new ValidationConcernR<Customer>(_customer)
             .AssertNotDateTimeOffsetNull(x => _customer.Register);
 
         Assert.True(_customer.IsValid());
 
-
         _customer = new Customer();
 
-        new ValidationConcernR<Customer>(_customer)
+        _ = new ValidationConcernR<Customer>(_customer)
             .AssertNotDateTimeOffsetNull(x => _customer.Register);
 
         Assert.False(_customer.IsValid());
@@ -100,31 +95,29 @@ public class FluentValidatorTests
             Register = DateTimeOffset.Now
         };
 
-        new ValidationConcernR<Customer>(_customer)
+        _ = new ValidationConcernR<Customer>(_customer)
             .AssertDateTimeOffsetNull(x => _customer.Register);
 
         Assert.False(_customer.IsValid());
 
-
         _customer = new Customer();
 
-        new ValidationConcernR<Customer>(_customer)
+        _ = new ValidationConcernR<Customer>(_customer)
             .AssertDateTimeOffsetNull(x => _customer.Register);
 
         Assert.True(_customer.IsValid());
     }
 
-
     [Theory]
     [Trait("CommonApi.Domain-FluentValidator", nameof(FluentValidator))]
-    [InlineData(null, "!@#$%¨&*()_-+{}[]^~,.<>|/´`", false)]
-    [InlineData("Sem caractere requerido", "!@#$%¨&*()_-+{}[]^~,.<>|/´`", false)]
-    [InlineData("Tem caractere + nesse texto", "!@#$%¨&*()_-+{}[]^~,.<>|/´`", true)]
+    [InlineData(null, "!@#$%�&*()_-+{}[]^~,.<>|/�`", false)]
+    [InlineData("Sem caractere requerido", "!@#$%�&*()_-+{}[]^~,.<>|/�`", false)]
+    [InlineData("Tem caractere + nesse texto", "!@#$%�&*()_-+{}[]^~,.<>|/�`", true)]
     public void AssertContainsString(string nome, string contem, bool resultado)
     {
 
         _customer.Name = nome;
-        new ValidationConcernR<Customer>(_customer).AssertContains(x => _customer.Name, contem);
+        _ = new ValidationConcernR<Customer>(_customer).AssertContains(x => _customer.Name, contem);
         Assert.Equal(resultado, _customer.IsValid());
 
     }
@@ -136,15 +129,14 @@ public class FluentValidatorTests
         var contem = new string[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
         _customer.Name = "Tem o numero 8 nesse texto";
-        new ValidationConcernR<Customer>(_customer).AssertContains(x => _customer.Name, contem);
+        _ = new ValidationConcernR<Customer>(_customer).AssertContains(x => _customer.Name, contem);
         Assert.True(_customer.IsValid());
-
 
         var _customer2 = new Customer
         {
-            Name = "Não tem numero nesse texto"
+            Name = "N�o tem numero nesse texto"
         };
-        new ValidationConcernR<Customer>(_customer2).AssertContains(x => _customer2.Name, contem);
+        _ = new ValidationConcernR<Customer>(_customer2).AssertContains(x => _customer2.Name, contem);
         Assert.False(_customer2.IsValid());
 
     }
@@ -156,7 +148,7 @@ public class FluentValidatorTests
         var contem = new string[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
         _customer.Name = null;
-        new ValidationConcernR<Customer>(_customer).AssertContains(x => _customer.Name, contem);
+        _ = new ValidationConcernR<Customer>(_customer).AssertContains(x => _customer.Name, contem);
         Assert.False(_customer.IsValid());
     }
 
@@ -167,7 +159,7 @@ public class FluentValidatorTests
     public void AssertIsRequired(string nome, bool retorno)
     {
         _customer.Name = nome;
-        new ValidationConcernR<Customer>(_customer).AssertIsRequired(x => x.Name);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsRequired(x => x.Name);
         Assert.Equal(retorno, _customer.IsValid());
     }
 
@@ -180,7 +172,7 @@ public class FluentValidatorTests
     public void AssertHasMinLength(string nome, int min, bool retorno)
     {
         _customer.Name = nome;
-        new ValidationConcernR<Customer>(_customer).AssertHasMinLength(x => x.Name, min);
+        _ = new ValidationConcernR<Customer>(_customer).AssertHasMinLength(x => x.Name, min);
         Assert.Equal(retorno, _customer.IsValid());
     }
 
@@ -190,10 +182,9 @@ public class FluentValidatorTests
     {
         const int max = 3;
 
-        new ValidationConcernR<Customer>(_customer).AssertHasMinLength(x => null, max);
+        _ = new ValidationConcernR<Customer>(_customer).AssertHasMinLength(x => null, max);
         Assert.False(_customer.IsValid());
     }
-
 
     [Theory]
     [Trait("CommonApi.Domain-FluentValidator", nameof(FluentValidator))]
@@ -204,7 +195,7 @@ public class FluentValidatorTests
     public void AssertHasMaxLength(string nome, int max, bool retorno)
     {
         _customer.Name = nome;
-        new ValidationConcernR<Customer>(_customer).AssertHasMaxLength(x => x.Name, max);
+        _ = new ValidationConcernR<Customer>(_customer).AssertHasMaxLength(x => x.Name, max);
         Assert.Equal(retorno, _customer.IsValid());
     }
 
@@ -214,7 +205,7 @@ public class FluentValidatorTests
     {
         const int max = 5;
 
-        new ValidationConcernR<Customer>(_customer).AssertHasMaxLength(x => null, max);
+        _ = new ValidationConcernR<Customer>(_customer).AssertHasMaxLength(x => null, max);
         Assert.True(_customer.IsValid());
     }
 
@@ -227,7 +218,7 @@ public class FluentValidatorTests
     public void AssertIsFixedLength(string nome, int length, bool retorno)
     {
         _customer.Name = nome;
-        new ValidationConcernR<Customer>(_customer).AssertFixedLength(x => x.Name, length);
+        _ = new ValidationConcernR<Customer>(_customer).AssertFixedLength(x => x.Name, length);
         Assert.Equal(retorno, _customer.IsValid());
     }
 
@@ -239,7 +230,7 @@ public class FluentValidatorTests
     public void AssertMatches(string nome, bool retorno)
     {
         _customer.Name = nome;
-        new ValidationConcernR<Customer>(_customer).AssertRegexIsMatches("^\\d{5}[-]\\d{3}$", "Name", _customer.Name);
+        _ = new ValidationConcernR<Customer>(_customer).AssertRegexIsMatches("^\\d{5}[-]\\d{3}$", "Name", _customer.Name);
         Assert.Equal(retorno, _customer.IsValid());
     }
 
@@ -250,7 +241,7 @@ public class FluentValidatorTests
     public void AssertIsEmail(string email, bool retorno)
     {
         _customer.Email = email;
-        new ValidationConcernR<Customer>(_customer).AssertIsEmail(x => x.Email);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsEmail(x => x.Email);
         Assert.Equal(retorno, _customer.IsValid());
     }
 
@@ -265,7 +256,7 @@ public class FluentValidatorTests
         _customer.Name = nome;
         var expressao = _customer.Name.Equals(nomeA);
 
-        new ValidationConcernR<Customer>(_customer)
+        _ = new ValidationConcernR<Customer>(_customer)
             .AssertNotAreEquals(x => expressao, esperado);
 
         Assert.Equal(retorno, _customer.IsValid());
@@ -276,7 +267,7 @@ public class FluentValidatorTests
     public void AssertNotAreEquals_DateTime_Valid()
     {
         _customer.Birthdate = DateTime.Now;
-        new ValidationConcernR<Customer>(_customer)
+        _ = new ValidationConcernR<Customer>(_customer)
             .AssertNotAreEquals(x => x.Birthdate, _customer.Birthdate);
 
         Assert.False(_customer.IsValid());
@@ -288,7 +279,7 @@ public class FluentValidatorTests
     {
         var dataHora = DateTime.Now;
         _customer.Birthdate = dataHora.AddHours(1);
-        new ValidationConcernR<Customer>(_customer)
+        _ = new ValidationConcernR<Customer>(_customer)
             .AssertNotAreEquals(x => x.Birthdate, dataHora);
 
         Assert.True(_customer.IsValid());
@@ -300,7 +291,7 @@ public class FluentValidatorTests
     {
         var dataHora = DateTimeOffset.Now;
         _customer.Register = dataHora;
-        new ValidationConcernR<Customer>(_customer)
+        _ = new ValidationConcernR<Customer>(_customer)
             .AssertNotAreEquals(x => x.Register, dataHora);
 
         Assert.False(_customer.IsValid());
@@ -312,7 +303,7 @@ public class FluentValidatorTests
     {
         var dataHora = DateTimeOffset.Now;
         _customer.Register = dataHora.AddHours(1);
-        new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.Register, dataHora);
+        _ = new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.Register, dataHora);
         Assert.True(_customer.IsValid());
     }
 
@@ -323,27 +314,27 @@ public class FluentValidatorTests
     {
         var vlrDecimal = Convert.ToDecimal(valorDecimal);
         _customer.ValueDecimal = vlrDecimal;
-        new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.ValueDecimal, vlrDecimal);
+        _ = new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.ValueDecimal, vlrDecimal);
         Assert.Equal(retorno, _customer.IsValid());
 
         var vlrLong = Convert.ToInt64(valorLong);
         _customer.ValueLong = vlrLong;
-        new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.ValueLong, vlrLong);
+        _ = new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.ValueLong, vlrLong);
         Assert.Equal(retorno, _customer.IsValid());
 
         var vlrDouble = Convert.ToDouble(valorDouble);
         _customer.Height = vlrDouble;
-        new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.Height, vlrDouble);
+        _ = new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.Height, vlrDouble);
         Assert.Equal(retorno, _customer.IsValid());
 
         var vlrFloat = Convert.ToSingle(valorFloat);
         _customer.ValueFloat = vlrFloat;
-        new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.ValueFloat, vlrFloat);
+        _ = new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.ValueFloat, vlrFloat);
         Assert.Equal(retorno, _customer.IsValid());
 
         var vlrInt = Convert.ToInt32(valorInt);
         _customer.Age = vlrInt;
-        new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.Age, vlrInt);
+        _ = new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.Age, vlrInt);
         Assert.Equal(retorno, _customer.IsValid());
 
     }
@@ -355,31 +346,30 @@ public class FluentValidatorTests
     {
         var vlrDecimal = Convert.ToDecimal(valorDecimal);
         _customer.ValueDecimal = vlrDecimal;
-        new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.ValueDecimal, vlrDecimal - 1);
+        _ = new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.ValueDecimal, vlrDecimal - 1);
         Assert.Equal(retorno, _customer.IsValid());
 
         var vlrLong = Convert.ToInt64(valorLong);
         _customer.ValueLong = vlrLong;
-        new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.ValueLong, vlrLong - 1);
+        _ = new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.ValueLong, vlrLong - 1);
         Assert.Equal(retorno, _customer.IsValid());
 
         var vlrDouble = Convert.ToDouble(valorDouble);
         _customer.Height = vlrDouble;
-        new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.Height, vlrDouble / 10000);
+        _ = new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.Height, vlrDouble / 10000);
         Assert.Equal(retorno, _customer.IsValid());
 
         var vlrFloat = Convert.ToSingle(valorFloat);
         _customer.ValueFloat = vlrFloat;
-        new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.ValueFloat, vlrFloat / 10000);
+        _ = new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.ValueFloat, vlrFloat / 10000);
         Assert.Equal(retorno, _customer.IsValid());
 
         var vlrInt = Convert.ToInt32(valorInt);
         _customer.Age = vlrInt;
-        new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.Age, vlrInt - 1);
+        _ = new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.Age, vlrInt - 1);
         Assert.Equal(retorno, _customer.IsValid());
 
     }
-
 
     [Theory]
     [Trait("CommonApi.Domain-FluentValidator", nameof(FluentValidator))]
@@ -388,7 +378,7 @@ public class FluentValidatorTests
     public void AssertNotAreEquals(string nome, string nomeA, bool retorno)
     {
         _customer.Name = nome;
-        new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.Name, nomeA);
+        _ = new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.Name, nomeA);
         Assert.Equal(retorno, _customer.IsValid());
     }
 
@@ -401,7 +391,7 @@ public class FluentValidatorTests
         _customer.Name = "Lincoln Zocateli";
         var expressao = _customer.Name.Equals(valorA);
 
-        new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => expressao, true);
+        _ = new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => expressao, true);
         Assert.Equal(result, _customer.IsValid());
     }
 
@@ -411,7 +401,7 @@ public class FluentValidatorTests
     {
         var dataHora = DateTime.Now;
         _customer.Birthdate = dataHora;
-        new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.Birthdate, dataHora.AddHours(1));
+        _ = new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.Birthdate, dataHora.AddHours(1));
         Assert.False(_customer.IsValid());
     }
 
@@ -421,7 +411,7 @@ public class FluentValidatorTests
     {
         var dataHora = DateTime.Now;
         _customer.Birthdate = dataHora;
-        new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.Birthdate, dataHora);
+        _ = new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.Birthdate, dataHora);
         Assert.True(_customer.IsValid());
     }
 
@@ -431,7 +421,7 @@ public class FluentValidatorTests
     {
         var dataHora = DateTimeOffset.Now;
         _customer.Register = dataHora;
-        new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.Register, dataHora.AddHours(1));
+        _ = new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.Register, dataHora.AddHours(1));
         Assert.False(_customer.IsValid());
     }
 
@@ -442,27 +432,27 @@ public class FluentValidatorTests
     {
         var vlrDecimal = Convert.ToDecimal(valorDecimal);
         _customer.ValueDecimal = vlrDecimal;
-        new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.ValueDecimal, vlrDecimal - 1000);
+        _ = new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.ValueDecimal, vlrDecimal - 1000);
         Assert.Equal(retorno, _customer.IsValid());
 
         var vlrLong = Convert.ToInt64(valorLong);
         _customer.ValueLong = vlrLong;
-        new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.ValueLong, vlrLong - 1000);
+        _ = new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.ValueLong, vlrLong - 1000);
         Assert.Equal(retorno, _customer.IsValid());
 
         var vlrDouble = Convert.ToDouble(valorDouble);
         _customer.Height = vlrDouble;
-        new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.Height, vlrDouble / 10000);
+        _ = new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.Height, vlrDouble / 10000);
         Assert.Equal(retorno, _customer.IsValid());
 
         var vlrFloat = Convert.ToSingle(valorFloat);
         _customer.ValueFloat = vlrFloat;
-        new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.ValueFloat, vlrFloat / 10000);
+        _ = new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.ValueFloat, vlrFloat / 10000);
         Assert.Equal(retorno, _customer.IsValid());
 
         var vlrInt = Convert.ToInt32(valorInt);
         _customer.Age = vlrInt;
-        new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.Age, vlrInt - 1000);
+        _ = new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.Age, vlrInt - 1000);
         Assert.Equal(retorno, _customer.IsValid());
 
     }
@@ -474,27 +464,27 @@ public class FluentValidatorTests
     {
         var vlrDecimal = Convert.ToDecimal(valorDecimal);
         _customer.ValueDecimal = vlrDecimal;
-        new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.ValueDecimal, vlrDecimal);
+        _ = new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.ValueDecimal, vlrDecimal);
         Assert.Equal(retorno, _customer.IsValid());
 
         var vlrLong = Convert.ToInt64(valorLong);
         _customer.ValueLong = vlrLong;
-        new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.ValueLong, vlrLong);
+        _ = new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.ValueLong, vlrLong);
         Assert.Equal(retorno, _customer.IsValid());
 
         var vlrDouble = Convert.ToDouble(valorDouble);
         _customer.Height = vlrDouble;
-        new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.Height, vlrDouble);
+        _ = new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.Height, vlrDouble);
         Assert.Equal(retorno, _customer.IsValid());
 
         var vlrFloat = Convert.ToSingle(valorFloat);
         _customer.ValueFloat = vlrFloat;
-        new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.ValueFloat, vlrFloat);
+        _ = new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.ValueFloat, vlrFloat);
         Assert.Equal(retorno, _customer.IsValid());
 
         var vlrInt = Convert.ToInt32(valorInt);
         _customer.Age = vlrInt;
-        new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.Age, vlrInt);
+        _ = new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.Age, vlrInt);
         Assert.Equal(retorno, _customer.IsValid());
 
     }
@@ -508,7 +498,7 @@ public class FluentValidatorTests
     public void AssertAreEquals(string nome, string nomeA, bool retorno)
     {
         _customer.Name = nome;
-        new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.Name, nomeA);
+        _ = new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.Name, nomeA);
         Assert.Equal(retorno, _customer.IsValid());
     }
 
@@ -523,7 +513,7 @@ public class FluentValidatorTests
     {
         _customer.Url = url;
 
-        new ValidationConcernR<Customer>(_customer).AssertIsUrl(x => x.Url);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsUrl(x => x.Url);
         Assert.Equal(retorno, _customer.IsValid());
     }
 
@@ -546,7 +536,7 @@ public class FluentValidatorTests
     public void AssertIsTelephone(string numero, bool result)
     {
         _customer.Telephone = numero;
-        new ValidationConcernR<Customer>(_customer).AssertIsTelephone(x => x.Telephone);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsTelephone(x => x.Telephone);
         Assert.Equal(result, _customer.IsValid());
     }
 
@@ -568,7 +558,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.Age, ageA);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.Age, ageA);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -580,7 +570,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.Height, heingtA);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.Height, heingtA);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -592,7 +582,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.Birthdate, DateTime.Today.AddYears(birthdateA));
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.Birthdate, DateTime.Today.AddYears(birthdateA));
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -604,7 +594,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.ValueDecimal, valueDecimalA);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.ValueDecimal, valueDecimalA);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -616,7 +606,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.ValueFloat, valueFloatA);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.ValueFloat, valueFloatA);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -628,9 +618,8 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.ValueLong, valueLongA);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.ValueLong, valueLongA);
         Assert.Equal(result, _customer.IsValid());
-
 
     }
     [Theory]
@@ -651,7 +640,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.Age, ageA);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.Age, ageA);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -663,7 +652,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.Height, heingtA);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.Height, heingtA);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -675,7 +664,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.Birthdate, DateTime.Today.AddYears(birthdateA));
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.Birthdate, DateTime.Today.AddYears(birthdateA));
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -687,7 +676,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.ValueDecimal, valueDecimalA);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.ValueDecimal, valueDecimalA);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -699,7 +688,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.ValueFloat, valueFloatA);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.ValueFloat, valueFloatA);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -711,9 +700,8 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.ValueLong, valueLongA);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.ValueLong, valueLongA);
         Assert.Equal(result, _customer.IsValid());
-
 
     }
     [Theory]
@@ -735,7 +723,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsGreaterOrEqualsThan(x => x.Age, age + valueAdd);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterOrEqualsThan(x => x.Age, age + valueAdd);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -747,7 +735,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsGreaterOrEqualsThan(x => x.Height, height + valueAdd);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterOrEqualsThan(x => x.Height, height + valueAdd);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -759,20 +747,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsGreaterOrEqualsThan(x => x.Birthdate, _customer.Birthdate.AddYears(valueAdd));
-        Assert.Equal(result, _customer.IsValid());
-
-
-        _customer = new Customer
-        {
-            Age = age,
-            Height = height,
-            Birthdate = DateTime.Today.AddYears(birthdate),
-            ValueDecimal = valueDecimal,
-            ValueFloat = valueFloat,
-            ValueLong = valueLong
-        };
-        new ValidationConcernR<Customer>(_customer).AssertIsGreaterOrEqualsThan(x => x.ValueDecimal, valueDecimal + valueAdd);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterOrEqualsThan(x => x.Birthdate, _customer.Birthdate.AddYears(valueAdd));
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -784,7 +759,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsGreaterOrEqualsThan(x => x.ValueFloat, valueFloat + valueAdd);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterOrEqualsThan(x => x.ValueDecimal, valueDecimal + valueAdd);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -796,7 +771,19 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsGreaterOrEqualsThan(x => x.ValueLong, valueLong + valueAdd);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterOrEqualsThan(x => x.ValueFloat, valueFloat + valueAdd);
+        Assert.Equal(result, _customer.IsValid());
+
+        _customer = new Customer
+        {
+            Age = age,
+            Height = height,
+            Birthdate = DateTime.Today.AddYears(birthdate),
+            ValueDecimal = valueDecimal,
+            ValueFloat = valueFloat,
+            ValueLong = valueLong
+        };
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterOrEqualsThan(x => x.ValueLong, valueLong + valueAdd);
         Assert.Equal(result, _customer.IsValid());
     }
 
@@ -821,7 +808,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.Age, age + valueAdd);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.Age, age + valueAdd);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -833,7 +820,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.Height, height + valueAdd);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.Height, height + valueAdd);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -845,7 +832,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.Birthdate, DateTime.Today.AddYears(valueAdd));
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.Birthdate, DateTime.Today.AddYears(valueAdd));
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -857,7 +844,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.ValueDecimal, valueDecimalA);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.ValueDecimal, valueDecimalA);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -869,7 +856,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.ValueFloat, valueFloatA);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.ValueFloat, valueFloatA);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -881,7 +868,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.ValueLong, valueLongA);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.ValueLong, valueLongA);
         Assert.Equal(result, _customer.IsValid());
     }
     [Theory]
@@ -905,7 +892,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.Age, age + valueAdd);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.Age, age + valueAdd);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -917,7 +904,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.Height, height + valueAdd);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.Height, height + valueAdd);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -929,7 +916,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.Birthdate, DateTime.Today.AddYears(valueAdd));
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.Birthdate, DateTime.Today.AddYears(valueAdd));
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -941,7 +928,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.ValueDecimal, valueDecimalA);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.ValueDecimal, valueDecimalA);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -953,7 +940,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.ValueFloat, valueFloatA);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.ValueFloat, valueFloatA);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -965,7 +952,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.ValueLong, valueLongA);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.ValueLong, valueLongA);
         Assert.Equal(result, _customer.IsValid());
     }
 
@@ -991,7 +978,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsLowerOrEqualsThan(x => x.Age, ageA);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerOrEqualsThan(x => x.Age, ageA);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -1003,7 +990,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsLowerOrEqualsThan(x => x.Height, heightA);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerOrEqualsThan(x => x.Height, heightA);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -1015,7 +1002,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsLowerOrEqualsThan(x => x.Birthdate, DateTime.Today.AddYears(birthdateA));
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerOrEqualsThan(x => x.Birthdate, DateTime.Today.AddYears(birthdateA));
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -1027,7 +1014,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsLowerOrEqualsThan(x => x.ValueDecimal, valueDecimalA);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerOrEqualsThan(x => x.ValueDecimal, valueDecimalA);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -1039,7 +1026,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsLowerOrEqualsThan(x => x.ValueFloat, valueFloatA);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerOrEqualsThan(x => x.ValueFloat, valueFloatA);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -1051,7 +1038,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsLowerOrEqualsThan(x => x.ValueLong, valueLongA);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerOrEqualsThan(x => x.ValueLong, valueLongA);
         Assert.Equal(result, _customer.IsValid());
 
     }
@@ -1078,7 +1065,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsBetween(x => x.Age, ageA, ageA + 2);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsBetween(x => x.Age, ageA, ageA + 2);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -1090,7 +1077,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsBetween(x => x.Height, heightA, heightA + 2);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsBetween(x => x.Height, heightA, heightA + 2);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -1102,7 +1089,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsBetween(x => x.Birthdate, DateTime.Today.AddYears(birthdateA), DateTime.Today.AddYears(birthdateB));
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsBetween(x => x.Birthdate, DateTime.Today.AddYears(birthdateA), DateTime.Today.AddYears(birthdateB));
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -1114,7 +1101,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsBetween(x => x.ValueDecimal, valueDecimalA, valueDecimalA + 2);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsBetween(x => x.ValueDecimal, valueDecimalA, valueDecimalA + 2);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -1126,7 +1113,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsBetween(x => x.ValueFloat, valueFloatA, valueFloatA + 2);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsBetween(x => x.ValueFloat, valueFloatA, valueFloatA + 2);
         Assert.Equal(result, _customer.IsValid());
 
         _customer = new Customer
@@ -1138,7 +1125,7 @@ public class FluentValidatorTests
             ValueFloat = valueFloat,
             ValueLong = valueLong
         };
-        new ValidationConcernR<Customer>(_customer).AssertIsBetween(x => x.ValueLong, valueLongA, valueLongA + 2);
+        _ = new ValidationConcernR<Customer>(_customer).AssertIsBetween(x => x.ValueLong, valueLongA, valueLongA + 2);
         Assert.Equal(result, _customer.IsValid());
 
     }
@@ -1151,9 +1138,8 @@ public class FluentValidatorTests
         var dataMenor = DateTime.Today.AddMonths(-2);
         var dataMaior = DateTime.Today.AddMonths(2);
 
-        new ValidationConcernR<Customer>(_customer)
+        _ = new ValidationConcernR<Customer>(_customer)
             .AssertIsBetween(x => dataComparar, dataMenor, dataMaior);
-
 
         Assert.Contains(nameof(dataComparar), _customer.Notifications.FirstOrDefault().Message);
         Assert.Contains(nameof(dataComparar), _customer.Notifications.FirstOrDefault().Property);

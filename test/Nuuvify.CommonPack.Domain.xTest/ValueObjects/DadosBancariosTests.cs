@@ -18,9 +18,7 @@ public class DadosBancariosTests
     public void DadosBancariosTest(string bancoNumero, string agenciaNumero, string agenciaNome, string contaCorrente, TipoContaBancaria tipoConta, bool retorno)
     {
 
-
         var _agenciaNome = agenciaNome.ToTitleCase();
-
 
         var teste = new DadosBancarios(bancoNumero, agenciaNumero, agenciaNome, contaCorrente, tipoConta);
 

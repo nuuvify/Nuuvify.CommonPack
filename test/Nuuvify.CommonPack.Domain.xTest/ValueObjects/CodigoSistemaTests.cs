@@ -25,7 +25,6 @@ public class CodigoSistemaTests
         Assert.Equal(result, situacao.IsValid());
     }
 
-
     [Theory]
     [Trait("CommonApi.Domain-ValueObjects", nameof(CodigoSistemaVo))]
     [InlineData("reinf", "REINF", 1)]
@@ -40,7 +39,6 @@ public class CodigoSistemaTests
         Assert.Equal(hashCodigo, situacao.GetHashCode());
     }
 
-
     [Theory]
     [Trait("CommonApi.Domain-ValueObjects", nameof(CodigoSistemaVo))]
     [InlineData("reinf", "REINF", 1)]
@@ -53,7 +51,6 @@ public class CodigoSistemaTests
         var codigoLiteral = new CodigoSistemaVo(codigo);
         var codigoNumerico = codigoLiteral.Codigo.ToEnumNumero<CodigoSistema>();
         var codigoNumericoOutraForma = codigoLiteral.GetHashCode();
-
 
         Assert.Equal(result, codigoLiteral.ToString());
         Assert.Equal(hashCodigo, codigoNumerico);

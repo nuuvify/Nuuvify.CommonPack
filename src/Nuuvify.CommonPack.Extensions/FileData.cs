@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 
-
 namespace Nuuvify.CommonPack.Extensions;
 
 public class FileData
@@ -10,8 +9,6 @@ public class FileData
     public string Id { get; set; }
     public string Name { get; private set; }
     public byte[] Content { get; private set; }
-
-
 
     /// <summary>
     /// Retorna uma string concatenando Id_Name
@@ -24,7 +21,6 @@ public class FileData
             : $"{Id}_{Name}";
 
     }
-
 
     /// <summary>
     /// Informe um Stream, e fileLength, sera populado as propriedades: <br/>
@@ -95,13 +91,12 @@ public class FileData
     public void Download(byte[] fileContent, string pathFileName)
     {
 
-        Directory.CreateDirectory(Path.GetDirectoryName(pathFileName));
+        _ = Directory.CreateDirectory(Path.GetDirectoryName(pathFileName));
         File.WriteAllBytes(pathFileName, fileContent);
 
         Name = pathFileName;
         Content = fileContent;
 
     }
-
 
 }

@@ -4,7 +4,6 @@ using Xunit;
 
 namespace Nuuvify.CommonPack.Domain.xTest.ValueObjects;
 
-
 public class EmitidoRecebidoTests
 {
     [Theory]
@@ -25,8 +24,5 @@ public class EmitidoRecebidoTests
         Assert.Equal(testResult, enumIsTrue);
         Assert.Equal(enumCode, resultEnum);
     }
-
-
-
 
 }

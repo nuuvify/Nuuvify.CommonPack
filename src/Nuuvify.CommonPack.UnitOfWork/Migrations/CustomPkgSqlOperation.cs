@@ -15,7 +15,6 @@ public abstract class CustomPkgSqlOperation : SqlOperation
     public abstract string Schema { get; }
     public abstract string UserGrant { get; }
 
-
     public override string ToString()
     {
         if (string.IsNullOrWhiteSpace(Schema))

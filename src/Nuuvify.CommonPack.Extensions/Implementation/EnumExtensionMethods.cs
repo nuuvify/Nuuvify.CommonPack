@@ -2,9 +2,7 @@
 using System.Linq;
 using System.Reflection;
 
-
 namespace Nuuvify.CommonPack.Extensions.Implementation;
-
 
 public static class EnumExtensionMethods
 {
@@ -27,8 +25,6 @@ public static class EnumExtensionMethods
         return GenericEnum.ToString();
     }
 
-
-
     /// <summary>
     /// Obtem o numero do Enum atraves do texto passado
     /// </summary>
@@ -40,7 +36,6 @@ public static class EnumExtensionMethods
         if (value == null)
             return int.MaxValue;
 
-
         if (Enum.IsDefined(typeof(T), value))
         {
             var numeroEnum = $@"{Enum.Parse(typeof(T), value):D}";
@@ -50,7 +45,6 @@ public static class EnumExtensionMethods
 
         return int.MaxValue;
     }
-
 
     /// <summary>
     /// Obtem o texto do Enum atraves do numero passado
@@ -85,7 +79,6 @@ public static class EnumExtensionMethods
         return null;
     }
 
-
     /// <summary>
     /// Obter a descrição do atributo definido no enum, a partir de um int
     /// </summary>
@@ -107,14 +100,12 @@ public static class EnumExtensionMethods
     {
         var descricao = "";
 
-
         foreach (var item in Enum.GetValues(typeof(T)))
         {
             if (item.ToString() == value)
             {
                 var field = item.GetType().GetField(item.ToString());
                 var attributes = field.GetCustomAttributes(false);
-
 
                 dynamic displayAttribute = null;
 
@@ -144,7 +135,6 @@ public static class EnumExtensionMethods
     public static bool IsEnum<T>(this string value, out int enumCode)
     {
         var numberEnum = int.MaxValue;
-
 
         var description = value.ToEnumDescricao<T>();
         var number = value.ToEnumNumero<T>();
@@ -190,15 +180,12 @@ public static class EnumExtensionMethods
         var descricao = "";
         var codigo = "";
 
-
         if (value == null) return codigo;
-
 
         foreach (var item in Enum.GetValues(typeof(T)))
         {
             var field = item.GetType().GetField(item.ToString());
             var attributes = field.GetCustomAttributes(false);
-
 
             dynamic displayAttribute = null;
 

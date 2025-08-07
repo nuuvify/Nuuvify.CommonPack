@@ -24,7 +24,6 @@ public static class FormFileCollectionExtensions
         if (files == null || files.Count == 0)
             return list;
 
-
         string fileName;
         byte[] fileBytes;
 
@@ -35,7 +34,6 @@ public static class FormFileCollectionExtensions
                 file.CopyTo(ms);
                 fileBytes = ms.ToArray();
             }
-
 
             fileName = $"{prefixFileName}{file.FileName}";
             if (!list.TryGetValue(fileName.Trim(), out byte[] value))

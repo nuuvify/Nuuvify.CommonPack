@@ -5,18 +5,14 @@ using Nuuvify.CommonPack.StandardHttpClient.Results;
 
 namespace Nuuvify.CommonPack.StandardHttpClient.WebServices;
 
-
 public partial class StandardWebService
 {
-
-
 
     private HttpStandardXmlReturn GetStreamReader(Stream data)
     {
 
         _returnMessage = new HttpStandardXmlReturn();
         var xmlResponseDocument = new XmlDocument();
-
 
         using (var reader = new StreamReader(data))
         {
@@ -43,7 +39,6 @@ public partial class StandardWebService
 
     }
 
-
     private async Task<HttpStandardXmlReturn> StandardGetRequestStreamAsync(
         string url,
         XmlDocument soapEnvelopeXml,
@@ -54,7 +49,6 @@ public partial class StandardWebService
             _httpClient?.BaseAddress?.AbsoluteUri);
 
         HttpStandardXmlReturn httpStandardReturn;
-
 
         if (!string.IsNullOrWhiteSpace(_httpClient?.BaseAddress?.AbsoluteUri) &&
             _httpClient.BaseAddress.IsAbsoluteUri)
@@ -87,8 +81,6 @@ public partial class StandardWebService
         }
 
         _logger.LogDebug("Url and message after config {FullUrl}", FullUrl.ToString());
-
-
 
         var content = new StringContent(
             soapEnvelopeXml.OuterXml,
@@ -123,12 +115,8 @@ public partial class StandardWebService
             }
         }
 
-
         return httpStandardReturn;
 
     }
-
-
-
 
 }

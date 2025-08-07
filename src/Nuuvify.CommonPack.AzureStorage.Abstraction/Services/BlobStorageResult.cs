@@ -2,19 +2,14 @@ using System.Collections.Generic;
 
 namespace Nuuvify.CommonPack.AzureStorage.Abstraction;
 
-
 public class BlobStorageResult
 {
-
 
     public BlobStorageResult()
     {
         Blobs = new Dictionary<string, byte[]>();
         StringBlobs = new Dictionary<string, string>();
     }
-
-
-
 
     /// <summary>
     /// Key: Nome do arquivo, Value: conteudo do arquivo em base64

@@ -11,45 +11,41 @@ public class FaturaConfig : EntityConfiguration<Fatura>
 
         DefaultConfig(builder, "FATURAS", "FATURA");
 
-
-        builder.Property(e => e.NumeroFatura)
+        _ = builder.Property(e => e.NumeroFatura)
             .IsRequired()
             .HasColumnName($"NUMERO_FATURA")
             .HasColumnType("NUMBER(8)");
 
-
-        builder.OwnsOne(
+        _ = builder.OwnsOne(
             o => o.EnderecoEntrega,
             pp =>
             {
-                pp.Property(p => p.Cidade)
+                _ = pp.Property(p => p.Cidade)
                     .HasColumnName("ENTREGA_CIDADE")
                     .HasColumnType($"VARCHAR2({Endereco.MaxCidade})");
 
-                pp.Property(p => p.Logradouro)
+                _ = pp.Property(p => p.Logradouro)
                     .HasColumnName("ENTREGA_LOGRADOURO")
                     .HasColumnType($"VARCHAR2({Endereco.MaxLogradouro})");
 
             });
 
-        builder.OwnsOne(
+        _ = builder.OwnsOne(
             o => o.EnderecoFatura,
             pp =>
             {
-                pp.Property(p => p.Cidade)
+                _ = pp.Property(p => p.Cidade)
                     .HasColumnName("FATURA_CIDADE")
                     .HasColumnType($"VARCHAR2({Endereco.MaxCidade})");
 
-                pp.Property(p => p.Logradouro)
+                _ = pp.Property(p => p.Logradouro)
                     .HasColumnName("FATURA_LOGRADOURO")
                     .HasColumnType($"VARCHAR2({Endereco.MaxLogradouro})");
 
             });
 
-
         AuditConfig(builder);
         AuditUserIdIgnore(builder);
-
 
     }
 }

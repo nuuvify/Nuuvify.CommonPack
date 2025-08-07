@@ -10,7 +10,7 @@ public static class DictionaryExtension
 
         if (dictionary.TryGetValue(key, out object valueTest))
         {
-            dictionary.Remove(key);
+            _ = dictionary.Remove(key);
         }
         dictionary.Add(key, value);
 

@@ -20,7 +20,7 @@ public static class PkgOperationBuilder
             case "Oracle.EntityFrameworkCore":
                 {
                     var sql = pkg.GetPkgBuilder();
-                    sql.Append(pkg.Grant());
+                    _ = sql.Append(pkg.Grant());
 
                     return migrationBuilder.Sql(sql.ToString());
 
@@ -28,7 +28,7 @@ public static class PkgOperationBuilder
             case "Microsoft.EntityFrameworkCore.SqlServer":
                 {
                     var sql = pkg.GetPkgBuilder();
-                    sql.Append(pkg.Grant());
+                    _ = sql.Append(pkg.Grant());
 
                     return migrationBuilder.Sql(sql.ToString());
                 }

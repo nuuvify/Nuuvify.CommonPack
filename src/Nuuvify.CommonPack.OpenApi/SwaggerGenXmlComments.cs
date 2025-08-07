@@ -11,8 +11,7 @@ public static class SwaggerGenXmlComments
     public static void Configuration(this IServiceCollection services)
     {
 
-
-        services.AddSwaggerGen(options =>
+        _ = services.AddSwaggerGen(options =>
         {
 
             options.EnableAnnotations();
@@ -33,12 +32,9 @@ public static class SwaggerGenXmlComments
                 }
             }
 
-
         });
 
-
     }
-
 
     public static string XmlCommentsFilePath(string baseDirectory, string fileXml)
     {

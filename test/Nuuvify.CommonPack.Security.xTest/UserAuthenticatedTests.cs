@@ -25,7 +25,6 @@ public class UserAuthenticatedTests
 
         _context = new DefaultHttpContext();
 
-
         var cwsComGrupo = new PersonWithRolesQueryResult
         {
             Email = "fulano@zzz.com",
@@ -33,14 +32,12 @@ public class UserAuthenticatedTests
             Name = "Fulano de tal"
         };
 
-
         string projectPath = AppDomain.CurrentDomain.BaseDirectory.Split(new String[] { @"bin\" }, StringSplitOptions.None)[0];
 
         _config = new ConfigurationBuilder()
            .SetBasePath(projectPath)
            .AddJsonFile(Path.Combine(projectPath, "configTest.json"))
            .Build();
-
 
         var _jwtOptions = new JwtTokenOptions
         {
@@ -53,12 +50,9 @@ public class UserAuthenticatedTests
             .WithJwtOptions(_jwtOptions)
             .WithJwtUserClaims(cwsComGrupo);
 
-
-
         _context.User.AddIdentity(jwtClass.GetClaimsIdentity());
 
     }
-
 
     private IDistributedCache GetSqlServerCache(SqlServerCacheOptions options = null)
     {

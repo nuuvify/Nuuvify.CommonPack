@@ -19,7 +19,6 @@ public abstract class CustomViewSqlOperation : SqlOperation
     public abstract string Schema { get; }
     public abstract string UserGrant { get; }
 
-
     public override string ToString()
     {
         if (string.IsNullOrWhiteSpace(Schema))
@@ -35,6 +34,5 @@ public abstract class CustomViewSqlOperation : SqlOperation
     public abstract StringBuilder GetViewBuilder();
 
     public abstract StringBuilder Grant();
-
 
 }

@@ -29,7 +29,6 @@ namespace Nuuvify.CommonPack.Domain.xTest.ValueObjects;
 
 //     }
 
-
 //     [Theory]
 //     [Trait("CommonApi.Domain-ValueObjects", nameof(IndicadorPessoa))]
 //     [InlineData("cliente", "", int.MaxValue, false)]
@@ -48,7 +47,6 @@ namespace Nuuvify.CommonPack.Domain.xTest.ValueObjects;
 //         var codigoLiteral = pessoa;
 //         var retornoDescricao = codigoLiteral.GetCodeEnumByDescription<IndicadorPessoa>();
 //         var codigoNumerico = retornoDescricao.ToEnumNumero<IndicadorPessoa>();
-
 
 //         Assert.Equal(descricao, retornoDescricao);
 //         Assert.Equal(codigoNumerico, codigoRetorno);

@@ -23,7 +23,7 @@ public static class PollyCustomExtensions
         {
             if (context.TryGetValue(ServiceNameKey, out object value))
             {
-                context.Remove(ServiceNameKey);
+                _ = context.Remove(ServiceNameKey);
             }
             context.Add(ServiceNameKey, serviceName);
 

@@ -19,5 +19,4 @@ public enum EnumNacionalidadeFiscal
     [Description("C")]
     EstrangeiroComCpfCnpj = 2,
 
-
 }

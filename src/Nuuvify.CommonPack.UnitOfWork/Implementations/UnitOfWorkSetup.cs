@@ -20,11 +20,11 @@ public static class UnitOfWorkSetup
     /// </remarks>
     public static IServiceCollection AddUnitOfWork<TContext>(this IServiceCollection services) where TContext : DbContext
     {
-        // Following has a issue: IUnitOfWork cannot support multiple dbcontext/database, 
+        // Following has a issue: IUnitOfWork cannot support multiple dbcontext/database,
         // that means cannot call AddUnitOfWork<TContext> multiple times.
         // Solution: check IUnitOfWork whether or null
-        services.AddScoped<IUnitOfWork, UnitOfWork<TContext>>();
-        services.AddScoped<IUnitOfWork<TContext>, UnitOfWork<TContext>>();
+        _ = services.AddScoped<IUnitOfWork, UnitOfWork<TContext>>();
+        _ = services.AddScoped<IUnitOfWork<TContext>, UnitOfWork<TContext>>();
 
         return services;
     }
@@ -43,8 +43,8 @@ public static class UnitOfWorkSetup
         where TContext1 : DbContext
         where TContext2 : DbContext
     {
-        services.AddScoped<IUnitOfWork<TContext1>, UnitOfWork<TContext1>>();
-        services.AddScoped<IUnitOfWork<TContext2>, UnitOfWork<TContext2>>();
+        _ = services.AddScoped<IUnitOfWork<TContext1>, UnitOfWork<TContext1>>();
+        _ = services.AddScoped<IUnitOfWork<TContext2>, UnitOfWork<TContext2>>();
 
         return services;
     }
@@ -65,9 +65,9 @@ public static class UnitOfWorkSetup
         where TContext2 : DbContext
         where TContext3 : DbContext
     {
-        services.AddScoped<IUnitOfWork<TContext1>, UnitOfWork<TContext1>>();
-        services.AddScoped<IUnitOfWork<TContext2>, UnitOfWork<TContext2>>();
-        services.AddScoped<IUnitOfWork<TContext3>, UnitOfWork<TContext3>>();
+        _ = services.AddScoped<IUnitOfWork<TContext1>, UnitOfWork<TContext1>>();
+        _ = services.AddScoped<IUnitOfWork<TContext2>, UnitOfWork<TContext2>>();
+        _ = services.AddScoped<IUnitOfWork<TContext3>, UnitOfWork<TContext3>>();
 
         return services;
     }
@@ -90,10 +90,10 @@ public static class UnitOfWorkSetup
         where TContext3 : DbContext
         where TContext4 : DbContext
     {
-        services.AddScoped<IUnitOfWork<TContext1>, UnitOfWork<TContext1>>();
-        services.AddScoped<IUnitOfWork<TContext2>, UnitOfWork<TContext2>>();
-        services.AddScoped<IUnitOfWork<TContext3>, UnitOfWork<TContext3>>();
-        services.AddScoped<IUnitOfWork<TContext4>, UnitOfWork<TContext4>>();
+        _ = services.AddScoped<IUnitOfWork<TContext1>, UnitOfWork<TContext1>>();
+        _ = services.AddScoped<IUnitOfWork<TContext2>, UnitOfWork<TContext2>>();
+        _ = services.AddScoped<IUnitOfWork<TContext3>, UnitOfWork<TContext3>>();
+        _ = services.AddScoped<IUnitOfWork<TContext4>, UnitOfWork<TContext4>>();
 
         return services;
     }
@@ -109,7 +109,7 @@ public static class UnitOfWorkSetup
         where TEntity : class
         where TRepository : class, IRepository<TEntity>
     {
-        services.AddScoped<IRepository<TEntity>, TRepository>();
+        _ = services.AddScoped<IRepository<TEntity>, TRepository>();
 
         return services;
     }

@@ -12,28 +12,26 @@ public class PedidoItemConfig : EntityConfiguration<PedidoItem>
 
         DefaultConfig(builder, "pedido_itens", "pedido_item");
 
-        builder.Property(e => e.CodigoMercadoria)
+        _ = builder.Property(e => e.CodigoMercadoria)
             .IsRequired()
             .IsUnicode(false)
             .HasMaxLength(10);
 
-        builder.Property(e => e.Quantidade)
+        _ = builder.Property(e => e.Quantidade)
             .IsRequired()
             .HasColumnName($"qtd")
             .HasColumnType("numeric(10,4)");
 
-        builder.Property(e => e.ValorUnitario)
+        _ = builder.Property(e => e.ValorUnitario)
             .IsRequired()
             .HasColumnType("decimal(18,4)");
 
-
-        builder.Property(e => e.PedidoId)
+        _ = builder.Property(e => e.PedidoId)
             .IsRequired()
             .IsUnicode(false)
             .HasMaxLength(DomainEntity.MaxId);
 
-
-        builder.HasOne(d => d.Pedido)
+        _ = builder.HasOne(d => d.Pedido)
             .WithMany(p => p.Itens)
             .HasForeignKey(f => f.PedidoId)
             .OnDelete(DeleteBehavior.Cascade)

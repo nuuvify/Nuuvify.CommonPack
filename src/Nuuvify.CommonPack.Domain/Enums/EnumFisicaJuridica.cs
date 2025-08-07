@@ -15,5 +15,4 @@ public enum EnumFisicaJuridica
     [Description("J")]
     Juridica = 1,
 
-
 }

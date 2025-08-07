@@ -25,7 +25,6 @@ public class AtivoInativoTests
         Assert.Equal(result, situacao.IsValid());
     }
 
-
     [Theory]
     [Trait("CommonApi.Domain-ValueObjects", nameof(AtivoInativo))]
     [InlineData("a", "A", 0)]

@@ -11,7 +11,6 @@ using Nuuvify.CommonPack.Security.Jwt;
 
 namespace Nuuvify.CommonPack.Security.JwtOpenId;
 
-
 /// <summary>
 /// Inclui a claim <see cref="Constants.UserIsValidToApplication"/> nas claims do usuario autenticado pelo servidor
 /// <para>
@@ -42,11 +41,8 @@ public class AddRolesClaimsTransformation : IClaimsTransformation
             var newIdentity = (ClaimsIdentity)clone.Identity;
             var loginId = principal.GetLogin();
 
-
             var gruposDoUsuario = await _userAccountRepository.GetUserRoles(loginId);
             var isValidAuthenticated = false;
-
-
 
             foreach (KeyValuePair<string, string> item in policyGroups.PolicyGroups)
             {
@@ -67,10 +63,8 @@ public class AddRolesClaimsTransformation : IClaimsTransformation
             return clone;
         }
 
-
         return principal;
 
     }
-
 
 }

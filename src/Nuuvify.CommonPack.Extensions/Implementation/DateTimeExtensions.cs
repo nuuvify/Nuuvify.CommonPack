@@ -36,7 +36,6 @@ public static class DateTimeExtensions
 
     }
 
-
     /// <summary>
     /// Retorna a data correspondente ao primeiro dia util do mes/ano da data atual
     /// </summary>
@@ -70,6 +69,5 @@ public static class DateTimeExtensions
 
         return firstDayOfMonth;
     }
-
 
 }

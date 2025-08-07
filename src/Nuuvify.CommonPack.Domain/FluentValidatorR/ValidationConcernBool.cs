@@ -6,7 +6,6 @@ using Nuuvify.CommonPack.Extensions.Notificator;
 
 namespace Nuuvify.CommonPack.Domain;
 
-
 public partial class ValidationConcernR<T> where T : NotifiableR
 {
 
@@ -73,7 +72,6 @@ public partial class ValidationConcernR<T> where T : NotifiableR
             Name = "";
         }
     }
-
 
     /// <summary>
     /// Usage: 
@@ -158,8 +156,6 @@ public partial class ValidationConcernR<T> where T : NotifiableR
         }
         return this;
     }
-
-
 
     /// <summary>
     /// Usage: 

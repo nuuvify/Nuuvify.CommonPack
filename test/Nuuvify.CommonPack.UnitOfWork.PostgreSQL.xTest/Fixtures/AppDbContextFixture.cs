@@ -8,15 +8,12 @@ using Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Arrange;
 
 namespace Nuuvify.CommonPack.UnitOfWork.PostgreSQL.xTest.Fixtures;
 
-
-
 public class AppDbContextFixture : BaseAppDbContextFixture
 {
 
     private string RemoveTables { get; set; }
     public string Schema { get; }
     private string CnnString { get; set; }
-
 
     public AppDbContextFixture()
     {
@@ -37,13 +34,12 @@ public class AppDbContextFixture : BaseAppDbContextFixture
         Schema = config.GetSection(SchemaTag)?.Value;
         RemoveTables = config.GetSection("TestOptions:RemoveTables")?.Value;
 
-
         mockIConfigurationCustom = new Mock<IConfigurationCustom>();
-        mockIConfigurationCustom.Setup(x => x.GetSectionValue(SchemaTag))
+        _ = mockIConfigurationCustom.Setup(x => x.GetSectionValue(SchemaTag))
             .Returns(Schema);
-        mockIConfigurationCustom.Setup(x => x.GetConnectionString(CnnTag))
+        _ = mockIConfigurationCustom.Setup(x => x.GetConnectionString(CnnTag))
             .Returns(CnnString);
-        mockIConfigurationCustom.Setup(x => x.GetCorrelationId())
+        _ = mockIConfigurationCustom.Setup(x => x.GetCorrelationId())
             .Returns(CorrelationFake);
 
         var options = new DbContextOptionsBuilder<StubDbContext>()
@@ -53,7 +49,6 @@ public class AppDbContextFixture : BaseAppDbContextFixture
             .EnableDetailedErrors()
             .EnableSensitiveDataLogging()
             .Options;
-
 
         Db = new StubDbContext(options, mockIConfigurationCustom.Object);
     }
@@ -77,7 +72,6 @@ public class AppDbContextFixture : BaseAppDbContextFixture
 
     }
 
-
     protected override void Dispose(bool disposing)
     {
         if (disposing && Db != null && !PreventDisposal)
@@ -89,31 +83,29 @@ public class AppDbContextFixture : BaseAppDbContextFixture
                 var delete = new StringBuilder("DELETE FROM ")
                     .AppendFormat("{0}.", Schema);
 
-
                 var sql = new StringBuilder()
                     .Append(delete)
                     .Append("PEDIDO_ITENS");
 
-                Db.Database.ExecuteSqlRaw(sql.ToString());
+                _ = Db.Database.ExecuteSqlRaw(sql.ToString());
 
                 sql = new StringBuilder()
                     .Append(delete)
                     .Append("PEDIDOS");
 
-                Db.Database.ExecuteSqlRaw(sql.ToString());
+                _ = Db.Database.ExecuteSqlRaw(sql.ToString());
 
                 sql = new StringBuilder()
                     .Append(delete)
                     .Append("FATURAS");
 
-                Db.Database.ExecuteSqlRaw(sql.ToString());
+                _ = Db.Database.ExecuteSqlRaw(sql.ToString());
 
                 sql = new StringBuilder()
                     .Append(delete)
                     .Append("autohistory");
 
-                Db.Database.ExecuteSqlRaw(sql.ToString());
-
+                _ = Db.Database.ExecuteSqlRaw(sql.ToString());
 
                 Console.WriteLine("Tabelas de teste excluidas.");
             }

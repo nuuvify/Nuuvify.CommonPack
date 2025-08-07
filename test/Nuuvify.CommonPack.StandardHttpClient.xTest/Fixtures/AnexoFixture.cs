@@ -13,5 +13,4 @@ public class AnexoFixture
     public string AggregateId { get; set; }
     public string TipoAnexo { get; set; }
 
-
 }

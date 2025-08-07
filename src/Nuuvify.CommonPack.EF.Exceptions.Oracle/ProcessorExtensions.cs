@@ -26,7 +26,7 @@ public static class ProcessorExtensions
     /// <returns></returns>
     public static DbContextOptionsBuilder UseExceptionProcessor(this DbContextOptionsBuilder self)
     {
-        self.ReplaceService<IStateManager, OracleExceptionProcessorStateManager>();
+        _ = self.ReplaceService<IStateManager, OracleExceptionProcessorStateManager>();
         return self;
     }
 
@@ -34,7 +34,7 @@ public static class ProcessorExtensions
     public static DbContextOptionsBuilder<TContext> UseExceptionProcessor<TContext>(this DbContextOptionsBuilder<TContext> self)
         where TContext : DbContext
     {
-        self.ReplaceService<IStateManager, OracleExceptionProcessorStateManager>();
+        _ = self.ReplaceService<IStateManager, OracleExceptionProcessorStateManager>();
         return self;
     }
 }

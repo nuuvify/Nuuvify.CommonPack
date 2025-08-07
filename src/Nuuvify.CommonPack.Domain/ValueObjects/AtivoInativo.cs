@@ -5,10 +5,8 @@ using Nuuvify.CommonPack.Extensions.Notificator;
 
 namespace Nuuvify.CommonPack.Domain.ValueObjects;
 
-
 public class AtivoInativo : NotifiableR
 {
-
 
     protected AtivoInativo() { }
 
@@ -28,13 +26,11 @@ public class AtivoInativo : NotifiableR
         }
     }
 
-
     /// <summary>
     /// Retorna os valores literais ou description do enum
     /// <see cref="EnumAtivoInativo"/>
     /// </summary>
     public string Codigo { get; private set; }
-
 
     private bool ValidarLiteral(string literal)
     {
@@ -67,8 +63,6 @@ public class AtivoInativo : NotifiableR
     }
 
     public const int maxCodigo = 1;
-
-
 
     public override string ToString()
     {

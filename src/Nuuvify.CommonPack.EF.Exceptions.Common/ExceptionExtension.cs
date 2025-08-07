@@ -7,7 +7,6 @@ namespace EntityFramework.Exceptions.Common;
 public static class ExceptionExtension
 {
 
-
     public static IDictionary<string, string> CustomMessage(this CustomDbUpdateException exception)
     {
         return CustomMessage((DbUpdateException)exception);

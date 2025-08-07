@@ -14,7 +14,6 @@ public abstract class BaseValidation<TEntity, TValidation> : NotifiableR,
 
     public abstract Task Valid(TEntity entity);
 
-
     public IList<NotificationR> ValidationResult()
     {
         return (IList<NotificationR>)Notifications.ToList();

@@ -3,7 +3,6 @@ using Nuuvify.CommonPack.Extensions.Notificator;
 
 namespace Nuuvify.CommonPack.Domain.ValueObjects;
 
-
 public class Endereco : NotifiableR
 {
 
@@ -25,9 +24,7 @@ public class Endereco : NotifiableR
         DefinirComplemento(complemento);
         DefinirSiglaPais(siglaPais);
 
-
     }
-
 
     public string TipoLogradouro { get; private set; }
     public string Logradouro { get; private set; }
@@ -40,15 +37,12 @@ public class Endereco : NotifiableR
     public string Complemento { get; private set; }
     public string SiglaPais { get; private set; }
 
-
-
     private void DefinirTipoLogradouro(string tipoLogradouro)
     {
         var validacao = Notifications.Count;
 
-        new ValidationConcernR<Endereco>(this)
+        _ = new ValidationConcernR<Endereco>(this)
             .AssertHasMaxLength(x => tipoLogradouro, MaxTipoLogradouro);
-
 
         if (validacao.Equals(Notifications.Count))
             TipoLogradouro = tipoLogradouro?.ToUpper();
@@ -58,10 +52,9 @@ public class Endereco : NotifiableR
     {
         var validacao = Notifications.Count;
 
-        new ValidationConcernR<Endereco>(this)
+        _ = new ValidationConcernR<Endereco>(this)
             .AssertHasMinLength(x => logradouro, MinLogradouro)
             .AssertHasMaxLength(x => logradouro, MaxLogradouro);
-
 
         if (validacao.Equals(Notifications.Count))
             Logradouro = StringExtensionMethods.ToTitleCase(logradouro);
@@ -73,10 +66,9 @@ public class Endereco : NotifiableR
 
         var codigoMunicipio = codigo.GetNumbers();
 
-        new ValidationConcernR<Endereco>(this)
+        _ = new ValidationConcernR<Endereco>(this)
             .AssertHasMinLength(x => codigoMunicipio, MinCodigoMunicipio)
             .AssertHasMaxLength(x => codigoMunicipio, MaxCodigoMunicipio);
-
 
         if (validacao.Equals(Notifications.Count))
             CodigoMunicipio = codigoMunicipio;
@@ -86,11 +78,9 @@ public class Endereco : NotifiableR
     {
         var validacao = Notifications.Count;
 
-        new ValidationConcernR<Endereco>(this)
+        _ = new ValidationConcernR<Endereco>(this)
             .AssertHasMinLength(x => nomeMunicipio, MinNomeMunicipio)
             .AssertHasMaxLength(x => nomeMunicipio, MaxNomeMunicipio);
-
-
 
         if (validacao.Equals(Notifications.Count))
             NomeMunicipio = StringExtensionMethods.ToTitleCase(nomeMunicipio);
@@ -100,9 +90,8 @@ public class Endereco : NotifiableR
     {
         var validacao = Notifications.Count;
 
-        new ValidationConcernR<Endereco>(this)
+        _ = new ValidationConcernR<Endereco>(this)
             .AssertFixedLength(x => uf, MaxUF);
-
 
         if (validacao.Equals(Notifications.Count))
             UF = uf.ToUpper();
@@ -112,24 +101,20 @@ public class Endereco : NotifiableR
     {
         var validacao = Notifications.Count;
 
-        new ValidationConcernR<Endereco>(this)
+        _ = new ValidationConcernR<Endereco>(this)
             .AssertHasMaxLength(x => bairro, MaxBairro);
-
 
         if (validacao.Equals(Notifications.Count))
             Bairro = StringExtensionMethods.ToTitleCase(bairro);
     }
-
 
     private void DefinirCep(string cep)
     {
         var validacao = Notifications.Count;
         cep = StringExtensionMethods.GetNumbers(cep);
 
-
-        new ValidationConcernR<Endereco>(this)
+        _ = new ValidationConcernR<Endereco>(this)
             .AssertFixedLength(x => cep, MaxCep);
-
 
         if (validacao.Equals(Notifications.Count))
             Cep = cep;
@@ -138,11 +123,9 @@ public class Endereco : NotifiableR
     {
         var validacao = Notifications.Count;
 
-        new ValidationConcernR<Endereco>(this)
+        _ = new ValidationConcernR<Endereco>(this)
             .AssertHasMinLength(x => numeroLogradouro, MinNumero)
             .AssertHasMaxLength(x => numeroLogradouro, MaxNumero);
-
-
 
         if (validacao.Equals(Notifications.Count))
             Numero = numeroLogradouro;
@@ -152,9 +135,8 @@ public class Endereco : NotifiableR
     {
         var validacao = Notifications.Count;
 
-        new ValidationConcernR<Endereco>(this)
+        _ = new ValidationConcernR<Endereco>(this)
             .AssertHasMaxLength(x => complemento, MaxComplemento);
-
 
         if (validacao.Equals(Notifications.Count) && (!(complemento is null)))
         {
@@ -166,15 +148,13 @@ public class Endereco : NotifiableR
     {
         var validacao = Notifications.Count;
 
-        new ValidationConcernR<Endereco>(this)
+        _ = new ValidationConcernR<Endereco>(this)
             .AssertHasMinLength(x => siglaPais, MinSiglaPais)
             .AssertHasMaxLength(x => siglaPais, MaxSiglaPais);
-
 
         if (validacao.Equals(Notifications.Count))
             SiglaPais = siglaPais.ToUpper();
     }
-
 
     public static int MinTipoLogradouro { get; set; } = 0;
     public static int MaxTipoLogradouro { get; set; } = 10;

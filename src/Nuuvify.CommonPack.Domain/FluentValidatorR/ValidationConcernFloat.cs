@@ -72,7 +72,6 @@ public partial class ValidationConcernR<T> where T : NotifiableR
     {
         ConfigConcern(selector);
 
-
         if (!string.IsNullOrWhiteSpace(SelectorNull))
         {
             ConfigConcernMenssage("SelectorNull", typeof(T), aggregateId: aggregateId);
@@ -150,7 +149,6 @@ public partial class ValidationConcernR<T> where T : NotifiableR
             AssertValid = true;
         }
 
-
         return this;
     }
 
@@ -199,7 +197,6 @@ public partial class ValidationConcernR<T> where T : NotifiableR
     public ValidationConcernR<T> AssertIsBetween(Expression<Func<T, float>> selector, float a, float b, string message = "", string aggregateId = null)
     {
         ConfigConcern(selector);
-
 
         if (!string.IsNullOrWhiteSpace(SelectorNull))
         {

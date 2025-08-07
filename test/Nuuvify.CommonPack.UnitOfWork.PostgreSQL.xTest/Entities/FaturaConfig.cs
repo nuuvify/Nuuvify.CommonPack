@@ -9,57 +9,52 @@ public class FaturaConfig : EntityConfiguration<Fatura>
     public override void Configure(EntityTypeBuilder<Fatura> builder)
     {
 
-
         // DefaultConfig(builder, "faturas", "fatura", "_id");
         //DefaultConfig(builder, "faturas", "fatura");
 
-        builder.ToTable("faturas");
+        _ = builder.ToTable("faturas");
 
-        builder.HasKey(x => x.Id)
+        _ = builder.HasKey(x => x.Id)
             .HasName($"pk_fatura");
 
-        builder.Property(x => x.Id)
+        _ = builder.Property(x => x.Id)
             .HasColumnName($"FaturaId")
             .IsUnicode(false)
             .HasMaxLength(Fatura.MaxId)
             .IsRequired();
 
-
-        builder.Property(e => e.NumeroFatura)
+        _ = builder.Property(e => e.NumeroFatura)
             .IsRequired()
             .HasColumnType("numeric(8)");
 
-
-        builder.OwnsOne(
+        _ = builder.OwnsOne(
             o => o.EnderecoEntrega,
             pp =>
             {
 
-                pp.Property(p => p.Cidade)
+                _ = pp.Property(p => p.Cidade)
                     .HasColumnName("EntregaCidade")
                     .IsUnicode(false)
                     .HasMaxLength(Endereco.MaxCidade);
 
-                pp.Property(p => p.Logradouro)
+                _ = pp.Property(p => p.Logradouro)
                     .HasColumnName("EntregaLogradouro")
                     .IsUnicode(false)
                     .HasMaxLength(Endereco.MaxLogradouro);
 
             });
 
-
-
-        builder.OwnsOne(
+        _ = builder.OwnsOne(
             o => o.EnderecoFatura,
             pp =>
             {
 
-                pp.Property(p => p.Cidade)
+                _ = pp.Property(p => p.Cidade)
                     .HasColumnName("FaturaCidade")
                     .IsUnicode(false)
                     .HasMaxLength(Endereco.MaxCidade);
 
-                pp.Property(p => p.Logradouro)
+                _ = pp.Property(p => p.Logradouro)
                     .HasColumnName("FaturaLogradouro")
                     .IsUnicode(false)
                     .HasMaxLength(Endereco.MaxLogradouro);
@@ -68,7 +63,6 @@ public class FaturaConfig : EntityConfiguration<Fatura>
 
         AuditConfig(builder);
         AuditUserIdIgnore(builder);
-
 
     }
 }

@@ -19,8 +19,8 @@ public static class UseSwaggerSetup
     public static void UseSwaggerConfiguration(this WebApplication app)
     {
 
-        app.UseSwagger();
-        app.MapWhen(
+        _ = app.UseSwagger();
+        _ = app.MapWhen(
             context => context.Request.Path.StartsWithSegments("/swagger"),
             appBuilder => appBuilder.Use(next =>
             {

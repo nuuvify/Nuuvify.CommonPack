@@ -3,7 +3,6 @@ using Nuuvify.CommonPack.StandardHttpClient.Results;
 
 namespace Nuuvify.CommonPack.StandardHttpClient;
 
-
 public interface IStandardWebService
 {
     /// <summary>
@@ -12,7 +11,6 @@ public interface IStandardWebService
     /// </summary>
     /// <value></value>
     Uri FullUrl { get; }
-
 
     /// <summary>
     /// Cria uma nova instancia do HttpClient ou, se informado o nome de um client já registrado
@@ -27,7 +25,6 @@ public interface IStandardWebService
     /// <param name="url">A url é obrigatorio</param>
     void CreateHttp(Uri url);
 
-
     /// <summary>
     /// Recebe uma instancia de HttpClientHandler onde você pode incluir outras configurações
     /// como Proxy e delegate para verificação de certificados.
@@ -35,8 +32,6 @@ public interface IStandardWebService
     /// <param name="httpClientHandler"></param>
     /// <param name="uri"></param>
     void CreateHttp(HttpClientHandler httpClientHandler, Uri uri);
-
-
 
     /// <summary>
     /// Executa uma consulta SOAP
@@ -52,7 +47,6 @@ public interface IStandardWebService
         string accept = "text/xml",
         string contentType = "text/xml;charset=\"utf-8\"");
 
-
     /// <summary>
     /// Limpa definições de Headers, QueryString e autorization
     /// </summary>
@@ -67,7 +61,6 @@ public interface IStandardWebService
     /// </param>
     /// <returns></returns>
     IStandardWebService WithCurrelationHeader(string correlationId);
-
 
     /// <summary>
     /// Incluir Headers para a instancia do HttpClient
@@ -96,8 +89,6 @@ public interface IStandardWebService
     /// <returns></returns>
     IStandardWebService WithQueryString(string key, object value);
 
-
     void Configure(int timeOut);
-
 
 }
