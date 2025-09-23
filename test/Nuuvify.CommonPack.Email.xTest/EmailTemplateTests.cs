@@ -1,6 +1,6 @@
 ﻿namespace Nuuvify.CommonPack.Email.xTest;
 
-[Collection(nameof(DataCollection))]
+[Collection(nameof(EmailDataCollection))]
 public class EmailTemplateTests
 {
 
@@ -9,13 +9,11 @@ public class EmailTemplateTests
     private readonly IConfiguration config;
     private readonly Mock<IConfiguration> configMock;
     private ConfigureFromConfigurationOptions<EmailServerConfiguration> configEmailServer;
-    private readonly ITestOutputHelper _outputHelper;
     private readonly EmailConfigFixture _emailConfigFixture;
 
     public EmailTemplateTests(ITestOutputHelper outputHelper,
         EmailConfigFixture emailConfigFixture)
     {
-        _outputHelper = outputHelper;
         _emailConfigFixture = emailConfigFixture;
 
         configMock = new Mock<IConfiguration>();

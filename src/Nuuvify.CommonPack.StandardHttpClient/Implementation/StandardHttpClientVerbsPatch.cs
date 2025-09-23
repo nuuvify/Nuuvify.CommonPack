@@ -42,7 +42,7 @@ public partial class StandardHttpClientService
         var content = new FormUrlEncodedContent(enumerable);
 
         message.Content = content;
-        message.CustomRequestHeader(_headerStandard)
+        _ = message.CustomRequestHeader(_headerStandard)
                .AddAuthorizationHeader(_headerAuthorization);
 
         return await StandardSendAsync(url, message, cancellationToken);

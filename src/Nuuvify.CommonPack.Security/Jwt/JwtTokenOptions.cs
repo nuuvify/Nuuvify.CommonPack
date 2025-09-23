@@ -6,8 +6,6 @@ namespace Nuuvify.CommonPack.Security.Jwt;
 public class JwtTokenOptions
 {
 
-
-
     public string Subject { get; set; }
     public string Issuer { get; set; }
     public IList<string> Issuers { get; set; }
@@ -17,12 +15,11 @@ public class JwtTokenOptions
 
     /// <summary>
     /// Data da Criacao do token.
-    /// Não expirar antes de 
+    /// Não expirar antes de
     /// </summary>
     public DateTimeOffset NotBefore { get; set; } = DateTimeOffset.Now;
 
-
-    private TimeSpan _validFor;
+    private TimeSpan _validFor = TimeSpan.FromHours(8);
 
     /// <summary>
     /// Valido por n horas
@@ -36,16 +33,12 @@ public class JwtTokenOptions
         set
         {
             if (value.TotalSeconds <= 0)
-                value = new TimeSpan(ValidatedAt.Hour, ValidatedAt.Minute, ValidatedAt.Second);
-
-            if (value.TotalSeconds <= 0)
             {
                 value = TimeSpan.FromHours(8);
             }
             _validFor = value;
         }
     }
-
 
     /// <summary>
     /// Data/Hora de expiracao, NotBefore + ValidFor
@@ -63,17 +56,13 @@ public class JwtTokenOptions
     public string JtiGenerator { get; set; } = Guid.NewGuid().ToString();
     public string SecretKey { get; set; }
 
-
-
     public SigningCredentials SigningCredentials()
     {
         var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(KeyEncoding()),
             SecurityAlgorithms.HmacSha256);
 
-
         if (signingCredentials.Key.KeySize < 288)
             throw new SecurityTokenInvalidSigningKeyException($"Saltkey deve ter pelo meno 32 digitos = {nameof(SigningCredentials)}");
-
 
         return signingCredentials;
     }
@@ -84,7 +73,6 @@ public class JwtTokenOptions
         {
             throw new ArgumentNullException(SecretKey);
         }
-
 
         return Encoding.ASCII.GetBytes(SecretKey);
     }

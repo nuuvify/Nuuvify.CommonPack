@@ -16,7 +16,6 @@ public static class DbContextExtensions
 
     public static int AggregatesChanges { get; set; }
 
-
     public static IDictionary<object, object> FindPrimaryKeyValues<T>(this DbContext dbContext, T entity)
     {
         if (entity == null)
