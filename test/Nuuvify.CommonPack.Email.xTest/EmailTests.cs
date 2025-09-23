@@ -1,6 +1,6 @@
 ﻿namespace Nuuvify.CommonPack.Email.xTest;
 
-[Collection(nameof(DataCollection))]
+[Collection(nameof(EmailDataCollection))]
 public class EmailTests
 {
 
@@ -40,7 +40,7 @@ public class EmailTests
 
     [Fact]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
-    public void EmailComRemetenteNuloInvalido()
+    public async Task EmailComRemetenteNuloInvalido()
     {
 
         var destinatarios = new Dictionary<string, string>
@@ -55,16 +55,16 @@ public class EmailTests
 
         var testarEnvio = new Email(emailServerConfiguration);
 
-        var emailEnviado = testarEnvio.EnviarAsync(destinatarios, null, assunto, mensagem);
+        var emailEnviado = await testarEnvio.EnviarAsync(destinatarios, null, assunto, mensagem);
 
-        Assert.True(emailEnviado.Result.Equals(teste));
+        Assert.True(emailEnviado.Equals(teste));
         Assert.False(testarEnvio.IsValid());
 
     }
 
     [Fact]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
-    public void EmailComEnderecoDoDestinatarioNuloDeveSerInvalido()
+    public async Task EmailComEnderecoDoDestinatarioNuloDeveSerInvalido()
     {
 
         var destinatarios = new Dictionary<string, string>
@@ -79,16 +79,16 @@ public class EmailTests
 
         var testarEnvio = new Email(emailServerConfiguration);
 
-        var emailEnviado = testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
+        var emailEnviado = await testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
 
-        Assert.True(emailEnviado.Result.Equals(teste));
+        Assert.True(emailEnviado.Equals(teste));
         Assert.False(testarEnvio.IsValid());
 
     }
 
     [Fact]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
-    public void EnviarEmailSemAnexoIncorreto()
+    public async Task EnviarEmailSemAnexoIncorreto()
     {
 
         var destinatarios = new Dictionary<string, string>
@@ -103,9 +103,9 @@ public class EmailTests
 
         var testarEnvio = new Email(emailServerConfiguration);
 
-        var emailEnviado = testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
+        var emailEnviado = await testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
 
-        Assert.True(emailEnviado.Result.Equals(teste));
+        Assert.True(emailEnviado.Equals(teste));
         Assert.False(testarEnvio.IsValid());
     }
 
@@ -284,19 +284,22 @@ public class EmailTests
         const string mensagem = "Esse é o corpo do email";
         const bool teste = false;
 
-        var mockSmpt = new Mock<SmtpClient>();
-        _ = mockSmpt.Setup(s => s.ConnectAsync(config.GetSection("EmailConfig:EmailServerConfigurationFake:ServerHost").Value, 0, MailKit.Security.SecureSocketOptions.Auto, default))
-            .Throws<Exception>();
+        // Configuração com host incorreto para forçar falha
+        var emailServerConfigurationInvalida = new EmailServerConfiguration
+        {
+            ServerHost = "host-inexistente.invalid",
+            Port = 587,
+            AccountUserName = "teste@teste.com",
+            AccountPassword = "senha123"
+        };
 
-        var testarEnvio = new Email(emailServerConfiguration);
+        var testarEnvio = new Email(emailServerConfigurationInvalida);
 
-        var emailEnviado = testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, mensagem);
+        // O método deve retornar false ao tentar conectar com host inválido
+        var emailResult = await testarEnvio.EnviarAsync(destinatarios, remetentes, assunto, mensagem);
 
-        var emailResult = await emailEnviado;
-
-        Assert.True(emailResult.Equals(teste));
-        var exception = await Assert.ThrowsAsync<Exception>(() => Task.FromResult(teste));
-
+        Assert.Equal(teste, emailResult);
+        Assert.False(testarEnvio.IsValid());
     }
 
 }

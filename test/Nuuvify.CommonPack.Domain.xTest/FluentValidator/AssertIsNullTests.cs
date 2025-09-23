@@ -182,7 +182,7 @@ public class AssertIsNullTests : NotifiableR
             .AssertIsGreaterOrEqualsThan(x => customer.Height, 10D)
             .RemoveSelectorMessage();
 
-        var messageActual = otherClass.Notifications.FirstOrDefault(x => x.Message.Equals(messageExpected)).Message;
+        var messageActual = otherClass.Notifications.FirstOrDefault(x => x.Message.Equals(messageExpected, StringComparison.Ordinal)).Message;
 
         Assert.NotNull(otherClass);
         Assert.True(otherClass.Notifications.Count == 2);

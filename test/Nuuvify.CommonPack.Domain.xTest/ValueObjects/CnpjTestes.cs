@@ -24,8 +24,8 @@ public class CnpjTestes
     public void CNPJMensagemInvalido(string cnpj, string mensagem)
     {
         var _cnpj = new Cnpj(cnpj);
-        Assert.Equal(mensagem, _cnpj.Notifications.FirstOrDefault(x => x.Message.Equals(mensagem)).Message);
-        Assert.Equal(nameof(Cnpj), _cnpj.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Cnpj)}")).Property);
+        Assert.Equal(mensagem, _cnpj.Notifications.FirstOrDefault(x => x.Message.Equals(mensagem, StringComparison.Ordinal)).Message);
+        Assert.Equal(nameof(Cnpj), _cnpj.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Cnpj)}", StringComparison.Ordinal)).Property);
     }
 
     [Theory]

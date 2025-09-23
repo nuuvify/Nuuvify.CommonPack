@@ -16,7 +16,7 @@ namespace Nuuvify.CommonPack.Security.Jwt;
 ///             dynamic suaVariavel = new PolicyGroupsApplication(_configuration);
 ///             Console.WriteLine(suaVariavel.GroupUsers);
 /// </code>
-/// </example>    
+/// </example>
 /// </summary>
 public class PolicyGroupsApplication : DynamicObject
 {
@@ -68,7 +68,7 @@ public class PolicyGroupsApplication : DynamicObject
         if (result != null)
         {
             var text = result;
-            var exists = args.Any(x => x.ToString().ToUpperInvariant().Equals(text.ToString().ToUpperInvariant()));
+            var exists = args.Any(x => x.ToString().ToUpperInvariant().Equals(text.ToString().ToUpperInvariant(), StringComparison.Ordinal));
             return exists;
         }
 

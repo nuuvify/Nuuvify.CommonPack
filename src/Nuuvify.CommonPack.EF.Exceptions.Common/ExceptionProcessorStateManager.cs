@@ -89,8 +89,8 @@ public abstract class ExceptionProcessorStateManager<T> : StateManager where T :
 
             return ExceptionFactory.Create(error, ex, entries, CustomNewMessage, CustomErrors);
         }
-        else if (typeof(T).Name.Equals("DB2Exception", StringComparison.InvariantCultureIgnoreCase) ||
-                 typeof(T).Name.Equals("OracleException", StringComparison.InvariantCultureIgnoreCase))
+        else if (typeof(T).Name.Equals("DB2Exception", StringComparison.OrdinalIgnoreCase) ||
+                 typeof(T).Name.Equals("OracleException", StringComparison.OrdinalIgnoreCase))
         {
             var entries = ex.Entries.Select(entry =>
                 base.GetOrCreateEntry(entry.Entity, entry.Metadata)).ToList();

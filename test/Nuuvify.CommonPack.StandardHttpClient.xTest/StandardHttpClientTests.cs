@@ -22,7 +22,7 @@ public class StandardHttpClientTests
         {
             Codigo = 123456,
             DataCadastro = DateTime.Now,
-            Descricao = "Isso é um teste"
+            Descricao = "Isso Ã£ um teste"
         };
 
         var jsonConverted = JsonSerializer.Serialize(fakeClassReturn);
@@ -88,7 +88,7 @@ public class StandardHttpClientTests
     }
 
     [Fact]
-    public void DeleteApiRealDeveRetornarMensagemComSucesso()
+    public async Task DeleteApiRealDeveRetornarMensagemComSucesso()
     {
         var resultDefault = new HttpStandardReturn
         {
@@ -121,18 +121,18 @@ public class StandardHttpClientTests
         standardClient.CreateClient();
         standardClient.ResetStandardHttpClient();
 
-        var result = standardClient
+        var result = await standardClient
             .WithHeader("Accept-Language", "pt-BR")
             .WithCurrelationHeader("zxzxzxzxzxzxzxzxzxz")
             .WithAuthorization("bearer", "xyz")
-            .Delete(url).Result;
+            .Delete(url);
 
         Assert.Equal(resultDefault.ReturnCode, result.ReturnCode);
 
     }
 
     [Fact]
-    public void PatchApiRealDeveRetornarMensagemComSucesso()
+    public async Task PatchApiRealDeveRetornarMensagemComSucesso()
     {
         var resultDefault = new HttpStandardReturn
         {
@@ -168,14 +168,14 @@ public class StandardHttpClientTests
         {
             Codigo = 123456,
             DataCadastro = DateTime.Now,
-            Descricao = "Isso é um teste"
+            Descricao = "Isso Ã£ um teste"
         };
 
-        var result = standardClient
+        var result = await standardClient
             .WithHeader("Accept-Language", "pt-BR")
             .WithCurrelationHeader("zxzxzxzxzxzxzxzxzxz")
             .WithAuthorization("bearer", "xyz")
-            .Patch(url, fakeClass).Result;
+            .Patch(url, fakeClass);
 
         Assert.Equal(resultDefault.ReturnCode, result.ReturnCode);
 
@@ -311,12 +311,6 @@ public class StandardHttpClientTests
 
         var jsonConverted = JsonSerializer.Serialize(returnClass);
 
-        var resultDefault = new HttpStandardReturn
-        {
-            ReturnCode = "200",
-            ReturnMessage = jsonConverted,
-            Success = true
-        };
         using var clientHandlerStub = new DelegatingHandlerStub(new HttpResponseMessage()
         {
             StatusCode = HttpStatusCode.OK,
@@ -342,7 +336,7 @@ public class StandardHttpClientTests
     }
 
     [Fact]
-    public void AutenticacaoBasicDeveGerarBase64()
+    public async Task AutenticacaoBasicDeveGerarBase64()
     {
 
         var username = "zocateli";
@@ -388,18 +382,18 @@ public class StandardHttpClientTests
         standardClient.ResetStandardHttpClient();
         standardClient.LogRequest = true;
 
-        var result = standardClient
+        _ = await standardClient
             .WithHeader("Accept-Language", "pt-BR")
             .WithCurrelationHeader("zxzxzxzxzxzxzxzxzxz")
             .WithAuthorization("Basic", $"{username}:{password}")
-            .Post(url, messageTeste).Result;
+            .Post(url, messageTeste);
 
         Assert.Equal(standardClient.AuthorizationLog, $"Basic {base64}");
 
     }
 
     [Fact]
-    public void AutenticacaoBearer()
+    public async Task AutenticacaoBearer()
     {
         var token = "xyxyxyxyxyxyxyxyxyxyxyxyxyxy.";
 
@@ -440,11 +434,11 @@ public class StandardHttpClientTests
         standardClient.ResetStandardHttpClient();
         standardClient.LogRequest = true;
 
-        var result = standardClient
+        _ = await standardClient
             .WithHeader("Accept-Language", "pt-BR")
             .WithCurrelationHeader("zxzxzxzxzxzxzxzxzxz")
             .WithAuthorization("bearer", token)
-            .Post(url, messageTeste).Result;
+            .Post(url, messageTeste);
 
         Assert.Equal(standardClient.AuthorizationLog, $"bearer {token}");
 

@@ -20,14 +20,14 @@ public class ControllerCustomAuthorizationHandler : AuthorizationHandler<Control
         else
         {
 
-            if (requirement.ClaimType.Equals(Constants.UserClaimHeader, System.StringComparison.InvariantCultureIgnoreCase))
+            if (requirement.ClaimType.Equals(Constants.UserClaimHeader, System.StringComparison.OrdinalIgnoreCase))
             {
                 isAuthenticated = false;
             }
             else
             {
                 var claims = context.User.Claims
-                    .Where(x => x.Type.Equals(requirement.ClaimType))?
+                    .Where(x => x.Type.Equals(requirement.ClaimType, StringComparison.Ordinal))?
                     .ToList();
 
                 isAuthenticated = claims?.Count > 0;

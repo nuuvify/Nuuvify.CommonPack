@@ -48,7 +48,7 @@ internal class NotificationRConverter : JsonConverter<NotificationR>
             propertyName = reader.GetString() ?? "";
 
             propertyInfo = notification.GetProperties()
-                .FirstOrDefault(p => p.Name.Equals(propertyName, StringComparison.InvariantCultureIgnoreCase));
+                .FirstOrDefault(p => p.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase));
 
             if (propertyInfo != null)
             {

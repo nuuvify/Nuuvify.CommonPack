@@ -25,8 +25,8 @@ public class CpfTests
     public void CPFMensagemInvalido(string cpf, string mensagem)
     {
         var _cpf = new Cpf(cpf);
-        Assert.Equal(mensagem, _cpf.Notifications.FirstOrDefault(x => x.Message.Equals(mensagem)).Message);
-        Assert.Equal(nameof(Cpf), _cpf.Notifications.FirstOrDefault(x => x.Property.Equals(nameof(Cpf))).Property);
+        Assert.Equal(mensagem, _cpf.Notifications.FirstOrDefault(x => x.Message.Equals(mensagem, StringComparison.Ordinal)).Message);
+        Assert.Equal(nameof(Cpf), _cpf.Notifications.FirstOrDefault(x => x.Property.Equals(nameof(Cpf), StringComparison.Ordinal)).Property);
 
     }
 

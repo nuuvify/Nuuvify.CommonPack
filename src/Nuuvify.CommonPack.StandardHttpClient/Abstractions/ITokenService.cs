@@ -21,7 +21,7 @@ public interface ITokenService
     CredentialToken GetActualToken();
 
     /// <summary>
-    /// Obtem um novo token para as credenciais informadas, se não informar as credenciais, 
+    /// Obtem um novo token para as credenciais informadas, se não informar as credenciais,
     /// será usado a chave do appsettings AzureAdOpenID:cc:ClientId e ClientSecret <br/>
     /// Esse metodo sempre ira obter um novo token a partir de CredentialApi ou <br/>
     /// informe um valor para HttpClientTokenName caso queira outro nome
@@ -35,8 +35,13 @@ public interface ITokenService
     /// <param name="userClaim">Usuario que esta logado na aplicação, ele sera incluido no Header para a CredentialApi apenas como informativo <see cref="Constants.UserClaimHeader"/> <br/>
     /// Null = Sera utilizado o usuario "Anonymous", se passar string.Empty, não será utilizado nenhum usuario.
     /// </param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<CredentialToken> GetToken(string login = null, string password = null, string userClaim = null);
+    Task<CredentialToken> GetToken(
+        string login = null,
+        string password = null,
+        string userClaim = null,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Obtem o token do usuario no contexto atual.
