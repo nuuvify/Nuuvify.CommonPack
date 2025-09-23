@@ -20,7 +20,7 @@ public class OptenteSimplesTests
         var literal = simNao.GetDescription();
 
         Assert.Equal(retorno, optante.IsValid());
-        Assert.True(literal.Equals(optante.OptantePeloSimples));
+        Assert.True(literal.Equals(optante.OptantePeloSimples, StringComparison.Ordinal));
         Assert.Equal(dataEntradaOuSaida, optante.DataOpcaoPeloSimples);
 
     }

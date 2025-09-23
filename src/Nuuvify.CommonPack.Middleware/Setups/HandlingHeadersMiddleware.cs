@@ -87,7 +87,7 @@ public class HandlingHeadersMiddleware
         var executable = Path.GetFileNameWithoutExtension(executablePath);
         string basePath;
 
-        if ("dotnet".Equals(executable, StringComparison.InvariantCultureIgnoreCase))
+        if ("dotnet".Equals(executable, StringComparison.OrdinalIgnoreCase))
         {
             basePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
         }

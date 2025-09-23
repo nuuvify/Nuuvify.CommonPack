@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 
 namespace System.Collections.Generic;
@@ -27,7 +28,7 @@ public static class CustomDictionaryExtensions
 
         for (int i = 0; i < dic.Count; i++)
         {
-            _ = _query.Append($"{dic.ElementAtOrDefault(i).Key}={dic.ElementAtOrDefault(i).Value}&");
+            _ = _query.Append(CultureInfo.InvariantCulture, $"{dic.ElementAtOrDefault(i).Key}={dic.ElementAtOrDefault(i).Value}&");
 
         }
 

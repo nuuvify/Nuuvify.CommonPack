@@ -110,9 +110,9 @@ public class FluentValidatorTests
 
     [Theory]
     [Trait("CommonApi.Domain-FluentValidator", nameof(FluentValidator))]
-    [InlineData(null, "!@#$%�&*()_-+{}[]^~,.<>|/�`", false)]
-    [InlineData("Sem caractere requerido", "!@#$%�&*()_-+{}[]^~,.<>|/�`", false)]
-    [InlineData("Tem caractere + nesse texto", "!@#$%�&*()_-+{}[]^~,.<>|/�`", true)]
+    [InlineData(null, "!@#$%ã&*()_-+{}[]^~,.<>|/ã`", false)]
+    [InlineData("Sem caractere requerido", "!@#$%ã&*()_-+{}[]^~,.<>|/ã`", false)]
+    [InlineData("Tem caractere + nesse texto", "!@#$%ã&*()_-+{}[]^~,.<>|/ã`", true)]
     public void AssertContainsString(string nome, string contem, bool resultado)
     {
 
@@ -134,7 +134,7 @@ public class FluentValidatorTests
 
         var _customer2 = new Customer
         {
-            Name = "N�o tem numero nesse texto"
+            Name = "Não tem numero nesse texto"
         };
         _ = new ValidationConcernR<Customer>(_customer2).AssertContains(x => _customer2.Name, contem);
         Assert.False(_customer2.IsValid());
@@ -254,7 +254,7 @@ public class FluentValidatorTests
     public void AssertNotAreEquals_bool(string nome, string nomeA, bool esperado, bool retorno)
     {
         _customer.Name = nome;
-        var expressao = _customer.Name.Equals(nomeA);
+        var expressao = _customer.Name.Equals(nomeA, StringComparison.Ordinal);
 
         _ = new ValidationConcernR<Customer>(_customer)
             .AssertNotAreEquals(x => expressao, esperado);
@@ -389,7 +389,7 @@ public class FluentValidatorTests
     public void AssertAreEquals_bool(string valorA, bool result)
     {
         _customer.Name = "Lincoln Zocateli";
-        var expressao = _customer.Name.Equals(valorA);
+        var expressao = _customer.Name.Equals(valorA, StringComparison.Ordinal);
 
         _ = new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => expressao, true);
         Assert.Equal(result, _customer.IsValid());

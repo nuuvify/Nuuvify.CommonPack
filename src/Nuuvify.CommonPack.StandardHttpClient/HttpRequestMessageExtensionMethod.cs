@@ -111,7 +111,7 @@ public static class HttpRequestMessageExtensionMethod
 
         if (string.IsNullOrWhiteSpace(scheme)) return request;
 
-        if (scheme.Equals("bearer", StringComparison.InvariantCultureIgnoreCase))
+        if (scheme.Equals("bearer", StringComparison.OrdinalIgnoreCase))
         {
             if (request.Headers.Authorization != null)
             {
@@ -122,7 +122,7 @@ public static class HttpRequestMessageExtensionMethod
                 new AuthenticationHeaderValue(scheme, tokenOrPassword);
 
         }
-        else if (scheme.Equals("basic", StringComparison.InvariantCultureIgnoreCase))
+        else if (scheme.Equals("basic", StringComparison.OrdinalIgnoreCase))
         {
             if (request.Headers.Authorization != null)
             {

@@ -48,7 +48,7 @@ public class AddRolesClaimsTransformation : IClaimsTransformation
             {
 
                 isValidAuthenticated = gruposDoUsuario.Count(x =>
-                    x.Group.Equals(item.Value, StringComparison.InvariantCultureIgnoreCase)) > 0;
+                    x.Group.Equals(item.Value, StringComparison.OrdinalIgnoreCase)) > 0;
 
                 if (isValidAuthenticated) break;
 

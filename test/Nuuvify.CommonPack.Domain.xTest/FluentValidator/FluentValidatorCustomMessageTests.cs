@@ -120,7 +120,7 @@ public class FluentValidatorCustomMessageTests
     {
         const string message = "This is a test";
         _customer.Name = "Balta";
-        var expressionResult = _customer.Name.Equals("Balta");
+        var expressionResult = _customer.Name.Equals("Balta", StringComparison.Ordinal);
 
         _ = new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => expressionResult, true, message);
         Assert.Equal(message, _customer.Notifications.FirstOrDefault().Message);
@@ -157,27 +157,27 @@ public class FluentValidatorCustomMessageTests
         var vlrDecimal = Convert.ToDecimal(valorDecimal);
         _customer.ValueDecimal = vlrDecimal;
         _ = new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.ValueDecimal, vlrDecimal, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueDecimal.AssertNotAreEquals"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueDecimal.AssertNotAreEquals", StringComparison.Ordinal))?.Message);
 
         var vlrLong = Convert.ToInt64(valorLong);
         _customer.ValueLong = vlrLong;
         _ = new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.ValueLong, vlrLong, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueLong.AssertNotAreEquals"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueLong.AssertNotAreEquals", StringComparison.Ordinal))?.Message);
 
         var vlrDouble = Convert.ToDouble(valorDouble);
         _customer.Height = vlrDouble;
         _ = new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.Height, vlrDouble, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Height.AssertNotAreEquals"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Height.AssertNotAreEquals", StringComparison.Ordinal))?.Message);
 
         var vlrFloat = Convert.ToSingle(valorFloat);
         _customer.ValueFloat = vlrFloat;
         _ = new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.ValueFloat, vlrFloat, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueFloat.AssertNotAreEquals"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueFloat.AssertNotAreEquals", StringComparison.Ordinal))?.Message);
 
         var vlrInt = Convert.ToInt32(valorInt);
         _customer.Age = vlrInt;
         _ = new ValidationConcernR<Customer>(_customer).AssertNotAreEquals(x => x.Age, vlrInt, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Age.AssertNotAreEquals"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Age.AssertNotAreEquals", StringComparison.Ordinal))?.Message);
     }
 
     [Fact]
@@ -186,7 +186,7 @@ public class FluentValidatorCustomMessageTests
     {
         const string message = "This is a test";
         _customer.Name = "Balta";
-        var expressionResult = _customer.Name.Equals("Balta");
+        var expressionResult = _customer.Name.Equals("Balta", StringComparison.Ordinal);
 
         _ = new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => expressionResult, false, message);
         Assert.Equal(message, _customer.Notifications.FirstOrDefault().Message);
@@ -222,27 +222,27 @@ public class FluentValidatorCustomMessageTests
         var vlrDecimal = Convert.ToDecimal(valorDecimal);
         _customer.ValueDecimal = vlrDecimal;
         _ = new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.ValueDecimal, vlrDecimal - 1000, $"{message} {vlrDecimal - 1000}");
-        Assert.Equal($"{message} {vlrDecimal - 1000}", _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueDecimal.AssertAreEquals"))?.Message);
+        Assert.Equal($"{message} {vlrDecimal - 1000}", _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueDecimal.AssertAreEquals", StringComparison.Ordinal))?.Message);
 
         var vlrLong = Convert.ToInt64(valorLong);
         _customer.ValueLong = vlrLong;
         _ = new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.ValueLong, vlrLong - 1000, $"{message} {vlrLong - 1000}");
-        Assert.Equal($"{message} {vlrLong - 1000}", _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueLong.AssertAreEquals"))?.Message);
+        Assert.Equal($"{message} {vlrLong - 1000}", _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueLong.AssertAreEquals", StringComparison.Ordinal))?.Message);
 
         var vlrDouble = Convert.ToDouble(valorDouble);
         _customer.Height = vlrDouble;
         _ = new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.Height, vlrDouble / 10000, $"{message} {vlrDouble / 10000}");
-        Assert.Equal($"{message} {vlrDouble / 10000}", _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Height.AssertAreEquals"))?.Message);
+        Assert.Equal($"{message} {vlrDouble / 10000}", _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Height.AssertAreEquals", StringComparison.Ordinal))?.Message);
 
         var vlrFloat = Convert.ToSingle(valorFloat);
         _customer.ValueFloat = vlrFloat;
         _ = new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.ValueFloat, vlrFloat / 10000, $"{message} {vlrFloat / 10000}");
-        Assert.Equal($"{message} {vlrFloat / 10000}", _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueFloat.AssertAreEquals"))?.Message);
+        Assert.Equal($"{message} {vlrFloat / 10000}", _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueFloat.AssertAreEquals", StringComparison.Ordinal))?.Message);
 
         var vlrInt = Convert.ToInt32(valorInt);
         _customer.Age = vlrInt;
         _ = new ValidationConcernR<Customer>(_customer).AssertAreEquals(x => x.Age, vlrInt - 1000, $"{message} {vlrInt - 1000}");
-        Assert.Equal($"{message} {vlrInt - 1000}", _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Age.AssertAreEquals"))?.Message);
+        Assert.Equal($"{message} {vlrInt - 1000}", _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Age.AssertAreEquals", StringComparison.Ordinal))?.Message);
     }
 
     [Fact]
@@ -288,7 +288,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.Age, ageA, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Age.AssertIsGreaterThan"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Age.AssertIsGreaterThan", StringComparison.Ordinal))?.Message);
 
         _customer = new Customer
         {
@@ -300,7 +300,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.Height, heingtA, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Height.AssertIsGreaterThan"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Height.AssertIsGreaterThan", StringComparison.Ordinal))?.Message);
 
         _customer = new Customer
         {
@@ -312,7 +312,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.Birthdate, DateTime.Today.AddYears(birthdateA), message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Birthdate.AssertIsGreaterThan"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Birthdate.AssertIsGreaterThan", StringComparison.Ordinal))?.Message);
 
         _customer = new Customer
         {
@@ -324,7 +324,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.ValueDecimal, valueDecimalA, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueDecimal.AssertIsGreaterThan"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueDecimal.AssertIsGreaterThan", StringComparison.Ordinal))?.Message);
 
         _customer = new Customer
         {
@@ -336,7 +336,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.ValueFloat, valueFloatA, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueFloat.AssertIsGreaterThan"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueFloat.AssertIsGreaterThan", StringComparison.Ordinal))?.Message);
 
         _customer = new Customer
         {
@@ -348,7 +348,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterThan(x => x.ValueLong, valueLongA, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueLong.AssertIsGreaterThan"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueLong.AssertIsGreaterThan", StringComparison.Ordinal))?.Message);
 
     }
 
@@ -372,7 +372,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterOrEqualsThan(x => x.Age, age + valueAdd, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Age.AssertIsGreaterOrEqualsThan"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Age.AssertIsGreaterOrEqualsThan", StringComparison.Ordinal))?.Message);
 
         _customer = new Customer
         {
@@ -384,7 +384,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterOrEqualsThan(x => x.Height, height + valueAdd, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Height.AssertIsGreaterOrEqualsThan"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Height.AssertIsGreaterOrEqualsThan", StringComparison.Ordinal))?.Message);
 
         _customer = new Customer
         {
@@ -396,7 +396,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterOrEqualsThan(x => x.Birthdate, _customer.Birthdate.AddYears(valueAdd), message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Birthdate.AssertIsGreaterOrEqualsThan"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Birthdate.AssertIsGreaterOrEqualsThan", StringComparison.Ordinal))?.Message);
 
         _customer = new Customer
         {
@@ -408,7 +408,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterOrEqualsThan(x => x.ValueDecimal, valueDecimal + valueAdd, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueDecimal.AssertIsGreaterOrEqualsThan"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueDecimal.AssertIsGreaterOrEqualsThan", StringComparison.Ordinal))?.Message);
 
         _customer = new Customer
         {
@@ -420,7 +420,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterOrEqualsThan(x => x.ValueFloat, valueFloat + valueAdd, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueFloat.AssertIsGreaterOrEqualsThan"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueFloat.AssertIsGreaterOrEqualsThan", StringComparison.Ordinal))?.Message);
 
         _customer = new Customer
         {
@@ -432,7 +432,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsGreaterOrEqualsThan(x => x.ValueLong, valueLong + valueAdd, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueLong.AssertIsGreaterOrEqualsThan"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueLong.AssertIsGreaterOrEqualsThan", StringComparison.Ordinal))?.Message);
     }
 
     [Theory]
@@ -459,7 +459,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.Age, age + valueAdd, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Age.AssertIsLowerThan"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Age.AssertIsLowerThan", StringComparison.Ordinal))?.Message);
 
         _customer = new Customer
         {
@@ -471,7 +471,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.Height, height + valueAdd, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Height.AssertIsLowerThan"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Height.AssertIsLowerThan", StringComparison.Ordinal))?.Message);
 
         _customer = new Customer
         {
@@ -483,7 +483,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.Birthdate, DateTime.Today.AddYears(valueAdd), message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Birthdate.AssertIsLowerThan"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Birthdate.AssertIsLowerThan", StringComparison.Ordinal))?.Message);
 
         _customer = new Customer
         {
@@ -495,7 +495,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.ValueDecimal, valueDecimalA, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueDecimal.AssertIsLowerThan"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueDecimal.AssertIsLowerThan", StringComparison.Ordinal))?.Message);
 
         _customer = new Customer
         {
@@ -507,7 +507,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.ValueFloat, valueFloatA, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueFloat.AssertIsLowerThan"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueFloat.AssertIsLowerThan", StringComparison.Ordinal))?.Message);
 
         _customer = new Customer
         {
@@ -519,7 +519,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerThan(x => x.ValueLong, valueLongA, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueLong.AssertIsLowerThan"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueLong.AssertIsLowerThan", StringComparison.Ordinal))?.Message);
     }
 
     [Theory]
@@ -546,7 +546,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerOrEqualsThan(x => x.Age, ageA, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Age.AssertIsLowerOrEqualsThan"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Age.AssertIsLowerOrEqualsThan", StringComparison.Ordinal))?.Message);
 
         _customer = new Customer
         {
@@ -558,7 +558,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerOrEqualsThan(x => x.Height, heightA, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Height.AssertIsLowerOrEqualsThan"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Height.AssertIsLowerOrEqualsThan", StringComparison.Ordinal))?.Message);
 
         _customer = new Customer
         {
@@ -570,7 +570,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerOrEqualsThan(x => x.Birthdate, DateTime.Today.AddYears(birthdateA), message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Birthdate.AssertIsLowerOrEqualsThan"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Birthdate.AssertIsLowerOrEqualsThan", StringComparison.Ordinal))?.Message);
 
         _customer = new Customer
         {
@@ -582,7 +582,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerOrEqualsThan(x => x.ValueDecimal, valueDecimalA, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueDecimal.AssertIsLowerOrEqualsThan"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueDecimal.AssertIsLowerOrEqualsThan", StringComparison.Ordinal))?.Message);
 
         _customer = new Customer
         {
@@ -594,7 +594,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerOrEqualsThan(x => x.ValueFloat, valueFloatA, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueFloat.AssertIsLowerOrEqualsThan"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueFloat.AssertIsLowerOrEqualsThan", StringComparison.Ordinal))?.Message);
 
         _customer = new Customer
         {
@@ -606,7 +606,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsLowerOrEqualsThan(x => x.ValueLong, valueLongA, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueLong.AssertIsLowerOrEqualsThan"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueLong.AssertIsLowerOrEqualsThan", StringComparison.Ordinal))?.Message);
     }
 
     [Theory]
@@ -633,7 +633,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsBetween(x => x.Age, ageA, ageA + 2, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Age.AssertIsBetween"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Age.AssertIsBetween", StringComparison.Ordinal))?.Message);
 
         _customer = new Customer
         {
@@ -645,7 +645,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsBetween(x => x.Height, heightA, heightA + 2, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Height.AssertIsBetween"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Height.AssertIsBetween", StringComparison.Ordinal))?.Message);
 
         _customer = new Customer
         {
@@ -659,7 +659,7 @@ public class FluentValidatorCustomMessageTests
         _ = new ValidationConcernR<Customer>(_customer).AssertIsBetween(x => x.Birthdate, DateTime.Today.AddYears(birthdateA), DateTime.Today.AddYears(birthdateB), message);
 
         var messageActual = _customer.Notifications
-                                     .FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Birthdate.AssertIsBetween"))?
+                                     .FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.Birthdate.AssertIsBetween", StringComparison.Ordinal))?
                                      .Message;
 
         Assert.Equal(message, messageActual);
@@ -674,7 +674,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsBetween(x => x.ValueDecimal, valueDecimalA, valueDecimalA + 2, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueDecimal.AssertIsBetween"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueDecimal.AssertIsBetween", StringComparison.Ordinal))?.Message);
 
         _customer = new Customer
         {
@@ -686,7 +686,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsBetween(x => x.ValueFloat, valueFloatA, valueFloatA + 2, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueFloat.AssertIsBetween"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueFloat.AssertIsBetween", StringComparison.Ordinal))?.Message);
 
         _customer = new Customer
         {
@@ -698,7 +698,7 @@ public class FluentValidatorCustomMessageTests
             ValueLong = valueLong
         };
         _ = new ValidationConcernR<Customer>(_customer).AssertIsBetween(x => x.ValueLong, valueLongA, valueLongA + 2, message);
-        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueLong.AssertIsBetween"))?.Message);
+        Assert.Equal(message, _customer.Notifications.FirstOrDefault(x => x.Property.Equals($"{nameof(Customer)}.ValueLong.AssertIsBetween", StringComparison.Ordinal))?.Message);
 
     }
 

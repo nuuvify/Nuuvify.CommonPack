@@ -25,7 +25,7 @@ public class AssertNotAreEqualsTests : NotifiableR
         Customer customer = null;
 
         var valido = new ValidationConcernR<Customer>(customer)
-            .AssertNotAreEquals(x => x.Name == "Jo�o", true);
+            .AssertNotAreEquals(x => x.Name == "João", true);
 
         Assert.Null(customer);
         Assert.True(valido.Errors.Count > 0);
@@ -36,11 +36,11 @@ public class AssertNotAreEqualsTests : NotifiableR
     {
         Customer customer = new Customer
         {
-            Name = "Jo�o"
+            Name = "João"
         };
 
         _ = new ValidationConcernR<Customer>(customer)
-            .AssertNotAreEquals(x => x.Name == "Jo�o", true);
+            .AssertNotAreEquals(x => x.Name == "João", true);
 
         Assert.NotNull(customer);
         Assert.True(customer.Notifications.Count > 0);
@@ -55,7 +55,7 @@ public class AssertNotAreEqualsTests : NotifiableR
         };
 
         _ = new ValidationConcernR<Customer>(customer)
-            .AssertNotAreEquals(x => x.Name == "Jo�o", false)
+            .AssertNotAreEquals(x => x.Name == "João", false)
             .AssertNotDateTimeNull(x => customer.Birthdate);
 
         Assert.NotNull(customer);

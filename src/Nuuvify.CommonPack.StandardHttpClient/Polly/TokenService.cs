@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http;
@@ -62,7 +63,12 @@ public class TokenService : ITokenService
         return _credentialToken;
     }
 
-    public async Task<bool> GetNewToken(string urlToken, string login, string password, string userClaim = null)
+    public async Task<bool> GetNewToken(
+        string urlToken,
+        string login,
+        string password,
+        string userClaim = null,
+        CancellationToken cancellationToken = default)
     {
         var messageLog = $"{nameof(TokenService.GetNewToken)}";
 
@@ -83,7 +89,10 @@ public class TokenService : ITokenService
 
         _logger.LogDebug("{MessageLog} - User Claim: {UserClaim}", messageLog, userClaim);
 
-        var response = await _standardHttpClient.Post(urlRoute: urlToken, messageBody: messageBody);
+        var response = await _standardHttpClient.Post(
+            urlRoute: urlToken,
+            messageBody: messageBody,
+            cancellationToken: cancellationToken);
 
         _credentialToken = ReturnClass<CredentialToken>(response);
 
@@ -111,13 +120,17 @@ public class TokenService : ITokenService
     }
 
     ///<inheritdoc/>
-    public async Task<CredentialToken> GetToken(string login = null, string password = null, string userClaim = null)
+    public async Task<CredentialToken> GetToken(
+        string login = null,
+        string password = null,
+        string userClaim = null,
+        CancellationToken cancellationToken = default)
     {
 
         Notifications.Clear();
 
         var messageLog = $"{nameof(TokenService.GetToken)}";
-        _logger.LogDebug($"{messageLog} - Inicio");
+        _logger.LogDebug("{MessageLog} - Inicio", messageLog);
 
         if (string.IsNullOrWhiteSpace(login))
         {
@@ -147,7 +160,7 @@ public class TokenService : ITokenService
             return null;
         }
 
-        _ = await GetNewToken(urlToken, login, password, userClaim);
+        _ = await GetNewToken(urlToken, login, password, userClaim, cancellationToken);
 
         if (_credentialToken != null && !string.IsNullOrWhiteSpace(_credentialToken.Token))
         {
@@ -166,7 +179,7 @@ public class TokenService : ITokenService
     public string GetTokenAcessor()
     {
         var messageLog = $"{nameof(TokenService.GetTokenAcessor)}";
-        _logger.LogDebug($"{messageLog} - Inicio");
+        _logger.LogDebug("{MessageLog} - Inicio", messageLog);
 
         if (!IsAuthenticated(out string token))
         {
@@ -208,12 +221,12 @@ public class TokenService : ITokenService
             }
             Notifications.Add(new NotificationR(typeof(T).Name, "Não foi possivel deserializar essa classe"));
             Notifications.Add(new NotificationR(typeof(T).Name, $"{returnResult.ReturnMessage}"));
-            return (T)Convert.ChangeType(null, typeof(T));
+            return (T)Convert.ChangeType(null, typeof(T), CultureInfo.InvariantCulture);
         }
         Notifications.Add(new NotificationR(typeof(T).Name, $"Não houve sucesso no retorno da request para a classe {nameof(HttpStandardReturn)}"));
         Notifications.Add(new NotificationR(typeof(T).Name, $"{returnResult.ReturnMessage}"));
 
-        return (T)Convert.ChangeType(null, typeof(T));
+        return (T)Convert.ChangeType(null, typeof(T), CultureInfo.InvariantCulture);
     }
 
     private T DeserealizeObject<T>(string message) where T : class
@@ -232,6 +245,6 @@ public class TokenService : ITokenService
             return returnData;
         }
 
-        return (T)Convert.ChangeType(null, typeof(T));
+        return (T)Convert.ChangeType(null, typeof(T), CultureInfo.InvariantCulture);
     }
 }

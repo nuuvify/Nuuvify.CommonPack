@@ -20,7 +20,7 @@ public static class HealthCheckExtensions
 
     /// <summary>
     /// Esse metodo utiliza as configurações do appsettings.json para configurar o HealthCheck
-    /// 
+    ///
     /// </summary>
     /// <code>
     /// <example>
@@ -112,7 +112,7 @@ public static class HealthCheckExtensions
         }
 
         if (string.IsNullOrWhiteSpace(providerStorage) ||
-            providerStorage.Equals("sqlite", StringComparison.InvariantCultureIgnoreCase))
+            providerStorage.Equals("sqlite", StringComparison.OrdinalIgnoreCase))
         {
 
             var pathSqlite = Path.Combine(Path.GetTempPath(), $"{AssemblyExtension.GetApplicationNameByAssembly}_healthchecks.db");
@@ -157,7 +157,7 @@ public static class HealthCheckExtensions
     /// <summary>
     /// Adiciona um health check para a api de credenciais "CredentialApi"
     /// <p>AzureKeyVault para AzureAdOpenID--cc--ClientSecret</p>
-    /// <p>AzureBlobStorage para BlobDotnetDataProtection</p> 
+    /// <p>AzureBlobStorage para BlobDotnetDataProtection</p>
     /// </summary>
     /// <param name="builder"></param>
     /// <param name="configuration"></param>
@@ -264,7 +264,7 @@ public static class HealthCheckExtensions
     }
 
     /// <summary>
-    /// Esse metodo usa os parametros do appsettings.json 
+    /// Esse metodo usa os parametros do appsettings.json
     /// <p>HealthCheckCustomConfiguration:UrlHealthCheck</p>
     /// <p>HealthCheckCustomConfiguration:UrlHealthCheckUI</p>
     /// <p>HealthCheckCustomConfiguration:UrlHealthCheckApiData</p>

@@ -33,7 +33,7 @@ public class SwaggerJsonIgnore : IOperationFilter
             foreach (var property in ignoredProperties)
             {
                 operation.Parameters = operation.Parameters
-                    .Where(p => !p.Name.Equals(property.Name, StringComparison.InvariantCulture) &&
+                    .Where(p => !p.Name.Equals(property.Name, StringComparison.Ordinal) &&
                         p.In != ParameterLocation.Header)
                     .ToList();
             }

@@ -41,7 +41,7 @@ public class UserAuthenticated : IUserAuthenticated
         token = "";
         if (_accessor.HttpContext == null) return false;
         var esquemaAutenticacao = _accessor.HttpContext.Request.Headers
-            .FirstOrDefault(x => x.Key.Equals("Authorization")).Value;
+            .FirstOrDefault(x => x.Key.Equals("Authorization", StringComparison.Ordinal)).Value;
 
         foreach (var item in esquemaAutenticacao)
         {
@@ -71,7 +71,7 @@ public class UserAuthenticated : IUserAuthenticated
             item = groups[i];
 
             claim = _accessor.HttpContext.User.Claims
-                .FirstOrDefault(c => c.Type.Equals(item, System.StringComparison.InvariantCultureIgnoreCase));
+                .FirstOrDefault(c => c.Type.Equals(item, System.StringComparison.OrdinalIgnoreCase));
 
             authorized = claim != null;
 
@@ -87,7 +87,7 @@ public class UserAuthenticated : IUserAuthenticated
 
         if (_accessor.HttpContext == null) return string.Empty;
         var claim = _accessor.HttpContext.User.Claims
-            .FirstOrDefault(c => c.Type.Equals(claimName, System.StringComparison.InvariantCultureIgnoreCase));
+            .FirstOrDefault(c => c.Type.Equals(claimName, System.StringComparison.OrdinalIgnoreCase));
 
         return claim?.Value;
     }

@@ -58,7 +58,7 @@ public class FaturaRepository
             x => x.Id == _seedDbFixture.Fatura.Id);
 
         var faturaNewVersion = await _faturaRepository.FindAsync(fatura.Id);
-        faturaNewVersion.Update("Essa � a vers�o 2 da fatura");
+        faturaNewVersion.Update("Essa ã a versão 2 da fatura");
 
         var registries = await _faturaRepository.SaveChangesAsync();
 
