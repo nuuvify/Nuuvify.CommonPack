@@ -1,6 +1,6 @@
-﻿namespace Nuuvify.CommonPack.StandardHttpClientService.xTest;
+namespace Nuuvify.CommonPack.StandardHttpClientService.xTest;
 
-[Order(2)]
+[Trait("Category", "Unit")]
 public class BaseHttpCustomTests : NotifiableR
 {
     private readonly Mock<IHttpClientFactory> mockFactory;
@@ -18,7 +18,7 @@ public class BaseHttpCustomTests : NotifiableR
         Config = AppSettingsConfig.GetConfig();
     }
 
-    [Fact, Order(1)]
+    [Fact]
     public async Task QuandoObterTokenRetornarErroNotificationDeveSerLancada()
     {
 
@@ -76,7 +76,7 @@ public class BaseHttpCustomTests : NotifiableR
         Assert.True(tokenService.Notifications.Count > 0);
     }
 
-    [LocalTestFact, Order(2)]
+    [LocalTestFact]
     public async Task ObtemCadastroPessoaValido()
     {
         var config = AppSettingsConfig.GetConfig();

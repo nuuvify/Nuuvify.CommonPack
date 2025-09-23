@@ -1,7 +1,7 @@
 namespace Nuuvify.CommonPack.Email.xTest.Fixtures;
 
-[CollectionDefinition(nameof(DataCollection))]
-public class DataCollection :
+[CollectionDefinition(nameof(EmailDataCollection))]
+public class EmailDataCollection :
     ICollectionFixture<EmailConfigFixture>
 {
 

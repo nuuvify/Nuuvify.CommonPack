@@ -38,7 +38,6 @@ public static partial class ModelBuilderExtensions
     {
         IEnumerable<IMutableEntityType> entityTypes;
 
-
         if (classIgnore is null)
         {
 
@@ -119,20 +118,17 @@ public static partial class ModelBuilderExtensions
             }
         }
 
-
-
         if (entityTypes != null)
         {
             foreach (var entityType in entityTypes)
             {
                 if (entityType.ClrType.BaseType.Name == entityType.ClrType.Name ||
                     entityType.ClrType.BaseType.Name == "Object")
-                    modelBuilder.Ignore(entityType.ClrType);
+                    _ = modelBuilder.Ignore(entityType.ClrType);
             }
         }
 
     }
-
 
 }
 

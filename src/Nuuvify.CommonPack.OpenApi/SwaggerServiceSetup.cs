@@ -2,21 +2,19 @@
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Nuuvify.CommonPack.OpenApi
+namespace Nuuvify.CommonPack.OpenApi;
+
+public static class SwaggerServiceSetup
 {
-    public static class SwaggerServiceSetup
+
+    public static void AddSwaggerSetup(this IServiceCollection services)
     {
 
-        public static void AddSwaggerSetup(this IServiceCollection services)
-        {
+        _ = services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerGenOptionsConfigure>();
 
-            services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerGenOptionsConfigure>();
+        SwaggerGenXmlComments.Configuration(services);
+        SwaggerGenSecurity.Configuration(services);
+        SwaggerGenJsonIgnore.Configuration(services);
 
-
-            SwaggerGenXmlComments.Configuration(services);
-            SwaggerGenSecurity.Configuration(services);
-            SwaggerGenJsonIgnore.Configuration(services);
-
-        }
     }
 }
