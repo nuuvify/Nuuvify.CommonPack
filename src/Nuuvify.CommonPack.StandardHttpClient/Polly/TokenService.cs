@@ -92,7 +92,7 @@ public class TokenService : ITokenService
         var response = await _standardHttpClient.Post(
             urlRoute: urlToken,
             messageBody: messageBody,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken).ConfigureAwait(false);
 
         _credentialToken = ReturnClass<CredentialToken>(response);
 
@@ -160,7 +160,7 @@ public class TokenService : ITokenService
             return null;
         }
 
-        _ = await GetNewToken(urlToken, login, password, userClaim, cancellationToken);
+        _ = await GetNewToken(urlToken, login, password, userClaim, cancellationToken).ConfigureAwait(false);
 
         if (_credentialToken != null && !string.IsNullOrWhiteSpace(_credentialToken.Token))
         {
