@@ -18,7 +18,7 @@ namespace Nuget.CustomManagement.NugetCustomManagementPackage;
 /// </summary>
 public class NugetCustomManagementPackage
 {
-    private const string PackageVersion = "2.1.0-test.25092903";
+    private const string PackageVersion = "2.1.0-test.25093006";
 
     public IDictionary<string, string> Packages { get; set; }
 

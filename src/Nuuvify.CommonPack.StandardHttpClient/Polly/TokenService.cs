@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -18,11 +19,14 @@ public class TokenService : ITokenService
     private readonly ILogger<TokenService> _logger;
     private readonly IStandardHttpClient _standardHttpClient;
     private readonly IConfiguration _configuration;
-    protected readonly IHttpContextAccessor _accessor;
+    private readonly IHttpContextAccessor _accessor;
+    private readonly List<NotificationR> _notifications;
+
     private CredentialToken _credentialToken;
+    protected IHttpContextAccessor Accessor => _accessor;
 
     ///<inheritdoc/>
-    public List<NotificationR> Notifications { get; set; }
+    public ReadOnlyCollection<NotificationR> Notifications => new ReadOnlyCollection<NotificationR>(_notifications);
 
     public TokenService(
         IOptions<CredentialToken> credentialToken,
@@ -38,7 +42,7 @@ public class TokenService : ITokenService
 
         _credentialToken = credentialToken.Value;
 
-        Notifications = new List<NotificationR>();
+        _notifications = new List<NotificationR>();
     }
 
     private string GetHttpClientTokenName { get; set; }
@@ -127,7 +131,7 @@ public class TokenService : ITokenService
         CancellationToken cancellationToken = default)
     {
 
-        Notifications.Clear();
+        _notifications.Clear();
 
         var messageLog = $"{nameof(TokenService.GetToken)}";
         _logger.LogDebug("{MessageLog} - Inicio", messageLog);
@@ -153,7 +157,7 @@ public class TokenService : ITokenService
             string.IsNullOrWhiteSpace(urlLogin) ||
             string.IsNullOrWhiteSpace(urlToken))
         {
-            Notifications.Add(new NotificationR(nameof(GetToken), "Algum dos dados a seguir não deveria estar branco: login ou password ou urlLogin ou urlToken"));
+            _notifications.Add(new NotificationR(nameof(GetToken), "Algum dos dados a seguir não deveria estar branco: login ou password ou urlLogin ou urlToken"));
 
             _logger.LogWarning("{MessageLog} - Algum dos dados a seguir não deveria estar branco: login ou password ou urlLogin ou urlToken", messageLog);
 
@@ -210,7 +214,7 @@ public class TokenService : ITokenService
 
     private T ReturnClass<T>(HttpStandardReturn returnResult) where T : class
     {
-        Notifications.Clear();
+        _notifications.Clear();
 
         if (returnResult.Success)
         {
@@ -219,12 +223,12 @@ public class TokenService : ITokenService
                 return DeserealizeObject<T>(returnResult.ReturnMessage);
 
             }
-            Notifications.Add(new NotificationR(typeof(T).Name, "Não foi possivel deserializar essa classe"));
-            Notifications.Add(new NotificationR(typeof(T).Name, $"{returnResult.ReturnMessage}"));
+            _notifications.Add(new NotificationR(typeof(T).Name, "Não foi possivel deserializar essa classe"));
+            _notifications.Add(new NotificationR(typeof(T).Name, $"{returnResult.ReturnMessage}"));
             return (T)Convert.ChangeType(null, typeof(T), CultureInfo.InvariantCulture);
         }
-        Notifications.Add(new NotificationR(typeof(T).Name, $"Não houve sucesso no retorno da request para a classe {nameof(HttpStandardReturn)}"));
-        Notifications.Add(new NotificationR(typeof(T).Name, $"{returnResult.ReturnMessage}"));
+        _notifications.Add(new NotificationR(typeof(T).Name, $"Não houve sucesso no retorno da request para a classe {nameof(HttpStandardReturn)}"));
+        _notifications.Add(new NotificationR(typeof(T).Name, $"{returnResult.ReturnMessage}"));
 
         return (T)Convert.ChangeType(null, typeof(T), CultureInfo.InvariantCulture);
     }

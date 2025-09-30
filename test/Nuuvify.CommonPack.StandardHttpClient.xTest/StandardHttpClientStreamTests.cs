@@ -6,13 +6,11 @@ public class StandardHttpClientServiceStreamTests
 {
 
     private readonly Mock<IHttpClientFactory> mockFactory;
-    private readonly IConfiguration Config;
 
     public StandardHttpClientServiceStreamTests()
     {
         mockFactory = new Mock<IHttpClientFactory>();
 
-        Config = AppSettingsConfig.GetConfig();
     }
 
     [Fact]
