@@ -140,7 +140,7 @@ public partial class StandardWebService : IStandardWebService, IDisposable
 
         _ = _httpClient.CustomRequestHeader(_headerStandard);
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(accept));
-        return await StandardGetRequestStreamAsync(url, soapEnvelopeXml, accept);
+        return await StandardGetRequestStreamAsync(url, soapEnvelopeXml, accept).ConfigureAwait(false);
 
     }
 

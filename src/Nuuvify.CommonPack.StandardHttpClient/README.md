@@ -1,9 +1,25 @@
 # Nuuvify.CommonPack.StandardHttpClient
 
-[![Build Status - QAS](https://dev.azure.com/nuuvify/Nuuvify.CommonPack/_apis/build/status/Nuuvify.CommonPack?branchName=qas)](https://dev.azure.com/nuuvify/Nuuvify.CommonPack/_build/latest?definitionId=1&branchName=qas)
-[![Build Status - Main](https://dev.azure.com/nuuvify/Nuuvify.CommonPack/_apis/build/status/Nuuvify.CommonPack?branchName=main)](https://dev.azure.com/nuuvify/Nuuvify.CommonPack/_build/latest?definitionId=1&branchName=main)
+[![Build Status - Main](https://dev.azure.com/nuuvers/Nuuvify/_apis/build/status/CI-Github-Nuuvify.CommonPack?repoName=lzocateli00%2FNuuvify.CommonPack&branchName=main)](https://dev.azure.com/nuuvers/Nuuvify/_build/latest?definitionId=23&repoName=lzocateli00%2FNuuvify.CommonPack&branchName=main)
+[![Build Status - QAS](https://dev.azure.com/nuuvers/Nuuvify/_apis/build/status/CI-Github-Nuuvify.CommonPack?repoName=lzocateli00%2FNuuvify.CommonPack&branchName=qas)](https://dev.azure.com/nuuvers/Nuuvify/_build/latest?definitionId=23&repoName=lzocateli00%2FNuuvify.CommonPack&branchName=qas)
+[![NuGet](https://img.shields.io/nuget/v/Nuuvify.CommonPack.StandardHttpClient.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.StandardHttpClient/)
+[![Downloads](https://img.shields.io/nuget/dt/Nuuvify.CommonPack.StandardHttpClient.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.StandardHttpClient/)
 
-Biblioteca para padronização de comunicação HTTP com APIs externas, incluindo gerenciamento de tokens, retry policies, e serialização padronizada.
+Cliente HTTP otimizado com retry policies, gerenciamento de tokens, resource management e performance aprimorada para bibliotecas .NET.
+
+## 🚀 Destaques da Versão 1.1.0
+
+### ⚡ Performance & Resource Management
+- **ConfigureAwait(false)** implementado em todas as operações assíncronas
+- **Proper disposal pattern** para HttpRequestMessage e HttpResponseMessage
+- **Memory leak prevention** através de gerenciamento adequado de recursos
+- **Compliance com CA2000** (análise estática de código)
+
+### 🔄 Otimizações Implementadas
+- ✅ **Escalabilidade aprimorada** em cenários de alta concorrência
+- ✅ **Redução significativa** no uso de memória
+- ✅ **Prevenção de deadlocks** em código síncrono/assíncrono
+- ✅ **Thread pool optimization** com ConfigureAwait(false)
 
 ## Índice
 
@@ -37,6 +53,9 @@ Biblioteca para padronização de comunicação HTTP com APIs externas, incluind
 - ✅ **Headers customizáveis** e autenticação flexível
 - ✅ **QueryString helper** com encoding automático
 - ✅ **Upload de arquivos (multipart)** com progress tracking
+- ✅ **Performance otimizada** com ConfigureAwait(false) para Class Libraries
+- ✅ **Gerenciamento de recursos** com proper disposal de HttpRequestMessage e HttpResponseMessage
+- ✅ **Memory leak prevention** através de padrões IDisposable corretos
 
 ## Dependências
 
@@ -410,6 +429,44 @@ var resultado = await _httpClient
     .Get("api/dados", cancellationToken);
 ```
 
+## Performance e Best Practices
+
+### 🚀 Otimizações Implementadas
+
+A biblioteca foi otimizada seguindo as melhores práticas para **Class Libraries** em .NET:
+
+#### ConfigureAwait(false)
+- ✅ **Todos os `await`** utilizam `ConfigureAwait(false)` para evitar captura desnecessária de contexto
+- ✅ **Melhor escalabilidade** em aplicações server-side (ASP.NET, Web APIs)
+- ✅ **Prevenção de deadlocks** em código síncrono que chama métodos assíncronos
+- ✅ **Performance superior** em cenários de alta concorrência
+
+#### Resource Management
+- ✅ **Proper disposal** de `HttpRequestMessage` com `using var`
+- ✅ **Automatic cleanup** de `HttpResponseMessage` no padrão IDisposable
+- ✅ **Memory leak prevention** através de liberação adequada de recursos
+- ✅ **Compliance com CA2000** (análise estática do código)
+
+```csharp
+// ✅ Exemplo de como a biblioteca gerencia recursos internamente:
+using var message = new HttpRequestMessage(HttpMethod.Post, url)
+{
+    Content = new StringContent(jsonData, Encoding.UTF8, "application/json")
+};
+
+// HttpResponseMessage é automaticamente disposto via padrão IDisposable
+var response = await httpClient.SendAsync(message, cancellationToken).ConfigureAwait(false);
+```
+
+#### Benefícios para sua aplicação:
+
+| Benefício            | Descrição                                        |
+| -------------------- | ------------------------------------------------ |
+| **🔄 Escalabilidade** | Threads não ficam bloqueadas aguardando contexto |
+| **⚡ Performance**    | Menor overhead de gerenciamento de contexto      |
+| **🛡️ Estabilidade**   | Prevenção de memory leaks e deadlocks            |
+| **📊 Monitoramento**  | Melhor utilização de recursos do sistema         |
+
 ## Configurações Avançadas
 
 ### Retry Policy Personalizada
@@ -536,6 +593,26 @@ _httpClient.CreateClient();
 // NÃO chame ResetStandardHttpClient() aqui
 _httpClient.WithHeader("Custom-Header", "valor");
 var result = await _httpClient.Get("api/dados");
+```
+
+### Problema: Memory leaks ou alta utilização de memória
+**Solução:** A biblioteca já implementa proper disposal automaticamente. Certifique-se de:
+```csharp
+// ✅ Use IDisposable pattern se criar instâncias manuais
+using var httpClientService = serviceProvider.GetService<IStandardHttpClient>();
+
+// ✅ Em DI, a biblioteca gerencia recursos automaticamente
+// Não é necessário disposal manual quando injetado via DI
+```
+
+### Problema: Deadlocks em código síncrono
+**Solução:** A biblioteca usa `ConfigureAwait(false)` internamente. Em seu código:
+```csharp
+// ✅ Use async/await corretamente
+var resultado = await _httpClient.Get("api/dados", cancellationToken);
+
+// ❌ Evite .Result ou .Wait() em contextos síncronos
+// var resultado = _httpClient.Get("api/dados").Result; // Pode causar deadlock
 ```
 
 

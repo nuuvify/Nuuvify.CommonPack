@@ -12,11 +12,11 @@ public partial class StandardHttpClientService
     {
         var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
-        var message = new HttpRequestMessage(HttpMethod.Get, url)
+        using var message = new HttpRequestMessage(HttpMethod.Get, url)
             .CustomRequestHeader(_headerStandard)
             .AddAuthorizationHeader(_headerAuthorization);
 
-        return await StandardStreamSendAsync(url, message, cancellationToken);
+        return await StandardStreamSendAsync(url, message, cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<HttpStandardReturn> Get(
@@ -25,11 +25,11 @@ public partial class StandardHttpClientService
     {
         var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
-        var message = new HttpRequestMessage(HttpMethod.Get, url)
+        using var message = new HttpRequestMessage(HttpMethod.Get, url)
             .CustomRequestHeader(_headerStandard)
             .AddAuthorizationHeader(_headerAuthorization);
 
-        return await StandardSendAsync(url, message, cancellationToken);
+        return await StandardSendAsync(url, message, cancellationToken).ConfigureAwait(false);
     }
 
 }
