@@ -3,15 +3,11 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <Description>
-      Essa biblioteca é uma extensão do EntityFrameworkCore para ser utilizado junto com UnitOfWork
-      a fim de incluir na tabela AutoHistory, todas as alterações feitas em um registro em qualquer
-      entidade da aplicação.
-      Essa bilioteca deve ser instalada no seu projeto Infra.Data
-        </Description>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
-        <PackageTags>Nuuvify</PackageTags>
+        <PackageId>Nuuvify.CommonPack.AutoHistory</PackageId>
+        <Title>Nuuvify CommonPack Auto History</Title>
+        <PackageTags>Nuuvify, EntityFramework, EF, AutoHistory, Audit, UnitOfWork, .NET</PackageTags>
+        <Description>Extensão do EntityFrameworkCore para ser utilizado junto com UnitOfWork a fim de incluir na tabela AutoHistory todas as alterações feitas em um registro em qualquer entidade da aplicação</Description>
+        <Product>CommonPack Auto History</Product>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,11 +16,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Nuuvify.CommonPack.UnitOfWork.Abstraction\Nuuvify.CommonPack.UnitOfWork.Abstraction.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Include="README.md" Pack="true" PackagePath="\" />
-        <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
     </ItemGroup>
 
     <ItemGroup Label="Packaging">
