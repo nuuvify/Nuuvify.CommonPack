@@ -17,7 +17,7 @@ public static class HttpRetryPolicies
                 onRetryAsync: async (message, retrySleep, context) =>
                 {
                     retryNum++;
-                    await OnHttpRetry(message, request, retrySleep, retryNum, retryPolicyConfig.RetryCount, context, logger);
+                    await OnHttpRetry(message, request, retrySleep, retryNum, retryPolicyConfig.RetryCount, context, logger).ConfigureAwait(false);
 
                     if (retryNum > retryPolicyConfig.RetryCount) retryNum = 0;
                 });
@@ -48,7 +48,7 @@ public static class HttpRetryPolicies
             logger.LogWarning("{messageLog}", messageLog);
         }
 
-        await Task.CompletedTask;
+        await Task.CompletedTask.ConfigureAwait(false);
     }
 
 }
