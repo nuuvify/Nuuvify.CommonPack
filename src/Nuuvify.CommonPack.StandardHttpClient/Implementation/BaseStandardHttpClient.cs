@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.Extensions.JsonConverter;
 using Nuuvify.CommonPack.Extensions.Notificator;
+using Nuuvify.CommonPack.Security.Abstraction;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 
 namespace Nuuvify.CommonPack.StandardHttpClient;
@@ -17,6 +18,7 @@ public abstract partial class BaseStandardHttpClient
 
     private readonly IStandardHttpClient _standardHttpClient;
     private readonly ITokenService _tokenService;
+    private readonly List<NotificationR> _notifications;
 
     /// <summary>
     /// Você pode alterar a configuração que é realizada no construtor
@@ -24,15 +26,29 @@ public abstract partial class BaseStandardHttpClient
     /// <value></value>
     protected JsonSerializerOptions JsonSettings { get; set; }
 
-    protected Collection<NotificationR> Notifications { get; set; }
+    /// <summary>
+    /// Lista de notificações coletadas durante operações HTTP
+    /// </summary>
+    protected ReadOnlyCollection<NotificationR> Notifications => new ReadOnlyCollection<NotificationR>(_notifications);
+
+    /// <summary>
+    /// Instância do cliente HTTP padrão para execução de requisições HTTP
+    /// </summary>
+    /// <value>Cliente HTTP configurado com as políticas de retry, circuit breaker e timeout</value>
+    protected IStandardHttpClient StandardHttpClient => _standardHttpClient;
+
+    /// <summary>
+    /// Serviço de gerenciamento de tokens de autenticação
+    /// </summary>
+    /// <value>Serviço responsável por obter, renovar e gerenciar tokens de acesso para APIs</value>
+    protected ITokenService TokenService => _tokenService;
 
     protected BaseStandardHttpClient(
         IStandardHttpClient standardHttpClient,
         ITokenService tokenService)
     {
         _standardHttpClient = standardHttpClient;
-
-        Notifications = new Collection<NotificationR>();
+        _notifications = new List<NotificationR>();
 
         JsonSettings = new JsonSerializerOptions
         {
@@ -55,7 +71,7 @@ public abstract partial class BaseStandardHttpClient
         return _tokenService.GetTokenAcessor();
     }
     ///<inheritdoc cref="ITokenService.GetToken"/>
-    public virtual async Task<bool> GetToken(
+    public virtual async Task<bool> GetTokenAsync(
         string login = null,
         string password = null,
         string userClaim = null,
@@ -67,7 +83,26 @@ public abstract partial class BaseStandardHttpClient
             userClaim: userClaim,
             cancellationToken: cancellationToken
         );
+
+        AddNotifications(_tokenService.Notifications);
         return token.IsValidToken();
+    }
+    ///<inheritdoc cref="ITokenService.GetToken"/>
+    public virtual async Task<CredentialToken> GetToken(
+        string login = null,
+        string password = null,
+        string userClaim = null,
+        CancellationToken cancellationToken = default)
+    {
+        var token = await _tokenService.GetToken(
+            login: login,
+            password: password,
+            userClaim: userClaim,
+            cancellationToken: cancellationToken
+        );
+
+        AddNotifications(_tokenService.Notifications);
+        return token;
     }
 
     /// <summary>
@@ -97,7 +132,7 @@ public abstract partial class BaseStandardHttpClient
             message = $"Não houve sucesso no retorno da request {standardReturn}";
         }
 
-        Notifications.Add(new NotificationR(
+        AddNotification(new NotificationR(
             property: typeof(T).Name,
             message: $"{message}-Correlation: {_standardHttpClient.CorrelationId}",
             aggregatorId: api,
@@ -130,14 +165,14 @@ public abstract partial class BaseStandardHttpClient
             {
                 return (T)Convert.ChangeType(null, typeof(T), CultureInfo.InvariantCulture);
             }
-            Notifications.Add(new NotificationR(
+            AddNotification(new NotificationR(
                 property: "ReturnClass<T>",
                 message: $"Não foi possivel deserializar o retorno para a classe {typeof(T).Name}-Correlation: {_standardHttpClient.CorrelationId}. ReturCode: {standardReturn?.ReturnCode}",
                 aggregatorId: api,
                 type: ApplicationErrorType,
                 originNotification: null));
 
-            Notifications.Add(new NotificationR(
+            AddNotification(new NotificationR(
                 property: "ReturnClass<T>",
                 message: messageClean,
                 aggregatorId: api,
@@ -149,13 +184,13 @@ public abstract partial class BaseStandardHttpClient
         else if (standardReturn?.ReturnCode != "422")
         {
 
-            Notifications.Add(new NotificationR(property: typeof(T).Name,
+            AddNotification(new NotificationR(property: typeof(T).Name,
                 message: $"Não houve sucesso no retorno da request para a classe {nameof(HttpStandardReturn)}-Correlation: {_standardHttpClient.CorrelationId}",
                 aggregatorId: api,
                 type: ApplicationErrorType,
                 originNotification: null));
 
-            Notifications.Add(new NotificationR(property: typeof(T).Name,
+            AddNotification(new NotificationR(property: typeof(T).Name,
                     message: standardReturn?.ReturnMessage,
                     aggregatorId: api,
                     type: OriginMessageType,
@@ -190,13 +225,13 @@ public abstract partial class BaseStandardHttpClient
             {
                 return new List<T>();
             }
-            Notifications.Add(new NotificationR(property: "ReturnList<>",
+            AddNotification(new NotificationR(property: "ReturnList<>",
                 message: $"Não foi possivel deserializar o retorno para a classe {typeof(T).Name}-Correlation: {_standardHttpClient.CorrelationId}. ReturCode: {standardReturn?.ReturnCode}",
                 aggregatorId: api,
                 type: ApplicationErrorType,
                 originNotification: null));
 
-            Notifications.Add(new NotificationR(property: "ReturnList<>",
+            AddNotification(new NotificationR(property: "ReturnList<>",
                 message: messageClean,
                 aggregatorId: api,
                 type: OriginMessageType,
@@ -206,13 +241,13 @@ public abstract partial class BaseStandardHttpClient
         }
         else if (standardReturn?.ReturnCode != "422")
         {
-            Notifications.Add(new NotificationR(property: typeof(T).Name,
+            AddNotification(new NotificationR(property: typeof(T).Name,
                 message: $"Não houve sucesso no retorno da request para a classe {nameof(HttpStandardReturn)}-Correlation: {_standardHttpClient.CorrelationId}",
                 aggregatorId: api,
                 type: ApplicationErrorType,
                 originNotification: null));
 
-            Notifications.Add(new NotificationR(property: "ReturnList<>",
+            AddNotification(new NotificationR(property: "ReturnList<>",
                 message: standardReturn?.ReturnMessage,
                 aggregatorId: api,
                 type: OriginMessageType,
@@ -223,9 +258,59 @@ public abstract partial class BaseStandardHttpClient
         return new List<T>();
     }
 
+    /// <summary>
+    /// Verifica se não há notificações (indica operação válida)
+    /// </summary>
+    /// <returns>True se não houver notificações, False caso contrário</returns>
     public bool IsValid()
     {
-        return Notifications.Count == 0;
+        return _notifications.Count == 0;
+    }
+
+    /// <summary>
+    /// Adiciona uma notificação à lista
+    /// </summary>
+    /// <param name="notification">Notificação a ser adicionada</param>
+    protected void AddNotification(NotificationR notification)
+    {
+        if (notification != null)
+        {
+            _notifications.Add(notification);
+        }
+    }
+
+    /// <summary>
+    /// Adiciona uma coleção de notificações à lista
+    /// </summary>
+    /// <param name="notifications">Coleção de notificações</param>
+    protected void AddNotifications(IEnumerable<NotificationR> notifications)
+    {
+        if (notifications != null)
+        {
+            _notifications.AddRange(notifications);
+        }
+    }
+
+    /// <summary>
+    /// Remove todas as notificações
+    /// </summary>
+    protected void ClearNotifications()
+    {
+        _notifications.Clear();
+    }
+
+    /// <summary>
+    /// Remove notificações por propriedade
+    /// </summary>
+    /// <param name="property">Nome da propriedade</param>
+    /// <returns>Número de notificações removidas</returns>
+    protected int RemoveNotifications(string property)
+    {
+        if (!string.IsNullOrEmpty(property))
+        {
+            return _notifications.RemoveAll(x => x.Property?.Equals(property, StringComparison.OrdinalIgnoreCase) == true);
+        }
+        return 0;
     }
 
 }

@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.Extensions.Notificator;
 using Nuuvify.CommonPack.Security.Abstraction;
@@ -55,7 +56,7 @@ public interface ITokenService
     /// <summary>
     /// Obtem as mensagens de inconsistencias ocorridas dentro da classe
     /// </summary>
-    List<NotificationR> Notifications { get; set; }
+    ReadOnlyCollection<NotificationR> Notifications { get; }
 
     /// <summary>
     /// Retorna o nome para uma instancia HttpClient, informe null, caso não queira nomear

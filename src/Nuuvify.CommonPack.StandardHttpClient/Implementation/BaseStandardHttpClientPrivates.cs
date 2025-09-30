@@ -40,7 +40,7 @@ public abstract partial class BaseStandardHttpClient
         catch (JsonException ex)
         {
             // Log the exception if needed
-            Notifications.Add(new NotificationR(MethodBase.GetCurrentMethod().Name, $"Failed to deserialize JSON message: {message} jsonDataDepth: {jsonDataDepth} Exception: {ex.Message}"));
+            AddNotification(new NotificationR(MethodBase.GetCurrentMethod().Name, $"Failed to deserialize JSON message: {message} jsonDataDepth: {jsonDataDepth} Exception: {ex.Message}"));
         }
 
         return new List<T>();
@@ -76,7 +76,7 @@ public abstract partial class BaseStandardHttpClient
         catch (JsonException ex)
         {
             // Log the exception if needed
-            Notifications.Add(new NotificationR(MethodBase.GetCurrentMethod().Name, $"Failed to deserialize JSON message: {message} jsonDataDepth: {jsonDataDepth} Exception: {ex.Message}"));
+            AddNotification(new NotificationR(MethodBase.GetCurrentMethod().Name, $"Failed to deserialize JSON message: {message} jsonDataDepth: {jsonDataDepth} Exception: {ex.Message}"));
         }
 
         return (T)Convert.ChangeType(null, typeof(T), CultureInfo.InvariantCulture);
@@ -112,7 +112,7 @@ public abstract partial class BaseStandardHttpClient
         }
         catch (JsonException ex)
         {
-            Notifications.Add(new NotificationR(MethodBase.GetCurrentMethod().Name, $"Failed to navigate JSON structure at depth {depth} Exception: {ex.Message}"));
+            AddNotification(new NotificationR(MethodBase.GetCurrentMethod().Name, $"Failed to navigate JSON structure at depth {depth} Exception: {ex.Message}"));
             return null;
         }
     }
@@ -275,7 +275,7 @@ public abstract partial class BaseStandardHttpClient
 
     private void AddOriginNotification(string property, string message, string aggregatorId)
     {
-        Notifications.Add(new NotificationR(
+        AddNotification(new NotificationR(
             property: property,
             message: message,
             aggregatorId: aggregatorId,
@@ -287,7 +287,7 @@ public abstract partial class BaseStandardHttpClient
     {
         var message = $"Ocorreu o erro: {ex.Message} ao deserializar o retorno: {standardReturn.ReturnMessage}. Correlation: {_standardHttpClient.CorrelationId} - Talvez possa ser resolvido com parametros da propriedade JsonSettings ou com uma classe para deserialização mais adequada";
 
-        Notifications.Add(new NotificationR(
+        AddNotification(new NotificationR(
             property: ex.Source,
             message: message,
             aggregatorId: $"{api}",
