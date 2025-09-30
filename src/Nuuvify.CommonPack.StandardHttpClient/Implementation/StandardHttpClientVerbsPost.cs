@@ -15,7 +15,7 @@ public partial class StandardHttpClientService
     {
         var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
-        var message = new HttpRequestMessage(HttpMethod.Post, url)
+        using var message = new HttpRequestMessage(HttpMethod.Post, url)
         {
             Content = new StringContent(
                 JsonSerializer.Serialize(messageBody),
@@ -25,7 +25,7 @@ public partial class StandardHttpClientService
         .CustomRequestHeader(_headerStandard)
         .AddAuthorizationHeader(_headerAuthorization);
 
-        return await StandardSendAsync(url, message, cancellationToken);
+        return await StandardSendAsync(url, message, cancellationToken).ConfigureAwait(false);
 
     }
 
@@ -38,7 +38,7 @@ public partial class StandardHttpClientService
     {
         var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
-        var message = new HttpRequestMessage(HttpMethod.Post, url)
+        using var message = new HttpRequestMessage(HttpMethod.Post, url)
         {
             Content = new StringContent(
                 messageBody.ToString(),
@@ -49,7 +49,7 @@ public partial class StandardHttpClientService
         .CustomRequestHeader(_headerStandard)
         .AddAuthorizationHeader(_headerAuthorization);
 
-        return await StandardSendAsync(url, message, cancellationToken);
+        return await StandardSendAsync(url, message, cancellationToken).ConfigureAwait(false);
 
     }
 
@@ -62,7 +62,7 @@ public partial class StandardHttpClientService
     {
         var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
-        var message = new HttpRequestMessage(HttpMethod.Post, url)
+        using var message = new HttpRequestMessage(HttpMethod.Post, url)
         {
             Content = messageBody
         }
@@ -70,7 +70,7 @@ public partial class StandardHttpClientService
         .AddAuthorizationHeader(_headerAuthorization);
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType));
 
-        return await StandardSendAsync(url, message, cancellationToken);
+        return await StandardSendAsync(url, message, cancellationToken).ConfigureAwait(false);
 
     }
 
@@ -80,7 +80,7 @@ public partial class StandardHttpClientService
     {
         var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
-        var message = new HttpRequestMessage(HttpMethod.Post, url);
+        using var message = new HttpRequestMessage(HttpMethod.Post, url);
 
         IEnumerable<KeyValuePair<string, string>> enumerable = _formParameter;
 
@@ -90,7 +90,7 @@ public partial class StandardHttpClientService
         _ = message.CustomRequestHeader(_headerStandard)
                .AddAuthorizationHeader(_headerAuthorization);
 
-        return await StandardSendAsync(url, message, cancellationToken);
+        return await StandardSendAsync(url, message, cancellationToken).ConfigureAwait(false);
 
     }
 
@@ -102,7 +102,7 @@ public partial class StandardHttpClientService
     {
         var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
-        var message = new HttpRequestMessage(HttpMethod.Post, url)
+        using var message = new HttpRequestMessage(HttpMethod.Post, url)
         {
             Content = messageBody
         }
@@ -110,7 +110,7 @@ public partial class StandardHttpClientService
         .AddAuthorizationHeader(_headerAuthorization);
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType));
 
-        return await StandardStreamSendAsync(url, message, cancellationToken);
+        return await StandardStreamSendAsync(url, message, cancellationToken).ConfigureAwait(false);
     }
 
 }

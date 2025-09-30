@@ -47,6 +47,7 @@ public partial class StandardHttpClientService : IStandardHttpClient, IDisposabl
         _headerAuthorization.Clear();
         _httpClient.DefaultRequestHeaders.Authorization = null;
         _httpClient.DefaultRequestHeaders.Accept.Clear();
+        CustomHttpResponseMessage?.Dispose();
         CustomHttpResponseMessage = null;
 
         CorrelationId = string.Empty;
@@ -185,6 +186,7 @@ public partial class StandardHttpClientService : IStandardHttpClient, IDisposabl
         if (disposing)
         {
             _httpClient?.Dispose();
+            CustomHttpResponseMessage?.Dispose();
         }
     }
 

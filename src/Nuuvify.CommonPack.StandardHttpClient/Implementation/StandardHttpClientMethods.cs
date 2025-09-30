@@ -84,18 +84,18 @@ public partial class StandardHttpClientService
             System.Net.Http.HttpCompletionOption HttpOption;
             HttpOption = (System.Net.Http.HttpCompletionOption)CompletionOption;
 
-            response = await _httpClient.SendAsync(message, HttpOption, cancellationToken);
+            response = await _httpClient.SendAsync(message, HttpOption, cancellationToken).ConfigureAwait(false);
 
         }
         else
         {
-            response = await _httpClient.SendAsync(message, cancellationToken);
+            response = await _httpClient.SendAsync(message, cancellationToken).ConfigureAwait(false);
         }
 
         if (LogRequest)
             LogRequestMessage(message);
 
-        HttpStandardReturn httpStandardReturn = await HandleResponseMessage(response);
+        HttpStandardReturn httpStandardReturn = await HandleResponseMessage(response).ConfigureAwait(false);
 
         _logger.LogDebug("HttpStandardReturn return: {ReturnCode}", httpStandardReturn.ReturnCode);
 
@@ -148,18 +148,18 @@ public partial class StandardHttpClientService
             System.Net.Http.HttpCompletionOption HttpOption;
             HttpOption = (System.Net.Http.HttpCompletionOption)CompletionOption;
 
-            response = await _httpClient.SendAsync(message, HttpOption, cancellationToken);
+            response = await _httpClient.SendAsync(message, HttpOption, cancellationToken).ConfigureAwait(false);
 
         }
         else
         {
-            response = await _httpClient.SendAsync(message, cancellationToken);
+            response = await _httpClient.SendAsync(message, cancellationToken).ConfigureAwait(false);
         }
 
         if (LogRequest)
             LogRequestMessage(message);
 
-        HttpStandardStreamReturn httpStandardStreamReturn = await HandleResponseMessageStream(response);
+        HttpStandardStreamReturn httpStandardStreamReturn = await HandleResponseMessageStream(response).ConfigureAwait(false);
 
         _logger.LogDebug("HttpStandardReturn return: {ReturnCode}", httpStandardStreamReturn?.ReturnCode);
 
@@ -173,6 +173,8 @@ public partial class StandardHttpClientService
 
         if (response is null) return returnMessage;
 
+        // Dispose previous response if exists
+        CustomHttpResponseMessage?.Dispose();
         CustomHttpResponseMessage = response;
 
         var resultNumber = (int)response.StatusCode;
@@ -180,7 +182,7 @@ public partial class StandardHttpClientService
         returnMessage.ReturnCode = resultNumber.ToString(CultureInfo.InvariantCulture);
         returnMessage.Success = response.IsSuccessStatusCode;
 
-        var content = await response.Content.ReadAsStringAsync();
+        var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         returnMessage.ReturnMessage = content;
 
@@ -193,6 +195,8 @@ public partial class StandardHttpClientService
 
         if (response is null) return returnMessage;
 
+        // Dispose previous response if exists
+        CustomHttpResponseMessage?.Dispose();
         CustomHttpResponseMessage = response;
 
         var resultNumber = (int)response.StatusCode;
@@ -200,7 +204,7 @@ public partial class StandardHttpClientService
         returnMessage.ReturnCode = resultNumber.ToString(CultureInfo.InvariantCulture);
         returnMessage.Success = response.IsSuccessStatusCode;
 
-        var content = await response.Content.ReadAsStreamAsync();
+        var content = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 
         returnMessage.ReturnMessage = content;
 

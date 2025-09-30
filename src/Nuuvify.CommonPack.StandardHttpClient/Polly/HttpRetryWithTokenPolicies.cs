@@ -19,7 +19,7 @@ public static class HttpRetryWithTokenPolicies
                 onRetryAsync: async (message, retrySleep, context) =>
                 {
                     retryNum++;
-                    await OnHttpRetryWithToken(message, request, tokenService, retrySleep, retryNum, retryPolicyConfig.RetryCount, context, logger);
+                    await OnHttpRetryWithToken(message, request, tokenService, retrySleep, retryNum, retryPolicyConfig.RetryCount, context, logger).ConfigureAwait(false);
 
                     if (retryNum > retryPolicyConfig.RetryCount) retryNum = 0;
                 });
@@ -59,7 +59,7 @@ public static class HttpRetryWithTokenPolicies
 
             if (string.IsNullOrWhiteSpace(tokenService.GetActualToken()?.Token) || retryNum != 1)
             {
-                _ = await tokenService.GetToken();
+                _ = await tokenService.GetToken().ConfigureAwait(false);
             }
 
             _ = request.AddAuthorizationHeader("bearer", tokenService.GetActualToken()?.Token);
@@ -76,7 +76,7 @@ public static class HttpRetryWithTokenPolicies
             logger.LogInformation("{messageLog}", messageLog);
         }
 
-        await Task.CompletedTask;
+        await Task.CompletedTask.ConfigureAwait(false);
     }
 
 }

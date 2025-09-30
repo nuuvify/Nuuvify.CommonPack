@@ -60,7 +60,7 @@ public partial class StandardWebService
             }
             else
             {
-                _logger.LogWarning("Url base e relativa informada esta invalido Base: {AbsoluteUri} Relativa: {url}",
+                _logger.LogWarning("Url base e relativa informada esta invalido Base: {AbsoluteUri} Relativa: {Url}",
                     _httpClient?.BaseAddress?.AbsoluteUri,
                     url);
 
@@ -75,19 +75,19 @@ public partial class StandardWebService
             }
             else
             {
-                _logger.LogWarning("Url informada é invalida {url}", url);
+                _logger.LogWarning("Url informada é invalida {Url}", url);
                 return null;
             }
         }
 
         _logger.LogDebug("Url and message after config {FullUrl}", FullUrl.ToString());
 
-        var content = new StringContent(
+        using var content = new StringContent(
             soapEnvelopeXml.OuterXml,
             Encoding.UTF8,
             mediaType);
 
-        HttpResponseMessage response = await _httpClient.PostAsync(FullUrl, content);
+        HttpResponseMessage response = await _httpClient.PostAsync(FullUrl, content).ConfigureAwait(false);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -109,7 +109,7 @@ public partial class StandardWebService
                 response.StatusCode,
                 response.ReasonPhrase);
 
-            using (var stream = await response.Content.ReadAsStreamAsync())
+            using (var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
             {
                 httpStandardReturn = GetStreamReader(stream);
             }
