@@ -21,6 +21,25 @@
         <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
         <Nullable>disable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+
+        <!-- Default Target Framework (can be overridden in individual projects) -->
+        <TargetFramework Condition="'$(TargetFramework)' == ''">net8.0</TargetFramework>
+
+        <!-- Package Common Configuration -->
+        <Category>Libraries</Category>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/nuuvify/Nuuvify.CommonPack</RepositoryUrl>
+        <RepositoryBranch>main</RepositoryBranch>
+        <DevelopmentDependency>false</DevelopmentDependency>
+        <RequireLicenseAcceptance>false</RequireLicenseAcceptance>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+
+        <!-- Package Documentation Common -->
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageReleaseNotes>$([System.IO.File]::ReadAllText('$(MSBuildProjectDirectory)/CHANGELOG.md'))</PackageReleaseNotes>
     </PropertyGroup>
 
     <PropertyGroup Condition="$(OsPlatform) == 'Linux'">
@@ -33,6 +52,11 @@
     <ItemGroup>
         <None Include="../../LICENSE" Pack="true" PackagePath="" />
         <None Include="../../Images/logonuuvify.jpg" Pack="true" PackagePath="" />
+    </ItemGroup>
+
+    <ItemGroup Label="Common Package Content">
+        <None Include="README.md" Pack="true" PackagePath="\" Condition="Exists('$(MSBuildProjectDirectory)/README.md')" />
+        <None Include="CHANGELOG.md" Pack="true" PackagePath="\" Condition="Exists('$(MSBuildProjectDirectory)/CHANGELOG.md')" />
     </ItemGroup>
 
     <ItemGroup Label="Packaging">

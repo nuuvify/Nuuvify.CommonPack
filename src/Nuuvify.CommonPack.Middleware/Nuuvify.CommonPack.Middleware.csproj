@@ -2,24 +2,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <Description>
-      Middlewares e filtros customizados, deve ser baixado no projeto IoC
-      HandlingHeadersMiddleware - Inclui a versão da aplicação e do assembly no header da request,
-      também loga o conteudo da request
-      GlobalHandleException - Captura e loga as exceptions de forma global
-      ValidateModelAttribute - Retorna os erros da ModelState de forma padronizada
-        </Description>
+        <!-- Project Specific Configuration -->
         <RootNamespace>Nuuvify.CommonPack.Middleware</RootNamespace>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
-        <PackageTags>Nuuvify</PackageTags>
-    </PropertyGroup>
+        <AssemblyName>Nuuvify.CommonPack.Middleware</AssemblyName>
+        <Product>Nuuvify CommonPack Middleware</Product>
 
-    <ItemGroup>
-        <None Include="README.md" Pack="true" PackagePath="\" />
-        <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
-    </ItemGroup>
+        <!-- Package Specific Metadata -->
+        <PackageId>Nuuvify.CommonPack.Middleware</PackageId>
+        <Title>Nuuvify CommonPack Middleware</Title>
+        <Description>Middlewares e filtros customizados, deve ser baixado no projeto IoC. HandlingHeadersMiddleware - Inclui a versão da aplicação e do assembly no header da request, também loga o conteudo da request. GlobalHandleException - Captura e loga as exceptions de forma global. ValidateModelAttribute - Retorna os erros da ModelState de forma padronizada</Description>
+        <Summary>Custom middlewares and filters for ASP.NET Core applications</Summary>
+
+        <!-- Package Specific Tags -->
+        <PackageTags>middleware;filters;exception-handling;validation;headers;logging;aspnetcore;nuuvify;dotnet</PackageTags>
+    </PropertyGroup>
 
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />

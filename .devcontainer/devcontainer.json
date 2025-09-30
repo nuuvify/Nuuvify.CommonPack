@@ -13,12 +13,13 @@
         "source=${localEnv:APPDATA}\\Microsoft\\UserSecrets,target=/root/.microsoft/usersecrets,type=bind,consistency=cached"
     ],
     "remoteEnv": {
-        "AZURE_DEVOPS_EXT_PAT": "${localEnv:AZURE_DEVOPS_EXT_PAT}"
+        "AZURE_DEVOPS_EXT_PAT": "${localEnv:AZURE_DEVOPS_EXT_PAT}",
+        "NUGET_API_KEY": "${localEnv:NUGET_API_KEY}"
     },
     "containerEnv": {
-        "HTTP_PROXY": "${localEnv:HTTP_PROXY}",
-        "HTTPS_PROXY": "${localEnv:HTTPS_PROXY}",
-        "NO_PROXY": "${localEnv:NO_PROXY}",
+        // "HTTP_PROXY": "${localEnv:HTTP_PROXY}",
+        // "HTTPS_PROXY": "${localEnv:HTTPS_PROXY}",
+        // "NO_PROXY": "${localEnv:NO_PROXY}",
         "WORKFOLDER": "${containerWorkspaceFolder}"
     },
     "onCreateCommand": "chmod +x ./.devcontainer/custom-install.sh && chmod +x ./.devcontainer/.zshrc",

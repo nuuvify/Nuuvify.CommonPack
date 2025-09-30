@@ -3,17 +3,12 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
-        <Description>Azure Blobs Storage - Instalar no projeto de Dominio</Description>
+        <PackageId>Nuuvify.CommonPack.AzureStorage.Abstraction</PackageId>
+        <Title>Nuuvify CommonPack Azure Storage Abstraction</Title>
+        <PackageTags>Nuuvify, Azure, Storage, Abstraction, .NET</PackageTags>
+        <Description>Azure Blobs Storage - Instalar no projeto de Domínio</Description>
+        <Product>CommonPack Azure Storage Abstraction</Product>
         <RootNamespace>Nuuvify.CommonPack.AzureStorage.Abstraction</RootNamespace>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
-        <PackageTags>Azure;Storage</PackageTags>
     </PropertyGroup>
-
-    <ItemGroup>
-        <None Include="README.md" Pack="true" PackagePath="\" />
-        <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
-    </ItemGroup>
-
 
 </Project>
