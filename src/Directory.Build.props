@@ -54,9 +54,9 @@
         <None Include="../../Images/logonuuvify.jpg" Pack="true" PackagePath="" />
     </ItemGroup>
 
-    <ItemGroup Label="Common Package Content" Condition="Exists('$(MSBuildProjectDirectory)/README.md') AND Exists('$(MSBuildProjectDirectory)/CHANGELOG.md')">
-        <None Include="README.md" Pack="true" PackagePath="\" />
-        <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
+    <ItemGroup Label="Common Package Content">
+        <None Include="README.md" Pack="true" PackagePath="\" Condition="Exists('$(MSBuildProjectDirectory)/README.md')" />
+        <None Include="CHANGELOG.md" Pack="true" PackagePath="\" Condition="Exists('$(MSBuildProjectDirectory)/CHANGELOG.md')" />
     </ItemGroup>
 
     <ItemGroup Label="Packaging">
