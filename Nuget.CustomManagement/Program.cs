@@ -31,7 +31,7 @@ try
     logger.LogInformation("**** Environment: {EnvironmentName} ****", builder.Environment.EnvironmentName);
 
     var nugetCustomManagementPackage = new NugetCustomManagementPackage();
-    await nugetCustomManagementPackage.DeletePackage(logger, default);
+    await nugetCustomManagementPackage.DeletePackage(logger, builder.Environment.EnvironmentName, default);
 
     var host = builder.Build();
 
@@ -63,6 +63,7 @@ catch (Exception ex)
 /// </summary>
 public class NugetCustomManagementPackage
 {
+    private const string PackageVersion = "2.1.0-test.25092903";
 
     public IDictionary<string, string> Packages { get; set; }
 
@@ -72,65 +73,81 @@ public class NugetCustomManagementPackage
         Packages = new Dictionary<string, string>
         {
 
-            { "Nuuvify.CommonPack.AutoHistory", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.AzureStorage", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.AzureStorage.Abstraction", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.Domain", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.EF.Exceptions.Common", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.EF.Exceptions.Db2", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.EF.Exceptions.Oracle", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.Email", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.Email.Abstraction", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.Extensions", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.HealthCheck", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.Middleware", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.Middleware.Abstraction", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.OpenApi", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.Security", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.Security.Abstraction", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.Security.JwtCredentials", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.Security.JwtStore.Ef", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.UnitOfWork", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.UnitOfWork.Abstraction", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.StandardHttpClient", "2.0.0-preview.24102305" }
+            { "Nuuvify.CommonPack.AutoHistory", PackageVersion },
+            { "Nuuvify.CommonPack.AzureStorage", PackageVersion },
+            { "Nuuvify.CommonPack.AzureStorage.Abstraction", PackageVersion },
+            { "Nuuvify.CommonPack.Domain", PackageVersion },
+            { "Nuuvify.CommonPack.EF.Exceptions.Common", PackageVersion },
+            { "Nuuvify.CommonPack.EF.Exceptions.Db2", PackageVersion },
+            { "Nuuvify.CommonPack.EF.Exceptions.Oracle", PackageVersion },
+            { "Nuuvify.CommonPack.Email", PackageVersion },
+            { "Nuuvify.CommonPack.Email.Abstraction", PackageVersion },
+            { "Nuuvify.CommonPack.Extensions", PackageVersion },
+            { "Nuuvify.CommonPack.HealthCheck", PackageVersion },
+            { "Nuuvify.CommonPack.Middleware", PackageVersion },
+            { "Nuuvify.CommonPack.Middleware.Abstraction", PackageVersion },
+            { "Nuuvify.CommonPack.OpenApi", PackageVersion },
+            { "Nuuvify.CommonPack.Security", PackageVersion },
+            { "Nuuvify.CommonPack.Security.Abstraction", PackageVersion },
+            { "Nuuvify.CommonPack.Security.JwtCredentials", PackageVersion },
+            { "Nuuvify.CommonPack.Security.JwtStore.Ef", PackageVersion },
+            { "Nuuvify.CommonPack.UnitOfWork", PackageVersion },
+            { "Nuuvify.CommonPack.UnitOfWork.Abstraction", PackageVersion },
+            { "Nuuvify.CommonPack.StandardHttpClient", PackageVersion }
         };
 
     }
 
-    public async Task DeletePackage(Microsoft.Extensions.Logging.ILogger logger, CancellationToken cancellationToken)
+    public async Task DeletePackage(Microsoft.Extensions.Logging.ILogger logger, string environmentName, CancellationToken cancellationToken)
     {
 
-        var nugetConfig = new NuGet.Configuration.PackageSource("https://api.nuget.org/v3/index.json");
-
-        SourceCacheContext cacheNuget = new SourceCacheContext();
-        SourceRepository repository = Repository.Factory.GetCoreV3(nugetConfig);
-        PackageUpdateResource resource = await repository.GetResourceAsync<PackageUpdateResource>();
-
-        string apiKey = "xxxxxxxxxxxx";
-
-        logger.LogInformation("===========> Start delete packages");
-
-        foreach (var item in Packages)
+        NuGet.Configuration.PackageSource nugetConfig;
+        if (environmentName.Equals("Production", StringComparison.OrdinalIgnoreCase))
         {
-
-            var result = resource.Delete(
-                item.Key,
-                item.Value,
-                getApiKey: packageSource => apiKey,
-                confirm: packageSource => true,
-                noServiceEndpoint: false,
-                NullLogger.Instance).GetAwaiter();
-
-            result.GetResult();
-
-            logger.LogInformation("Package deleted = {Id} {Version} Result = {Result}",
-                item.Key,
-                item.Value,
-                result.IsCompleted);
+            throw new InvalidOperationException("Operation not allowed in PRODUCTION environment");
+        }
+        else if (environmentName.Equals("Development", StringComparison.OrdinalIgnoreCase))
+        {
+            nugetConfig = new NuGet.Configuration.PackageSource("https://apiint.nugettest.org/v3/index.json");
+            logger.LogWarning("Operation not allowed in DEVELOPMENT environment");
+        }
+        else
+        {
+            nugetConfig = new NuGet.Configuration.PackageSource("https://api.nuget.org/v3/index.json");
+            logger.LogWarning("Operation not allowed in QUALITY environment");
         }
 
-        logger.LogInformation("===========> Completed delete packages");
+        using (var cacheNuget = new SourceCacheContext())
+        {
+            SourceRepository repository = Repository.Factory.GetCoreV3(nugetConfig);
+            PackageUpdateResource resource = await repository.GetResourceAsync<PackageUpdateResource>();
+
+            string apiKey = Environment.GetEnvironmentVariable("NUGET_API_KEY");
+
+            logger.LogInformation("===========> Start delete packages");
+
+            foreach (var item in Packages)
+            {
+
+                var result = resource.Delete(
+                    item.Key,
+                    item.Value,
+                    getApiKey: packageSource => apiKey,
+                    confirm: packageSource => true,
+                    noServiceEndpoint: false,
+                    NullLogger.Instance).GetAwaiter();
+
+                result.GetResult();
+
+                logger.LogInformation("Package deleted = {Id} {Version} Result = {Result}",
+                    item.Key,
+                    item.Value,
+                    result.IsCompleted);
+            }
+
+            logger.LogInformation("===========> Completed delete packages");
+
+        }
 
     }
-
 }

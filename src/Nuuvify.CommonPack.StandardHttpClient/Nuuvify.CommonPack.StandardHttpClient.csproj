@@ -2,26 +2,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <Description>
-      Possui classes para padronizar a comunicação com apis externas, padronizando inclusive o
-      retorno da request.
-      A classe BaseStandardHttpClient deverá ser implementada como herança, em uma classe especifica
-      no seu projeto de Infra.Data, siga as instruções contidas no Assempbly
-      Para chamadas de apis externas não , não utilize a classe BaseStandardHttpClient, apenas
-      utilize IStandardHttpClient, e deserealize o retorno conforme o fornecedor
-      da api pede.
-        </Description>
+        <!-- Project Specific Configuration -->
         <RootNamespace>Nuuvify.CommonPack.StandardHttpClient</RootNamespace>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
-        <PackageTags>Nuuvify</PackageTags>
-    </PropertyGroup>
+        <AssemblyName>Nuuvify.CommonPack.StandardHttpClient</AssemblyName>
+        <Product>Nuuvify CommonPack StandardHttpClient</Product>
 
-    <ItemGroup>
-        <None Include="README.md" Pack="true" PackagePath="\" />
-        <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
-    </ItemGroup>
+        <!-- Package Specific Metadata -->
+        <PackageId>Nuuvify.CommonPack.StandardHttpClient</PackageId>
+        <Title>Nuuvify CommonPack StandardHttpClient</Title>
+        <Description>Cliente HTTP otimizado para .NET com gerenciamento automático de tokens, retry policies com Polly, resource management otimizado e performance aprimorada. Inclui ConfigureAwait(false) para bibliotecas, proper disposal patterns e prevenção de memory leaks. Ideal para comunicação resiliente com APIs REST e web services SOAP.</Description>
+        <Summary>Cliente HTTP otimizado com retry policies, gerenciamento de tokens e resource management para .NET 8.0</Summary>
+
+        <!-- Package Specific Tags -->
+        <PackageTags>http;httpclient;api;rest;polly;retry;circuit-breaker;token;authentication;performance;async;configureawait;resource-management;memory-leak-prevention;nuuvify;dotnet;netcore;aspnetcore</PackageTags>
+    </PropertyGroup>
 
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
