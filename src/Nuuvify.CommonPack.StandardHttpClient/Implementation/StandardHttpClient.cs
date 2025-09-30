@@ -153,7 +153,10 @@ public partial class StandardHttpClientService : IStandardHttpClient, IDisposabl
 
         return this;
     }
-
+    public IStandardHttpClient WithHeader(KeyValuePair<string, string> header)
+    {
+        return WithHeader(header.Key, header.Value);
+    }
     public IStandardHttpClient WithFormParameter(string key, string value)
     {
         if (string.IsNullOrWhiteSpace(key)) return this;
@@ -168,11 +171,6 @@ public partial class StandardHttpClientService : IStandardHttpClient, IDisposabl
         }
 
         return this;
-    }
-
-    public IStandardHttpClient WithHeader(KeyValuePair<string, string> header)
-    {
-        return WithHeader(header.Key, header.Value);
     }
 
     public void Dispose()

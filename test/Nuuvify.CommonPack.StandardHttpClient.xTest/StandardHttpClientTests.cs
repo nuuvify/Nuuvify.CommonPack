@@ -34,38 +34,47 @@ public class StandardHttpClientTests
             Success = true
         };
 
-        using var clientHandlerStub = new DelegatingHandlerStub(new HttpResponseMessage()
+        // Criar HttpResponseMessage que será retornada pelo mock
+        using var mockResponse = new HttpResponseMessage(HttpStatusCode.OK)
         {
-            StatusCode = HttpStatusCode.OK,
             Content = new StringContent(jsonConverted, Encoding.UTF8, "application/json")
-        });
+        };
 
-        using var client = new HttpClient(clientHandlerStub, true)
+        // Usar DelegatingHandlerStub corretamente
+        using var clientHandlerStub = new DelegatingHandlerStub(mockResponse);
+
+        // Criar HttpClient com disposeHandler = false para evitar problemas de disposal
+        using var client = new HttpClient(clientHandlerStub, disposeHandler: false)
         {
             BaseAddress = new Uri("https://meuteste/")
         };
         client.DefaultRequestHeaders.Add("Accept", "application/json");
 
-        _ = mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(client);
+        // Setup do mock - garantir que sempre retorne o mesmo cliente
+        _ = mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(() => client);
 
         var url = "api/externafake";
 
         using var standardClient = new StandardHttpClient.StandardHttpClientService(
             mockFactory.Object,
             new NullLogger<StandardHttpClient.StandardHttpClientService>());
+
+        // Criar cliente primeiro
         standardClient.CreateClient();
 
+        // Fazer a requisição
         var result = await standardClient
             .WithQueryString("codigo", fakeClassReturn.Codigo)
             .Get(url);
 
         var urlReturn = "https://meuteste/api/externafake?codigo=123456";
 
+        // Verificações
+        Assert.NotNull(result);
         Assert.Equal(resultDefault.ReturnCode, result.ReturnCode);
         Assert.Equal(resultDefault.ReturnMessage, result.ReturnMessage);
         Assert.Equal(resultDefault.Success, result.Success);
         Assert.Equal(urlReturn, standardClient.FullUrl.ToString());
-
     }
 
     [LocalTestFact]
@@ -105,13 +114,13 @@ public class StandardHttpClientTests
             Content = new StringContent(jsonConverted, Encoding.UTF8, "application/json")
         });
 
-        using var client = new HttpClient(clientHandlerStub, true)
+        using var client = new HttpClient(clientHandlerStub, disposeHandler: false)
         {
             BaseAddress = new Uri("https://meuteste/")
         };
         client.DefaultRequestHeaders.Add("Accept", "application/json");
 
-        _ = mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(client);
+        _ = mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(() => client);
 
         var url = "api/cliente";
 
@@ -143,19 +152,20 @@ public class StandardHttpClientTests
 
         var jsonConverted = JsonSerializer.Serialize(resultDefault);
 
-        using var clientHandlerStub = new DelegatingHandlerStub(new HttpResponseMessage()
+        using var mockResponse = new HttpResponseMessage(HttpStatusCode.OK)
         {
-            StatusCode = HttpStatusCode.OK,
             Content = new StringContent(jsonConverted, Encoding.UTF8, "application/json")
-        });
+        };
 
-        using var client = new HttpClient(clientHandlerStub, true)
+        using var clientHandlerStub = new DelegatingHandlerStub(mockResponse);
+
+        using var client = new HttpClient(clientHandlerStub, disposeHandler: false)
         {
             BaseAddress = new Uri("https://meuteste/")
         };
         client.DefaultRequestHeaders.Add("Accept", "application/json");
 
-        _ = mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(client);
+        _ = mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(() => client);
 
         var url = "api/cliente";
 
@@ -311,18 +321,19 @@ public class StandardHttpClientTests
 
         var jsonConverted = JsonSerializer.Serialize(returnClass);
 
-        using var clientHandlerStub = new DelegatingHandlerStub(new HttpResponseMessage()
+        using var mockResponse = new HttpResponseMessage(HttpStatusCode.OK)
         {
-            StatusCode = HttpStatusCode.OK,
             Content = new StringContent(jsonConverted, Encoding.UTF8, "application/json")
-        });
-        using var client = new HttpClient(clientHandlerStub, true)
+        };
+
+        using var clientHandlerStub = new DelegatingHandlerStub(mockResponse);
+        using var client = new HttpClient(clientHandlerStub, disposeHandler: false)
         {
             BaseAddress = new Uri($"{urlLogin}/{urlToken}")
         };
 
         _ = mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>()))
-            .Returns(client);
+            .Returns(() => client);
 
         using var standardClient = new StandardHttpClient.StandardHttpClientService(
             mockFactory.Object,
@@ -365,13 +376,13 @@ public class StandardHttpClientTests
             Content = new StringContent(jsonConverted, Encoding.UTF8, "application/json")
         });
 
-        using var client = new HttpClient(clientHandlerStub, true)
+        using var client = new HttpClient(clientHandlerStub, disposeHandler: false)
         {
             BaseAddress = new Uri("https://meuteste/")
         };
         client.DefaultRequestHeaders.Add("Accept", "application/json");
 
-        _ = mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(client);
+        _ = mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(() => client);
 
         var url = "api/cliente";
 
@@ -417,13 +428,13 @@ public class StandardHttpClientTests
             Content = new StringContent(jsonConverted, Encoding.UTF8, "application/json")
         });
 
-        using var client = new HttpClient(clientHandlerStub, true)
+        using var client = new HttpClient(clientHandlerStub, disposeHandler: false)
         {
             BaseAddress = new Uri("https://meuteste/")
         };
         client.DefaultRequestHeaders.Add("Accept", "application/json");
 
-        _ = mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(client);
+        _ = mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(() => client);
 
         var url = "api/cliente";
 
