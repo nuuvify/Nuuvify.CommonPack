@@ -3,17 +3,14 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
+        <PackageId>Nuuvify.CommonPack.EF.Exceptions.Db2</PackageId>
+        <Title>Nuuvify CommonPack EF Exceptions DB2</Title>
+        <PackageTags>Nuuvify, EntityFramework, EF, EFCore, Database, DB2, IBM</PackageTags>
         <Description>Handle database errors easily when working with Entity Framework Core. Catch specific exceptions such as UniqueConstraintException, CannotInsertNullException, MaxLengthExceededException, NumericOverflowException or ReferenceConstraintException instead of generic DbUpdateException</Description>
+        <Product>CommonPack EF Exceptions DB2</Product>
         <RootNamespace>Nuuvify.CommonPack.EF.Exceptions.Db2</RootNamespace>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
-        <PackageTags>EntityFramework;EF;EFCore;Database;IBM;DB2</PackageTags>
     </PropertyGroup>
 
-    <ItemGroup>
-        <None Include="README.md" Pack="true" PackagePath="\" />
-        <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
-    </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Net.IBM.Data.Db2" Version="8.0.0.400" Condition="'$(os)' == 'Windows_NT'" />
         <PackageReference Include="Net.IBM.Data.Db2-lnx" Version="8.0.0.400" Condition="'$(os)' == 'UNIX'" />

@@ -3,18 +3,12 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <Description>
-      Documentação da api através da swagger (OpenApi), deve ser baixado no projeto IoC
-        </Description>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
-        <PackageTags>Nuuvify</PackageTags>
+        <PackageId>Nuuvify.CommonPack.OpenApi</PackageId>
+        <Title>Nuuvify CommonPack OpenApi</Title>
+        <PackageTags>Nuuvify, OpenApi, Swagger, Documentation, API, .NET</PackageTags>
+        <Description>Documentação da API através do Swagger (OpenApi), deve ser baixado no projeto IoC</Description>
+        <Product>CommonPack OpenApi</Product>
     </PropertyGroup>
-
-    <ItemGroup>
-        <None Include="README.md" Pack="true" PackagePath="\" />
-        <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
-    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
