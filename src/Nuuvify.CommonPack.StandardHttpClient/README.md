@@ -7,7 +7,14 @@
 
 Cliente HTTP otimizado com retry policies, gerenciamento de tokens, resource management e performance aprimorada para bibliotecas .NET.
 
-## 🚀 Destaques da Versão 1.1.0
+## 🚀 Destaques da Versão 2.2.0
+
+### 🔔 Sistema de Notificações Avançado
+- **Sistema de notificações robusto** com `ReadOnlyCollection<NotificationR>`
+- **Thread-safe notifications** para coleta segura de erros e avisos
+- **Integração automática** com TokenService para rastreamento de autenticação
+- **Notificações de serialização** para debugging de problemas JSON
+- **Gerenciamento completo** com métodos Add, Clear e Remove
 
 ### ⚡ Performance & Resource Management
 - **ConfigureAwait(false)** implementado em todas as operações assíncronas
@@ -15,11 +22,18 @@ Cliente HTTP otimizado com retry policies, gerenciamento de tokens, resource man
 - **Memory leak prevention** através de gerenciamento adequado de recursos
 - **Compliance com CA2000** (análise estática de código)
 
+### 🧪 Testes Unitários Aprimorados
+- ✅ **100% de testes unitários passando** com correção completa de SocketException
+- ✅ **Mock setup otimizado** com padrão `disposeHandler: false`
+- ✅ **Infraestrutura de testes robusta** com handlers aprimorados
+- ✅ **Debugging tools** para troubleshooting de HTTP mocking
+
 ### 🔄 Otimizações Implementadas
 - ✅ **Escalabilidade aprimorada** em cenários de alta concorrência
 - ✅ **Redução significativa** no uso de memória
 - ✅ **Prevenção de deadlocks** em código síncrono/assíncrono
 - ✅ **Thread pool optimization** com ConfigureAwait(false)
+- ✅ **Error tracking** com sistema de notificações integrado
 
 ## Índice
 
@@ -56,6 +70,8 @@ Cliente HTTP otimizado com retry policies, gerenciamento de tokens, resource man
 - ✅ **Performance otimizada** com ConfigureAwait(false) para Class Libraries
 - ✅ **Gerenciamento de recursos** com proper disposal de HttpRequestMessage e HttpResponseMessage
 - ✅ **Memory leak prevention** através de padrões IDisposable corretos
+- ✅ **Sistema de notificações** thread-safe para rastreamento de erros e operações
+- ✅ **Error tracking integrado** com coleta automática de problemas de serialização e autenticação
 
 ## Dependências
 
@@ -429,6 +445,98 @@ var resultado = await _httpClient
     .Get("api/dados", cancellationToken);
 ```
 
+### Sistema de Notificações
+
+A biblioteca oferece um sistema robusto de notificações para rastreamento de erros e operações:
+
+```csharp
+public class MeuClienteComNotificacoes : BaseStandardHttpClient
+{
+    public MeuClienteComNotificacoes(IStandardHttpClient standardHttpClient, ITokenService tokenService)
+        : base(standardHttpClient, tokenService)
+    {
+    }
+
+    public async Task<Usuario> ObterUsuarioComRastreamento(int id, CancellationToken cancellationToken = default)
+    {
+        // Limpar notificações anteriores
+        ClearNotifications();
+
+        try
+        {
+            var resultado = await ExecuteWithTokenAsync<Usuario>(
+                httpClient => httpClient.Get($"api/usuarios/{id}", cancellationToken)
+            );
+
+            // Verificar se houve problemas durante a operação
+            if (Notifications.Any())
+            {
+                foreach (var notification in Notifications)
+                {
+                    Console.WriteLine($"Aviso: {notification.Message} (Propriedade: {notification.Property})");
+                }
+            }
+
+            return resultado.Data;
+        }
+        catch (Exception ex)
+        {
+            // Adicionar notificação personalizada
+            AddNotification(new NotificationR(
+                property: "ObterUsuario",
+                message: $"Erro ao obter usuário {id}: {ex.Message}",
+                type: "error"
+            ));
+            throw;
+        }
+    }
+
+    public ReadOnlyCollection<NotificationR> ObterNotificacoes()
+    {
+        return Notifications;
+    }
+
+    public void LimparNotificacoes()
+    {
+        ClearNotifications();
+    }
+
+    public int RemoverNotificacoesPorPropriedade(string propriedade)
+    {
+        return RemoveNotifications(propriedade);
+    }
+}
+```
+
+#### Tipos de Notificações Automáticas
+
+| Cenário                       | Tipo de Notificação                                   |
+| ----------------------------- | ----------------------------------------------------- |
+| **Erro de serialização JSON** | Captura automática de problemas de conversão          |
+| **Falha de autenticação**     | Erros durante obtenção/renovação de tokens            |
+| **Timeout de requisição**     | Notificações de timeout em operações HTTP             |
+| **Erro de deserialização**    | Problemas ao converter resposta JSON                  |
+| **Token service errors**      | Integração automática com ITokenService.Notifications |
+
+#### Thread Safety
+
+```csharp
+// ✅ As notificações são thread-safe via ReadOnlyCollection
+public async Task ProcessarMultiplasRequisicoes()
+{
+    var tasks = Enumerable.Range(1, 10).Select(async i =>
+    {
+        await ObterUsuario(i);
+
+        // Safe para acessar de múltiplas threads
+        var notificacoes = Notifications;
+        return notificacoes.Count;
+    });
+
+    await Task.WhenAll(tasks);
+}
+```
+
 ## Performance e Best Practices
 
 ### 🚀 Otimizações Implementadas
@@ -540,6 +648,21 @@ _httpClient.Configure(
 | `Delete(string, CancellationToken)`         | Requisição DELETE             |
 | `GetStream(string, CancellationToken)`      | Download de arquivo           |
 
+### BaseStandardHttpClient
+
+| Propriedade/Método                                                              | Descrição                                    |
+| ------------------------------------------------------------------------------- | -------------------------------------------- |
+| `Notifications`                                                                 | ReadOnlyCollection de notificações coletadas |
+| `StandardHttpClient`                                                            | Instância do cliente HTTP padrão             |
+| `TokenService`                                                                  | Serviço de gerenciamento de tokens           |
+| `JsonSettings`                                                                  | Configurações de serialização JSON           |
+| `ExecuteWithTokenAsync<T>(Func<IStandardHttpClient, Task<HttpStandardReturn>>)` | Executa operação HTTP com token automático   |
+| `GetTokenAsync(string, string, string, CancellationToken)`                      | Obtém token de autenticação                  |
+| `AddNotification(NotificationR)`                                                | Adiciona notificação personalizada           |
+| `AddNotifications(IEnumerable<NotificationR>)`                                  | Adiciona múltiplas notificações              |
+| `ClearNotifications()`                                                          | Limpa todas as notificações                  |
+| `RemoveNotifications(string)`                                                   | Remove notificações por propriedade          |
+
 ### ITokenService
 
 | Método                                                           | Descrição                    |
@@ -558,6 +681,14 @@ _httpClient.Configure(
 | `ReturnCode`                  | `string` | Código de retorno HTTP         |
 | `ReturnMessage`               | `string` | Conteúdo da resposta           |
 | `GetReturnMessageWithoutRn()` | `string` | Limpa quebras de linha do JSON |
+
+### NotificationR
+
+| Propriedade | Tipo     | Descrição                                  |
+| ----------- | -------- | ------------------------------------------ |
+| `Property`  | `string` | Nome da propriedade/operação relacionada   |
+| `Message`   | `string` | Mensagem descritiva da notificação         |
+| `Type`      | `string` | Tipo da notificação (error, warning, info) |
 
 ## Troubleshooting
 
@@ -615,6 +746,52 @@ var resultado = await _httpClient.Get("api/dados", cancellationToken);
 // var resultado = _httpClient.Get("api/dados").Result; // Pode causar deadlock
 ```
 
+### Problema: Notificações não estão sendo coletadas
+**Solução:** Certifique-se de herdar de `BaseStandardHttpClient` e usar `ExecuteWithTokenAsync`:
+```csharp
+public class MeuCliente : BaseStandardHttpClient
+{
+    public async Task<T> MinhaOperacao()
+    {
+        // ✅ Uso correto - notificações serão coletadas automaticamente
+        var resultado = await ExecuteWithTokenAsync<T>(
+            httpClient => httpClient.Get("api/dados")
+        );
+
+        // Verificar notificações após a operação
+        if (Notifications.Any())
+        {
+            // Processar notificações...
+        }
+    }
+}
+```
+
+### Problema: Acesso concorrente às notificações
+**Solução:** Use a propriedade `Notifications` que é thread-safe:
+```csharp
+// ✅ Thread-safe via ReadOnlyCollection
+var notificacoes = Notifications;
+
+// ❌ Não acesse diretamente a lista interna
+// var notificacoes = _notifications; // Campo privado
+```
+
+### Problema: Muitas notificações acumuladas
+**Solução:** Limpe as notificações periodicamente:
+```csharp
+public async Task ProcessarLote()
+{
+    foreach (var item in lote)
+    {
+        ClearNotifications(); // Limpar antes de cada operação
+        await ProcessarItem(item);
+
+        // Processar notificações específicas do item
+        ProcessarNotificacoes(item.Id);
+    }
+}
+```
 
 ## Changelog
 
