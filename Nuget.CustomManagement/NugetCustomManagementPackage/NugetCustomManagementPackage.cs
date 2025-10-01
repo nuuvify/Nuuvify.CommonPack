@@ -18,13 +18,11 @@ namespace Nuget.CustomManagement.NugetCustomManagementPackage;
 /// </summary>
 public class NugetCustomManagementPackage
 {
-    private const string PackageVersion = "2.1.0-test.25093006";
-
     public IDictionary<string, string> Packages { get; set; }
+    public string PackageVersion { get; set; } = "2.0.0-test.25041512";
 
     public NugetCustomManagementPackage()
     {
-
         Packages = new Dictionary<string, string>
         {
 
@@ -133,7 +131,12 @@ public class NugetCustomManagementPackage
             successCount, failureCount);
     }
 
-    private static async Task<bool> TryDeleteSinglePackage(Microsoft.Extensions.Logging.ILogger logger, PackageUpdateResource resource, string apiKey, KeyValuePair<string, string> package, CancellationToken cancellationToken)
+    private static async Task<bool> TryDeleteSinglePackage(
+        Microsoft.Extensions.Logging.ILogger logger,
+        PackageUpdateResource resource,
+        string apiKey,
+        KeyValuePair<string, string> package,
+        CancellationToken cancellationToken)
     {
         try
         {
