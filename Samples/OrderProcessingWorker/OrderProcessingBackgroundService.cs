@@ -1,5 +1,5 @@
 using Azure.Messaging.ServiceBus;
-using Nuuvify.CommonPack.BackgroundService.Abstraction;
+using Nuuvify.CommonPack.BackgroundService.Services;
 using Nuuvify.CommonPack.Middleware.Abstraction;
 using System.Diagnostics;
 using System.Net;
@@ -44,7 +44,7 @@ public class OrderProcessingBackgroundService : ServiceBusBackgroundService<Orde
         logger.LogInformation("Configurando Service Bus - Topic: {Topic}, Subscription: {Subscription}",
             topicName, subscription);
 
-        ConfigureServiceBus(
+        base.ConfigureServiceBus(
             cnnName: cnnName,
             topicName: topicName,
             subscription: subscription,
