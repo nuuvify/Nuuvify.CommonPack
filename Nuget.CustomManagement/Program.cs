@@ -27,12 +27,94 @@ try
     logger.LogInformation("**** Environment: {EnvironmentName} ****", builder.Environment.EnvironmentName);
 
     var nugetCustomManagementPackage = new NugetCustomManagementPackage();
-    await nugetCustomManagementPackage.DeletePackage(logger, builder.Environment.EnvironmentName, default);
 
+    Console.WriteLine("Gerenciador de Pacotes NuGet");
+    Console.WriteLine("Digite ':q' para sair a qualquer momento");
+    Console.WriteLine();
+
+    while (true)
+    {
+        Console.Write("Informe a versão do pacote a ser excluída (ou ':q' para sair): ");
+
+        ConsoleKeyInfo keyInfo;
+        string packageVersion = "";
+
+        // Lê a entrada do usuário caractere por caractere para detectar :q
+        while (true)
+        {
+            keyInfo = Console.ReadKey(intercept: true);
+
+            // Verifica se é :q (dois pontos seguido de q)
+            if (keyInfo.KeyChar == ':')
+            {
+                packageVersion += keyInfo.KeyChar;
+                Console.Write(keyInfo.KeyChar);
+
+                // Aguarda o próximo caractere
+                var nextKeyInfo = Console.ReadKey(intercept: true);
+                if (nextKeyInfo.KeyChar == 'q' || nextKeyInfo.KeyChar == 'Q')
+                {
+                    Console.Write(nextKeyInfo.KeyChar);
+                    Console.WriteLine();
+                    Console.WriteLine("Operação cancelada pelo usuário.");
+                    goto ExitLoop;
+                }
+                else
+                {
+                    // Se não for 'q', adiciona os dois caracteres normalmente
+                    packageVersion += nextKeyInfo.KeyChar;
+                    Console.Write(nextKeyInfo.KeyChar);
+                }
+                continue;
+            }
+
+            // Verifica se é Enter
+            if (keyInfo.Key == ConsoleKey.Enter)
+            {
+                Console.WriteLine();
+                break;
+            }
+
+            // Verifica se é Backspace
+            if (keyInfo.Key == ConsoleKey.Backspace)
+            {
+                if (packageVersion.Length > 0)
+                {
+                    packageVersion = packageVersion[..^1];
+                    Console.Write("\b \b");
+                }
+            }
+            // Adiciona caracteres normais
+            else if (!char.IsControl(keyInfo.KeyChar))
+            {
+                packageVersion += keyInfo.KeyChar;
+                Console.Write(keyInfo.KeyChar);
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(packageVersion))
+        {
+            try
+            {
+                nugetCustomManagementPackage.PackageVersion = packageVersion;
+                await nugetCustomManagementPackage.DeletePackage(logger, builder.Environment.EnvironmentName, default);
+                Console.WriteLine($"✅ Pacote versão {packageVersion} processado com sucesso!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Erro ao processar pacote versão {packageVersion}: {ex.Message}");
+            }
+        }
+        else
+        {
+            Console.WriteLine("⚠️ Versão não informada. Tente novamente.");
+        }
+
+        Console.WriteLine();
+    }
+
+ExitLoop:
     var host = builder.Build();
-
-    // await host.StartAsync();
-    // await host.WaitForShutdownAsync();
 
 }
 catch (TaskCanceledException ex)
