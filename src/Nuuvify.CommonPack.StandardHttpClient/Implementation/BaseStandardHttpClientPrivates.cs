@@ -16,17 +16,20 @@ public abstract partial class BaseStandardHttpClient
     {
         try
         {
-            if (jsonDataDepth > 0)
+            string jsonData = string.Empty;
+
+            if (jsonDataDepth == 0)
             {
-                // Navigate through nested "Data" properties based on depth
-                var jsonData = NavigateToDataProperty(message, jsonDataDepth);
-                if (!string.IsNullOrEmpty(jsonData))
+                jsonDataDepth = 1;
+            }
+
+            jsonData = NavigateToDataProperty(message, jsonDataDepth);
+            if (!string.IsNullOrEmpty(jsonData))
+            {
+                var nestedList = JsonSerializer.Deserialize<List<T>>(jsonData, JsonSettings);
+                if (nestedList != null)
                 {
-                    var nestedList = JsonSerializer.Deserialize<List<T>>(jsonData, JsonSettings);
-                    if (nestedList != null)
-                    {
-                        return nestedList;
-                    }
+                    return nestedList;
                 }
             }
 
@@ -46,30 +49,32 @@ public abstract partial class BaseStandardHttpClient
         return new List<T>();
     }
 
-
     private T DeserealizeObject<T>(string message, int jsonDataDepth = 0) where T : class
     {
         try
         {
-            if (jsonDataDepth > 0)
+            string jsonData = string.Empty;
+
+            if (jsonDataDepth == 0)
             {
-                // Navigate through nested "Data" properties based on depth
-                var nestedJsonData = NavigateToDataProperty(message, jsonDataDepth);
-                if (!string.IsNullOrEmpty(nestedJsonData))
+                jsonDataDepth = 1;
+            }
+
+            var nestedJsonData = NavigateToDataProperty(message, jsonDataDepth);
+            if (!string.IsNullOrEmpty(nestedJsonData))
+            {
+                var nestedObject = JsonSerializer.Deserialize<T>(nestedJsonData, JsonSettings);
+                if (nestedObject != null)
                 {
-                    var nestedObject = JsonSerializer.Deserialize<T>(nestedJsonData, JsonSettings);
-                    if (nestedObject != null)
-                    {
-                        return nestedObject;
-                    }
+                    return nestedObject;
                 }
             }
 
             // Fallback: Try to deserialize using the existing DeserializeObjectSuccess approach
-            var jsonData = JsonSerializer.Deserialize<DeserializeObjectSuccess<T>>(message, JsonSettings);
-            if (!(jsonData is null) && jsonData.Data != null)
+            var jsonDataObj = JsonSerializer.Deserialize<DeserializeObjectSuccess<T>>(message, JsonSettings);
+            if (!(jsonDataObj is null) && jsonDataObj.Data != null)
             {
-                var returnData = jsonData.Data;
+                var returnData = jsonDataObj.Data;
                 return returnData;
             }
         }
