@@ -76,7 +76,7 @@ public class BaseHttpCustomTests : NotifiableR
         Assert.True(tokenService.Notifications.Count > 0);
     }
 
-    [LocalTestFact]
+    [Fact(Skip = "Teste de integração real que requer conectividade externa")]
     public async Task ObtemCadastroPessoaValido()
     {
         var config = AppSettingsConfig.GetConfig();

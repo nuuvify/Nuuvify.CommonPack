@@ -1,6 +1,6 @@
 using Azure.Messaging.ServiceBus;
 using Microsoft.Extensions.Logging;
-using Nuuvify.CommonPack.BackgroundService.Abstraction;
+using Nuuvify.CommonPack.BackgroundService.Services;
 using Nuuvify.CommonPack.Middleware.Abstraction;
 using System.Diagnostics;
 
