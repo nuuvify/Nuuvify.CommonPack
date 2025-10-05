@@ -88,7 +88,7 @@ public abstract partial class BaseStandardHttpClient
             using var document = JsonDocument.Parse(jsonMessage);
             var currentElement = document.RootElement;
 
-            for (int i = 0; i < depth; i++)
+            for (int i = 0; i < depth + 1; i++)
             {
                 // Check if current element is an object before trying to get properties
                 if (currentElement.ValueKind != JsonValueKind.Object)

@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Nuuvify.CommonPack.Middleware.Abstraction;
 using System.Diagnostics;
 
-namespace Nuuvify.CommonPack.BackgroundService.Abstraction;
+namespace Nuuvify.CommonPack.BackgroundService.Services;
 
 public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensions.Hosting.BackgroundService
 {
