@@ -1,0 +1,67 @@
+{
+    "success": true,
+    "data": [
+        {
+            "id": "4b54007f-2f19-41e6-a637-a5b5b12b7af0",
+            "dataCadastro": "2025-10-05T16:23:15.3572035-03:00",
+            "usuarioCadastro": "EasyTributos_cc_client",
+            "tipo": "ITFPAGAMENTO-DIARIO",
+            "ambiente": "PRD",
+            "idExecucao": "EasyTributos",
+            "usuarioSolicitante": "brazildevops",
+            "empresaSap": "28",
+            "tipoDocumento": "R*",
+            "diasParaProcessar": 16,
+            "dataInicioPagamento": "2025-09-15T00:00:00",
+            "proximaExecucao": "2025-10-05T16:10:00-03:00",
+            "tipoIncremento": "diario"
+        },
+        {
+            "id": "5bb4bc03-a783-4e75-80f0-ffcce9e39d99",
+            "dataCadastro": "2025-10-05T16:23:25.749618-03:00",
+            "usuarioCadastro": "EasyTributos_cc_client",
+            "tipo": "ITFPAGAMENTO-DIARIO",
+            "ambiente": "PRD",
+            "idExecucao": "EasyTributos",
+            "usuarioSolicitante": "brazildevops",
+            "empresaSap": "UN",
+            "tipoDocumento": "R*",
+            "tipoMovimento": "EWB",
+            "diasParaProcessar": 16,
+            "dataInicioPagamento": "2025-09-15T00:00:00",
+            "proximaExecucao": "2025-10-05T16:10:00-03:00",
+            "tipoIncremento": "diario"
+        },
+        {
+            "id": "9440d671-a602-45e1-afa3-e52c3f5ab342",
+            "dataCadastro": "2025-10-05T16:23:22.3652993-03:00",
+            "usuarioCadastro": "EasyTributos_cc_client",
+            "tipo": "ITFPAGAMENTO-DIARIO",
+            "ambiente": "PRD",
+            "idExecucao": "EasyTributos",
+            "usuarioSolicitante": "brazildevops",
+            "empresaSap": "28",
+            "tipoDocumento": "R*",
+            "tipoMovimento": "EWB",
+            "diasParaProcessar": 16,
+            "dataInicioPagamento": "2025-09-15T00:00:00",
+            "proximaExecucao": "2025-10-05T16:10:00-03:00",
+            "tipoIncremento": "diario"
+        },
+        {
+            "id": "b1d932ae-c02b-45ff-b401-1e86a5c34dd9",
+            "dataCadastro": "2025-10-05T16:23:19.0783952-03:00",
+            "usuarioCadastro": "EasyTributos_cc_client",
+            "tipo": "ITFPAGAMENTO-DIARIO",
+            "ambiente": "PRD",
+            "idExecucao": "EasyTributos",
+            "usuarioSolicitante": "brazildevops",
+            "empresaSap": "UN",
+            "tipoDocumento": "R*",
+            "diasParaProcessar": 16,
+            "dataInicioPagamento": "2025-09-15T00:00:00",
+            "proximaExecucao": "2025-10-05T16:10:00-03:00",
+            "tipoIncremento": "diario"
+        }
+    ]
+}

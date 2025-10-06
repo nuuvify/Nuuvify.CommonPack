@@ -1,4 +1,5 @@
 using Nuuvify.CommonPack.StandardHttpClient.Results;
+using Nuuvify.CommonPack.StandardHttpClient.xTest.Configs;
 
 namespace Nuuvify.CommonPack.StandardHttpClient.xTest;
 
@@ -776,6 +777,132 @@ public class BaseStandardHttpClientTests
         Assert.True(returnClass[0].PropBool);
         Assert.False(returnClass[1].PropBool);
         Assert.True(returnClass[2].PropBool);
+    }
+
+    [Fact]
+    [Trait("Category", "Unit")]
+    public void ReturnList_Com_Dados_ResultDeserialize_Json_DeveRetornarLista()
+    {
+        // Arrange - Usa dados do arquivo ResultDeserialize.json incorporado
+        var jsonContent = """
+        {
+            "success": true,
+            "data": [
+                {
+                    "id": "4b54007f-2f19-41e6-a637-a5b5b12b7af0",
+                    "dataCadastro": "2025-10-05T16:23:15.3572035-03:00",
+                    "usuarioCadastro": "EasyTributos_cc_client",
+                    "tipo": "ITFPAGAMENTO-DIARIO",
+                    "ambiente": "PRD",
+                    "idExecucao": "EasyTributos",
+                    "usuarioSolicitante": "brazildevops",
+                    "empresaSap": "28",
+                    "tipoDocumento": "R*",
+                    "diasParaProcessar": 16,
+                    "dataInicioPagamento": "2025-09-15T00:00:00",
+                    "proximaExecucao": "2025-10-05T16:10:00-03:00",
+                    "tipoIncremento": "diario"
+                },
+                {
+                    "id": "5bb4bc03-a783-4e75-80f0-ffcce9e39d99",
+                    "dataCadastro": "2025-10-05T16:23:25.749618-03:00",
+                    "usuarioCadastro": "EasyTributos_cc_client",
+                    "tipo": "ITFPAGAMENTO-DIARIO",
+                    "ambiente": "PRD",
+                    "idExecucao": "EasyTributos",
+                    "usuarioSolicitante": "brazildevops",
+                    "empresaSap": "UN",
+                    "tipoDocumento": "R*",
+                    "tipoMovimento": "EWB",
+                    "diasParaProcessar": 16,
+                    "dataInicioPagamento": "2025-09-15T00:00:00",
+                    "proximaExecucao": "2025-10-05T16:10:00-03:00",
+                    "tipoIncremento": "diario"
+                },
+                {
+                    "id": "9440d671-a602-45e1-afa3-e52c3f5ab342",
+                    "dataCadastro": "2025-10-05T16:23:22.3652993-03:00",
+                    "usuarioCadastro": "EasyTributos_cc_client",
+                    "tipo": "ITFPAGAMENTO-DIARIO",
+                    "ambiente": "PRD",
+                    "idExecucao": "EasyTributos",
+                    "usuarioSolicitante": "brazildevops",
+                    "empresaSap": "28",
+                    "tipoDocumento": "R*",
+                    "tipoMovimento": "EWB",
+                    "diasParaProcessar": 16,
+                    "dataInicioPagamento": "2025-09-15T00:00:00",
+                    "proximaExecucao": "2025-10-05T16:10:00-03:00",
+                    "tipoIncremento": "diario"
+                },
+                {
+                    "id": "b1d932ae-c02b-45ff-b401-1e86a5c34dd9",
+                    "dataCadastro": "2025-10-05T16:23:19.0783952-03:00",
+                    "usuarioCadastro": "EasyTributos_cc_client",
+                    "tipo": "ITFPAGAMENTO-DIARIO",
+                    "ambiente": "PRD",
+                    "idExecucao": "EasyTributos",
+                    "usuarioSolicitante": "brazildevops",
+                    "empresaSap": "UN",
+                    "tipoDocumento": "R*",
+                    "diasParaProcessar": 16,
+                    "dataInicioPagamento": "2025-09-15T00:00:00",
+                    "proximaExecucao": "2025-10-05T16:10:00-03:00",
+                    "tipoIncremento": "diario"
+                }
+            ]
+        }
+        """;
+
+        var httpReturnResult = new HttpStandardReturn
+        {
+            Success = true,
+            ReturnCode = "200",
+            ReturnMessage = jsonContent
+        };
+
+        // Act - jsonDataDepth 1 para navegar um nível até a propriedade "data"
+        var returnClass = baseHttpClient.ReturnList<ProcessamentoResult>(httpReturnResult, "api/processamentos", 1);
+
+        // Assert
+        Assert.NotNull(returnClass);
+
+        // Debug: verificar se há erros de deserialização
+        var isValid = baseHttpClient.IsValid();
+
+        Assert.True(returnClass.Count == 4, $"Esperado 4 itens, mas obteve {returnClass.Count}. IsValid: {isValid}");
+
+        // Verifica o primeiro item
+        var primeiroItem = returnClass.First();
+        Assert.Equal("4b54007f-2f19-41e6-a637-a5b5b12b7af0", primeiroItem.Id);
+        Assert.Equal("EasyTributos_cc_client", primeiroItem.UsuarioCadastro);
+        Assert.Equal("ITFPAGAMENTO-DIARIO", primeiroItem.Tipo);
+        Assert.Equal("PRD", primeiroItem.Ambiente);
+        Assert.Equal("EasyTributos", primeiroItem.IdExecucao);
+        Assert.Equal("brazildevops", primeiroItem.UsuarioSolicitante);
+        Assert.Equal("28", primeiroItem.EmpresaSap);
+        Assert.Equal("R*", primeiroItem.TipoDocumento);
+        Assert.Equal(16, primeiroItem.DiasParaProcessar);
+        Assert.Equal("diario", primeiroItem.TipoIncremento);
+        Assert.Null(primeiroItem.TipoMovimento); // Este campo não existe no primeiro item
+
+        // Verifica o segundo item que tem TipoMovimento
+        var segundoItem = returnClass.Skip(1).First();
+        Assert.Equal("5bb4bc03-a783-4e75-80f0-ffcce9e39d99", segundoItem.Id);
+        Assert.Equal("UN", segundoItem.EmpresaSap);
+        Assert.Equal("EWB", segundoItem.TipoMovimento);
+
+        // Verifica que todos os itens têm o mesmo tipo
+        Assert.All(returnClass, item =>
+        {
+            Assert.Equal("ITFPAGAMENTO-DIARIO", item.Tipo);
+            Assert.Equal("PRD", item.Ambiente);
+            Assert.Equal("EasyTributos", item.IdExecucao);
+            Assert.Equal("brazildevops", item.UsuarioSolicitante);
+        });
+
+        // Verifica que o baseHttpClient está válido (sem erros)
+        Assert.True(baseHttpClient.IsValid());
     }
 
     #endregion

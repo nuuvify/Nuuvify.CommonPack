@@ -12,24 +12,21 @@ namespace Nuuvify.CommonPack.StandardHttpClient;
 public abstract partial class BaseStandardHttpClient
 {
 
-    private IList<T> DeserealizeList<T>(string message, int jsonDataDepth = 0) where T : class
+    private IList<T> DeserealizeList<T>(string message, int jsonDataDepth = 1) where T : class
     {
         try
         {
-            string jsonData = string.Empty;
-
-            if (jsonDataDepth == 0)
+            if (jsonDataDepth > 0)
             {
-                jsonDataDepth = 1;
-            }
-
-            jsonData = NavigateToDataProperty(message, jsonDataDepth);
-            if (!string.IsNullOrEmpty(jsonData))
-            {
-                var nestedList = JsonSerializer.Deserialize<List<T>>(jsonData, JsonSettings);
-                if (nestedList != null)
+                // Navigate through nested "Data" properties based on depth
+                var jsonData = NavigateToDataProperty(message, jsonDataDepth);
+                if (!string.IsNullOrEmpty(jsonData))
                 {
-                    return nestedList;
+                    var nestedList = JsonSerializer.Deserialize<List<T>>(jsonData, JsonSettings);
+                    if (nestedList != null)
+                    {
+                        return nestedList;
+                    }
                 }
             }
 
@@ -49,24 +46,21 @@ public abstract partial class BaseStandardHttpClient
         return new List<T>();
     }
 
-    private T DeserealizeObject<T>(string message, int jsonDataDepth = 0) where T : class
+    private T DeserealizeObject<T>(string message, int jsonDataDepth = 1) where T : class
     {
         try
         {
-            string jsonData = string.Empty;
-
-            if (jsonDataDepth == 0)
+            if (jsonDataDepth > 0)
             {
-                jsonDataDepth = 1;
-            }
-
-            var nestedJsonData = NavigateToDataProperty(message, jsonDataDepth);
-            if (!string.IsNullOrEmpty(nestedJsonData))
-            {
-                var nestedObject = JsonSerializer.Deserialize<T>(nestedJsonData, JsonSettings);
-                if (nestedObject != null)
+                // Navigate through nested "Data" properties based on depth
+                var nestedJsonData = NavigateToDataProperty(message, jsonDataDepth);
+                if (!string.IsNullOrEmpty(nestedJsonData))
                 {
-                    return nestedObject;
+                    var nestedObject = JsonSerializer.Deserialize<T>(nestedJsonData, JsonSettings);
+                    if (nestedObject != null)
+                    {
+                        return nestedObject;
+                    }
                 }
             }
 
@@ -93,7 +87,7 @@ public abstract partial class BaseStandardHttpClient
             using var document = JsonDocument.Parse(jsonMessage);
             var currentElement = document.RootElement;
 
-            for (int i = 0; i < depth + 1; i++)
+            for (int i = 0; i < depth; i++)
             {
                 // Check if current element is an object before trying to get properties
                 if (currentElement.ValueKind != JsonValueKind.Object)
