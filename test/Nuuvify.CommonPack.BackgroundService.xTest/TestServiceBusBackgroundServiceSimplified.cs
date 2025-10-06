@@ -39,7 +39,7 @@ public class TestServiceBusBackgroundServiceSimplified : ServiceBusBackgroundSer
         return Task.FromResult(_executeRuleResult);
     }
 
-    protected override void Dispose(bool disposing)
+    protected override void DisposeCustom(bool disposing)
     {
         if (_throwOnDispose)
         {
@@ -53,7 +53,7 @@ public class TestServiceBusBackgroundServiceSimplified : ServiceBusBackgroundSer
             }
         }
 
-        base.Dispose(disposing);
+        base.DisposeCustom(disposing);
     }
 
     // Propriedades públicas para teste
@@ -101,7 +101,7 @@ public class TestServiceBusBackgroundServiceSimplified : ServiceBusBackgroundSer
 
     public bool GetAbandonMessageIfFailed() => AbandonMessageIfFailed;
 
-    public void TestConfigureServiceBus(string cnnName, string queueName, Azure.Messaging.ServiceBus.ServiceBusClientOptions? serviceBusClientOptions, Azure.Messaging.ServiceBus.ServiceBusProcessorOptions? serviceBusProcessorOptions)
+    public void TestConfigureServiceBus(string cnnName, string queueName, Azure.Messaging.ServiceBus.ServiceBusClientOptions serviceBusClientOptions, Azure.Messaging.ServiceBus.ServiceBusProcessorOptions serviceBusProcessorOptions)
     {
         ConfigureServiceBus(cnnName, queueName, serviceBusClientOptions, serviceBusProcessorOptions);
     }

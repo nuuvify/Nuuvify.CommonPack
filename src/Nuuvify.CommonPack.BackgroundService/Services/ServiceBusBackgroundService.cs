@@ -1,8 +1,10 @@
+#nullable enable
 using Azure.Core;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Extensions.Logging;
 using Nuuvify.CommonPack.Middleware.Abstraction;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Nuuvify.CommonPack.BackgroundService.Services;
 
@@ -12,13 +14,16 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
     private readonly IConfigurationCustom _configurationCustom;
     private readonly RequestConfiguration _requestConfiguration;
 
+    // Recursos IDisposable adequadamente liberados via DisposeAsync no método DisposeCustom
+    [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed")]
     private ServiceBusClient _serviceBusClient;
+    [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed")]
     private ServiceBusProcessor _serviceBusProcessor;
 
     protected RequestConfiguration RequestConfiguration => _requestConfiguration;
     protected ILogger<ServiceBusBackgroundService<T>> Logger => _logger;
     protected IConfigurationCustom ConfigurationCustom => _configurationCustom;
-    protected ActivitySource ActivitySourceCustom { get; set; }
+    protected ActivitySource ActivitySourceCustom { get; set; } = null!;
 
     /// <summary>
     /// Configurar para abandonar mensagens em caso de falha em vez de enviá-las para dead letter
@@ -49,6 +54,21 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
     /// <param name="subscription">ServiceBus:Topic:Subscription</param>
     /// <param name="serviceBusClientOptions">Opções do cliente Service Bus</param>
     /// <param name="serviceBusProcessorOptions">Opções do processador Service Bus</param>
+    /// <example>
+    /// Exemplo de configuração no appsettings.json:
+    /// <code>
+    /// "ServiceBus": {
+    ///     "CnnName": "Reinf-ItfPagamentos",
+    ///     "Topic": {
+    ///         "Name": "topic-reinf",
+    ///         "Subscription": "Worker_InterfacePagamentos"
+    ///     }
+    /// },
+    /// "ConnectionString": {
+    ///     "Reinf-ItfPagamentos": "Endpoint=sb://xxxxxxxxxxxx;EntityPath=topic-reinf"
+    /// }
+    /// </code>
+    /// </example>
     protected virtual void ConfigureServiceBus(
         string cnnName,
         string topicName,
@@ -230,6 +250,10 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
 
         try
         {
+            if (_serviceBusProcessor == null)
+            {
+                throw new InvalidOperationException("ServiceBus não foi configurado. Chame um dos métodos ConfigureServiceBus antes de iniciar o processamento.");
+            }
 
             _serviceBusProcessor.ProcessMessageAsync += (args) => HandleMessageAsync(args, stoppingToken);
             _serviceBusProcessor.ProcessErrorAsync += HandleErrorAsync;
@@ -239,14 +263,14 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
             // Aguarda até que o token de cancelamento seja acionado
             await Task.Delay(Timeout.Infinite, stoppingToken);
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException ex)
         {
-            _logger.LogInformation("Processamento de mensagens foi cancelado");
+            _logger.LogInformation(ex, "Processamento de mensagens foi cancelado");
         }
         catch (ServiceBusException ex)
         {
             _logger.LogError(ex, "Erro específico do Service Bus ao inicializar o processamento: {Reason}", ex.Reason);
-            throw;
+            throw new InvalidOperationException($"Falha ao inicializar o processamento do Service Bus: {ex.Reason}", ex);
         }
         finally
         {
@@ -310,7 +334,7 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
             _logger.LogError(ex, "Erro de comunicação no Service Bus. Verifique as configurações de rede. Reason: {Reason}, Resource: {EntityPath}",
                 ex.Reason, args.Message?.Subject ?? "Unknown");
             await args.DeadLetterMessageAsync(args.Message, cancellationToken: cancellationToken);
-            throw;
+            throw new InvalidOperationException($"Erro de comunicação no Service Bus para mensagem {args.Message?.MessageId ?? "Unknown"}: {ex.Reason}", ex);
         }
         catch (OperationCanceledException ex)
         {
@@ -328,7 +352,7 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
         {
             _logger.LogError(ex, "Houve um erro durante a execução do Worker.ExecuteAsync");
             await args.DeadLetterMessageAsync(args.Message, cancellationToken: cancellationToken);
-            throw;
+            throw new InvalidOperationException($"Erro não tratado durante processamento da mensagem {args.Message?.MessageId ?? "Unknown"}: {ex.Message}", ex);
         }
     }
 
@@ -370,7 +394,7 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
         catch (Exception ex)
         {
             _logger.LogError(ex, "Erro ao parar o processamento das mensagens do bus");
-            throw;
+            throw new InvalidOperationException($"Erro ao parar o processamento do Service Bus: {ex.Message}", ex);
         }
         finally
         {
@@ -383,7 +407,7 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
     /// </summary>
     public sealed override void Dispose()
     {
-        Dispose(true);
+        DisposeCustom(true);
         base.Dispose();
         GC.SuppressFinalize(this);
     }
@@ -392,14 +416,17 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
     /// Método protegido para liberação de recursos
     /// </summary>
     /// <param name="disposing">Indica se o método está sendo chamado pelo Dispose ou pelo finalizador</param>
-    protected virtual void Dispose(bool disposing)
+    protected virtual void DisposeCustom(bool disposing)
     {
         if (disposing)
         {
             try
             {
+                // Dispose dos recursos IDisposable para satisfazer CA1001
                 _serviceBusProcessor?.DisposeAsync().AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
                 _serviceBusClient?.DisposeAsync().AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
+
+                ActivitySourceCustom?.Dispose();
             }
             catch (ObjectDisposedException)
             {
