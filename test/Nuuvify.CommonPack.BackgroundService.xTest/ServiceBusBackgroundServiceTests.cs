@@ -45,7 +45,7 @@ public class TestServiceBusBackgroundService : ServiceBusBackgroundService<TestS
         return Task.FromResult(_executeRuleResult);
     }
 
-    protected override void Dispose(bool disposing)
+    protected override void DisposeCustom(bool disposing)
     {
         if (_throwOnDispose)
         {
@@ -59,7 +59,7 @@ public class TestServiceBusBackgroundService : ServiceBusBackgroundService<TestS
             }
         }
 
-        base.Dispose(disposing);
+        base.DisposeCustom(disposing);
     }
 
     // Métodos públicos para testes
@@ -106,23 +106,23 @@ public class TestServiceBusBackgroundService : ServiceBusBackgroundService<TestS
 
     public bool GetAbandonMessageIfFailed() => AbandonMessageIfFailed;
 
-    public void TestConfigureServiceBus(string cnnName, string queueName, ServiceBusClientOptions? serviceBusClientOptions, ServiceBusProcessorOptions? serviceBusProcessorOptions)
+    public void TestConfigureServiceBus(string cnnName, string queueName, ServiceBusClientOptions serviceBusClientOptions, ServiceBusProcessorOptions serviceBusProcessorOptions)
     {
         ConfigureServiceBus(cnnName, queueName, serviceBusClientOptions, serviceBusProcessorOptions);
     }
 
-    public void TestConfigureServiceBusWithTopicConnectionString(string connectionString, string topicName, string subscription, ServiceBusClientOptions? serviceBusClientOptions, ServiceBusProcessorOptions? serviceBusProcessorOptions)
+    public void TestConfigureServiceBusWithTopicConnectionString(string connectionString, string topicName, string subscription, ServiceBusClientOptions serviceBusClientOptions, ServiceBusProcessorOptions serviceBusProcessorOptions)
     {
         // Para testar com topic e subscription usando connection string
         ConfigureServiceBus(connectionString, topicName, subscription, serviceBusClientOptions, serviceBusProcessorOptions);
     }
 
-    public void TestConfigureServiceBusWithTopicCredentials(string topicName, string subscription, string fullyQualifiedNamespace, Azure.Core.TokenCredential credential, ServiceBusClientOptions? serviceBusClientOptions, ServiceBusProcessorOptions? serviceBusProcessorOptions)
+    public void TestConfigureServiceBusWithTopicCredentials(string topicName, string subscription, string fullyQualifiedNamespace, Azure.Core.TokenCredential credential, ServiceBusClientOptions serviceBusClientOptions, ServiceBusProcessorOptions serviceBusProcessorOptions)
     {
         ConfigureServiceBus(topicName, subscription, fullyQualifiedNamespace, credential, serviceBusClientOptions, serviceBusProcessorOptions);
     }
 
-    public void TestConfigureServiceBusWithQueueCredentials(string queueName, string fullyQualifiedNamespace, Azure.Core.TokenCredential credential, ServiceBusClientOptions? serviceBusClientOptions, ServiceBusProcessorOptions? serviceBusProcessorOptions)
+    public void TestConfigureServiceBusWithQueueCredentials(string queueName, string fullyQualifiedNamespace, Azure.Core.TokenCredential credential, ServiceBusClientOptions serviceBusClientOptions, ServiceBusProcessorOptions serviceBusProcessorOptions)
     {
         ConfigureServiceBus(queueName, fullyQualifiedNamespace, credential, serviceBusClientOptions, serviceBusProcessorOptions);
     }
