@@ -146,10 +146,18 @@ public abstract partial class BaseStandardHttpClient
     /// Deserializa um retorno JSON para uma classe C# <br/>
     /// Para deserializar XML, use sua propria classe conforme essa documentação: <seealso cref="ReturnGenericClass"/>
     /// </summary>
+    /// <param name="standardReturn">Resultado da requisição HTTP</param>
+    /// <param name="api">Nome da API para identificação em logs</param>
+    /// <param name="jsonDataDepth">Profundidade da propriedade 'data' no JSON. Use:
+    /// - 0: Quando o objeto está no nível raiz (ex: {"id": 1, "nome": "João"})
+    /// - 1: Padrão, quando há uma propriedade 'data' (ex: {"data": {"id": 1, "nome": "João"}})
+    /// - 2: Para JSON aninhado (ex: {"response": {"data": {"id": 1, "nome": "João"}}})</param>
+    /// <typeparam name="T">Tipo da classe para deserialização</typeparam>
+    /// <returns>Objeto deserializado do tipo T ou null em caso de erro</returns>
     public virtual T ReturnClass<T>(
         HttpStandardReturn standardReturn,
         string api,
-        int jsonDataDepth = 0) where T : class
+        int jsonDataDepth = 1) where T : class
     {
         if (standardReturn.Success)
         {
@@ -205,10 +213,18 @@ public abstract partial class BaseStandardHttpClient
     /// Deserializa uma lista JSON para uma classe C# com navegação por profundidade de propriedades Data <br/>
     /// Para deserializar XML, use sua propria classe conforme essa documentação: <seealso cref="ReturnGenericClass"/>
     /// </summary>
+    /// <param name="standardReturn">Resultado da requisição HTTP</param>
+    /// <param name="api">Nome da API para identificação em logs</param>
+    /// <param name="jsonDataDepth">Profundidade da propriedade 'data' no JSON. Use:
+    /// - 0: Quando o array está no nível raiz (ex: [{"id": 1}, {"id": 2}])
+    /// - 1: Padrão, quando há uma propriedade 'data' (ex: {"data": [{"id": 1}, {"id": 2}]})
+    /// - 2: Para JSON aninhado (ex: {"response": {"data": [{"id": 1}, {"id": 2}]}})</param>
+    /// <typeparam name="T">Tipo da classe para deserialização dos itens da lista</typeparam>
+    /// <returns>Lista de objetos do tipo T ou lista vazia em caso de erro</returns>
     public virtual IList<T> ReturnList<T>(
         HttpStandardReturn standardReturn,
         string api,
-        int jsonDataDepth = 0) where T : class
+        int jsonDataDepth = 1) where T : class
     {
 
         if (standardReturn.Success)
