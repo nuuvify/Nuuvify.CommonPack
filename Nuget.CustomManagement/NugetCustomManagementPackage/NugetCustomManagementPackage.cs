@@ -19,7 +19,7 @@ namespace Nuget.CustomManagement.NugetCustomManagementPackage;
 public class NugetCustomManagementPackage
 {
     public IDictionary<string, string> Packages { get; set; }
-    public string PackageVersion { get; set; } = "2.0.0-test.25041512";
+    public string PackageVersion { get; set; } = "2.1.0-test.25100505";
 
     public NugetCustomManagementPackage()
     {
