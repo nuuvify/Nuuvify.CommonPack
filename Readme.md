@@ -5,19 +5,29 @@
 
 Coleção de bibliotecas .NET para desenvolvimento de aplicações robustas, escaláveis e de alta performance.
 
+## 🆕 Novidades
+
+### BackgroundService v2.0 - Diagnóstico Avançado
+- **✨ Propriedades de diagnóstico contextuais** para Dead Letter Queue e Abandon
+- **🔧 Arquitetura modular refatorada** com complexidade cognitiva reduzida
+- **🔍 Troubleshooting aprimorado** com metadados detalhados
+- **📊 Observabilidade avançada** para monitoramento e métricas
+
 ## 📦 Pacotes Disponíveis
 
-| Pacote                                    | Descrição                | Versão                                                                                                                                                      | Downloads                                                                                                                                                        |
-| ----------------------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Nuuvify.CommonPack.StandardHttpClient** | Cliente HTTP otimizado   | [![NuGet](https://img.shields.io/nuget/v/Nuuvify.CommonPack.StandardHttpClient.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.StandardHttpClient/) | [![Downloads](https://img.shields.io/nuget/dt/Nuuvify.CommonPack.StandardHttpClient.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.StandardHttpClient/) |
-| **Nuuvify.CommonPack.Security**           | Componentes de segurança | [![NuGet](https://img.shields.io/nuget/v/Nuuvify.CommonPack.Security.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.Security/)                     | [![Downloads](https://img.shields.io/nuget/dt/Nuuvify.CommonPack.Security.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.Security/)                     |
-| **Nuuvify.CommonPack.Extensions**         | Métodos de extensão      | [![NuGet](https://img.shields.io/nuget/v/Nuuvify.CommonPack.Extensions.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.Extensions/)                 | [![Downloads](https://img.shields.io/nuget/dt/Nuuvify.CommonPack.Extensions.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.Extensions/)                 |
-| **Nuuvify.CommonPack.UnitOfWork**         | Padrão Unit of Work      | [![NuGet](https://img.shields.io/nuget/v/Nuuvify.CommonPack.UnitOfWork.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.UnitOfWork/)                 | [![Downloads](https://img.shields.io/nuget/dt/Nuuvify.CommonPack.UnitOfWork.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.UnitOfWork/)                 |
+| Pacote                                    | Descrição                                      | Versão                                                                                                                                                      | Downloads                                                                                                                                                        |
+| ----------------------------------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Nuuvify.CommonPack.BackgroundService**  | 🆕 Serviços de background com Azure Service Bus | [![NuGet](https://img.shields.io/nuget/v/Nuuvify.CommonPack.BackgroundService.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.BackgroundService/)   | [![Downloads](https://img.shields.io/nuget/dt/Nuuvify.CommonPack.BackgroundService.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.BackgroundService/)   |
+| **Nuuvify.CommonPack.StandardHttpClient** | Cliente HTTP otimizado                         | [![NuGet](https://img.shields.io/nuget/v/Nuuvify.CommonPack.StandardHttpClient.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.StandardHttpClient/) | [![Downloads](https://img.shields.io/nuget/dt/Nuuvify.CommonPack.StandardHttpClient.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.StandardHttpClient/) |
+| **Nuuvify.CommonPack.Security**           | Componentes de segurança                       | [![NuGet](https://img.shields.io/nuget/v/Nuuvify.CommonPack.Security.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.Security/)                     | [![Downloads](https://img.shields.io/nuget/dt/Nuuvify.CommonPack.Security.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.Security/)                     |
+| **Nuuvify.CommonPack.Extensions**         | Métodos de extensão                            | [![NuGet](https://img.shields.io/nuget/v/Nuuvify.CommonPack.Extensions.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.Extensions/)                 | [![Downloads](https://img.shields.io/nuget/dt/Nuuvify.CommonPack.Extensions.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.Extensions/)                 |
+| **Nuuvify.CommonPack.UnitOfWork**         | Padrão Unit of Work                            | [![NuGet](https://img.shields.io/nuget/v/Nuuvify.CommonPack.UnitOfWork.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.UnitOfWork/)                 | [![Downloads](https://img.shields.io/nuget/dt/Nuuvify.CommonPack.UnitOfWork.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.UnitOfWork/)                 |
 
 ##  Documentação
 
 Cada pacote possui documentação detalhada:
 
+- 📚 [BackgroundService](src/Nuuvify.CommonPack.BackgroundService/README.md) **🆕 Com diagnóstico avançado**
 - 📚 [StandardHttpClient](src/Nuuvify.CommonPack.StandardHttpClient/README.md)
 - 📚 [Security](src/Nuuvify.CommonPack.Security/README.md)
 - 📚 [Extensions](src/Nuuvify.CommonPack.Extensions/README.md)

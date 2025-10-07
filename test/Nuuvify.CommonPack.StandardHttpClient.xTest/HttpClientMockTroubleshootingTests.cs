@@ -57,7 +57,7 @@ public class HttpClientMockTroubleshootingTests
             _output.WriteLine($"HttpClient criado com BaseAddress: {client.BaseAddress}");
 
             // Setup mock
-            mockFactory.Setup(f => f.CreateClient(It.IsAny<string>()))
+            _ = mockFactory.Setup(f => f.CreateClient(It.IsAny<string>()))
                       .Returns(() =>
                       {
                           _output.WriteLine("Mock CreateClient chamado");
