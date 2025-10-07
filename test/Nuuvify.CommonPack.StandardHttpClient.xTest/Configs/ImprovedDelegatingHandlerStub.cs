@@ -37,7 +37,7 @@ public class ImprovedDelegatingHandlerStub : DelegatingHandler
         // Copiar headers
         foreach (var header in _fakeResponse.Headers)
         {
-            clonedResponse.Headers.TryAddWithoutValidation(header.Key, header.Value);
+            _ = clonedResponse.Headers.TryAddWithoutValidation(header.Key, header.Value);
         }
 
         return clonedResponse;

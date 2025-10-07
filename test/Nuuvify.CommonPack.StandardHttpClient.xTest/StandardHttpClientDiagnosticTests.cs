@@ -39,7 +39,7 @@ public class StandardHttpClientDiagnosticTests
         };
 
         // Setup mock factory to return our mocked client
-        mockFactory.Setup(x => x.CreateClient(It.IsAny<string>()))
+        _ = mockFactory.Setup(x => x.CreateClient(It.IsAny<string>()))
                   .Returns(mockHttpClient);
 
         // Act & Assert
@@ -80,7 +80,7 @@ public class StandardHttpClientDiagnosticTests
         // Create HttpClient WITHOUT BaseAddress
         var mockHttpClient = new HttpClient(handlerStub, disposeHandler: false);
 
-        mockFactory.Setup(x => x.CreateClient(It.IsAny<string>()))
+        _ = mockFactory.Setup(x => x.CreateClient(It.IsAny<string>()))
                   .Returns(mockHttpClient);
 
         // Act & Assert

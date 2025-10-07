@@ -5,11 +5,14 @@ using Microsoft.Extensions.Logging;
 using Nuuvify.CommonPack.Middleware.Abstraction;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace Nuuvify.CommonPack.BackgroundService.Services;
 
 public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensions.Hosting.BackgroundService
 {
+    private const string UnknownValue = "Unknown";
+
     private readonly ILogger<ServiceBusBackgroundService<T>> _logger;
     private readonly IConfigurationCustom _configurationCustom;
     private readonly RequestConfiguration _requestConfiguration;
@@ -229,6 +232,7 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
 
     /// <summary>
     /// Método abstrato que deve ser implementado pelas classes derivadas para executar a lógica de negócio
+    /// Utilisa o RequestConfiguration.CorrelationId como umas das propriedades
     /// </summary>
     /// <param name="message">Mensagem recebida do Service Bus</param>
     /// <param name="activitySource">Source para criação de atividades de telemetria</param>
@@ -238,6 +242,84 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
         ServiceBusReceivedMessage message,
         ActivitySource activitySource,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Cria propriedades de diagnóstico para mensagens que vão para Dead Letter Queue
+    /// Utilisa o RequestConfiguration.CorrelationId como umas das propriedades
+    /// </summary>
+    /// <param name="message">Mensagem original</param>
+    /// <param name="errorDetails">Detalhes do erro</param>
+    /// <param name="exceptionType">Tipo da exceção</param>
+    /// <returns>Dicionário com propriedades de diagnóstico</returns>
+    /// <remarks>
+    /// Propriedades criadas:
+    /// <list type="bullet">
+    /// <item><description><c>ErrorDetails</c>: Detalhes específicos do erro ocorrido</description></item>
+    /// <item><description><c>FailureTime</c>: Timestamp ISO 8601 do momento da falha</description></item>
+    /// <item><description><c>WorkerVersion</c>: Versão do assembly do worker</description></item>
+    /// <item><description><c>CorrelationId</c>: ID de correlação da requisição</description></item>
+    /// <item><description><c>DeliveryAttempt</c>: Número de tentativas de entrega da mensagem</description></item>
+    /// <item><description><c>MessageId</c>: ID único da mensagem do Service Bus</description></item>
+    /// <item><description><c>ExceptionType</c>: Tipo da exceção ou "ProcessingFailure" se não especificado</description></item>
+    /// <item><description><c>WorkerInstance</c>: Nome da máquina onde o worker está executando</description></item>
+    /// <item><description><c>ProcessedBy</c>: Nome da classe que processou a mensagem</description></item>
+    /// </list>
+    /// </remarks>
+    protected virtual Dictionary<string, object> CreateDeadLetterProperties(
+        ServiceBusReceivedMessage message,
+        string errorDetails,
+        string? exceptionType = null)
+    {
+        return new Dictionary<string, object>
+        {
+            ["ErrorDetails"] = errorDetails,
+            ["FailureTime"] = DateTimeOffset.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", System.Globalization.CultureInfo.InvariantCulture),
+            ["WorkerVersion"] = Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? UnknownValue,
+            ["CorrelationId"] = RequestConfiguration.CorrelationId,
+            ["DeliveryAttempt"] = message.DeliveryCount,
+            ["MessageId"] = message.MessageId,
+            ["ExceptionType"] = exceptionType ?? "ProcessingFailure",
+            ["WorkerInstance"] = Environment.MachineName,
+            ["ProcessedBy"] = Assembly.GetEntryAssembly()?.GetName().Name ?? GetType().Name
+        };
+    }
+
+    /// <summary>
+    /// Cria propriedades de diagnóstico para mensagens abandonadas
+    /// Utilisa o RequestConfiguration.CorrelationId como umas das propriedades
+    /// </summary>
+    /// <param name="message">Mensagem original</param>
+    /// <param name="abandonReason">Motivo do abandono</param>
+    /// <returns>Dicionário com propriedades de diagnóstico</returns>
+    /// <remarks>
+    /// Propriedades criadas:
+    /// <list type="bullet">
+    /// <item><description><c>AbandonReason</c>: Motivo específico pelo qual a mensagem foi abandonada</description></item>
+    /// <item><description><c>AbandonTime</c>: Timestamp ISO 8601 do momento do abandono</description></item>
+    /// <item><description><c>RetryCount</c>: Número de tentativas já realizadas (DeliveryCount)</description></item>
+    /// <item><description><c>CorrelationId</c>: ID de correlação da requisição</description></item>
+    /// <item><description><c>MessageId</c>: ID único da mensagem do Service Bus</description></item>
+    /// <item><description><c>WorkerInstance</c>: Nome da máquina onde o worker está executando</description></item>
+    /// <item><description><c>NextRetryHint</c>: Sugestão de timestamp para próxima tentativa (1 minuto após o abandono)</description></item>
+    /// <item><description><c>ProcessedBy</c>: Nome da classe que processou a mensagem</description></item>
+    /// </list>
+    /// </remarks>
+    protected virtual Dictionary<string, object> CreateAbandonProperties(
+        ServiceBusReceivedMessage message,
+        string abandonReason)
+    {
+        return new Dictionary<string, object>
+        {
+            ["AbandonReason"] = abandonReason,
+            ["AbandonTime"] = DateTimeOffset.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", System.Globalization.CultureInfo.InvariantCulture),
+            ["RetryCount"] = message.DeliveryCount,
+            ["CorrelationId"] = RequestConfiguration.CorrelationId,
+            ["MessageId"] = message.MessageId,
+            ["WorkerInstance"] = Environment.MachineName,
+            ["NextRetryHint"] = DateTimeOffset.UtcNow.AddMinutes(1).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", System.Globalization.CultureInfo.InvariantCulture),
+            ["ProcessedBy"] = Assembly.GetEntryAssembly()?.GetName().Name ?? GetType().Name
+        };
+    }
 
     /// <summary>
     /// Método principal que executa o processamento das mensagens do Service Bus
@@ -308,17 +390,7 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
             }
             else
             {
-                _logger.LogWarning("{MethodName} retornou false para a mensagem {MessageId}. Verificando comportamento de falha.",
-                    nameof(ExecuteReceivedMessageAsync), args.Message.MessageId);
-
-                if (AbandonMessageIfFailed)
-                {
-                    await args.AbandonMessageAsync(args.Message, cancellationToken: cancellationToken);
-                }
-                else
-                {
-                    await args.DeadLetterMessageAsync(args.Message, cancellationToken: cancellationToken);
-                }
+                await HandleBusinessLogicFailureAsync(args, cancellationToken);
             }
         }
         catch (ServiceBusException ex) when (
@@ -326,33 +398,19 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
             ex.Reason == ServiceBusFailureReason.SessionLockLost ||
             ex.Reason == ServiceBusFailureReason.QuotaExceeded)
         {
-            _logger.LogError(ex, "Erro específico do Service Bus durante a execução do Worker: {Reason}", ex.Reason);
-            await args.DeadLetterMessageAsync(args.Message, cancellationToken: cancellationToken);
+            await HandleServiceBusSpecificExceptionAsync(args, ex, cancellationToken);
         }
         catch (ServiceBusException ex) when (ex.Reason == ServiceBusFailureReason.ServiceCommunicationProblem)
         {
-            _logger.LogError(ex, "Erro de comunicação no Service Bus. Verifique as configurações de rede. Reason: {Reason}, Resource: {EntityPath}",
-                ex.Reason, args.Message?.Subject ?? "Unknown");
-            await args.DeadLetterMessageAsync(args.Message, cancellationToken: cancellationToken);
-            throw new InvalidOperationException($"Erro de comunicação no Service Bus para mensagem {args.Message?.MessageId ?? "Unknown"}: {ex.Reason}", ex);
+            await HandleServiceBusCommunicationExceptionAsync(args, ex, cancellationToken);
         }
         catch (OperationCanceledException ex)
         {
-            _logger.LogWarning(ex, "Operação cancelada durante a execução do Worker");
-            if (AbandonMessageIfFailed)
-            {
-                await args.AbandonMessageAsync(args.Message, cancellationToken: cancellationToken);
-            }
-            else
-            {
-                await args.DeadLetterMessageAsync(args.Message, cancellationToken: cancellationToken);
-            }
+            await HandleOperationCanceledExceptionAsync(args, ex, cancellationToken);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Houve um erro durante a execução do Worker.ExecuteAsync");
-            await args.DeadLetterMessageAsync(args.Message, cancellationToken: cancellationToken);
-            throw new InvalidOperationException($"Erro não tratado durante processamento da mensagem {args.Message?.MessageId ?? "Unknown"}: {ex.Message}", ex);
+            await HandleGenericExceptionAsync(args, ex, cancellationToken);
         }
     }
 
