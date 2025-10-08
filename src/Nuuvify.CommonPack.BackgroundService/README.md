@@ -10,9 +10,13 @@ Biblioteca para criação de serviços de background que processam mensagens do 
 - ✅ Classe base abstrata para implementação de workers
 - ✅ Integração completa com Azure Service Bus
 - ✅ Telemetria e observabilidade com OpenTelemetry
-- ✅ Tratamento robusto de erros
+- ✅ Tratamento robusto de erros com diagnóstico avançado
+- ✅ **Propriedades de diagnóstico** para Dead Letter Queue e Abandon
+- ✅ **Rastreamento detalhado** de falhas com metadados contextuais
 - ✅ Configuração flexível via connection strings ou Azure credentials
 - ✅ Suporte a dead letter queue e message abandonment
+- ✅ **Arquitetura modular** com separação de responsabilidades
+- ✅ **Complexidade cognitiva reduzida** para melhor manutenibilidade
 - ✅ Logging estruturado
 - ✅ Testes unitários incluídos
 
@@ -158,7 +162,7 @@ public interface IBackgroundServiceAbstract<T>
 
 ## Tratamento de Erros
 
-A classe base trata automaticamente diferentes tipos de erros:
+A classe base trata automaticamente diferentes tipos de erros com **diagnóstico avançado**:
 
 - **ServiceBusException**: Erros específicos do Service Bus (lock perdido, quota excedida, etc.)
 - **OperationCanceledException**: Cancelamento de operação
@@ -176,6 +180,46 @@ AbandonMessageIfFailed = true;
 AbandonMessageIfFailed = false;
 ```
 
+### 🆕 Propriedades de Diagnóstico
+
+Todas as mensagens que falham agora incluem **propriedades de diagnóstico contextuais**:
+
+#### Dead Letter Queue Properties:
+```json
+{
+  "ErrorDetails": "Unhandled exception: Database connection failed",
+  "FailureTime": "2025-10-07T19:26:30.123Z",
+  "WorkerVersion": "1.2.3.0",
+  "CorrelationId": "abc-123-def-456",
+  "DeliveryAttempt": 3,
+  "MessageId": "msg-789",
+  "ExceptionType": "SqlException",
+  "WorkerInstance": "SERVER01",
+  "ProcessedBy": "OrderProcessingService"
+}
+```
+
+#### Abandon Message Properties:
+```json
+{
+  "AbandonReason": "Operation was cancelled",
+  "AbandonTime": "2025-10-07T19:26:30.123Z",
+  "RetryCount": 2,
+  "CorrelationId": "abc-123-def-456",
+  "MessageId": "msg-789",
+  "WorkerInstance": "SERVER01",
+  "ProcessedBy": "OrderProcessingService",
+  "NextRetryHint": "2025-10-07T19:27:30.123Z"
+}
+```
+
+### Benefícios do Diagnóstico Avançado:
+
+- 🔍 **Troubleshooting Melhorado**: Informações detalhadas sobre falhas
+- 📊 **Observabilidade**: Rastreamento de padrões de erro
+- 🎯 **Root Cause Analysis**: Identificação rápida de problemas sistêmicos
+- 📈 **Métricas**: Criação de dashboards baseados nas propriedades
+
 ## Telemetria e Observabilidade
 
 A classe integra automaticamente com OpenTelemetry:
@@ -192,6 +236,42 @@ A biblioteca gera logs estruturados em vários níveis:
 - `Warning`: Operações canceladas
 - `Error`: Falhas no processamento
 - `Debug`: Detalhes internos (quando habilitado)
+
+## 🆕 Arquitetura Modular
+
+A partir desta versão, o código foi **refatorado** para melhor manutenibilidade:
+
+### Separação de Responsabilidades
+
+- **`ServiceBusBackgroundService.cs`**: Classe principal com lógica core
+- **`ServiceBusBackgroundService.ExceptionHandling.cs`**: Tratamento especializado de exceções
+
+### Métodos de Tratamento de Exceções
+
+```csharp
+// Métodos especializados para cada tipo de erro
+protected virtual async Task HandleServiceBusSpecificExceptionAsync(...)
+protected virtual async Task HandleServiceBusCommunicationExceptionAsync(...)
+protected virtual async Task HandleOperationCanceledExceptionAsync(...)
+protected virtual async Task HandleGenericExceptionAsync(...)
+protected virtual async Task HandleBusinessLogicFailureAsync(...)
+```
+
+### Métodos de Diagnóstico
+
+```csharp
+// Criação de propriedades contextuais
+protected virtual Dictionary<string, object> CreateDeadLetterProperties(...)
+protected virtual Dictionary<string, object> CreateAbandonProperties(...)
+```
+
+### Benefícios da Refatoração:
+
+- ✅ **Complexidade Cognitiva Reduzida**: Métodos menores e mais focados
+- ✅ **Manutenibilidade**: Mais fácil de modificar e estender
+- ✅ **Testabilidade**: Métodos especializados podem ser testados individualmente
+- ✅ **Reutilização**: Métodos podem ser sobrescritos em classes derivadas
+- ✅ **Clean Code**: Seguindo princípios SOLID
 
 ## Configurações Avançadas
 
@@ -213,6 +293,24 @@ protected BackgroundServiceAbstract(
 - `ConfigurationCustom`: Configuração da aplicação
 - `RequestConfiguration`: Configuração da requisição
 - `ActivitySourceCustom`: Source para telemetria
+
+### Métodos Personalizáveis
+
+Você pode sobrescrever os métodos de tratamento de exceções para comportamento customizado:
+
+```csharp
+protected override async Task HandleGenericExceptionAsync(
+    ProcessMessageEventArgs args,
+    Exception ex,
+    CancellationToken cancellationToken)
+{
+    // Seu tratamento customizado
+    Logger.LogError(ex, "Erro customizado: {Message}", ex.Message);
+
+    // Chamar implementação base se necessário
+    await base.HandleGenericExceptionAsync(args, ex, cancellationToken);
+}
+```
 
 ## Exemplo Completo
 
