@@ -1,3 +1,19 @@
+// =====================================================================================
+// 📚 EXEMPLOS DE USO - Nuuvify.CommonPack.AzureServiceBus
+// =====================================================================================
+//
+// Este arquivo contém exemplos práticos de como usar a biblioteca Azure Service Bus.
+//
+// 🚀 COMO USAR:
+// 1. Copie este arquivo para seu projeto
+// 2. Ajuste os namespaces conforme necessário
+// 3. Configure o Azure Service Bus no Program.cs:
+//    builder.Services.AddAzureServiceBus(builder.Configuration);
+// 4. Injete IServiceBusMessageSender onde precisar
+//
+// 📖 Para mais detalhes, veja: Examples/README.md
+// =====================================================================================
+
 using Nuuvify.CommonPack.AzureServiceBus.Abstraction.Interfaces;
 using Nuuvify.CommonPack.AzureServiceBus.Abstraction.Models;
 

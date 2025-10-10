@@ -13,8 +13,7 @@
         <PackageReference Include="xunit.runner.visualstudio" />
         <PackageReference Include="coverlet.collector" />
         <PackageReference Include="AutoMoqCore" />
-        <PackageReference Include="Bogus" />
-        <PackageReference Include="CountryData.Bogus" />
+
         <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" />

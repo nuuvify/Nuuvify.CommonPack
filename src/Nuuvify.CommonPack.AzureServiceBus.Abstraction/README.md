@@ -313,7 +313,7 @@ Mudanças que **mantêm** compatibilidade:
 
 Este projeto está licenciado sob a [Licença MIT](LICENSE).
 
-## � Suporte
+## c Suporte
 
 Para dúvidas e suporte técnico:
 
@@ -331,7 +331,7 @@ Este projeto segue o [Semantic Versioning](https://semver.org/):
 
 Consulte o [CHANGELOG.md](./CHANGELOG.md) para ver todas as mudanças detalhadas.
 
-## �🔗 Pacotes Relacionados
+## c🔗 Pacotes Relacionados
 
 - **[Nuuvify.CommonPack.AzureServiceBus](../Nuuvify.CommonPack.AzureServiceBus/)** - Implementação completa
 - **[Nuuvify.CommonPack.UnitOfWork.Abstraction](../Nuuvify.CommonPack.UnitOfWork.Abstraction/)** - Padrão Unit of Work
