@@ -12,8 +12,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Net.IBM.Data.Db2" Version="8.0.0.400" Condition="'$(os)' == 'Windows_NT'" />
-        <PackageReference Include="Net.IBM.Data.Db2-lnx" Version="8.0.0.400" Condition="'$(os)' == 'UNIX'" />
+        <PackageReference Include="Net.IBM.Data.Db2" Condition="'$(os)' == 'Windows_NT'" />
+        <PackageReference Include="Net.IBM.Data.Db2-lnx" Condition="'$(os)' == 'UNIX'" />
     </ItemGroup>
 
     <ItemGroup>

@@ -10,7 +10,7 @@
 
     <ItemGroup>
         <PackageReference Include="Azure.Messaging.ServiceBus" />
-        <PackageReference Include="FluentAssertions" />
+        <PackageReference Include="Shouldly" />
     </ItemGroup>
 
     <ItemGroup>
