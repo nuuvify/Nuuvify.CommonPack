@@ -89,17 +89,17 @@ public class ServiceBusTestFixture
     public Mock<IOptions<ServiceBusConfiguration>> CreateConfigurationOptionsMock(ServiceBusConfiguration config)
     {
         var mock = new Mock<IOptions<ServiceBusConfiguration>>();
-        mock.Setup(x => x.Value).Returns(config);
+        _ = mock.Setup(x => x.Value).Returns(config);
         return mock;
     }
 
     /// <summary>
     /// Cria um mock do IOptions<ServiceBusClientConfiguration>
     /// </summary>
-    public Mock<IOptions<ServiceBusClientConfiguration>> CreateClientConfigurationOptionsMock(ServiceBusClientConfiguration config = null)
+    public Mock<IOptions<ServiceBusClientConfiguration>> CreateClientConfigurationOptionsMock(ServiceBusClientConfiguration config)
     {
         var mock = new Mock<IOptions<ServiceBusClientConfiguration>>();
-        mock.Setup(x => x.Value).Returns(config);
+        _ = mock.Setup(x => x.Value).Returns(config);
         return mock;
     }
 
@@ -159,4 +159,92 @@ public class ServiceBusTestFixture
     /// Cria nomes de tópicos aleatórios para testes
     /// </summary>
     public string CreateTopicName() => _faker.Random.AlphaNumeric(10).ToLowerInvariant();
+
+    /// <summary>
+    /// Cria um IOptions<ServiceBusConfiguration> válido para testes
+    /// </summary>
+    public IOptions<ServiceBusConfiguration> CreateValidServiceBusConfiguration()
+    {
+        var config = CreateValidConfiguration();
+        var mock = CreateConfigurationOptionsMock(config);
+        return mock.Object;
+    }
+
+    /// <summary>
+    /// Cria um IOptions<ServiceBusConfiguration> inválido para testes
+    /// </summary>
+    public IOptions<ServiceBusConfiguration> CreateInvalidServiceBusConfiguration()
+    {
+        var config = CreateInvalidConfiguration();
+        var mock = CreateConfigurationOptionsMock(config);
+        return mock.Object;
+    }
+
+    /// <summary>
+    /// Cria um IOptions<ServiceBusClientConfiguration> válido para testes
+    /// </summary>
+    public IOptions<ServiceBusClientConfiguration> CreateValidServiceBusClientConfiguration()
+    {
+        var config = CreateValidClientConfiguration();
+        var mock = CreateClientConfigurationOptionsMock(config);
+        return mock.Object;
+    }
+
+    /// <summary>
+    /// Cria uma mensagem de exemplo para testes
+    /// </summary>
+    public object CreateSampleMessage()
+    {
+        return CreateTestMessage();
+    }
+
+    /// <summary>
+    /// Cria uma lista de mensagens de exemplo para testes
+    /// </summary>
+    public IReadOnlyCollection<object> CreateSampleMessageList(int count = 5)
+    {
+        return CreateTestMessages(count);
+    }
+
+    /// <summary>
+    /// Cria opções de mensagem do Service Bus para testes
+    /// </summary>
+    public ServiceBusMessageOptions CreateServiceBusMessageOptions()
+    {
+        return new ServiceBusMessageOptions
+        {
+            MessageId = _faker.Random.Guid().ToString(),
+            CorrelationId = _faker.Random.Guid().ToString(),
+            ContentType = "application/json",
+            Subject = _faker.Lorem.Word(),
+            TimeToLive = TimeSpan.FromMinutes(_faker.Random.Int(1, 60)),
+            ApplicationProperties = new Dictionary<string, object>
+            {
+                { "customProperty1", _faker.Lorem.Word() },
+                { "customProperty2", _faker.Random.Int(1, 100) }
+            }
+        };
+    }
+
+    /// <summary>
+    /// Cria opções de operação do Service Bus para testes
+    /// </summary>
+    public ServiceBusOperationOptions CreateServiceBusOperationOptions()
+    {
+        return new ServiceBusOperationOptions
+        {
+            UseTemporaryClient = _faker.Random.Bool()
+        };
+    }
+
+    /// <summary>
+    /// Cria uma instância do ServiceBusMessageSender para testes
+    /// </summary>
+    public ServiceBusMessageSender CreateServiceBusMessageSender()
+    {
+        var config = CreateValidServiceBusConfiguration();
+        var logger = CreateMockLogger<ServiceBusMessageSender>();
+
+        return new ServiceBusMessageSender(config, logger.Object);
+    }
 }

@@ -147,10 +147,10 @@ public class ServiceBusClientConfigurationTests : IClassFixture<ServiceBusTestFi
         var result = config.CreateClientOptions();
 
         // Assert
-        result.ShouldNotBeNull();
+        _ = result.ShouldNotBeNull();
         result.TransportType.ShouldBe(ServiceBusTransportType.AmqpTcp);
-        result.RetryOptions.ShouldNotBeNull();
-        result.WebProxy.ShouldNotBeNull();
+        _ = result.RetryOptions.ShouldNotBeNull();
+        _ = result.WebProxy.ShouldNotBeNull();
     }
 
     [Fact]
@@ -197,8 +197,8 @@ public class ServiceBusClientConfigurationTests : IClassFixture<ServiceBusTestFi
         // Assert
         result.ShouldBeSameAs(existingOptions);
         result.TransportType.ShouldBe(ServiceBusTransportType.AmqpTcp);
-        result.RetryOptions.ShouldNotBeNull();
-        result.WebProxy.ShouldNotBeNull();
+        _ = result.RetryOptions.ShouldNotBeNull();
+        _ = result.WebProxy.ShouldNotBeNull();
     }
 
     [Fact]
@@ -248,7 +248,7 @@ public class ServiceBusClientConfigurationTests : IClassFixture<ServiceBusTestFi
         // Assert
         result.ShouldBeSameAs(expectedClient);
         capturedConnectionString.ShouldBe(connectionString);
-        capturedOptions.ShouldNotBeNull();
+        _ = capturedOptions.ShouldNotBeNull();
         capturedOptions!.TransportType.ShouldBe(ServiceBusTransportType.AmqpTcp);
     }
 
@@ -267,8 +267,8 @@ public class ServiceBusClientConfigurationTests : IClassFixture<ServiceBusTestFi
         var result = config.CreateClient();
 
         // Assert
-        result.ShouldNotBeNull();
-        result.ShouldBeOfType<ServiceBusClient>();
+        _ = result.ShouldNotBeNull();
+        _ = result.ShouldBeOfType<ServiceBusClient>();
     }
 
     [Fact]
