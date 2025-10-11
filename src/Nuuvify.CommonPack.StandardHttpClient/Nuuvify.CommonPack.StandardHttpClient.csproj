@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
@@ -10,7 +10,7 @@
         <!-- Package Specific Metadata -->
         <PackageId>Nuuvify.CommonPack.StandardHttpClient</PackageId>
         <Title>Nuuvify CommonPack StandardHttpClient</Title>
-        <Description>Cliente HTTP otimizado para .NET com gerenciamento automático de tokens, retry policies com Polly, resource management otimizado e performance aprimorada. Inclui ConfigureAwait(false) para bibliotecas, proper disposal patterns e prevenção de memory leaks. Ideal para comunicação resiliente com APIs REST e web services SOAP.</Description>
+        <Description>Cliente HTTP otimizado para .NET com gerenciamento automctico de tokens, retry policies com Polly, resource management otimizado e performance aprimorada. Inclui ConfigureAwait(false) para bibliotecas, proper disposal patterns e prevencco de memory leaks. Ideal para comunicacco resiliente com APIs REST e web services SOAP.</Description>
         <Summary>Cliente HTTP otimizado com retry policies, gerenciamento de tokens e resource management para .NET 8.0</Summary>
 
         <!-- Package Specific Tags -->
@@ -19,7 +19,7 @@
 
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
-        <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="8.0.16" />
+        <PackageReference Include="Microsoft.Extensions.Http.Polly" />
     </ItemGroup>
 
     <ItemGroup>

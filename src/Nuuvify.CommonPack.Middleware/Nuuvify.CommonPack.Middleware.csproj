@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
@@ -10,7 +10,7 @@
         <!-- Package Specific Metadata -->
         <PackageId>Nuuvify.CommonPack.Middleware</PackageId>
         <Title>Nuuvify CommonPack Middleware</Title>
-        <Description>Middlewares e filtros customizados, deve ser baixado no projeto IoC. HandlingHeadersMiddleware - Inclui a versão da aplicação e do assembly no header da request, também loga o conteudo da request. GlobalHandleException - Captura e loga as exceptions de forma global. ValidateModelAttribute - Retorna os erros da ModelState de forma padronizada</Description>
+        <Description>Middlewares e filtros customizados, deve ser baixado no projeto IoC. HandlingHeadersMiddleware - Inclui a versco da aplicacco e do assembly no header da request, tambcm loga o conteudo da request. GlobalHandleException - Captura e loga as exceptions de forma global. ValidateModelAttribute - Retorna os erros da ModelState de forma padronizada</Description>
         <Summary>Custom middlewares and filters for ASP.NET Core applications</Summary>
 
         <!-- Package Specific Tags -->
@@ -19,8 +19,8 @@
 
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.KeyPerFile" Version="8.0.16" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.KeyPerFile" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
@@ -6,15 +6,15 @@
         <PackageId>Nuuvify.CommonPack.OpenApi</PackageId>
         <Title>Nuuvify CommonPack OpenApi</Title>
         <PackageTags>Nuuvify, OpenApi, Swagger, Documentation, API, .NET</PackageTags>
-        <Description>Documentação da API através do Swagger (OpenApi), deve ser baixado no projeto IoC</Description>
+        <Description>Documentacco da API atravcs do Swagger (OpenApi), deve ser baixado no projeto IoC</Description>
         <Product>CommonPack OpenApi</Product>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.2" />
-        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="8.1.2" />
-        <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="8.0.3" />
+        <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" />
+        <PackageReference Include="Swashbuckle.AspNetCore" />
+        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
+        <PackageReference Include="Swashbuckle.AspNetCore.Filters" />
     </ItemGroup>
 
 

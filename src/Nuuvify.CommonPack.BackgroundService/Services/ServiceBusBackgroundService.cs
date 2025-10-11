@@ -52,24 +52,25 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
     /// <summary>
     /// Configura o Service Bus com string de conexão
     /// </summary>
-    /// <param name="cnnName">ServiceBus:CnnName (Nome da ConnectionString no Vault)</param>
-    /// <param name="topicName">ServiceBus:Topic:Name</param>
-    /// <param name="subscription">ServiceBus:Topic:Subscription</param>
+    /// <param name="cnnName">ServiceBus-SuaAplicacao:ConnectionString (Nome da propriedade onde esta a ConnectionString no Vault)</param>
+    /// <param name="topicName">ServiceBus-SuaAplicacao:TopicName</param>
+    /// <param name="subscription">ServiceBus-SuaAplicacao:TopicSubscription</param>
     /// <param name="serviceBusClientOptions">Opções do cliente Service Bus</param>
     /// <param name="serviceBusProcessorOptions">Opções do processador Service Bus</param>
     /// <example>
     /// Exemplo de configuração no appsettings.json:
     /// <code>
-    /// "ServiceBus": {
-    ///     "CnnName": "Reinf-ItfPagamentos",
-    ///     "Topic": {
-    ///         "Name": "topic-reinf",
-    ///         "Subscription": "Worker_InterfacePagamentos"
-    ///     }
-    /// },
-    /// "ConnectionString": {
-    ///     "Reinf-ItfPagamentos": "Endpoint=sb://xxxxxxxxxxxx;EntityPath=topic-reinf"
-    /// }
+    ///    "ServiceBus-Reinf": {
+    ///        "TopicName": "topic-reinf",
+    ///        "TopicSubscription": "Worker_InterfacePagamentos",
+    ///        "QueueName": "queue-reinf",
+    ///        "OperationTimeoutSeconds": 30,
+    ///        "MaxRetryAttempts": 3,
+    ///        "RetryDelaySeconds": 5,
+    ///        "MaxBatchSize": 100,
+    ///        "DefaultMessageTtlMinutes": 60,
+    ///        "ConnectionString": "Endpoint=sb://teste"
+    ///    },
     /// </code>
     /// </example>
     protected virtual void ConfigureServiceBus(
@@ -79,23 +80,23 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
         ServiceBusClientOptions serviceBusClientOptions,
         ServiceBusProcessorOptions serviceBusProcessorOptions)
     {
-        var connectionString = _configurationCustom.GetConnectionString(cnnName);
+        var connectionString = _configurationCustom.GetSectionValue(cnnName);
 
         if (string.IsNullOrEmpty(cnnName))
         {
-            throw new ArgumentException("A conexão com o Service Bus não foi configurada corretamente. Verifique a configuração 'ServiceBus:CnnName'");
+            throw new ArgumentException("A conexão com o Service Bus não foi configurada corretamente. Verifique a configuração 'ServiceBus-SuaAplicacao:ConnectionString'");
         }
         if (string.IsNullOrEmpty(subscription))
         {
-            throw new ArgumentException("A assinatura do Service Bus não foi configurada corretamente. Verifique a configuração 'ServiceBus:Topic:Subscription'");
+            throw new ArgumentException("A assinatura do Service Bus não foi configurada corretamente. Verifique a configuração 'ServiceBus-SuaAplicacao:TopicSubscription'");
         }
         if (string.IsNullOrEmpty(topicName))
         {
-            throw new ArgumentException("O tópico do Service Bus não foi configurado corretamente. Verifique a configuração 'ServiceBus:Topic:Name'");
+            throw new ArgumentException("O tópico do Service Bus não foi configurado corretamente. Verifique a configuração 'ServiceBus-SuaAplicacao:TopicName'");
         }
         if (string.IsNullOrEmpty(connectionString))
         {
-            throw new ArgumentException("A conexão com o Service Bus não foi configurada corretamente. Não foi possível obter a ConnectionString do Vault. Verifique a configuração 'ServiceBus:CnnName' se existe no Vault dessa aplicação.");
+            throw new ArgumentException("A conexão com o Service Bus não foi configurada corretamente. Não foi possível obter a ServiceBus-SuaAplicacao:ConnectionString do Vault. Verifique a configuração 'ServiceBus-SuaAplicacao:ConnectionString' se existe no Vault dessa aplicação.");
         }
 
         _serviceBusClient = new ServiceBusClient(
@@ -111,9 +112,9 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
     /// <summary>
     /// Configura o Service Bus com credenciais Azure
     /// </summary>
-    /// <param name="topicName">ServiceBus:Topic:Name</param>
-    /// <param name="subscription">ServiceBus:Topic:Subscription</param>
-    /// <param name="fullyQualifiedNamespace">ServiceBus:FullyQualifiedNamespace</param>
+    /// <param name="topicName">ServiceBus-SuaAplicacao:TopicName</param>
+    /// <param name="subscription">ServiceBus-SuaAplicacao:TopicSubscription</param>
+    /// <param name="fullyQualifiedNamespace">ServiceBus-SuaAplicacao:FullyQualifiedNamespace</param>
     /// <param name="credential">Credencial Azure para autenticação</param>
     /// <param name="serviceBusClientOptions">Opções do cliente Service Bus</param>
     /// <param name="serviceBusProcessorOptions">Opções do processador Service Bus</param>
@@ -128,15 +129,15 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
 
         if (string.IsNullOrEmpty(subscription))
         {
-            throw new ArgumentException("A assinatura do Service Bus não foi configurada corretamente. Verifique a configuração 'ServiceBus:Topic:Subscription'");
+            throw new ArgumentException("A assinatura do Service Bus não foi configurada corretamente. Verifique a configuração 'ServiceBus-SuaAplicacao:TopicSubscription'");
         }
         if (string.IsNullOrEmpty(topicName))
         {
-            throw new ArgumentException("O tópico do Service Bus não foi configurado corretamente. Verifique a configuração 'ServiceBus:Topic:Name'");
+            throw new ArgumentException("O tópico do Service Bus não foi configurado corretamente. Verifique a configuração 'ServiceBus-SuaAplicacao:TopicName'");
         }
         if (string.IsNullOrEmpty(fullyQualifiedNamespace))
         {
-            throw new ArgumentException("O namespace totalmente qualificado do Service Bus não foi configurado corretamente. Verifique a configuração 'ServiceBus:FullyQualifiedNamespace'");
+            throw new ArgumentException("O namespace totalmente qualificado do Service Bus não foi configurado corretamente. Verifique a configuração 'ServiceBus-SuaAplicacao:FullyQualifiedNamespace'");
         }
         if (credential == null)
         {
@@ -157,8 +158,8 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
     /// <summary>
     /// Configura o Service Bus com string de conexão
     /// </summary>
-    /// <param name="cnnName">ServiceBus:CnnName (Nome da ConnectionString no Vault)</param>
-    /// <param name="queueName">ServiceBus:QueueName</param>
+    /// <param name="cnnName">ServiceBus-SuaAplicacao:ConnectionString (Nome da ConnectionString no Vault)</param>
+    /// <param name="queueName">ServiceBus-SuaAplicacao:QueueName</param>
     /// <param name="serviceBusClientOptions">Opções do cliente Service Bus</param>
     /// <param name="serviceBusProcessorOptions">Opções do processador Service Bus</param>
     protected virtual void ConfigureServiceBus(
@@ -171,15 +172,15 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
 
         if (string.IsNullOrEmpty(cnnName))
         {
-            throw new ArgumentException("A conexão com o Service Bus não foi configurada corretamente. Verifique a configuração 'ServiceBus:CnnName'");
+            throw new ArgumentException("A conexão com o Service Bus não foi configurada corretamente. Verifique a configuração 'ServiceBus-SuaAplicacao:ConnectionString'");
         }
         if (string.IsNullOrEmpty(queueName))
         {
-            throw new ArgumentException("A fila do Service Bus não foi configurada corretamente. Verifique a configuração 'ServiceBus:QueueName'");
+            throw new ArgumentException("A fila do Service Bus não foi configurada corretamente. Verifique a configuração 'ServiceBus-SuaAplicacao:QueueName'");
         }
         if (string.IsNullOrEmpty(connectionString))
         {
-            throw new ArgumentException("A conexão com o Service Bus não foi configurada corretamente. Não foi possível obter a ConnectionString do Vault. Verifique a configuração 'ServiceBus:CnnName' se existe no Vault dessa aplicação.");
+            throw new ArgumentException("A conexão com o Service Bus não foi configurada corretamente. Não foi possível obter a ConnectionString do Vault. Verifique a configuração 'ServiceBus-SuaAplicacao:ConnectionString' se existe no Vault dessa aplicação.");
         }
 
         _serviceBusClient = new ServiceBusClient(
@@ -194,8 +195,8 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
     /// <summary>
     /// Configura o Service Bus com string de conexão
     /// </summary>
-    /// <param name="queueName">ServiceBus:QueueName</param>
-    /// <param name="fullyQualifiedNamespace">ServiceBus:FullyQualifiedNamespace</param>
+    /// <param name="queueName">ServiceBus-SuaAplicacao:QueueName</param>
+    /// <param name="fullyQualifiedNamespace">ServiceBus-SuaAplicacao:FullyQualifiedNamespace</param>
     /// <param name="credential">Credencial Azure para autenticação</param>
     /// <param name="serviceBusClientOptions">Opções do cliente Service Bus</param>
     /// <param name="serviceBusProcessorOptions">Opções do processador Service Bus</param>
@@ -209,11 +210,11 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
 
         if (string.IsNullOrEmpty(queueName))
         {
-            throw new ArgumentException("A fila do Service Bus não foi configurada corretamente. Verifique a configuração 'ServiceBus:QueueName'");
+            throw new ArgumentException("A fila do Service Bus não foi configurada corretamente. Verifique a configuração 'ServiceBus-SuaAplicacao:QueueName'");
         }
         if (string.IsNullOrEmpty(fullyQualifiedNamespace))
         {
-            throw new ArgumentException("O namespace totalmente qualificado do Service Bus não foi configurado corretamente. Verifique a configuração 'ServiceBus:FullyQualifiedNamespace'");
+            throw new ArgumentException("O namespace totalmente qualificado do Service Bus não foi configurado corretamente. Verifique a configuração 'ServiceBus-SuaAplicacao:FullyQualifiedNamespace'");
         }
         if (credential == null)
         {
