@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
@@ -10,7 +10,7 @@
         <!-- Package Specific Metadata -->
         <PackageId>Nuuvify.CommonPack.Security</PackageId>
         <Title>Nuuvify CommonPack Security</Title>
-        <Description>Implementa Autorização e Autenticação com OAuth2, JWT - deve ser baixado no projeto IoC, aqui não contempla OpenId que esta em outra Lib</Description>
+        <Description>Implementa Autorizacco e Autenticacco com OAuth2, JWT - deve ser baixado no projeto IoC, aqui nco contempla OpenId que esta em outra Lib</Description>
         <Summary>Authorization and Authentication with OAuth2 and JWT for .NET 8.0</Summary>
 
         <!-- Package Specific Tags -->
@@ -18,11 +18,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Caching.SqlServer" Version="8.0.16" />
-        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="8.0.16" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.16" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.16" />
+        <PackageReference Include="Microsoft.Extensions.Caching.SqlServer" />
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+        <PackageReference Include="Microsoft.AspNetCore.Authorization" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
     </ItemGroup>
 
 

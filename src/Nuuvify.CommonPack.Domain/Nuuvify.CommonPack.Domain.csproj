@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
@@ -13,7 +13,7 @@
         <!-- Package Specific Metadata -->
         <PackageId>Nuuvify.CommonPack.Domain</PackageId>
         <Title>Nuuvify CommonPack Domain</Title>
-        <Description>Biblioteca com implementaçôes comuns para projetos DOMAIN</Description>
+        <Description>Biblioteca com implementacces comuns para projetos DOMAIN</Description>
         <Summary>Common implementations for Domain layer projects with FluentValidator and AutoMapper</Summary>
 
         <!-- Package Specific Tags -->
@@ -23,8 +23,8 @@
 
 
     <ItemGroup>
-        <PackageReference Include="AutoMapper" Version="12.0.1" />
-        <PackageReference Include="MediatR" Version="12.2.0" />
+        <PackageReference Include="AutoMapper" />
+        <PackageReference Include="MediatR" />
     </ItemGroup>
 
     <ItemGroup>
