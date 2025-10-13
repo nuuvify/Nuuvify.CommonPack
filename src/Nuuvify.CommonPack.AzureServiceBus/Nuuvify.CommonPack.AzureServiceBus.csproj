@@ -21,12 +21,15 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Azure.Messaging.ServiceBus" />
         <PackageReference Include="Microsoft.Extensions.Logging" />
         <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+        <PackageReference Include="System.Diagnostics.DiagnosticSource" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Nuuvify.CommonPack.AzureServiceBus.Abstraction\Nuuvify.CommonPack.AzureServiceBus.Abstraction.csproj" />
+        <ProjectReference Include="..\Nuuvify.CommonPack.Middleware.Abstraction\Nuuvify.CommonPack.Middleware.Abstraction.csproj" />
     </ItemGroup>
 
     <!-- Include Example Files in NuGet Package -->
@@ -34,6 +37,12 @@
         <None Include="Examples\ServiceBusUsageExamples.cs">
             <Pack>true</Pack>
             <PackagePath>content\Examples\ServiceBusUsageExamples.cs</PackagePath>
+            <BuildAction>None</BuildAction>
+            <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+        </None>
+        <None Include="Examples\ServiceBusMessageReceiverExamples.cs">
+            <Pack>true</Pack>
+            <PackagePath>content\Examples\ServiceBusMessageReceiverExamples.cs</PackagePath>
             <BuildAction>None</BuildAction>
             <CopyToOutputDirectory>Never</CopyToOutputDirectory>
         </None>
