@@ -14,9 +14,6 @@
 // 📖 Para mais detalhes, veja: Examples/README.md
 // =====================================================================================
 
-using Nuuvify.CommonPack.AzureServiceBus.Abstraction.Interfaces;
-using Nuuvify.CommonPack.AzureServiceBus.Abstraction.Models;
-
 namespace Nuuvify.CommonPack.AzureServiceBus.Examples;
 
 /// <summary>

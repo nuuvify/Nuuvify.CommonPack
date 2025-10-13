@@ -1,10 +1,12 @@
-using Azure.Messaging.ServiceBus;
-using Microsoft.Extensions.Logging;
+namespace Nuuvify.CommonPack.AzureServiceBus.Services.Receiver;
 
-namespace Nuuvify.CommonPack.BackgroundService.Services;
-
-public abstract partial class ServiceBusBackgroundService<T>
+/// <summary>
+/// Implementação do Azure Service Bus - Métodos de Tratamento de Exceções
+/// </summary>
+public abstract partial class ServiceBusMessageReceiver<T>
 {
+    #region Exception Handling Methods
+
     /// <summary>
     /// Trata exceções específicas do Service Bus com razões conhecidas
     /// (MessageLockLost, SessionLockLost, QuotaExceeded)
@@ -22,7 +24,7 @@ public abstract partial class ServiceBusBackgroundService<T>
         ServiceBusException ex,
         CancellationToken cancellationToken)
     {
-        _logger.LogError(ex, "Erro específico do Service Bus durante a execução do Worker: {Reason}", ex.Reason);
+        _logger.LogError(ex, "Erro específico do Service Bus durante o processamento: {Reason}", ex.Reason);
         var deadLetterProperties = CreateDeadLetterProperties(args.Message, $"ServiceBus specific error: {ex.Reason} - {ex.Message}", ex.GetType().Name);
         await args.DeadLetterMessageAsync(args.Message, propertiesToModify: deadLetterProperties, cancellationToken: cancellationToken);
     }
@@ -75,7 +77,7 @@ public abstract partial class ServiceBusBackgroundService<T>
         OperationCanceledException ex,
         CancellationToken cancellationToken)
     {
-        _logger.LogWarning(ex, "Operação cancelada durante a execução do Worker");
+        _logger.LogWarning(ex, "Operação cancelada durante o processamento da mensagem {MessageId}", args.Message.MessageId);
 
         if (AbandonMessageIfFailed)
         {
@@ -106,9 +108,14 @@ public abstract partial class ServiceBusBackgroundService<T>
         Exception ex,
         CancellationToken cancellationToken)
     {
-        _logger.LogError(ex, "Houve um erro durante a execução do Worker.ExecuteAsync");
-        var deadLetterProperties = CreateDeadLetterProperties(args.Message, $"Unhandled exception: {ex.Message}", ex.GetType().Name);
-        await args.DeadLetterMessageAsync(args.Message, propertiesToModify: deadLetterProperties, cancellationToken: cancellationToken);
+        _logger.LogError(ex, "Houve um erro durante o processamento da mensagem {MessageId}", args.Message?.MessageId ?? UnknownValue);
+
+        if (args.Message != null)
+        {
+            var deadLetterProperties = CreateDeadLetterProperties(args.Message, $"Unhandled exception: {ex.Message}", ex.GetType().Name);
+            await args.DeadLetterMessageAsync(args.Message, propertiesToModify: deadLetterProperties, cancellationToken: cancellationToken);
+        }
+
         throw new InvalidOperationException($"Erro não tratado durante processamento da mensagem {args.Message?.MessageId ?? UnknownValue}: {ex.Message}", ex);
     }
 
@@ -143,4 +150,6 @@ public abstract partial class ServiceBusBackgroundService<T>
             await args.DeadLetterMessageAsync(message: args.Message, propertiesToModify: deadLetterProperties, cancellationToken: cancellationToken);
         }
     }
+
+    #endregion
 }

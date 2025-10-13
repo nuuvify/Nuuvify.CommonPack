@@ -155,8 +155,12 @@ public class ServiceBusMessageSenderQueueTests : IAsyncDisposable
         var queueName = "test-queue";
         var messages = new List<object>();
 
-        // Act & Assert - Should not throw
-        await _sender.SendBatchMessagesToQueueAsync(queueName, messages, null, null, CancellationToken.None);
+        // Act
+        var exception = await Record.ExceptionAsync(() =>
+            _sender.SendBatchMessagesToQueueAsync(queueName, messages, null, null, CancellationToken.None));
+
+        // Assert - Should not throw any exception
+        exception.ShouldBeNull();
     }
 
     [Fact]

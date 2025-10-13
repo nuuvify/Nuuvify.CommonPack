@@ -1,6 +1,4 @@
-using Nuuvify.CommonPack.AzureServiceBus.Abstraction.Configuration;
-using Nuuvify.CommonPack.AzureServiceBus.Abstraction.Interfaces;
-using Nuuvify.CommonPack.AzureServiceBus.Services;
+using Nuuvify.CommonPack.AzureServiceBus.Services.Sender;
 
 namespace Nuuvify.CommonPack.AzureServiceBus.Extensions;
 
@@ -14,7 +12,7 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <param name="services">Coleção de serviços do DI</param>
     /// <param name="configuration">Configuração da aplicação</param>
-    /// <param name="sectionName">Nome da seção de configuração (padrão: "ServiceBus-SuaAplicacao")</param>
+    /// <param name="sectionName">Nome da seção de configuração (padrão: "ServiceBus:SuaAplicacao")</param>
     /// <returns>IServiceCollection para chaining</returns>
     /// <remarks>
     /// <para>Registra os seguintes serviços:</para>
@@ -22,7 +20,7 @@ public static class ServiceCollectionExtensions
     /// <item><description>ServiceBusConfiguration como singleton configurado via IOptions</description></item>
     /// <item><description>IServiceBusMessageSender como singleton thread-safe</description></item>
     /// </list>
-    /// <para>A configuração deve estar presente na seção especificada (padrão "ServiceBus-SuaAplicacao").</para>
+    /// <para>A configuração deve estar presente na seção especificada (padrão "ServiceBus:SuaAplicacao").</para>
     /// </remarks>
     /// <example>
     /// <code>
@@ -49,7 +47,7 @@ public static class ServiceCollectionExtensions
     /// }
     /// </code>
     /// </example>
-    public static IServiceCollection AddAzureServiceBus(this IServiceCollection services, IConfiguration configuration, string sectionName = "ServiceBus-SuaAplicacao")
+    public static IServiceCollection AddAzureServiceBus(this IServiceCollection services, IConfiguration configuration, string sectionName = "ServiceBus:SuaAplicacao")
     {
         // Configuração do Service Bus via Options Pattern
         _ = services.Configure<ServiceBusConfiguration>(configuration.GetSection(sectionName));

@@ -1,6 +1,4 @@
-using Nuuvify.CommonPack.AzureServiceBus.Abstraction.Configuration;
-
-namespace Nuuvify.CommonPack.AzureServiceBus.Services;
+namespace Nuuvify.CommonPack.AzureServiceBus.Services.Sender;
 
 /// <summary>
 /// Implementação do Azure Service Bus - Métodos de Validação
@@ -8,8 +6,6 @@ namespace Nuuvify.CommonPack.AzureServiceBus.Services;
 public partial class ServiceBusMessageSender
 {
     #region Métodos de Validação
-
-
 
     /// <summary>
     /// Verifica se o objeto foi disposed e lança exceção caso tenha sido

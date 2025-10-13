@@ -1,12 +1,13 @@
-using Nuuvify.CommonPack.AzureServiceBus.Abstraction.Models;
-
-namespace Nuuvify.CommonPack.AzureServiceBus.Services;
+namespace Nuuvify.CommonPack.AzureServiceBus.Services.Sender;
 
 /// <summary>
 /// Implementação do Azure Service Bus - Métodos para Queues
 /// </summary>
 public partial class ServiceBusMessageSender
 {
+    private const string TemporaryClientLabel = "temporário";
+    private const string DefaultClientLabel = "padrão";
+
     #region Métodos Auxiliares para Operações Customizadas
 
     /// <summary>
@@ -29,6 +30,46 @@ public partial class ServiceBusMessageSender
         }
 
         return (_serviceBusClient, false);
+    }
+
+    /// <summary>
+    /// Cria lotes de mensagens para envio otimizado ao Service Bus
+    /// </summary>
+    /// <typeparam name="T">Tipo das mensagens</typeparam>
+    /// <param name="messages">Lista de mensagens para criar os lotes</param>
+    /// <param name="messageOptions">Opções a serem aplicadas às mensagens</param>
+    /// <param name="sender">Sender do Service Bus para criar os lotes</param>
+    /// <returns>Lista de lotes de mensagens prontos para envio</returns>
+    private async Task<List<ServiceBusMessageBatch>> CreateMessageBatchesAsync<T>(List<T> messages, ServiceBusMessageOptions messageOptions, ServiceBusSender sender)
+    {
+        var batches = new List<ServiceBusMessageBatch>();
+        var currentBatch = await sender.CreateMessageBatchAsync();
+
+        foreach (var message in messages)
+        {
+            var serviceBusMessage = CreateServiceBusMessage(message, messageOptions);
+
+            if (!currentBatch.TryAddMessage(serviceBusMessage))
+            {
+                // O lote atual está cheio, adiciona à lista e cria um novo
+                batches.Add(currentBatch);
+                currentBatch = await sender.CreateMessageBatchAsync();
+
+                // Tenta adicionar a mensagem ao novo lote
+                if (!currentBatch.TryAddMessage(serviceBusMessage))
+                {
+                    throw new InvalidOperationException("Mensagem muito grande para caber em um lote do Service Bus");
+                }
+            }
+        }
+
+        // Adiciona o último lote se contém mensagens
+        if (currentBatch.Count > 0)
+        {
+            batches.Add(currentBatch);
+        }
+
+        return batches;
     }
 
     #endregion
@@ -76,7 +117,7 @@ public partial class ServiceBusMessageSender
             var serviceBusMessage = CreateServiceBusMessage(message, messageOptions);
 
             _logger.LogDebug("Enviando mensagem para queue '{QueueName}' com ID '{MessageId}' usando cliente {ClientType}",
-                queueName, serviceBusMessage.MessageId, shouldDisposeClient ? "temporário" : "padrão");
+                queueName, serviceBusMessage.MessageId, shouldDisposeClient ? TemporaryClientLabel : DefaultClientLabel);
 
             await ExecuteWithRetryAsync(
                 async () => await sender.SendMessageAsync(serviceBusMessage, cancellationToken),
@@ -177,10 +218,10 @@ public partial class ServiceBusMessageSender
         try
         {
             sender = client.CreateSender(queueName);
-            var batches = await CreateMessageBatchesAsync(messageList, messageOptions, sender, cancellationToken);
+            var batches = await CreateMessageBatchesAsync(messageList, messageOptions, sender);
 
             _logger.LogDebug("Enviando {BatchCount} lotes com total de {MessageCount} mensagens para queue '{QueueName}' usando cliente {ClientType}",
-                batches.Count, messageList.Count, queueName, shouldDisposeClient ? "temporário" : "padrão");
+                batches.Count, messageList.Count, queueName, shouldDisposeClient ? TemporaryClientLabel : DefaultClientLabel);
 
             foreach (var batch in batches)
             {
@@ -285,7 +326,7 @@ public partial class ServiceBusMessageSender
             var serviceBusMessage = CreateServiceBusMessage(message, messageOptions);
 
             _logger.LogDebug("Agendando mensagem para queue '{QueueName}' com ID '{MessageId}' para '{ScheduledTime}' usando cliente {ClientType}",
-                queueName, serviceBusMessage.MessageId, scheduledEnqueueTime, shouldDisposeClient ? "temporário" : "padrão");
+                queueName, serviceBusMessage.MessageId, scheduledEnqueueTime, shouldDisposeClient ? TemporaryClientLabel : DefaultClientLabel);
 
             var sequenceNumber = await ExecuteWithRetryAsync(
                 async () => await sender.ScheduleMessageAsync(serviceBusMessage, scheduledEnqueueTime, cancellationToken),
@@ -379,7 +420,7 @@ public partial class ServiceBusMessageSender
             sender = client.CreateSender(queueName);
 
             _logger.LogDebug("Cancelando mensagem agendada na queue '{QueueName}' com número de sequência '{SequenceNumber}' usando cliente {ClientType}",
-                queueName, sequenceNumber, shouldDisposeClient ? "temporário" : "padrão");
+                queueName, sequenceNumber, shouldDisposeClient ? TemporaryClientLabel : DefaultClientLabel);
 
             await ExecuteWithRetryAsync(
                 async () => await sender.CancelScheduledMessageAsync(sequenceNumber, cancellationToken),
