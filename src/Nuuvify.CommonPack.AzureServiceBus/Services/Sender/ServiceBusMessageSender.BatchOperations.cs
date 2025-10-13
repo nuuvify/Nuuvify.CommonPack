@@ -1,8 +1,4 @@
-using Azure.Messaging.ServiceBus;
-using Microsoft.Extensions.Logging;
-using Nuuvify.CommonPack.AzureServiceBus.Abstraction.Models;
-
-namespace Nuuvify.CommonPack.AzureServiceBus.Services;
+namespace Nuuvify.CommonPack.AzureServiceBus.Services.Sender;
 
 /// <summary>
 /// Implementação do Azure Service Bus - Métodos para Operações de Lote

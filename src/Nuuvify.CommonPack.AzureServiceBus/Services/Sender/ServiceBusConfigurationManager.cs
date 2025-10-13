@@ -1,9 +1,4 @@
-using Azure.Messaging.ServiceBus;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Nuuvify.CommonPack.AzureServiceBus.Abstraction.Configuration;
-
-namespace Nuuvify.CommonPack.AzureServiceBus.Services;
+namespace Nuuvify.CommonPack.AzureServiceBus.Services.Sender;
 
 /// <summary>
 /// Gerenciador responsável por processar e validar configurações do Azure Service Bus
@@ -118,7 +113,7 @@ internal sealed class ServiceBusConfigurationManager
             var errors = _baseConfiguration.ValidateConfiguration();
             var errorMessage = string.Join(", ", errors);
             _logger.LogError("Configuração inválida: {Errors}", errorMessage);
-            throw new ArgumentException($"Configuração inválida: {errorMessage}", nameof(ServiceBusConfiguration));
+            throw new ArgumentException($"Configuração inválida: {errorMessage}");
         }
     }
 

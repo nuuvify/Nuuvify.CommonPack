@@ -499,10 +499,33 @@ A biblioteca produz logs detalhados:
 
 ## 🧪 Testes
 
-### Exemplo de Teste de Integração
+### Cobertura de Testes
+
+A biblioteca possui **cobertura de testes abrangente** com mais de **300 testes unitários e de integração**:
+
+- **49.6% de cobertura de linha** para ServiceBusMessageReceiver
+- **70% de cobertura** para ServiceBusMessageSender
+- **96.9% de cobertura** para ServiceBusConfigurationManager
+- **44 testes específicos** para ServiceBusMessageReceiver e classes parciais
+
+### Estrutura de Testes
+
+Os testes estão organizados por funcionalidade:
+
+```
+Nuuvify.CommonPack.AzureServiceBus.xTest/
+├── Configuration/           # Testes de configuração
+├── Services/               # Testes de serviços
+│   ├── ServiceBusMessageSender*Tests.cs
+│   ├── ServiceBusMessageReceiver*Tests.cs
+│   └── ServiceBusConfiguration*Tests.cs
+└── Fixtures/               # Fixtures e helpers de teste
+```
+
+### Exemplo de Teste Unitário (Sender)
 
 ```csharp
-[Test]
+[Fact]
 public async Task SendMessage_ShouldSucceed_WhenValidConfiguration()
 {
     // Arrange
@@ -524,6 +547,77 @@ public async Task SendMessage_ShouldSucceed_WhenValidConfiguration()
     await sender.DisposeAsync();
 }
 ```
+
+### Exemplo de Teste Unitário (Receiver)
+
+```csharp
+[Fact]
+public async Task Constructor_WithValidParameters_ShouldCreateInstance()
+{
+    // Arrange
+    var loggerMock = new Mock<ILogger<TestServiceBusMessageReceiver>>();
+    var configMock = new Mock<IConfigurationCustom>();
+    var requestConfig = new RequestConfiguration { CorrelationId = Guid.NewGuid().ToString() };
+
+    // Act
+    await using var receiver = new TestServiceBusMessageReceiver(
+        loggerMock.Object,
+        configMock.Object,
+        requestConfig);
+
+    // Assert
+    Assert.NotNull(receiver);
+    Assert.False(receiver.IsProcessing);
+}
+```
+
+### Testes de Thread Safety
+
+```csharp
+[Fact]
+public async Task IsProcessing_ThreadSafety_ShouldHandleConcurrentAccess()
+{
+    // Arrange
+    await using var receiver = new TestServiceBusMessageReceiver(logger, config, requestConfig);
+    var tasks = new List<Task<bool>>();
+
+    // Act - Access IsProcessing from multiple threads
+    for (int i = 0; i < 10; i++)
+    {
+        tasks.Add(Task.Run(() => receiver.IsProcessing));
+    }
+
+    var results = await Task.WhenAll(tasks);
+
+    // Assert - All should return same value
+    Assert.All(results, result => Assert.False(result));
+}
+```
+
+### Executando os Testes
+
+```bash
+# Todos os testes
+dotnet test
+
+# Apenas testes do AzureServiceBus
+dotnet test --filter "FullyQualifiedName~AzureServiceBus"
+
+# Com cobertura de código
+dotnet test --collect:"XPlat Code Coverage"
+
+# Gerar relatório de cobertura
+reportgenerator -reports:"**/*.cobertura.xml" -targetdir:"CoverageReport"
+```
+
+### Ferramentas de Teste Utilizadas
+
+- **xUnit** - Framework de testes principal
+- **Moq** - Framework de mock para interfaces e classes
+- **Shouldly** - Biblioteca de assertions mais expressivas
+- **Bogus** - Geração de dados fake para testes
+- **ReportGenerator** - Geração de relatórios de cobertura
+- **Custom TestHelpers** - Classes de apoio específicas para ServiceBus
 
 ## ⚡ Otimização de Performance: ReuseConnections
 
@@ -597,6 +691,28 @@ Operações com configurações idênticas compartilham o mesmo cliente.
 - **Microsoft.Extensions.Configuration.Abstractions** - Abstrações de configuração
 - **Microsoft.Extensions.Options** - Sistema de opções do .NET
 - **Microsoft.Extensions.DependencyInjection.Abstractions** - Abstrações de DI
+
+### Organização do Código
+
+O projeto utiliza uma arquitetura modular com **GlobalUsings.cs** centralizando todas as declarações using:
+
+```csharp
+// GlobalUsings.cs - Centraliza using statements
+global using Azure.Messaging.ServiceBus;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Logging;
+global using Microsoft.Extensions.Options;
+// ... outros usings globais
+```
+
+### Qualidade do Código
+
+- **Nullable Reference Types**: Habilitado a nível de projeto (não por arquivo)
+- **SonarQube Compliant**: Supressões apropriadas para falsos positivos
+- **EditorConfig**: Padronização de estilo seguindo .editorconfig do projeto
+- **Code Coverage**: Monitoramento contínuo com metas de cobertura
+- **Thread-Safe**: Design thread-safe para uso em aplicações concorrentes
 
 ## 📄 Licença
 

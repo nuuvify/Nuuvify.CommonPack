@@ -1,7 +1,4 @@
-using Nuuvify.CommonPack.AzureServiceBus.Abstraction.Configuration;
-using Nuuvify.CommonPack.AzureServiceBus.Abstraction.Interfaces;
-
-namespace Nuuvify.CommonPack.AzureServiceBus.Services;
+namespace Nuuvify.CommonPack.AzureServiceBus.Services.Sender;
 
 /// <summary>
 /// Implementação completa do Azure Service Bus para envio de mensagens

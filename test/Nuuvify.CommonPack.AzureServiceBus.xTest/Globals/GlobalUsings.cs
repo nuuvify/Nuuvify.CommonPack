@@ -1,3 +1,4 @@
+global using Azure.Core;
 global using Azure.Messaging.ServiceBus;
 global using Bogus;
 global using Shouldly;
@@ -6,6 +7,9 @@ global using Microsoft.Extensions.Options;
 global using Moq;
 global using Nuuvify.CommonPack.AzureServiceBus.Abstraction.Configuration;
 global using Nuuvify.CommonPack.AzureServiceBus.Abstraction.Models;
-global using Nuuvify.CommonPack.AzureServiceBus.Services;
+global using Nuuvify.CommonPack.AzureServiceBus.Services.Sender;
+global using Nuuvify.CommonPack.AzureServiceBus.Services.Receiver;
 global using Nuuvify.CommonPack.AzureServiceBus.xTest.Fixtures;
+global using Nuuvify.CommonPack.Middleware.Abstraction;
+global using System.Diagnostics;
 global using Xunit;
