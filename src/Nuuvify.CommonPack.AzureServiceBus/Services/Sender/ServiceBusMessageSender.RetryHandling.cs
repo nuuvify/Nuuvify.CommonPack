@@ -1,6 +1,4 @@
-using System.Diagnostics.CodeAnalysis;
-
-namespace Nuuvify.CommonPack.AzureServiceBus.Services;
+namespace Nuuvify.CommonPack.AzureServiceBus.Services.Sender;
 
 /// <summary>
 /// Implementação do Azure Service Bus - Métodos de Retry e Tratamento de Exceções
