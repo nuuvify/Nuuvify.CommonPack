@@ -5,7 +5,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.1.0] - 2025-10-13
 
 ### Alterado
 - 📝 Documentação completa atualizada (README.md)
@@ -23,7 +23,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - 🧪 Exemplos detalhados de testabilidade com Mock e Moq
 - 🏗️ Diagrama de arquitetura de dependências
 
-## [1.0.0] - 2025-10-08
+## [2.0.0] - 2025-10-08
 
 ### Adicionado
 - 🎉 **Release inicial do Nuuvify.CommonPack.AzureServiceBus.Abstraction**

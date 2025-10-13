@@ -5,33 +5,39 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.1.0] - 2025-10-13
 
 ### Alterado
-- 🔧 Otimização de dependências do projeto (.csproj)
-- 📝 Atualização completa da documentação (README.md)
-- 🏷️ Adicionadas tags de PackageTags para melhor descoberta no NuGet
-- ✨ Descrição e Summary do pacote atualizadas com informações detalhadas
+- 🔧 **Código**: Removido `#nullable enable` de todos os arquivos fonte
+- 📝 **Documentação**: Atualização completa da documentação (README.md)
+- 🏷️ **Pacote**: Adicionadas tags de PackageTags para melhor descoberta no NuGet
+- ✨ **Pacote**: Descrição e Summary do pacote atualizadas com informações detalhadas
+- 🧹 **Código**: Centralizados using statements no arquivo GlobalUsings.cs
 
 ### Adicionado
-- 🆔 Badges do NuGet e licença MIT no README
-- 📚 Seção sobre outros pacotes da CommonPack
-- 🏢 Informações sobre a empresa Nuuvify
-- 📈 Seção de versionamento seguindo Semantic Versioning
-- 💬 Links para GitHub Discussions e Issues atualizados
+- 🆔 **Documentação**: Badges do NuGet e licença MIT no README
+- 📚 **Documentação**: Seção sobre outros pacotes da CommonPack
+- 🏢 **Documentação**: Informações sobre a empresa Nuuvify
+- 📈 **Documentação**: Seção de versionamento seguindo Semantic Versioning
+- 💬 **Documentação**: Links para GitHub Discussions e Issues atualizados
+- 📄 **Código**: Arquivo GlobalUsings.cs centralizado para todas as classes
+- 🔇 **Código**: Supressões SonarQube para regra S2325 (métodos privados não utilizados)
 
 ### Corrigido
-- ❌ Removidas dependências redundantes que já são herdadas via projeto de abstração:
+- ❌ **Dependências**: Removidas dependências redundantes que já são herdadas via projeto de abstração:
   - `Azure.Messaging.ServiceBus` (herdado)
   - `Microsoft.Extensions.Options` (herdado)
   - `Microsoft.Extensions.Logging.Abstractions` (herdado)
   - `Microsoft.Extensions.Configuration.Abstractions` (herdado)
   - `Microsoft.Extensions.DependencyInjection.Abstractions` (herdado)
-- ✅ Mantidas apenas dependências específicas necessárias:
+- ✅ **Dependências**: Mantidas apenas dependências específicas necessárias:
   - `Microsoft.Extensions.Logging` (implementação concreta)
   - `Microsoft.Extensions.Options.ConfigurationExtensions` (extensões de configuração)
+- 🏷️ **Nullable**: Removida configuração `#nullable enable` individualizada dos arquivos
+- 🧹 **Using**: Removidos using statements duplicados dos arquivos individuais
+- 🔇 **Qualidade**: Aplicadas supressões SonarQube apropriadas para falsos positivos
 
-## [1.0.0] - 2025-10-08
+## [2.0.0] - 2025-10-08
 
 ### Adicionado
 - 🎉 **Release inicial do Nuuvify.CommonPack.AzureServiceBus**
