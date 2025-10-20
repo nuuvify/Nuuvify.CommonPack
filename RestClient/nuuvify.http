@@ -1,0 +1,72 @@
+@method = https
+# @hostname = nome-api.zocate.li
+@hostname = localhost:5000
+@contentType = application/json
+@username = "{{$dotenv Seu_ClientId}}"
+
+@password = "{{$dotenv Seu_ClientSecret}}"
+
+
+###
+
+# @name credential
+# POST https://credential.zocate.li/api-lts/v2/Authentications/Token
+POST https://credential.zocate.li/api/v2/Authentications/Token
+Content-Type: {{contentType}}
+
+{
+  "login": {{username}},
+  "password": {{password}}
+}
+
+###
+@authToken = {{credential.response.body.data.token}}
+
+
+###
+POST {{method}}://{{hostname}}/v1/arquivos
+Authorization: bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="ReceivedFiles"; filename="CBCL.pfx"
+Content-Type: application/x-pkcs12
+
+< C:\Users\lzob8c1\Downloads\CBCL.pfx
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="AggregateId"
+
+04754557000411
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="PasswordFiles"
+
+047545
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+
+###
+PUT {{method}}://{{hostname}}/v1/arquivos
+Authorization: bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="ReceivedFiles"; filename="CBL.pfx"
+Content-Type: application/x-pkcs12
+
+< C:\Users\lzob8c1\Downloads\CBL.pfx
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="AggregateId"
+
+61064911000177
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="PasswordFiles"
+
+047545
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+
+###
+GET {{method}}://{{hostname}}/v1/arquivos/Download/61064911000177-cbl
+Authorization: bearer {{authToken}}
+
+#Content-Type: {{contentType}}

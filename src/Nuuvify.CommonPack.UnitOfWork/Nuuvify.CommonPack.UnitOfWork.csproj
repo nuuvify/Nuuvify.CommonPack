@@ -1,18 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Description>
-      Essa biblioteca tem objetivo de implementar UnitOfWork para qualquer banco de dados,
-      implementando metodos de uso basico e comumente utilizado em projetos.
-      Deve ser instalada no projeto Infra.IoC
-    </Description>
-  </PropertyGroup>
+    <PropertyGroup>
+        <!-- Project Specific Configuration -->
+        <RootNamespace>Nuuvify.CommonPack.UnitOfWork</RootNamespace>
+        <AssemblyName>Nuuvify.CommonPack.UnitOfWork</AssemblyName>
+        <Product>Nuuvify CommonPack UnitOfWork</Product>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Nuuvify.CommonPack.UnitOfWork.Abstraction\Nuuvify.CommonPack.UnitOfWork.Abstraction.csproj" />
-    <ProjectReference Include="..\Nuuvify.CommonPack.AutoHistory\Nuuvify.CommonPack.AutoHistory.csproj" />
-  </ItemGroup>
+        <!-- Package Specific Metadata -->
+        <PackageId>Nuuvify.CommonPack.UnitOfWork</PackageId>
+        <Title>Nuuvify CommonPack UnitOfWork</Title>
+        <Description>Essa biblioteca tem objetivo de implementar UnitOfWork para qualquer banco de dados, implementando metodos de uso basico e comumente utilizado em projetos. Deve ser instalada no projeto Infra.IoC</Description>
+        <Summary>Unit of Work pattern implementation for database operations in .NET 8.0</Summary>
+
+        <!-- Package Specific Tags -->
+        <PackageTags>unitofwork;repository;database;orm;entityframework;data-access;nuuvify;dotnet</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Nuuvify.CommonPack.UnitOfWork.Abstraction\Nuuvify.CommonPack.UnitOfWork.Abstraction.csproj" />
+        <ProjectReference Include="..\Nuuvify.CommonPack.AutoHistory\Nuuvify.CommonPack.AutoHistory.csproj" />
+    </ItemGroup>
 
 </Project>

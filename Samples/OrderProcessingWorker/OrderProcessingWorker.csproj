@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
+        <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.20.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Nuuvify.CommonPack.BackgroundService\Nuuvify.CommonPack.BackgroundService.csproj" />
+        <ProjectReference Include="..\..\src\Nuuvify.CommonPack.Middleware\Nuuvify.CommonPack.Middleware.csproj" />
+    </ItemGroup>
+
+</Project>

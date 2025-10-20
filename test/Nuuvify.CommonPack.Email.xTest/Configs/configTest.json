@@ -1,48 +1,48 @@
 ﻿{
-  "VirtualPath": "api",
-  "AllowedHosts": "*",
-  "ConnectionStrings": {
-    "vendas": ""
-  },
-  "TestOptions": {
-    "DataBaseTesteInMemory": false,
-    "DataBaseTesteOracle": false,
-    "DataBaseTesteSqlServer": false,
-    "DataBaseTestePostgreSQL": true,
-    "RemoveTables": true
-  },
-  "EmailConfig": {
-    "EmailServerConfiguration": {
-      "ServerHost": "smtp.zoho.com",
-      "Port": 587,
-      "Security": 192,
-      "AccountUserName": "",
-      "AccountPassword": ""
+    "VirtualPath": "api",
+    "AllowedHosts": "*",
+    "ConnectionStrings": {
+        "vendas": ""
     },
-    "EmailServerConfigurationFake": {
-      "ServerHost": "servidor.com",
-      "Port": 0,
-      "Security": 0,
-      "AccountUserName": "",
-      "AccountPassword": ""
+    "TestOptions": {
+        "DataBaseTesteInMemory": false,
+        "DataBaseTesteOracle": false,
+        "DataBaseTesteSqlServer": false,
+        "DataBaseTestePostgreSQL": true,
+        "RemoveTables": true
     },
-    "EmailServerConfigurationFakeNull": {
-      "ServerHost": "",
-      "Port": 0,
-      "Security": 0,
-      "AccountUserName": "",
-      "AccountPassword": ""
+    "EmailConfig": {
+        "EmailServerConfiguration": {
+            "ServerHost": "smtp.zoho.com",
+            "Port": 587,
+            "Security": 192,
+            "AccountUserName": "",
+            "AccountPassword": ""
+        },
+        "EmailServerConfigurationFake": {
+            "ServerHost": "servidor.com",
+            "Port": 0,
+            "Security": 0,
+            "AccountUserName": "",
+            "AccountPassword": ""
+        },
+        "EmailServerConfigurationFakeNull": {
+            "ServerHost": "",
+            "Port": 0,
+            "Security": 0,
+            "AccountUserName": "",
+            "AccountPassword": ""
+        },
+        "EmailAdministradores": {
+            "teste@dominio.com": "Fulano",
+            "teste1@dominio.com": "Cicrano"
+        }
     },
-    "EmailAdministradores": {
-      "teste@dominio.com": "Fulano",
-      "teste1@dominio.com": "Cicrano"
+    "AppConfig": {
+        "OwnerDB": "vendas",
+        "AppURLs": {
+            "UrlLoginApi": "https://seudominio.com.br/api-login/",
+            "UrlLoginApiToken": "api/v1/UserAuthenticate/Token"
+        }
     }
-  },
-  "AppConfig": {
-    "OwnerDB": "vendas",
-    "AppURLs": {
-      "UrlLoginApi": "https://seudominio.com.br/api-login/",
-      "UrlLoginApiToken": "api/v1/UserAuthenticate/Token"
-    }
-  }
 }

@@ -1,17 +1,17 @@
 
+using System.Globalization;
 using Microsoft.Extensions.Configuration;
 
 namespace Nuuvify.CommonPack.Extensions;
 
-
-public static class CacheTimeService
+public static class CacheTimeServiceExtension
 {
 
     /// <summary>
     /// Retona um DateTimeOffset com a data e hora de expiração do cache em LocatDateTime
     /// </summary>
     /// <returns></returns>
-    public static DateTimeOffset ExpireAt(IConfiguration confiruration, string configSection = "AppConfig:CacheExpire:Preco:Minute")
+    public static TimeSpan ExpireAt(IConfiguration confiruration, string configSection = "AppConfig:CacheExpire:Preco:Minute")
     {
         var timeValue = confiruration.GetSection(configSection)?.Value;
         if (double.TryParse(timeValue, out double time))
@@ -19,19 +19,18 @@ public static class CacheTimeService
         else
             return ExpireAt(timeValue);
     }
-
     /// <inheritdoc cref="ExpireAt(IConfiguration, string)"/>
-    public static DateTimeOffset ExpireAt(string exactTime = "17:00:00")
+    public static TimeSpan ExpireAt(string exactTime = "17:00:00")
     {
-        DateTimeOffset.TryParse(exactTime, out DateTimeOffset expireTime);
+        _ = DateTimeOffset.TryParse(exactTime, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTimeOffset expireTime);
         TimeSpan expireDiff = expireTime - DateTimeOffset.Now;
         if (expireDiff <= TimeSpan.Zero)
             expireTime = expireTime.AddDays(1);
-        return expireTime.LocalDateTime;
+        return expireTime - DateTimeOffset.Now;
     }
 
     /// <inheritdoc cref="ExpireAt(IConfiguration, string)"/>
-    public static DateTimeOffset ExpireAt(double time, CacheTime cacheTime)
+    public static TimeSpan ExpireAt(double time, CacheTime cacheTime)
     {
         switch (cacheTime)
         {
@@ -44,7 +43,7 @@ public static class CacheTimeService
                         time = Math.Abs(time) < 0.0001 ? 20 : time;
                         expireTime = DateTimeOffset.Now.AddSeconds(time);
                     }
-                    return expireTime.LocalDateTime;
+                    return expireTime - DateTimeOffset.Now;
                 }
             case CacheTime.seconds:
                 {
@@ -55,7 +54,7 @@ public static class CacheTimeService
                         time = Math.Abs(time) < 0.0001 ? 20 : time;
                         expireTime = DateTimeOffset.Now.AddSeconds(time);
                     }
-                    return expireTime.LocalDateTime;
+                    return expireTime - DateTimeOffset.Now;
                 }
             case CacheTime.miliseconds:
                 {
@@ -66,7 +65,7 @@ public static class CacheTimeService
                         time = Math.Abs(time) < 0.0001 ? 20 : time;
                         expireTime = DateTimeOffset.Now.AddSeconds(time);
                     }
-                    return expireTime.LocalDateTime;
+                    return expireTime - DateTimeOffset.Now;
                 }
             default:
                 {
@@ -77,18 +76,18 @@ public static class CacheTimeService
                         time = Math.Abs(time) < 0.0001 ? 20 : time;
                         expireTime = DateTimeOffset.Now.AddSeconds(time);
                     }
-                    return expireTime.LocalDateTime;
+                    return expireTime - DateTimeOffset.Now;
                 }
         }
     }
 
-    public enum CacheTime
-    {
-        minute = 1,
-        seconds = 2,
-        miliseconds = 3,
-        hours = 4,
-
-    }
 }
 
+public enum CacheTime
+{
+    minute = 1,
+    seconds = 2,
+    miliseconds = 3,
+    hours = 4,
+
+}

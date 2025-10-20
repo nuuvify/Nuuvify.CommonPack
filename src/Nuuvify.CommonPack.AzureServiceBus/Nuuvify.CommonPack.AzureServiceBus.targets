@@ -1,0 +1,8 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <ItemGroup>
+        <SourceCustomServiceBus Include="$(MSBuildThisFileDirectory)..\content\*.xml" />
+    </ItemGroup>
+    <Target Name="ServiceBusCopyFilesToProject" BeforeTargets="Build">
+        <Copy SourceFiles="@(SourceCustomServiceBus)" DestinationFolder="$(ProjectDir)\Docs" />
+    </Target>
+</Project>

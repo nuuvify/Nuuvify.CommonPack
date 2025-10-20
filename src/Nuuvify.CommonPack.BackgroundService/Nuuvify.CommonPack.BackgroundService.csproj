@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <PackageId>Nuuvify.CommonPack.BackgroundService</PackageId>
+        <Title>Nuuvify CommonPack Background Service</Title>
+        <PackageTags>Nuuvify, Worker, Azure, ServiceBus, Background, .NET</PackageTags>
+        <Description>BackgroundServiceCustom - Utilize em seus Workers para Azure Service Bus</Description>
+        <Product>CommonPack Background Service</Product>
+        <RootNamespace>Nuuvify.CommonPack.BackgroundService</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Azure.Messaging.ServiceBus" />
+        <PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" />
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Nuuvify.CommonPack.Middleware.Abstraction\Nuuvify.CommonPack.Middleware.Abstraction.csproj" />
+    </ItemGroup>
+
+</Project>

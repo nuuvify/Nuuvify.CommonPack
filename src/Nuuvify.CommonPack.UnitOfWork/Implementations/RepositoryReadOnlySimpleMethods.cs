@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Nuuvify.CommonPack.UnitOfWork;
 
-
 public partial class RepositoryReadOnly<TEntity> : IRepositoryReadOnly<TEntity> where TEntity : class
 {
 
@@ -124,9 +123,9 @@ public partial class RepositoryReadOnly<TEntity> : IRepositoryReadOnly<TEntity> 
         CancellationToken cancellationToken = default)
     {
         if (predicate == null)
-            return await _dbSet.AverageAsync(selector);
+            return await _dbSet.AverageAsync(selector, cancellationToken);
         else
-            return await _dbSet.Where(predicate).AverageAsync(selector);
+            return await _dbSet.Where(predicate).AverageAsync(selector, cancellationToken);
     }
 
     ///<inheritdoc/>
@@ -175,7 +174,6 @@ public partial class RepositoryReadOnly<TEntity> : IRepositoryReadOnly<TEntity> 
             return await _dbSet.AnyAsync(predicate, cancellationToken);
         }
     }
-
 
 }
 

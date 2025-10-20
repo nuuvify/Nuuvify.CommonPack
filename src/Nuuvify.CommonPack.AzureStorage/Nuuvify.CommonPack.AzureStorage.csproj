@@ -1,21 +1,24 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <Description>Abstração para Azure Blobs Storage - Instalar no projeto IoC</Description>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <PackageId>Nuuvify.CommonPack.AzureStorage</PackageId>
+        <Title>Nuuvify CommonPack Azure Storage</Title>
+        <PackageTags>Nuuvify, Azure, Storage, Blob, .NET</PackageTags>
+        <Description>Abstracco para Azure Blobs Storage - Instalar no projeto IoC</Description>
+        <Product>CommonPack Azure Storage</Product>
+        <RootNamespace>Nuuvify.CommonPack.AzureStorage</RootNamespace>
+    </PropertyGroup>
 
+    <ItemGroup>
+        <PackageReference Include="Azure.Storage.Blobs" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.20.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference
-      Include="..\Nuuvify.CommonPack.AzureStorage.Abstraction\Nuuvify.CommonPack.AzureStorage.Abstraction.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Nuuvify.CommonPack.AzureStorage.Abstraction\Nuuvify.CommonPack.AzureStorage.Abstraction.csproj" />
+    </ItemGroup>
 
 </Project>

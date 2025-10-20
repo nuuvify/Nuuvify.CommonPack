@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <Description>
-      This library has only abstractions/interfaces and has no external dependencies. <br/>
-      Use this library without your domain project without causing external dependencies. 
-    </Description>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <PackageId>Nuuvify.CommonPack.Email.Abstraction</PackageId>
+        <Title>Nuuvify CommonPack Email Abstraction</Title>
+        <PackageTags>Nuuvify, Email, Abstraction, .NET</PackageTags>
+        <Description>This library has only abstractions/interfaces and has no external dependencies. Use this library within your domain project without causing external dependencies.</Description>
+        <Product>CommonPack Email Abstraction</Product>
+        <RootNamespace>Nuuvify.CommonPack.Email.Abstraction</RootNamespace>
+    </PropertyGroup>
 
-  
-  <ItemGroup>
-    <ProjectReference Include="..\Nuuvify.CommonPack.Extensions\Nuuvify.CommonPack.Extensions.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Nuuvify.CommonPack.Extensions\Nuuvify.CommonPack.Extensions.csproj" />
+    </ItemGroup>
 
 
 </Project>

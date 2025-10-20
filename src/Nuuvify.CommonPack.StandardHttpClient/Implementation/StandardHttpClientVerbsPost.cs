@@ -5,10 +5,8 @@ using Nuuvify.CommonPack.StandardHttpClient.Results;
 
 namespace Nuuvify.CommonPack.StandardHttpClient;
 
-
-public partial class StandardHttpClient
+public partial class StandardHttpClientService
 {
-
 
     public async Task<HttpStandardReturn> Post(
         string urlRoute,
@@ -17,8 +15,7 @@ public partial class StandardHttpClient
     {
         var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
-
-        var message = new HttpRequestMessage(HttpMethod.Post, url)
+        using var message = new HttpRequestMessage(HttpMethod.Post, url)
         {
             Content = new StringContent(
                 JsonSerializer.Serialize(messageBody),
@@ -28,8 +25,7 @@ public partial class StandardHttpClient
         .CustomRequestHeader(_headerStandard)
         .AddAuthorizationHeader(_headerAuthorization);
 
-
-        return await StandardSendAsync(url, message, cancellationToken);
+        return await StandardSendAsync(url, message, cancellationToken).ConfigureAwait(false);
 
     }
 
@@ -42,9 +38,7 @@ public partial class StandardHttpClient
     {
         var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
-
-
-        var message = new HttpRequestMessage(HttpMethod.Post, url)
+        using var message = new HttpRequestMessage(HttpMethod.Post, url)
         {
             Content = new StringContent(
                 messageBody.ToString(),
@@ -55,8 +49,7 @@ public partial class StandardHttpClient
         .CustomRequestHeader(_headerStandard)
         .AddAuthorizationHeader(_headerAuthorization);
 
-
-        return await StandardSendAsync(url, message, cancellationToken);
+        return await StandardSendAsync(url, message, cancellationToken).ConfigureAwait(false);
 
     }
 
@@ -69,9 +62,7 @@ public partial class StandardHttpClient
     {
         var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
-
-
-        var message = new HttpRequestMessage(HttpMethod.Post, url)
+        using var message = new HttpRequestMessage(HttpMethod.Post, url)
         {
             Content = messageBody
         }
@@ -79,8 +70,7 @@ public partial class StandardHttpClient
         .AddAuthorizationHeader(_headerAuthorization);
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType));
 
-
-        return await StandardSendAsync(url, message, cancellationToken);
+        return await StandardSendAsync(url, message, cancellationToken).ConfigureAwait(false);
 
     }
 
@@ -90,20 +80,17 @@ public partial class StandardHttpClient
     {
         var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
-
-
-        var message = new HttpRequestMessage(HttpMethod.Post, url);
+        using var message = new HttpRequestMessage(HttpMethod.Post, url);
 
         IEnumerable<KeyValuePair<string, string>> enumerable = _formParameter;
 
         var content = new FormUrlEncodedContent(enumerable);
 
         message.Content = content;
-        message.CustomRequestHeader(_headerStandard)
+        _ = message.CustomRequestHeader(_headerStandard)
                .AddAuthorizationHeader(_headerAuthorization);
 
-
-        return await StandardSendAsync(url, message, cancellationToken);
+        return await StandardSendAsync(url, message, cancellationToken).ConfigureAwait(false);
 
     }
 
@@ -115,8 +102,7 @@ public partial class StandardHttpClient
     {
         var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
-
-        var message = new HttpRequestMessage(HttpMethod.Post, url)
+        using var message = new HttpRequestMessage(HttpMethod.Post, url)
         {
             Content = messageBody
         }
@@ -124,12 +110,8 @@ public partial class StandardHttpClient
         .AddAuthorizationHeader(_headerAuthorization);
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType));
 
-
-
-        return await StandardStreamSendAsync(url, message, cancellationToken);
+        return await StandardStreamSendAsync(url, message, cancellationToken).ConfigureAwait(false);
     }
-
-
 
 }
 
