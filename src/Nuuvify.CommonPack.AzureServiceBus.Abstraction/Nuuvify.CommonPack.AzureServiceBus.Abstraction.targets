@@ -1,0 +1,8 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <ItemGroup>
+        <SourceCustomFilesBusAbstraction Include="$(MSBuildThisFileDirectory)..\content\*.xml" />
+    </ItemGroup>
+    <Target Name="BusAbsCopyFilesToProject" BeforeTargets="Build">
+        <Copy SourceFiles="@(SourceCustomFilesBusAbstraction)" DestinationFolder="$(ProjectDir)\Docs" />
+    </Target>
+</Project>

@@ -3,21 +3,19 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <Description>
-            Armazena a chave privada para geracao de token em banco de dados e fornece uma chave
-            publica
-            para que seja validado pelos clients.
-            Essa biblioteca destinase apenas a aplicação que fornece um token.
-        </Description>
+        <PackageId>Nuuvify.CommonPack.Security.JwtStore.Ef</PackageId>
+        <Title>Nuuvify CommonPack Security JWT Store EF</Title>
+        <PackageTags>Nuuvify, Security, JWT, EntityFramework, .NET</PackageTags>
+        <Description>Armazena a chave privada para geração de token em banco de dados e fornece uma chave pública para que seja validado pelos clients. Essa biblioteca destina-se apenas à aplicação que fornece um token.</Description>
+        <Product>CommonPack Security JWT Store EF</Product>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.7" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference
-            Include="..\Nuuvify.CommonPack.Security.JwtCredentials\Nuuvify.CommonPack.Security.JwtCredentials.csproj" />
+        <ProjectReference Include="..\Nuuvify.CommonPack.Security.JwtCredentials\Nuuvify.CommonPack.Security.JwtCredentials.csproj" />
     </ItemGroup>
 
 

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Azure.Messaging.ServiceBus" />
+        <PackageReference Include="Shouldly" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Nuuvify.CommonPack.BackgroundService\Nuuvify.CommonPack.BackgroundService.csproj" />
+        <ProjectReference Include="..\..\src\Nuuvify.CommonPack.Middleware.Abstraction\Nuuvify.CommonPack.Middleware.Abstraction.csproj" />
+    </ItemGroup>
+
+</Project>

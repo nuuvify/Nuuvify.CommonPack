@@ -1,10 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <Description>Azure Blobs Storage - Instalar no projeto de Dominio</Description>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <PackageId>Nuuvify.CommonPack.AzureStorage.Abstraction</PackageId>
+        <Title>Nuuvify CommonPack Azure Storage Abstraction</Title>
+        <PackageTags>Nuuvify, Azure, Storage, Abstraction, .NET</PackageTags>
+        <Description>Azure Blobs Storage - Instalar no projeto de Domínio</Description>
+        <Product>CommonPack Azure Storage Abstraction</Product>
+        <RootNamespace>Nuuvify.CommonPack.AzureStorage.Abstraction</RootNamespace>
+    </PropertyGroup>
 
- 
 </Project>

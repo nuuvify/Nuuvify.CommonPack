@@ -1,29 +1,24 @@
 using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NuGet.Common;
-using NuGet.Protocol;
-using NuGet.Protocol.Core.Types;
-
+using Nuget.CustomManagement.NugetCustomManagementPackage;
 
 try
 {
     var builder = Host.CreateApplicationBuilder(args);
     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
     {
-        builder.Services.AddWindowsService(options =>
+        _ = builder.Services.AddWindowsService(options =>
         {
             options.ServiceName = ".NET Windows Service";
         });
     }
     else
     {
-        builder.Services.AddSystemd();
+        _ = builder.Services.AddSystemd();
     }
 
     var serviceProvider = builder.Services.BuildServiceProvider();
@@ -31,114 +26,120 @@ try
 
     logger.LogInformation("**** Environment: {EnvironmentName} ****", builder.Environment.EnvironmentName);
 
-
     var nugetCustomManagementPackage = new NugetCustomManagementPackage();
-    await nugetCustomManagementPackage.DeletePackage(logger, default);
 
+    Console.WriteLine("Gerenciador de Pacotes NuGet");
+    Console.WriteLine("Digite ':q' para sair a qualquer momento");
+    Console.WriteLine();
 
+    while (true)
+    {
+        Console.Write("Informe a versão do pacote a ser excluída (ou ':q' para sair): ");
+
+        ConsoleKeyInfo keyInfo;
+        string packageVersion = "";
+
+        // Lê a entrada do usuário caractere por caractere para detectar :q
+        while (true)
+        {
+            keyInfo = Console.ReadKey(intercept: true);
+
+            // Verifica se é :q (dois pontos seguido de q)
+            if (keyInfo.KeyChar == ':')
+            {
+                packageVersion += keyInfo.KeyChar;
+                Console.Write(keyInfo.KeyChar);
+
+                // Aguarda o próximo caractere
+                var nextKeyInfo = Console.ReadKey(intercept: true);
+                if (nextKeyInfo.KeyChar == 'q' || nextKeyInfo.KeyChar == 'Q')
+                {
+                    Console.Write(nextKeyInfo.KeyChar);
+                    Console.WriteLine();
+                    Console.WriteLine("Operação cancelada pelo usuário.");
+                    goto ExitLoop;
+                }
+                else
+                {
+                    // Se não for 'q', adiciona os dois caracteres normalmente
+                    packageVersion += nextKeyInfo.KeyChar;
+                    Console.Write(nextKeyInfo.KeyChar);
+                }
+                continue;
+            }
+
+            // Verifica se é Enter
+            if (keyInfo.Key == ConsoleKey.Enter)
+            {
+                Console.WriteLine();
+                break;
+            }
+
+            // Verifica se é Backspace
+            if (keyInfo.Key == ConsoleKey.Backspace)
+            {
+                if (packageVersion.Length > 0)
+                {
+                    packageVersion = packageVersion[..^1];
+                    Console.Write("\b \b");
+                }
+            }
+            // Adiciona caracteres normais
+            else if (!char.IsControl(keyInfo.KeyChar))
+            {
+                packageVersion += keyInfo.KeyChar;
+                Console.Write(keyInfo.KeyChar);
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(packageVersion))
+        {
+            try
+            {
+                nugetCustomManagementPackage.PackageVersion = packageVersion;
+                await nugetCustomManagementPackage.DeletePackage(logger, builder.Environment.EnvironmentName, default);
+                Console.WriteLine($"✅ Pacote versão {packageVersion} processado com sucesso!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Erro ao processar pacote versão {packageVersion}: {ex.Message}");
+            }
+        }
+        else
+        {
+            Console.WriteLine("⚠️ Versão não informada. Tente novamente.");
+        }
+
+        Console.WriteLine();
+    }
+
+ExitLoop:
     var host = builder.Build();
-
-
-    // await host.StartAsync();
-    // await host.WaitForShutdownAsync();
 
 }
 catch (TaskCanceledException ex)
 {
-    var message = $"Cancelamento de Task foi detectado, saindo do programa = {ex.Message}";
-
+    var message = $"❌ Operação foi cancelada: {ex.Message}";
     Console.WriteLine(message);
+    Environment.ExitCode = 1;
+}
+catch (InvalidOperationException ex)
+{
+    var message = $"❌ Erro de configuração: {ex.Message}";
+    Console.WriteLine(message);
+    Environment.ExitCode = 2;
 }
 catch (Exception ex)
 {
-    var message = $"Erro na inicialização ou finalização do programa = {ex.Message} StackTrace = {ex.StackTrace}";
-
+    var message = $"❌ Erro inesperado: {ex.Message}";
     Console.WriteLine(message);
-    if (!(ex.InnerException is null))
+
+    if (ex.InnerException != null)
     {
-        Console.WriteLine("#### InnerException: {0}", ex.InnerException?.Message);
-        Console.WriteLine("#### InnerException->StackTrace: {0}", ex.InnerException?.StackTrace);
-    }
-}
-
-
-/// <summary>
-/// Documentação; https://github.com/NuGet/Samples/blob/main/NuGetProtocolSamples/Program.cs
-/// <p>https://learn.microsoft.com/en-us/nuget/reference/nuget-client-sdk</p>
-/// </summary>
-public class NugetCustomManagementPackage
-{
-
-
-    public IDictionary<string, string> Packages { get; set; }
-
-    public NugetCustomManagementPackage()
-    {
-
-        Packages = new Dictionary<string, string>
-        {
-
-            { "Nuuvify.CommonPack.AutoHistory", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.AzureStorage", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.AzureStorage.Abstraction", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.Domain", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.EF.Exceptions.Common", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.EF.Exceptions.Db2", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.EF.Exceptions.Oracle", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.Email", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.Email.Abstraction", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.Extensions", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.HealthCheck", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.Middleware", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.Middleware.Abstraction", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.OpenApi", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.Security", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.Security.Abstraction", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.Security.JwtCredentials", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.Security.JwtStore.Ef", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.UnitOfWork", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.UnitOfWork.Abstraction", "2.0.0-preview.24102305" },
-            { "Nuuvify.CommonPack.StandardHttpClient", "2.0.0-preview.24102305" }
-        };
-
+        Console.WriteLine($"#### InnerException: {ex.InnerException.Message}");
+        Console.WriteLine($"#### InnerException->StackTrace: {ex.InnerException.StackTrace}");
     }
 
-    public async Task DeletePackage(Microsoft.Extensions.Logging.ILogger logger, CancellationToken cancellationToken)
-    {
-
-        var nugetConfig = new NuGet.Configuration.PackageSource("https://api.nuget.org/v3/index.json");
-
-
-        SourceCacheContext cacheNuget = new SourceCacheContext();
-        SourceRepository repository = Repository.Factory.GetCoreV3(nugetConfig);
-        PackageUpdateResource resource = await repository.GetResourceAsync<PackageUpdateResource>();
-
-        string apiKey = "xxxxxxxxxxxx";
-
-        logger.LogInformation("===========> Start delete packages");
-
-        foreach (var item in Packages)
-        {
-
-            var result = resource.Delete(
-                item.Key,
-                item.Value,
-                getApiKey: packageSource => apiKey,
-                confirm: packageSource => true,
-                noServiceEndpoint: false,
-                NullLogger.Instance).GetAwaiter();
-
-            result.GetResult();
-
-            logger.LogInformation("Package deleted = {Id} {Version} Result = {Result}",
-                item.Key,
-                item.Value,
-                result.IsCompleted);
-        }
-
-        logger.LogInformation("===========> Completed delete packages");
-
-
-    }
-
+    Console.WriteLine($"#### StackTrace: {ex.StackTrace}");
+    Environment.ExitCode = 3;
 }

@@ -1,26 +1,31 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Description>
-      Middlewares e filtros customizados, deve ser baixado no projeto IoC
-      HandlingHeadersMiddleware - Inclui a versão da aplicação e do assembly no header da request,
-      também loga o conteudo da request
-      GlobalHandleException - Captura e loga as exceptions de forma global
-      ValidateModelAttribute - Retorna os erros da ModelState de forma padronizada
-    </Description>
-  </PropertyGroup>
+    <PropertyGroup>
+        <!-- Project Specific Configuration -->
+        <RootNamespace>Nuuvify.CommonPack.Middleware</RootNamespace>
+        <AssemblyName>Nuuvify.CommonPack.Middleware</AssemblyName>
+        <Product>Nuuvify CommonPack Middleware</Product>
 
-  <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.KeyPerFile" Version="8.0.7" />
-  </ItemGroup>
+        <!-- Package Specific Metadata -->
+        <PackageId>Nuuvify.CommonPack.Middleware</PackageId>
+        <Title>Nuuvify CommonPack Middleware</Title>
+        <Description>Middlewares e filtros customizados, deve ser baixado no projeto IoC. HandlingHeadersMiddleware - Inclui a versco da aplicacco e do assembly no header da request, tambcm loga o conteudo da request. GlobalHandleException - Captura e loga as exceptions de forma global. ValidateModelAttribute - Retorna os erros da ModelState de forma padronizada</Description>
+        <Summary>Custom middlewares and filters for ASP.NET Core applications</Summary>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Nuuvify.CommonPack.Middleware.Abstraction\Nuuvify.CommonPack.Middleware.Abstraction.csproj" />
-    <ProjectReference Include="..\Nuuvify.CommonPack.Extensions\Nuuvify.CommonPack.Extensions.csproj" />
-  </ItemGroup>
+        <!-- Package Specific Tags -->
+        <PackageTags>middleware;filters;exception-handling;validation;headers;logging;aspnetcore;nuuvify;dotnet</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.KeyPerFile" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Nuuvify.CommonPack.Middleware.Abstraction\Nuuvify.CommonPack.Middleware.Abstraction.csproj" />
+        <ProjectReference Include="..\Nuuvify.CommonPack.Extensions\Nuuvify.CommonPack.Extensions.csproj" />
+    </ItemGroup>
 
 </Project>

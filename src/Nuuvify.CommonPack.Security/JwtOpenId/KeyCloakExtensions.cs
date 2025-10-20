@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
@@ -5,9 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Security.Claims;
+using System.Text.Json;
 
 namespace Nuuvify.CommonPack.Security.JwtOpenId;
 
@@ -18,8 +17,8 @@ public static class KeyCloakExtensions
     {
         if (options.SameSite == SameSiteMode.None)
         {
-            var userAgent = httpContext.Request.Headers["User-Agent"].ToString();
-            // TODO: Use your User Agent library of choice here. 
+            _ = httpContext.Request.Headers["User-Agent"].ToString();
+            // TODO: Use your User Agent library of choice here.
             //if (/* UserAgent doesn’t support new behavior */)
             {
                 options.SameSite = SameSiteMode.Unspecified;
@@ -29,13 +28,13 @@ public static class KeyCloakExtensions
 
     public static IServiceCollection AddKeyCloak(this IServiceCollection services, IConfiguration configuration)
     {
-        services.Configure<CookiePolicyOptions>(options =>
+        _ = services.Configure<CookiePolicyOptions>(options =>
         {
             options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
             options.OnAppendCookie = cookieContext => KeyCloakExtensions.CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
             options.OnDeleteCookie = cookieContext => KeyCloakExtensions.CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
         });
-        services.AddAuthentication(options =>
+        _ = services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = OpenIdConnectDefaults.AuthenticationScheme;
             options.DefaultSignInScheme = OpenIdConnectDefaults.AuthenticationScheme;
@@ -116,10 +115,7 @@ public static class KeyCloakExtensions
                OnTokenValidated = ConvertKeycloakRolesInAspNetRoles,
            };
 
-
-
        });
-
 
         return services;
     }
@@ -129,21 +125,23 @@ public static class KeyCloakExtensions
         var claim = context.SecurityToken.Claims.SingleOrDefault(it => it.Type == "resource_access" && it.ValueType == "JSON");
         if (claim != null)
         {
-            JObject value = JsonConvert.DeserializeObject<JObject>(claim.Value);
+
+            var value = JsonDocument.Parse(claim.Value);
             string audience = context.SecurityToken.Audiences.Single();
-            var prop = value[audience];
-            var roles = prop?["roles"];
-            if (roles != null)
+
+            if (value.RootElement.TryGetProperty(audience, out var audienceProp) &&
+                audienceProp.TryGetProperty("roles", out var rolesProp) &&
+                rolesProp.ValueKind == JsonValueKind.Array)
             {
                 var identity = (ClaimsIdentity)context.Principal.Identity;
-                identity.AddClaims(
-                    roles.Select(it => new Claim(ClaimTypes.Role, it.Value<string>())).ToArray()
-                );
+                foreach (var role in rolesProp.EnumerateArray())
+                {
+                    identity.AddClaim(new Claim(ClaimTypes.Role, role.GetString()));
+                }
             }
         }
         return Task.CompletedTask;
     }
-
 
     public static void AddProfilePolicy(this AuthorizationOptions options)
     {

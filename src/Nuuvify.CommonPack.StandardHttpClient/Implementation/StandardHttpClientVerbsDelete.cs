@@ -3,10 +3,8 @@ using System.Net.Http.Headers;
 
 namespace Nuuvify.CommonPack.StandardHttpClient;
 
-
-public partial class StandardHttpClient
+public partial class StandardHttpClientService
 {
-
 
     public async Task<HttpStandardReturn> Delete(
         string urlRoute,
@@ -14,13 +12,11 @@ public partial class StandardHttpClient
     {
         var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
-
-        var message = new HttpRequestMessage(HttpMethod.Delete, url)
+        using var message = new HttpRequestMessage(HttpMethod.Delete, url)
             .CustomRequestHeader(_headerStandard)
             .AddAuthorizationHeader(_headerAuthorization);
 
-
-        return await StandardSendAsync(url, message, cancellationToken);
+        return await StandardSendAsync(url, message, cancellationToken).ConfigureAwait(false);
 
     }
 
@@ -32,8 +28,7 @@ public partial class StandardHttpClient
     {
         var url = $"{urlRoute}{_queryString.ToQueryString()}";
 
-
-        var message = new HttpRequestMessage(HttpMethod.Delete, url)
+        using var message = new HttpRequestMessage(HttpMethod.Delete, url)
         {
             Content = messageBody
         }
@@ -41,11 +36,8 @@ public partial class StandardHttpClient
         .AddAuthorizationHeader(_headerAuthorization);
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType));
 
-
-
-        return await StandardStreamSendAsync(url, message, cancellationToken);
+        return await StandardStreamSendAsync(url, message, cancellationToken).ConfigureAwait(false);
     }
-
 
 }
 

@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="xunit" />
+        <PackageReference Include="xunit.runner.visualstudio" />
+        <PackageReference Include="coverlet.collector" />
+        <PackageReference Include="AutoMoqCore" />
+
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
+        <PackageReference Include="Microsoft.Extensions.Http" />
+        <PackageReference Include="Moq" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Nuuvify.CommonPack.AutoHistory\Nuuvify.CommonPack.AutoHistory.csproj" />
+        <ProjectReference Include="..\..\src\Nuuvify.CommonPack.Extensions\Nuuvify.CommonPack.Extensions.csproj" />
+        <ProjectReference Include="..\..\src\Nuuvify.CommonPack.Domain\Nuuvify.CommonPack.Domain.csproj" />
+        <ProjectReference Include="..\..\src\Nuuvify.CommonPack.Middleware.Abstraction\Nuuvify.CommonPack.Middleware.Abstraction.csproj" />
+        <ProjectReference Include="..\..\src\Nuuvify.CommonPack.UnitOfWork\Nuuvify.CommonPack.UnitOfWork.csproj" />
+        <ProjectReference Include="..\..\src\Nuuvify.CommonPack.UnitOfWork.Abstraction\Nuuvify.CommonPack.UnitOfWork.Abstraction.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="Configs\*.json" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
+</Project>

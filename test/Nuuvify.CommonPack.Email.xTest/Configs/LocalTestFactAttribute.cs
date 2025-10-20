@@ -1,22 +1,18 @@
-﻿using System;
-using Xunit;
+﻿namespace Nuuvify.CommonPack.Email.xTest.Configs;
 
-namespace Nuuvify.CommonPack.Email.xTest.Configs
+public sealed class LocalTestFactAttribute : FactAttribute
 {
-    public sealed class LocalTestFactAttribute : FactAttribute
+    public LocalTestFactAttribute()
     {
-        public LocalTestFactAttribute()
+        if (!IsLocalMachine())
         {
-            if (!IsLocalMachine())
-            {
-                Skip = "Ignore test in Server";
-            }
+            Skip = "Ignore test in Server";
         }
+    }
 
-        private static bool IsLocalMachine()
-        {
-            var machineName = Environment.MachineName;
-            return machineName.StartsWith("B8", StringComparison.OrdinalIgnoreCase);
-        }
+    private static bool IsLocalMachine()
+    {
+        var machineName = Environment.MachineName;
+        return machineName.StartsWith("LZ", StringComparison.OrdinalIgnoreCase);
     }
 }

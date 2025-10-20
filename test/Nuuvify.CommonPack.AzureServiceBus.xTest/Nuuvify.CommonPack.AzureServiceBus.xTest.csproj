@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <!-- Test Project Configuration -->
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+
+        <!-- Project Specific Configuration -->
+        <RootNamespace>Nuuvify.CommonPack.AzureServiceBus.xTest</RootNamespace>
+        <AssemblyName>Nuuvify.CommonPack.AzureServiceBus.xTest</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Shouldly" />
+        <PackageReference Include="Microsoft.Extensions.Options" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Nuuvify.CommonPack.AzureServiceBus\Nuuvify.CommonPack.AzureServiceBus.csproj" />
+        <ProjectReference Include="..\..\src\Nuuvify.CommonPack.AzureServiceBus.Abstraction\Nuuvify.CommonPack.AzureServiceBus.Abstraction.csproj" />
+    </ItemGroup>
+
+</Project>

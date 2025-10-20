@@ -3,7 +3,6 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Nuuvify.CommonPack.HealthCheck;
 
-
 /// <summary>
 /// Faz uma chamada http para um serviço e retorna o status da chamada.
 /// <p>Forceça os seguintes parâmetros: </p>
@@ -19,11 +18,8 @@ public class HttpCustomHealthCheck : IHealthCheck
     private readonly string _hcUrl;
     private readonly HealthStatus _failureStatus;
     private readonly bool _youWantReturnEndpointContent;
-
-
     private readonly HttpClient _httpClient;
     private readonly Func<HttpClient> _httpClientFactory;
-
 
     public HttpCustomHealthCheck(
         Uri baseUri,
@@ -37,7 +33,6 @@ public class HttpCustomHealthCheck : IHealthCheck
         _hcUrl = hcUrl;
         _failureStatus = failureStatus;
 
-
         _httpClientFactory = () => new HttpClient(httpClientHandler)
         {
             BaseAddress = baseUri
@@ -47,7 +42,6 @@ public class HttpCustomHealthCheck : IHealthCheck
 
     }
 
-
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = new CancellationToken())
     {
 
@@ -56,11 +50,10 @@ public class HttpCustomHealthCheck : IHealthCheck
         try
         {
 
-
             HealthCheckResult checkResult;
             var httpReturn = await _httpClient.GetAsync(_hcUrl, cancellationToken);
-            var contentReturn = httpReturn.Content.ReadAsStringAsync().Result;
-            int.TryParse(httpReturn.StatusCode.ToString(), out int returnCode);
+            var contentReturn = await httpReturn.Content.ReadAsStringAsync(cancellationToken);
+            _ = int.TryParse(httpReturn.StatusCode.ToString(), out var returnCode);
 
             resultData = new Dictionary<string, object>
             {
@@ -69,30 +62,21 @@ public class HttpCustomHealthCheck : IHealthCheck
                     _youWantReturnEndpointContent ? contentReturn : "Content received",
             };
 
-
-
             if (httpReturn.IsSuccessStatusCode)
             {
 
-                if (httpReturn.ReasonPhrase != "OK" ||
-                    returnCode >= 400)
-                {
-
-                    checkResult = _failureStatus.Equals(HealthStatus.Unhealthy) ?
+                checkResult = httpReturn.ReasonPhrase != "OK" ||
+                    returnCode >= 400
+                    ? _failureStatus.Equals(HealthStatus.Unhealthy) ?
                         HealthCheckResult.Unhealthy(
                             description: $"{_hcUrl} {nameof(HealthStatus.Unhealthy)}",
                             data: resultData) :
                         HealthCheckResult.Degraded(
                             description: $"{_hcUrl} {nameof(HealthStatus.Degraded)}",
-                            data: resultData);
-
-                }
-                else
-                {
-                    checkResult = HealthCheckResult.Healthy(
+                            data: resultData)
+                    : HealthCheckResult.Healthy(
                         description: $"{_hcUrl} {nameof(HealthStatus.Healthy)}",
                         data: resultData);
-                }
 
             }
             else
@@ -108,9 +92,32 @@ public class HttpCustomHealthCheck : IHealthCheck
 
             }
 
-
             return await Task.FromResult(checkResult);
 
+        }
+        catch (HttpRequestException ex)
+        {
+            return await Task.FromResult(
+                HealthCheckResult.Unhealthy(
+                    description: $"{_hcUrl} Failed HttpRequestException",
+                    exception: ex,
+                    data: resultData));
+        }
+        catch (TaskCanceledException ex)
+        {
+            return await Task.FromResult(
+                HealthCheckResult.Unhealthy(
+                    description: $"{_hcUrl} Failed TaskCanceledException",
+                    exception: ex,
+                    data: resultData));
+        }
+        catch (OperationCanceledException ex)
+        {
+            return await Task.FromResult(
+                HealthCheckResult.Unhealthy(
+                    description: $"{_hcUrl} Failed OperationCanceledException",
+                    exception: ex,
+                    data: resultData));
         }
         catch (Exception ex)
         {
@@ -122,6 +129,5 @@ public class HttpCustomHealthCheck : IHealthCheck
         }
 
     }
-
 
 }

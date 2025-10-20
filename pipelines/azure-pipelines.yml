@@ -8,32 +8,33 @@ resources:
 trigger:
   branches:
     include:
+    - nugettest/qas
     - qas
     - main
 pr:
   branches:
     include:
     - refs/*
-    
+
 
 variables:
   - template: variables/global.yml@templates
 
 
-stages: 
+stages:
 
 - stage: 'Build'
   displayName: 'Build Projects'
-        
+
   jobs:
   - job: 'Build_And_Package'
     displayName: 'Build & package artifacts'
 
     pool:
       vmImage: $(vmImageName)
-    
+
     steps:
-    
+
     - template: pipeline-templates/build-dotnetcore-nuget.yml@templates
       parameters:
         solution: '**/*.sln'
