@@ -54,6 +54,17 @@ internal class PagedList<TSource, TResult> : IPagedList<TResult>
     public bool HasNextPage => PageIndex - IndexFrom + 1 < TotalPages;
 
     /// <summary>
+    /// Gets the number of items to skip before taking the page.
+    /// Calculated as (PageIndex - IndexFrom) * PageSize.
+    /// </summary>
+    public int Skip => (PageIndex - IndexFrom) * PageSize;
+
+    /// <summary>
+    /// Gets the number of items to take for the current page.
+    /// </summary>
+    public int Take => PageSize;
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="PagedList{TSource, TResult}" /> class.
     /// </summary>
     /// <param name="source">The source</param>
@@ -61,7 +72,8 @@ internal class PagedList<TSource, TResult> : IPagedList<TResult>
     /// <param name="pageIndex">The index of the page</param>
     /// <param name="pageSize">The size of the page</param>
     /// <param name="indexFrom">The start index value</param>
-    public PagedList(IEnumerable<TSource> source,
+    public PagedList(
+        IEnumerable<TSource> source,
         Func<IEnumerable<TSource>, IEnumerable<TResult>> converter,
         int pageIndex,
         int pageSize,
@@ -81,11 +93,11 @@ internal class PagedList<TSource, TResult> : IPagedList<TResult>
             TotalCount = querable.Count();
             TotalPages = (int)Math.Ceiling(TotalCount / (double)PageSize);
 
-            var items = querable.Skip((PageIndex - IndexFrom) * PageSize)
-                                .Take(PageSize)
+            var items = querable.Skip(Skip)
+                                .Take(Take)
                                 .ToArray();
 
-            Items = new List<TResult>(converter(items));
+            Items = [.. converter(items)];
         }
         else
         {
@@ -95,11 +107,11 @@ internal class PagedList<TSource, TResult> : IPagedList<TResult>
             TotalCount = source.Count();
             TotalPages = (int)Math.Ceiling(TotalCount / (double)PageSize);
 
-            var items = source.Skip((PageIndex - IndexFrom) * PageSize)
-                              .Take(PageSize)
+            var items = source.Skip(Skip)
+                              .Take(Take)
                               .ToArray();
 
-            Items = new List<TResult>(converter(items));
+            Items = [.. converter(items)];
         }
     }
 
@@ -108,7 +120,8 @@ internal class PagedList<TSource, TResult> : IPagedList<TResult>
     /// </summary>
     /// <param name="source">The source.</param>
     /// <param name="converter">The converter.</param>
-    public PagedList(IPagedList<TSource> source,
+    public PagedList(
+        IPagedList<TSource> source,
         Func<IEnumerable<TSource>, IEnumerable<TResult>> converter)
     {
         PageIndex = source.PageIndex;
@@ -117,7 +130,7 @@ internal class PagedList<TSource, TResult> : IPagedList<TResult>
         TotalCount = source.TotalCount;
         TotalPages = source.TotalPages;
 
-        Items = new List<TResult>(converter(source.Items));
+        Items = [.. converter(source.Items)];
 
     }
 

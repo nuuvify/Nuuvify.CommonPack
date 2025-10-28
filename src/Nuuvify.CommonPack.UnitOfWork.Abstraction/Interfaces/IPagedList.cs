@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
+﻿namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 
 /// <summary>
 /// Provides the interface(s) for paged list of any type.
@@ -44,4 +42,15 @@ public interface IPagedList<T>
     /// </summary>
     /// <value>The has next page.</value>
     bool HasNextPage { get; }
+
+    /// <summary>
+    /// Gets the number of items to skip before taking the page.
+    /// Calculated as (PageIndex - IndexFrom) * PageSize.
+    /// </summary>
+    int Skip { get; }
+
+    /// <summary>
+    /// Gets the number of items to take for the current page.
+    /// </summary>
+    int Take { get; }
 }

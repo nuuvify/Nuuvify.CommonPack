@@ -17,7 +17,8 @@ public static class IEnumerablePagedListExtensions
     /// <param name="pageSize">The size of the page.</param>
     /// <param name="indexFrom">The start index value.</param>
     /// <returns>An instance of the inherited from <see cref="IPagedList{T}"/> interface.</returns>
-    public static IPagedList<T> ToPagedList<T>(this IEnumerable<T> source,
+    public static IPagedList<T> ToPagedList<T>(
+        this IEnumerable<T> source,
         int pageIndex,
         int pageSize,
         int indexFrom)
@@ -34,7 +35,8 @@ public static class IEnumerablePagedListExtensions
     /// <param name="pageSize">The page size.</param>
     /// <param name="indexFrom">The start index value.</param>
     /// <returns>An instance of the inherited from <see cref="IPagedList{T}"/> interface.</returns>
-    public static IPagedList<TResult> ToPagedList<TSource, TResult>(this IEnumerable<TSource> source,
+    public static IPagedList<TResult> ToPagedList<TSource, TResult>(
+        this IEnumerable<TSource> source,
         Func<IEnumerable<TSource>, IEnumerable<TResult>> converter,
         int pageIndex,
         int pageSize,
