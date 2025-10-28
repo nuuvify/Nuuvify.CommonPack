@@ -31,6 +31,11 @@ public static partial class StringExtensionMethods
         return Regex.Replace(text, "[^\x20-\x5F\x61-\x7E]+", "");
     }
 
+    /// <summary>
+    /// Extracts only letters and numbers from the input string, removing all special characters and spaces.
+    /// </summary>
+    /// <param name="text">The input string to process.</param>
+    /// <returns>A string containing only alphanumeric characters.</returns>
     public static string GetLettersAndNumbersOnly(this string text)
     {
         var newText = Regex.Replace(text, "[^a-zA-Z0-9]", "");
@@ -165,6 +170,11 @@ public static partial class StringExtensionMethods
         return newValue;
     }
 
+    /// <summary>
+    /// Converts the input string to title case using invariant culture.
+    /// </summary>
+    /// <param name="text">The input string to convert.</param>
+    /// <returns>The string in title case, or null if the input is null or whitespace.</returns>
     public static string ToTitleCase(this string text)
     {
         if (string.IsNullOrWhiteSpace(text)) return null;
