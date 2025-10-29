@@ -1,10 +1,6 @@
 ﻿using MimeKit;
 using Nuuvify.CommonPack.Email.Abstraction;
 using Nuuvify.CommonPack.Extensions.Notificator;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Nuuvify.CommonPack.Email;
 

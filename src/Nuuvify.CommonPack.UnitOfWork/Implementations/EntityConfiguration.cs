@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Nuuvify.CommonPack.Domain;
@@ -60,13 +60,13 @@ public abstract class EntityConfiguration<TEntity> :
         if (ProviderSelected.IsProviderOracle() ||
             ProviderSelected.IsProviderDb2())
         {
-            _ = builder.ToTable(tableName.ToUpper());
+            _ = builder.ToTable(tableName.ToUpper(CultureInfo.InvariantCulture));
 
             _ = builder.HasKey(x => x.Id)
-                .HasName($"PK_{idColumnName.ToUpper()}");
+                .HasName($"PK_{idColumnName.ToUpper(CultureInfo.InvariantCulture)}");
 
             _ = builder.Property(x => x.Id)
-                .HasColumnName($"{idColumnName.ToUpper()}{pkSufix}")
+                .HasColumnName($"{idColumnName.ToUpper(CultureInfo.InvariantCulture)}{pkSufix}")
                 .IsUnicode(false)
                 .HasMaxLength(DomainEntity.MaxId)
                 .IsRequired();

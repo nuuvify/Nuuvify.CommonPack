@@ -11,6 +11,8 @@
         <RootNamespace>Nuuvify.CommonPack.UnitOfWork.Abstraction</RootNamespace>
     </PropertyGroup>
 
+
+
     <ItemGroup>
         <ProjectReference Include="..\Nuuvify.CommonPack.Extensions\Nuuvify.CommonPack.Extensions.csproj" />
     </ItemGroup>
