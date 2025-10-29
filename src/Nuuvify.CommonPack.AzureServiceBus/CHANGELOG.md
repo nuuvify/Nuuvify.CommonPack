@@ -5,7 +5,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.1.0] - 2025-10-13
+## 2025-10-13
 
 ### Alterado
 - 🔧 **Código**: Removido `#nullable enable` de todos os arquivos fonte
@@ -37,7 +37,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - 🧹 **Using**: Removidos using statements duplicados dos arquivos individuais
 - 🔇 **Qualidade**: Aplicadas supressões SonarQube apropriadas para falsos positivos
 
-## [2.0.0] - 2025-10-08
+## 2025-10-08
 
 ### Adicionado
 - 🎉 **Release inicial do Nuuvify.CommonPack.AzureServiceBus**
