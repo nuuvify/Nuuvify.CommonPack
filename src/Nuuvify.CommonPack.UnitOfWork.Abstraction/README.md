@@ -49,7 +49,7 @@ Esta versão inclui **3 correções críticas** no operador `ContainsWithLikeFor
 - **Partial Classes**: `FiltersExtensions` dividido em arquivos separados
   - `FiltersExtensions.cs`: API pública com documentação completa
   - `FiltersExtensions.Private.cs`: Implementação privada
-  
+
 - **Documentação XML**: Exemplos práticos em todos os métodos públicos
 - **Code Cleanup**: Comentários inline substituídos por documentação XML
 - **100% Tested**: Todos os 12 testes passando com cobertura completa
@@ -139,7 +139,7 @@ public enum OrderStatus { Pending, Confirmed, Shipped, Delivered, Cancelled }
 public class ProductSearchModel : IQueryableCustom
 {
     // ===== OPERADORES DE IGUALDADE =====
-    
+
     /// <summary>
     /// Filtro por ID exato - Operador: Equals
     /// Exemplo: WHERE Id = @value
@@ -233,7 +233,7 @@ public class ProductSearchModel : IQueryableCustom
     /// <summary>
     /// Busca em múltiplos campos - Operador: ContainsWithLikeForList (NOVO!)
     /// Exemplo: WHERE (Name.Contains(@value1) OR Name.Contains(@value2) OR ...)
-    /// 
+    ///
     /// ✨ Este é o operador mais poderoso - permite busca OR em listas
     /// Use para implementar busca global, tags, categorias múltiplas, etc.
     /// </summary>
@@ -267,12 +267,13 @@ public class ProductSearchModel : IQueryableCustom
     /// <summary>
     /// Tamanho da página
     /// </summary>
-    [Key] 
+    [Key]
     public int PageSize { get; set; } = 10;
 
     /// <summary>
-    /// Ordenação: "Name asc, Price desc, CreatedAt"
-    /// Suporta múltiplos campos e direções
+    /// Ordenação: "A-Name, D-Price, A-CreatedAt"
+    /// Formato: "D-Campo" (Descendente) ou "A-Campo" (Ascendente)
+    /// Suporta múltiplos campos separados por vírgula
     /// </summary>
     public string Sort { get; set; } = string.Empty;
 }
@@ -372,11 +373,11 @@ public class OrderSearchModel : IQueryableCustom
 
     /// <summary>
     /// Exemplos de ordenação:
-    /// - "OrderDate desc" - Mais recentes primeiro
-    /// - "TotalAmount desc, OrderDate desc" - Por valor e data
-    /// - "CustomerName asc, OrderDate desc" - Por cliente e data
+    /// - "D-OrderDate" - Mais recentes primeiro (Descendente)
+    /// - "D-TotalAmount, D-OrderDate" - Por valor e data (ambos descendentes)
+    /// - "A-CustomerName, D-OrderDate" - Por cliente (ascendente) e data (descendente)
     /// </summary>
-    public string Sort { get; set; } = "OrderDate desc";
+    public string Sort { get; set; } = "D-OrderDate";
 }
 ```
 
@@ -402,18 +403,28 @@ public class ProductsController : ControllerBase
     /// Busca produtos com filtros dinâmicos e paginação
     /// </summary>
     [HttpGet("search")]
-    public async Task<ActionResult<PagedResult<ProductDto>>> SearchProducts([FromQuery] ProductSearchModel filter)
+    public async Task<ActionResult<IPagedList<ProductDto>>> SearchProducts([FromQuery] ProductSearchModel filter)
     {
         try
         {
             // ✅ Query com filtros dinâmicos, paginação e ordenação
-            var result = await _unitOfWork.QueryAsync<Product>()
+            var query = _unitOfWork.Repository<Product>()
+                .GetAll()
                 .Where(p => p.IsActive) // Filtro fixo
-                .FilterAndPaginate(filter) // Filtros dinâmicos + paginação
-                .ProjectToAsync<ProductDto>(); // Projeção para DTO
+                .Filter(filter) // Filtros dinâmicos
+                .Sort(filter.Sort) // Ordenação
+                .Select(p => new ProductDto // Projeção para DTO
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Category = p.Category,
+                    Price = p.Price
+                });
 
-            _logger.LogInformation("Produtos encontrados: {Count}/{Total}. Página: {Page}/{TotalPages}", 
-                result.Items.Count, result.TotalCount, result.CurrentPage, result.TotalPages);
+            var result = await query.ToPagedListAsync(filter.PageIndex, filter.PageSize);
+
+            _logger.LogInformation("Produtos encontrados: {Count}/{Total}. Página: {Page}/{TotalPages}",
+                result.Items.Count, result.TotalCount, result.PageIndex, result.TotalPages);
 
             return Ok(result);
         }
@@ -433,7 +444,8 @@ public class ProductsController : ControllerBase
         try
         {
             // ✅ Query sem paginação - apenas filtros dinâmicos
-            var products = await _unitOfWork.QueryAsync<Product>()
+            var products = await _unitOfWork.Repository<Product>()
+                .GetAll()
                 .Where(p => p.IsActive)
                 .Filter(filter) // Apenas filtros, sem paginação
                 .Select(p => new ProductDto
@@ -459,17 +471,29 @@ public class ProductsController : ControllerBase
     /// Demonstra o novo operador ContainsWithLikeForList
     /// </summary>
     [HttpGet("global-search")]
-    public async Task<ActionResult<PagedResult<ProductDto>>> GlobalSearch([FromQuery] string[] terms)
+    public async Task<ActionResult<IPagedList<ProductDto>>> GlobalSearch([FromQuery] string[] terms)
     {
         var filter = new ProductSearchModel
         {
             GlobalSearch = terms?.ToList(), // Busca OR em múltiplos termos
-            Sort = "Name asc"
+            Sort = "A-Name",
+            PageIndex = 1,
+            PageSize = 10
         };
 
-        var result = await _unitOfWork.QueryAsync<Product>()
-            .FilterAndPaginate(filter)
-            .ProjectToAsync<ProductDto>();
+        var query = _unitOfWork.Repository<Product>()
+            .GetAll()
+            .Filter(filter)
+            .Sort(filter.Sort)
+            .Select(p => new ProductDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Category = p.Category,
+                Price = p.Price
+            });
+
+        var result = await query.ToPagedListAsync(filter.PageIndex, filter.PageSize);
 
         return Ok(result);
     }
@@ -521,7 +545,7 @@ public class ProductsController : ControllerBase
     public async Task<ActionResult<ProductDto>> GetProduct(int id)
     {
         var product = await _unitOfWork.FindByIdAsync<Product>(id);
-        
+
         if (product == null)
             return NotFound();
 
@@ -557,15 +581,17 @@ public class OrderService
     /// <summary>
     /// Busca avançada de pedidos - demonstra filtros complexos
     /// </summary>
-    public async Task<PagedResult<OrderDto>> SearchOrdersAsync(OrderSearchModel filter)
+    public async Task<IPagedList<OrderDto>> SearchOrdersAsync(OrderSearchModel filter)
     {
         try
         {
             // ✅ Demonstra query complexa com joins e filtros dinâmicos
-            var result = await _unitOfWork.QueryAsync<Order>()
-                .Include(o => o.Items)
-                .Where(o => !o.Status.Equals(OrderStatus.Cancelled) || filter.ExcludeStatus != OrderStatus.Cancelled)
-                .FilterAndPaginate(filter)
+            var query = _unitOfWork.Repository<Order>()
+                .GetAll(
+                    predicate: o => !o.Status.Equals(OrderStatus.Cancelled) || filter.ExcludeStatus != OrderStatus.Cancelled,
+                    include: source => source.Include(o => o.Items))
+                .Filter(filter)
+                .Sort(filter.Sort)
                 .Select(o => new OrderDto
                 {
                     Id = o.Id,
@@ -575,8 +601,9 @@ public class OrderService
                     Status = o.Status.ToString(),
                     OrderDate = o.OrderDate,
                     ItemCount = o.Items.Count
-                })
-                .ToPagedResultAsync();
+                });
+
+            var result = await query.ToPagedListAsync(filter.PageIndex, filter.PageSize);
 
             _logger.LogInformation("Pedidos encontrados: {Count}/{Total}", result.Items.Count, result.TotalCount);
             return result;
@@ -594,7 +621,8 @@ public class OrderService
     public async Task<OrderReportDto> GetOrderReportAsync(OrderSearchModel filter)
     {
         // ✅ Consulta sem paginação para relatórios
-        var orders = await _unitOfWork.QueryAsync<Order>()
+        var orders = await _unitOfWork.Repository<Order>()
+            .GetAll()
             .Filter(filter) // Aplica apenas filtros, sem paginação
             .ToListAsync();
 
@@ -714,9 +742,9 @@ public class ProductGlobalSearchModel : IQueryableCustom
     /// </summary>
     [QueryOperator(Operator = WhereOperator.ContainsWithLikeForList, HasName = nameof(Product.Name))]
     public List<string>? SearchTerms { get; set; }
-    
-    [Key] public int PageIndex { get; set; } = 1;
-    [Key] public int PageSize { get; set; } = 10;
+
+    public int PageIndex { get; set; } = 1;
+    public int PageSize { get; set; } = 10;
     public string Sort { get; set; } = string.Empty;
 }
 
@@ -726,14 +754,23 @@ public async Task<ActionResult> GlobalSearch([FromQuery] string[] terms)
 {
     var filter = new ProductGlobalSearchModel
     {
-        SearchTerms = terms.ToList() // ["Apple", "Samsung", "Xiaomi"]
+        SearchTerms = terms.ToList(), // ["Apple", "Samsung", "Xiaomi"]
+        PageIndex = 1,
+        PageSize = 10
     };
-    
+
     // Resulta em: WHERE (Name.Contains("Apple") OR Name.Contains("Samsung") OR Name.Contains("Xiaomi"))
-    var result = await _unitOfWork.QueryAsync<Product>()
-        .FilterAndPaginate(filter)
-        .ToPagedResultAsync();
-    
+    var query = _unitOfWork.Repository<Product>()
+        .GetAll()
+        .Filter(filter)
+        .Select(p => new ProductDto
+        {
+            Id = p.Id,
+            Name = p.Name
+        });
+
+    var result = await query.ToPagedListAsync(filter.PageIndex, filter.PageSize);
+
     return Ok(result);
 }
 ```
@@ -745,18 +782,18 @@ public class ProductPriceRangeModel : IQueryableCustom
 {
     [QueryOperator(Operator = WhereOperator.GreaterThanOrEqualTo, HasName = nameof(Product.Price))]
     public decimal? MinPrice { get; set; }
-    
+
     [QueryOperator(Operator = WhereOperator.LessThanOrEqualTo, HasName = nameof(Product.Price))]
     public decimal? MaxPrice { get; set; }
-    
+
     [QueryOperator(Operator = WhereOperator.GreaterThanOrEqualTo, HasName = nameof(Product.CreatedAt))]
     public DateTime? StartDate { get; set; }
-    
+
     [QueryOperator(Operator = WhereOperator.LessThanOrEqualTo, HasName = nameof(Product.CreatedAt))]
     public DateTime? EndDate { get; set; }
-    
-    [Key] public int PageIndex { get; set; } = 1;
-    [Key] public int PageSize { get; set; } = 10;
+
+    public int PageIndex { get; set; } = 1;
+    public int PageSize { get; set; } = 10;
     public string Sort { get; set; } = string.Empty;
 }
 
@@ -772,17 +809,17 @@ public class ProductComplexFilterModel : IQueryableCustom
     // Categoria principal
     [QueryOperator(Operator = WhereOperator.Equals, HasName = nameof(Product.Category))]
     public string? PrimaryCategory { get; set; }
-    
+
     // Categoria alternativa (OR)
     [QueryOperator(Operator = WhereOperator.Equals, HasName = nameof(Product.Category), UseOr = true)]
     public string? AlternativeCategory { get; set; }
-    
+
     // Excluir produtos inativos (NOT)
     [QueryOperator(Operator = WhereOperator.Equals, HasName = nameof(Product.IsActive), UseNot = true)]
     public bool? ExcludeInactive { get; set; } = false; // NOT (IsActive = false) => produtos ativos
-    
-    [Key] public int PageIndex { get; set; } = 1;
-    [Key] public int PageSize { get; set; } = 10;
+
+    public int PageIndex { get; set; } = 1;
+    public int PageSize { get; set; } = 10;
     public string Sort { get; set; } = string.Empty;
 }
 
@@ -798,17 +835,17 @@ public class ProductTextSearchModel : IQueryableCustom
     // Busca case-sensitive (padrão)
     [QueryOperator(Operator = WhereOperator.Contains, HasName = nameof(Product.Name))]
     public string? NameExact { get; set; }
-    
+
     // Busca case-insensitive
     [QueryOperator(Operator = WhereOperator.Contains, HasName = nameof(Product.Name), CaseSensitive = false)]
     public string? NameIgnoreCase { get; set; }
-    
+
     // Categoria case-insensitive
     [QueryOperator(Operator = WhereOperator.Equals, HasName = nameof(Product.Category), CaseSensitive = false)]
     public string? Category { get; set; }
-    
-    [Key] public int PageIndex { get; set; } = 1;
-    [Key] public int PageSize { get; set; } = 10;
+
+    public int PageIndex { get; set; } = 1;
+    public int PageSize { get; set; } = 10;
     public string Sort { get; set; } = string.Empty;
 }
 
@@ -824,60 +861,77 @@ public class ProductNullableFilterModel : IQueryableCustom
     // Data de última atualização (pode ser null)
     [QueryOperator(Operator = WhereOperator.EqualsWhenNullable, HasName = nameof(Product.LastUpdate))]
     public DateTime? LastUpdate { get; set; }
-    
+
     // Estoque mínimo (nullable-safe)
     [QueryOperator(Operator = WhereOperator.GreaterThanOrEqualWhenNullable, HasName = nameof(Product.Stock))]
     public int? MinStock { get; set; }
-    
+
     // Preço máximo (nullable-safe)
     [QueryOperator(Operator = WhereOperator.LessThanOrEqualWhenNullable, HasName = nameof(Product.Price))]
     public decimal? MaxPrice { get; set; }
-    
-    [Key] public int PageIndex { get; set; } = 1;
-    [Key] public int PageSize { get; set; } = 10;
+
+    public int PageIndex { get; set; } = 1;
+    public int PageSize { get; set; } = 10;
     public string Sort { get; set; } = string.Empty;
 }
 ```
 
 ## 🔧 Ordenação Avançada
 
+### Formato do Sort
+
+A ordenação utiliza o formato de **prefixo** para indicar a direção:
+
+- **D-** = Descendente (Decrescente) - Ex: `D-Price` resulta em `ORDER BY Price DESC`
+- **A-** = Ascendente (Crescente) - Ex: `A-Name` resulta em `ORDER BY Name ASC`
+
+**Sintaxe**: `"[D|A]-NomePropriedade"`
+
+**Múltiplos campos**: Separe por vírgula - Ex: `"A-Category, D-Price, A-Name"`
+
 ### Exemplos de Ordenação Múltipla
 
 ```csharp
-// Ordenação simples
-filter.Sort = "Name asc";                    // ORDER BY Name ASC
-filter.Sort = "Price desc";                  // ORDER BY Price DESC
+// Ordenação simples - Descendente (D-)
+filter.Sort = "D-Name";                      // ORDER BY Name DESC
+filter.Sort = "D-Price";                     // ORDER BY Price DESC
+
+// Ordenação simples - Ascendente (A-)
+filter.Sort = "A-Name";                      // ORDER BY Name ASC
+filter.Sort = "A-Price";                     // ORDER BY Price ASC
 
 // Ordenação múltipla
-filter.Sort = "Category asc, Price desc";    // ORDER BY Category ASC, Price DESC
-filter.Sort = "IsActive desc, Name asc, CreatedAt desc"; // Múltiplos campos
+filter.Sort = "A-Category, D-Price";         // ORDER BY Category ASC, Price DESC
+filter.Sort = "D-IsActive, A-Name, D-CreatedAt"; // Múltiplos campos
 
 // Casos especiais
-filter.Sort = "Price";                       // ORDER BY Price ASC (direção padrão)
-filter.Sort = "";                           // Sem ordenação (ordem do banco)
+filter.Sort = "Price";                       // ⚠️ INVÁLIDO - deve especificar D- ou A-
+filter.Sort = "";                            // Sem ordenação (ordem do banco)
 ```
 
 ### Service com Ordenação Dinâmica
 
 ```csharp
-public async Task<PagedResult<ProductDto>> GetProductsWithSortingAsync(
-    string category, 
-    string sortBy = "name", 
-    string direction = "asc",
-    int page = 1, 
+public async Task<IPagedList<ProductDto>> GetProductsWithSortingAsync(
+    string category,
+    string sortBy = "name",
+    string direction = "A", // "A" para Ascendente ou "D" para Descendente
+    int page = 1,
     int pageSize = 20)
 {
     var filter = new ProductSearchModel
     {
         CategoryExact = category,
-        Sort = $"{sortBy} {direction}",
-        PageIndex = page.ToString(),
-        PageSize = pageSize.ToString()
+        Sort = $"{direction}-{sortBy}", // Ex: "A-Name" ou "D-Price"
+        PageIndex = page,
+        PageSize = pageSize
     };
 
-    return await _unitOfWork.QueryAsync<Product>()
+    var query = _unitOfWork.Repository<Product>()
+        .GetAll()
         .Where(p => p.IsActive)
-        .FilterAndPaginate(filter)
+        .Filter(filter)
+        .Sort(filter.Sort)
         .Select(p => new ProductDto
         {
             Id = p.Id,
@@ -885,8 +939,9 @@ public async Task<PagedResult<ProductDto>> GetProductsWithSortingAsync(
             Category = p.Category,
             Price = p.Price,
             CreatedAt = p.CreatedAt
-        })
-        .ToPagedResultAsync();
+        });
+
+    return await query.ToPagedListAsync(filter.PageIndex, filter.PageSize);
 }
 ```
 
@@ -915,16 +970,16 @@ public class OrderDto
     public int ItemCount { get; set; }
 }
 
-public class PagedResult<T>
-{
-    public List<T> Items { get; set; } = new();
-    public int CurrentPage { get; set; }
-    public int TotalPages { get; set; }
-    public int PageSize { get; set; }
-    public int TotalCount { get; set; }
-    public bool HasPreviousPage => CurrentPage > 1;
-    public bool HasNextPage => CurrentPage < TotalPages;
-}
+// IPagedList<T> é retornado por ToPagedListAsync()
+// Contém propriedades úteis para paginação:
+// - Items: Lista de itens da página atual
+// - PageIndex: Página atual (1-based)
+// - PageSize: Tamanho da página
+// - TotalCount: Total de registros
+// - TotalPages: Total de páginas
+// - HasPreviousPage: Indica se há página anterior
+// - HasNextPage: Indica se há próxima página
+// - IndexFrom: Índice inicial (default 0)
 
 public class OrderReportDto
 {
@@ -941,13 +996,15 @@ public class OrderReportDto
 
 ```csharp
 // ✅ BOM: Projeção para DTO
-var products = await _unitOfWork.QueryAsync<Product>()
+var products = await _unitOfWork.Repository<Product>()
+    .GetAll()
     .Filter(filter)
     .Select(p => new ProductDto { Id = p.Id, Name = p.Name }) // Apenas campos necessários
     .ToListAsync();
 
 // ❌ EVITAR: Carregar entidade completa desnecessariamente
-var products = await _unitOfWork.QueryAsync<Product>()
+var products = await _unitOfWork.Repository<Product>()
+    .GetAll()
     .Filter(filter)
     .ToListAsync(); // Carrega todos os campos
 ```
@@ -956,12 +1013,16 @@ var products = await _unitOfWork.QueryAsync<Product>()
 
 ```csharp
 // ✅ BOM: Paginação direta no banco
-var result = await _unitOfWork.QueryAsync<Product>()
-    .FilterAndPaginate(filter) // Skip/Take no SQL
-    .ToPagedResultAsync();
+var query = _unitOfWork.Repository<Product>()
+    .GetAll()
+    .Filter(filter)
+    .Select(p => new ProductDto { Id = p.Id, Name = p.Name });
+
+var result = await query.ToPagedListAsync(filter.PageIndex, filter.PageSize); // Skip/Take no SQL
 
 // ❌ EVITAR: Paginação em memória
-var allProducts = await _unitOfWork.QueryAsync<Product>()
+var allProducts = await _unitOfWork.Repository<Product>()
+    .GetAll()
     .Filter(filter)
     .ToListAsync();
 var pagedProducts = allProducts.Skip(skip).Take(take); // Carrega tudo na memória
@@ -971,17 +1032,21 @@ var pagedProducts = allProducts.Skip(skip).Take(take); // Carrega tudo na memór
 
 ```csharp
 // ✅ BOM: Include apenas quando necessário
-var orders = await _unitOfWork.QueryAsync<Order>()
-    .Include(o => o.Items.Take(5)) // Limit related data
+var orders = await _unitOfWork.Repository<Order>()
+    .GetAll(include: source => source
+        .Include(o => o.Items.Take(5))) // Limit related data
     .Filter(filter)
     .ToListAsync();
 
 // ❌ EVITAR: Include desnecessário
-var orders = await _unitOfWork.QueryAsync<Order>()
-    .Include(o => o.Items)
-    .Include(o => o.Customer)
-    .Include(o => o.ShippingAddress) // Dados não utilizados
+var orders = await _unitOfWork.Repository<Order>()
+    .GetAll(include: source => source
+        .Include(o => o.Items)
+        .Include(o => o.Customer)
+        .Include(o => o.ShippingAddress)) // Dados não utilizados
     .Filter(filter)
+    .ToListAsync();
+```
     .ToListAsync();
 ```
 
@@ -991,7 +1056,7 @@ var orders = await _unitOfWork.QueryAsync<Order>()
 
 ```csharp
 [Test]
-public async Task FilterAndPaginate_WithContainsWithLikeForList_ShouldReturnCorrectResults()
+public async Task Filter_WithContainsWithLikeForList_ShouldReturnCorrectResults()
 {
     // Arrange
     var products = new List<Product>
@@ -1005,12 +1070,13 @@ public async Task FilterAndPaginate_WithContainsWithLikeForList_ShouldReturnCorr
     var filter = new ProductSearchModel
     {
         GlobalSearch = new List<string> { "iPhone", "Samsung" },
-        PageSize = "10"
+        PageIndex = 1,
+        PageSize = 10
     };
 
     // Act
     var result = products.AsQueryable()
-        .FilterAndPaginate(filter)
+        .Filter(filter)
         .ToList();
 
     // Assert
@@ -1029,23 +1095,32 @@ public async Task SearchProducts_WithComplexFilters_ShouldReturnPagedResults()
     // Arrange
     using var context = new TestDbContext();
     var unitOfWork = new UnitOfWork<TestDbContext>(context);
-    
+
     await SeedTestData(context);
-    
+
     var filter = new ProductSearchModel
     {
         MinPrice = 100,
         MaxPrice = 1000,
         NameSearch = "Pro",
-        Sort = "Price desc",
-        PageIndex = "1",
-        PageSize = "5"
+        Sort = "D-Price",
+        PageIndex = 1,
+        PageSize = 5
     };
 
     // Act
-    var result = await unitOfWork.QueryAsync<Product>()
-        .FilterAndPaginate(filter)
-        .ToPagedResultAsync();
+    var query = unitOfWork.Repository<Product>()
+        .GetAll()
+        .Filter(filter)
+        .Sort(filter.Sort)
+        .Select(p => new ProductDto
+        {
+            Id = p.Id,
+            Name = p.Name,
+            Price = p.Price
+        });
+
+    var result = await query.ToPagedListAsync(filter.PageIndex, filter.PageSize);
 
     // Assert
     Assert.That(result.Items.Count, Is.LessThanOrEqualTo(5));
@@ -1058,7 +1133,7 @@ public async Task SearchProducts_WithComplexFilters_ShouldReturnPagedResults()
 ## 📊 Dependências
 
 - **.NET Standard 2.1** - Framework base
-- **Entity Framework Core** - ORM principal  
+- **Entity Framework Core** - ORM principal
 - **Microsoft.Extensions.DependencyInjection** - Container de DI
 - **System.Linq.Expressions** - Expression Trees
 - **Nuuvify.CommonPack.Extensions** - Extensões úteis
@@ -1078,7 +1153,10 @@ services.AddScoped<IUnitOfWork<AppDbContext>>();
 var tasks = Enumerable.Range(1, 10).Select(async i =>
 {
     var filter = new ProductSearchModel { NameSearch = $"Product {i}" };
-    return await _unitOfWork.QueryAsync<Product>().Filter(filter).ToListAsync();
+    return await _unitOfWork.Repository<Product>()
+        .GetAll()
+        .Filter(filter)
+        .ToListAsync();
 });
 
 var results = await Task.WhenAll(tasks);
@@ -1118,7 +1196,7 @@ public class QueryInterceptor : IQueryInterceptor
         {
             query = query.Where(e => !((ISoftDelete)e).IsDeleted);
         }
-        
+
         return query;
     }
 }
@@ -1143,7 +1221,7 @@ SELECT COUNT(*) FROM [Products] AS [p]
 
 **Solução**:
 1. **Atualize para v3.2.0+**: `dotnet add package Nuuvify.CommonPack.UnitOfWork.Abstraction --version 3.2.0`
-2. **Verifique sua lista não está vazia**: 
+2. **Verifique sua lista não está vazia**:
    ```csharp
    filter.SearchTerms = new List<string> { "iPhone", "Samsung" }; // ✅ Correto
    filter.SearchTerms = new List<string>(); // ❌ Lista vazia = sem filtro
@@ -1195,7 +1273,7 @@ System.NullReferenceException: Object reference not set to an instance of an obj
    {
        filter.NameSearch = searchTerm;
    }
-   
+
    // ❌ EVITAR - pode causar null expression
    filter.NameSearch = ""; // String vazia pode gerar problemas
    ```
@@ -1216,19 +1294,19 @@ WHERE [p].[Name] LIKE '%iphone%'
 **Solução**:
 1. **Verifique o atributo**:
    ```csharp
-   [QueryOperator(Operator = WhereOperator.Contains, 
-                  HasName = nameof(Product.Name), 
+   [QueryOperator(Operator = WhereOperator.Contains,
+                  HasName = nameof(Product.Name),
                   CaseSensitive = false)] // ✅ Essencial!
    public string? NameSearch { get; set; }
    ```
 
 2. **Para ContainsWithLikeForList** (v3.2.0+):
    ```csharp
-   [QueryOperator(Operator = WhereOperator.ContainsWithLikeForList, 
+   [QueryOperator(Operator = WhereOperator.ContainsWithLikeForList,
                   HasName = nameof(Product.Name),
                   CaseSensitive = false)] // ✅ Funciona na v3.2.0+
    public List<string>? SearchTerms { get; set; }
-   
+
    // SQL Gerado: WHERE Name LIKE '%IPHONE%' OR Name LIKE '%SAMSUNG%'
    ```
 
@@ -1253,14 +1331,14 @@ SELECT * FROM Products WHERE 0 = 1
        filter.SearchTerms = terms;
    }
    // Deixe null se não houver termos
-   
+
    // ❌ EVITAR em versões < 3.2.0
    filter.SearchTerms = new List<string>(); // Gera WHERE 0 = 1
    ```
 
 ### Problema: Performance lenta em queries grandes
 
-**Sintomas**: 
+**Sintomas**:
 - Queries demoram muito tempo
 - Alto consumo de memória
 - Timeout de banco de dados
@@ -1270,17 +1348,19 @@ SELECT * FROM Products WHERE 0 = 1
 1. **Use projeção (Select)**:
    ```csharp
    // ✅ BOM - apenas campos necessários
-   var products = await _unitOfWork.QueryAsync<Product>()
+   var products = await _unitOfWork.Repository<Product>()
+       .GetAll()
        .Filter(filter)
-       .Select(p => new ProductDto 
-       { 
-           Id = p.Id, 
-           Name = p.Name 
+       .Select(p => new ProductDto
+       {
+           Id = p.Id,
+           Name = p.Name
        })
        .ToListAsync();
-   
+
    // ❌ EVITAR - carrega entidade completa
-   var products = await _unitOfWork.QueryAsync<Product>()
+   var products = await _unitOfWork.Repository<Product>()
+       .GetAll()
        .Filter(filter)
        .ToListAsync();
    ```
@@ -1289,15 +1369,15 @@ SELECT * FROM Products WHERE 0 = 1
    ```csharp
    // ✅ BOM
    filter.PageSize = 50; // Máximo 50 registros por página
-   
+
    // ❌ EVITAR
    filter.PageSize = 10000; // Muito grande!
    ```
 
 3. **Use AsNoTracking para leitura**:
    ```csharp
-   var products = await _unitOfWork.QueryAsync<Product>()
-       .AsNoTracking() // ✅ Melhora performance em queries read-only
+   var products = await _unitOfWork.Repository<Product>()
+       .GetAll(disableTracking: true) // ✅ Melhora performance em queries read-only
        .Filter(filter)
        .ToListAsync();
    ```
@@ -1305,17 +1385,19 @@ SELECT * FROM Products WHERE 0 = 1
 4. **Evite Include desnecessário**:
    ```csharp
    // ✅ BOM - Include apenas quando necessário
-   var orders = await _unitOfWork.QueryAsync<Order>()
-       .Include(o => o.Items)
+   var orders = await _unitOfWork.Repository<Order>()
+       .GetAll(include: source => source
+           .Include(o => o.Items))
        .Filter(filter)
        .ToListAsync();
-   
+
    // ❌ EVITAR - Includes desnecessários
-   var orders = await _unitOfWork.QueryAsync<Order>()
-       .Include(o => o.Items)
-       .Include(o => o.Customer)
-       .Include(o => o.ShippingAddress)
-       .Include(o => o.PaymentDetails) // Dados não utilizados
+   var orders = await _unitOfWork.Repository<Order>()
+       .GetAll(include: source => source
+           .Include(o => o.Items)
+           .Include(o => o.Customer)
+           .Include(o => o.ShippingAddress)
+           .Include(o => o.PaymentDetails)) // Dados não utilizados
        .Filter(filter)
        .ToListAsync();
    ```
@@ -1328,23 +1410,24 @@ SELECT * FROM Products WHERE 0 = 1
 
 1. **Sintaxe correta**:
    ```csharp
-   // ✅ CORRETO
-   filter.Sort = "Name asc";
-   filter.Sort = "Price desc";
-   filter.Sort = "Category asc, Price desc, Name";
-   
-   // ❌ INCORRETO
-   filter.Sort = "Name ASC"; // Case-sensitive em alguns casos
-   filter.Sort = "Name,Price"; // Faltam direções
+   // ✅ CORRETO - Formato com prefixo D- ou A-
+   filter.Sort = "A-Name";                  // Ascendente
+   filter.Sort = "D-Price";                 // Descendente
+   filter.Sort = "A-Category, D-Price, A-Name"; // Múltiplos campos
+
+   // ❌ INCORRETO - Formato antigo (não suportado)
+   filter.Sort = "Name asc";                // ❌ Use "A-Name"
+   filter.Sort = "Price desc";              // ❌ Use "D-Price"
+   filter.Sort = "Name,Price";              // ❌ Faltam prefixos D- ou A-
    ```
 
 2. **Propriedade existe na entidade**:
    ```csharp
    // ✅ Propriedade existe em Product
-   filter.Sort = "Name asc";
-   
+   filter.Sort = "A-Name";
+
    // ❌ Propriedade não existe
-   filter.Sort = "InvalidProperty asc"; // Runtime error
+   filter.Sort = "D-InvalidProperty"; // Runtime error
    ```
 
 ### Recursos de Debug
@@ -1371,7 +1454,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 **Inspecionar expressões geradas**:
 ```csharp
-var filterExpression = _unitOfWork.QueryAsync<Product>()
+var filterExpression = _unitOfWork.Repository<Product>()
+    .GetAll()
     .FilterExpression(filter);
 
 Console.WriteLine(filterExpression?.ToString());
@@ -1388,7 +1472,7 @@ Contribuições são bem-vindas! Para contribuir:
 
 1. Fork o projeto
 2. Crie uma feature branch (`git checkout -b feature/nova-funcionalidade`)
-3. Commit suas mudanças (`git commit -am 'Adiciona nova funcionalidade'`)  
+3. Commit suas mudanças (`git commit -am 'Adiciona nova funcionalidade'`)
 4. Push para a branch (`git push origin feature/nova-funcionalidade`)
 5. Abra um Pull Request
 
@@ -1396,7 +1480,7 @@ Contribuições são bem-vindas! Para contribuir:
 
 Para dúvidas e suporte técnico:
 
-- 📧 Email: [suporte@nuuvify.com](mailto:suporte@nuuvify.com)
+- 📧 Email: [suporte@zocate.li](mailto:suporte@zocate.li)
 - 📋 Issues: [GitHub Issues](https://github.com/nuuvify/Nuuvify.CommonPack/issues)
 - 📖 Documentação: [Wiki do Projeto](https://github.com/nuuvify/Nuuvify.CommonPack/wiki)
 
@@ -1404,7 +1488,7 @@ Para dúvidas e suporte técnico:
 
 Este projeto segue o [Semantic Versioning](https://semver.org/):
 - **MAJOR**: Mudanças incompatíveis na API
-- **MINOR**: Novas funcionalidades mantendo compatibilidade  
+- **MINOR**: Novas funcionalidades mantendo compatibilidade
 - **PATCH**: Correções de bugs mantendo compatibilidade
 
 Consulte o [CHANGELOG.md](./CHANGELOG.md) para ver todas as mudanças.
