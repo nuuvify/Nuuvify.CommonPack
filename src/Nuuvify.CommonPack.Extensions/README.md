@@ -8,21 +8,91 @@ Biblioteca fundamental com implementação do Notification Pattern e extensões 
 
 ## 📋 Índice
 
-- [Funcionalidades](#funcionalidades)
-- [Instalação](#instalação)
-- [Dependências](#dependências)
-- [Configuração](#configuração)
-- [Uso](#uso)
-  - [Notification Pattern](#notification-pattern)
-  - [String Extensions](#string-extensions)
-  - [Enum Extensions](#enum-extensions)
-  - [Domain Entity](#domain-entity)
-  - [JSON Extensions](#json-extensions)
-  - [DateTime Extensions](#datetime-extensions)
-- [Exemplos Práticos](#exemplos-práticos)
-- [API Reference](#api-reference)
-- [Troubleshooting](#troubleshooting)
-- [Changelog](#changelog)
+- [Nuuvify.CommonPack.Extensions](#nuuvifycommonpackextensions)
+  - [📋 Índice](#-índice)
+  - [Funcionalidades](#funcionalidades)
+  - [Instalação](#instalação)
+    - [Via Package Manager Console](#via-package-manager-console)
+    - [Via .NET CLI](#via-net-cli)
+    - [Via PackageReference](#via-packagereference)
+  - [Dependências](#dependências)
+    - [NuGet Packages](#nuget-packages)
+    - [Framework](#framework)
+  - [Configuração](#configuração)
+  - [Uso](#uso)
+    - [Notification Pattern](#notification-pattern)
+      - [NotifiableR - Classe Base](#notifiabler---classe-base)
+      - [NotificationR - Estrutura de Notificação](#notificationr---estrutura-de-notificação)
+    - [String Extensions](#string-extensions)
+      - [Manipulação de Caracteres Especiais](#manipulação-de-caracteres-especiais)
+      - [Formatação e Conversão](#formatação-e-conversão)
+    - [Enum Extensions](#enum-extensions)
+      - [Conversões e Descrições](#conversões-e-descrições)
+    - [Domain Entity](#domain-entity)
+      - [Classe Base para Entidades](#classe-base-para-entidades)
+    - [JSON Extensions](#json-extensions)
+      - [Conversores Customizados](#conversores-customizados)
+    - [DateTime Extensions](#datetime-extensions)
+  - [Exemplos Práticos](#exemplos-práticos)
+    - [Exemplo 1: Validação de Formulário com Notifications](#exemplo-1-validação-de-formulário-com-notifications)
+    - [Exemplo 2: Processamento de Dados com Logging](#exemplo-2-processamento-de-dados-com-logging)
+    - [Exemplo 3: Service com Multiple Validations](#exemplo-3-service-com-multiple-validations)
+  - [API Reference](#api-reference)
+    - [Core Extensions](#core-extensions)
+      - [AssemblyExtension](#assemblyextension)
+      - [StringExtensionMethods](#stringextensionmethods)
+      - [StringExtensionToMethods](#stringextensiontomethods)
+      - [EnumExtensionMethods](#enumextensionmethods)
+      - [DateTimeExtensions](#datetimeextensions)
+      - [DictionaryExtension](#dictionaryextension)
+      - [ObjectExtension](#objectextension)
+    - [Validation \& Notification](#validation--notification)
+      - [NotifiableR](#notifiabler)
+      - [NotificationR](#notificationr)
+      - [DataAnnotationExtension](#dataannotationextension)
+      - [ValidatedNotNullExtensionMethods](#validatednotnullextensionmethods)
+    - [Advanced Extensions](#advanced-extensions)
+      - [ExpressionExtension](#expressionextension)
+      - [ReflectionConstantsExtension](#reflectionconstantsextension)
+      - [DistinctExtension](#distinctextension)
+    - [JSON \& Converters](#json--converters)
+      - [JsonTypesExtensions](#jsontypesextensions)
+      - [NullToDefaultValueConverter](#nulltodefaultvalueconverter)
+      - [JsonDateTimeConverters](#jsondatetimeconverters)
+    - [Logging](#logging)
+      - [NuuvifyLogFormatter](#nuuvifylogformatter)
+      - [NuuvifyLogSetupExtensions](#nuuvifylogsetupextensions)
+    - [Helpers \& Utilities](#helpers--utilities)
+      - [DomainEntity](#domainentity)
+      - [CustomGenericComparer](#customgenericcomparer)
+      - [CacheTimeService](#cachetimeservice)
+      - [PathHelper](#pathhelper)
+      - [Constants](#constants)
+      - [FileData](#filedata)
+      - [WebProxyConfigureMethod](#webproxyconfiguremethod)
+    - [Interfaces](#interfaces)
+      - [IDataAnnotationCustom](#idataannotationcustom)
+      - [INotPersistingAsTable](#inotpersistingastable)
+      - [IRepositoryValidation](#irepositoryvalidation)
+    - [Métodos Legados (Notification Pattern)](#métodos-legados-notification-pattern)
+      - [NotifiableR (Continuação)](#notifiabler-continuação)
+      - [NotificationR (Continuação)](#notificationr-continuação)
+    - [String Extensions (Continuação)](#string-extensions-continuação)
+      - [StringExtensionMethods (Continuação)](#stringextensionmethods-continuação)
+    - [Enum Extensions (Continuação)](#enum-extensions-continuação)
+      - [EnumExtensionMethods (Continuação)](#enumextensionmethods-continuação)
+    - [Domain Entity (Continuação)](#domain-entity-continuação)
+      - [DomainEntity (Continuação)](#domainentity-continuação)
+    - [JSON Extensions (Continuação)](#json-extensions-continuação)
+      - [NullToDefaultValueConverter (Continuação)](#nulltodefaultvalueconverter-continuação)
+  - [Troubleshooting](#troubleshooting)
+    - [Problemas Comuns](#problemas-comuns)
+      - [NullReferenceException com Strings](#nullreferenceexception-com-strings)
+      - [Notificações não aparecendo](#notificações-não-aparecendo)
+      - [Enum conversions falhando](#enum-conversions-falhando)
+    - [Logs e Debugging](#logs-e-debugging)
+  - [Changelog](#changelog)
+  - [📞 Suporte](#-suporte)
 
 ## Funcionalidades
 
@@ -34,6 +104,7 @@ Biblioteca fundamental com implementação do Notification Pattern e extensões 
 - ✅ **DateTime Extensions** para manipulações de data/hora
 - ✅ **Dictionary Extensions** para operações em dicionários
 - ✅ **Object Extensions** para reflexão e validações
+- ✅ **PathHelper** para manipulação e validação de caminhos cross-platform
 - ✅ **Logging Integration** com Microsoft.Extensions.Logging
 - ✅ **Data Annotations** com validações customizadas
 - ✅ **Compatibilidade .NET Standard 2.1** para máxima portabilidade
@@ -613,9 +684,893 @@ public class PedidoService : NotifiableR
 
 ## API Reference
 
-### Notification Pattern
+### Core Extensions
+
+#### AssemblyExtension
+
+Métodos para obter informações do assembly da aplicação.
+
+```csharp
+public static class AssemblyExtension
+{
+    // Obtém o nome da aplicação
+    public static string GetApplicationNameByAssembly(this Assembly assembly);
+
+    // Obtém o número do build
+    public static string GetApplicationBuildNumber(this Assembly assembly);
+
+    // Obtém a versão da aplicação
+    public static string GetApplicationVersion(this Assembly assembly);
+}
+```
+
+**Exemplo de uso**:
+```csharp
+var assembly = Assembly.GetExecutingAssembly();
+var appName = assembly.GetApplicationNameByAssembly();
+var version = assembly.GetApplicationVersion();
+var buildNumber = assembly.GetApplicationBuildNumber();
+
+Console.WriteLine($"{appName} v{version} (Build: {buildNumber})");
+```
+
+#### StringExtensionMethods
+
+Métodos de extensão para manipulação avançada de strings.
+
+```csharp
+public static partial class StringExtensionMethods
+{
+    // Remove caracteres especiais (mantém apenas ASCII 20-7E)
+    public static string RemoveSpecialChars(this string text);
+
+    // Mantém apenas letras e números
+    public static string GetLettersAndNumbersOnly(this string text);
+
+    // Obtém apenas caracteres Unicode
+    public static string GetUnicodeChars(this string text);
+
+    // Remove caracteres mas mantém diacríticos (acentos)
+    public static string RemoveCharsKeepDiacritics(this string text);
+
+    // Remove caracteres mas mantém os especificados
+    public static string RemoveCharsKeepChars(this string text, params string[] keepChars);
+
+    // Remove acentuação
+    public static string RemoveAccent(this string text);
+
+    // Extrai apenas números
+    public static string GetNumbers(this string text);
+
+    // Substring seguro (null-safe)
+    public static string SubstringNotNull(this string value, int start, int length);
+
+    // Converte para Title Case
+    public static string ToTitleCase(this string text);
+
+    // Remove \r\n e outros caracteres especificados
+    public static string GetReturnMessageWithoutRn(this string returnMessage, string otherCharToRemove = null);
+}
+```
+
+**Exemplo de uso**:
+```csharp
+string texto = "José & Maria - R$ 1.500,00!";
+
+// Diferentes tipos de limpeza
+string semEspeciais = texto.RemoveSpecialChars();        // "Jos  Maria  R 1500"
+string apenasAlnum = texto.GetLettersAndNumbersOnly();   // "JosMaria1500"
+string semAcentos = texto.RemoveAccent();                // "Jose & Maria - R$ 1.500,00!"
+string apenasNumeros = texto.GetNumbers();               // "1500"
+
+// Mantendo caracteres específicos
+string comTracos = texto.RemoveCharsKeepChars("-", "$"); // "José  Maria - R$ 150000"
+
+// Title Case
+string nome = "joão da silva".ToTitleCase();             // "João Da Silva"
+```
+
+#### StringExtensionToMethods
+
+Métodos de conversão de string com proteção contra null.
+
+```csharp
+public static partial class StringExtensionMethods
+{
+    // ToUpper invariante seguro
+    public static string ToUpperInvariantNotNull(this string value);
+
+    // ToUpper seguro
+    public static string ToUpperNotNull(this string value);
+
+    // ToLower seguro
+    public static string ToLowerNotNull(this string value);
+
+    // ToLower invariante seguro
+    public static string ToLowerInvariantNotNull(this string value);
+
+    // Trim seguro
+    public static string TrimNotNull(this string value);
+
+    // ToString seguro
+    public static string ToStringNotNull(this string value);
+}
+```
+
+**Exemplo de uso**:
+```csharp
+string texto = null;
+
+// Métodos tradicionais causariam NullReferenceException
+// string upper = texto.ToUpper(); // ❌ Exception!
+
+// Métodos seguros retornam null
+string upper = texto.ToUpperNotNull();           // null
+string lower = texto.ToLowerNotNull();           // null
+string trimmed = texto.TrimNotNull();            // null
+
+// Útil em chains
+string resultado = input?.TrimNotNull()?.ToLowerNotNull();
+```
+
+#### EnumExtensionMethods
+
+Métodos de extensão para trabalhar com enums.
+
+```csharp
+public static class EnumExtensionMethods
+{
+    // Obtém a descrição do enum (via [Description])
+    public static string GetDescription(this Enum GenericEnum);
+
+    // Converte string para número do enum
+    public static int ToEnumNumero<T>(this string value);
+
+    // Converte string para código do enum
+    public static string ToEnumCodigo<T>(this string value);
+
+    // Converte int para código do enum
+    public static string ToEnumCodigo<T>(this int value);
+
+    // Converte int para descrição do enum
+    public static string ToEnumDescricao<T>(this int value);
+
+    // Converte string para descrição do enum
+    public static string ToEnumDescricao<T>(this string value);
+
+    // Verifica se string é um enum válido
+    public static bool IsEnum<T>(this string value, out int enumCode);
+
+    // Obtém código do enum pela descrição
+    public static string GetCodeEnumByDescription<T>(this string value);
+}
+```
+
+**Exemplo de uso**:
+```csharp
+public enum StatusPedido
+{
+    [Description("Aguardando Pagamento")]
+    AguardandoPagamento = 1,
+
+    [Description("Em Preparação")]
+    EmPreparacao = 2
+}
+
+// Obter descrição
+var status = StatusPedido.AguardandoPagamento;
+string descricao = status.GetDescription(); // "Aguardando Pagamento"
+
+// Converter string para enum
+int numero = "AguardandoPagamento".ToEnumNumero<StatusPedido>(); // 1
+
+// Validar enum
+bool isValid = "StatusInvalido".IsEnum<StatusPedido>(out int codigo);
+// isValid = false, codigo = int.MaxValue
+```
+
+#### DateTimeExtensions
+
+Métodos de extensão para DateTime e DateTimeOffset.
+
+```csharp
+public static class DateTimeExtensions
+{
+    // Formata para padrão REST (yyyy-MM-dd ou yyyy-MM-ddTHH:mm:ss)
+    public static string GetFormatRest(this DateTime dateTime, bool timeToo = false);
+
+    // Formata DateTimeOffset para padrão REST
+    public static string GetFormatRest(this DateTimeOffset dateTimeOffset);
+
+    // Obtém o primeiro dia útil do mês
+    public static DateTime GetFirstWorkingDay(this DateTime data);
+
+    // Obtém o primeiro dia útil do mês (DateTimeOffset)
+    public static DateTimeOffset GetFirstWorkingDay(this DateTimeOffset data);
+}
+```
+
+**Exemplo de uso**:
+```csharp
+var hoje = DateTime.Now;
+
+// Formato REST
+string dataRest = hoje.GetFormatRest();           // "2025-10-28"
+string dataHoraRest = hoje.GetFormatRest(true);  // "2025-10-28T14:30:00"
+
+// Primeiro dia útil
+var primeiroDiaUtil = hoje.GetFirstWorkingDay();
+```
+
+#### DictionaryExtension
+
+Métodos de extensão para dicionários.
+
+```csharp
+public static class DictionaryExtension
+{
+    // Adiciona ou substitui valor no dicionário
+    public static void AddForce(this IDictionary<string, object> dictionary, string key, object value);
+}
+```
+
+**Exemplo de uso**:
+```csharp
+var dict = new Dictionary<string, object>
+{
+    { "nome", "João" }
+};
+
+// Adiciona ou atualiza sem verificar se existe
+dict.AddForce("nome", "Maria");   // Substitui
+dict.AddForce("idade", 30);        // Adiciona
+```
+
+#### ObjectExtension
+
+Métodos de extensão para objetos.
+
+```csharp
+public static class ObjectExtension
+{
+    // Compara objetos com proteção contra null
+    public static bool EqualsObjectNotNull(this object obj, object obj1);
+}
+```
+
+**Exemplo de uso**:
+```csharp
+object obj1 = null;
+object obj2 = "teste";
+
+// Comparação segura
+bool iguais = obj1.EqualsObjectNotNull(obj2); // false (sem NullReferenceException)
+```
+
+---
+
+### Validation & Notification
 
 #### NotifiableR
+
+Classe base para implementação do Notification Pattern.
+
+```csharp
+public class NotifiableR
+{
+    // Propriedades
+    public IReadOnlyCollection<NotificationR> Notifications { get; }
+
+    // Métodos
+    public bool IsValid();
+    public void AddNotification(string property, string message, string aggregateId = null);
+    public void AddNotifications(IList<NotificationR> notifications);
+    public void RemoveNotification(string property);
+    public void RemoveNotifications(bool removeAll = true);
+    public IList<NotificationR> LoggerNotifications(ILogger logger, string logDescription);
+}
+```
+
+**Exemplo de uso**:
+```csharp
+public class ProdutoService : NotifiableR
+{
+    public void ValidarProduto(string nome, decimal preco)
+    {
+        if (string.IsNullOrEmpty(nome))
+            AddNotification("Nome", "Nome é obrigatório");
+
+        if (preco <= 0)
+            AddNotification("Preco", "Preço deve ser maior que zero");
+
+        if (!IsValid())
+        {
+            // Processar erros
+            foreach (var error in Notifications)
+                Console.WriteLine($"{error.Property}: {error.Message}");
+        }
+    }
+}
+```
+
+#### NotificationR
+
+Estrutura de notificação individual.
+
+```csharp
+public class NotificationR
+{
+    public string Property { get; set; }
+    public string Message { get; set; }
+    public string AggregatorId { get; set; }
+    public DateTimeOffset DateOccurrence { get; set; }
+}
+```
+
+#### DataAnnotationExtension
+
+Extensões para integração com Data Annotations.
+
+```csharp
+public static class DataAnnotationExtension
+{
+    // Obtém notificações de validação
+    public static IList<NotificationR> GetNotifications(this IDataAnnotationCustom model);
+
+    // Valida modelo usando Data Annotations
+    public static bool DataAnnotationsIsValid(this IDataAnnotationCustom model);
+}
+```
+
+**Exemplo de uso**:
+```csharp
+public class ProdutoModel : IDataAnnotationCustom
+{
+    [Required(ErrorMessage = "Nome é obrigatório")]
+    public string Nome { get; set; }
+
+    [Range(1, 99999, ErrorMessage = "Preço deve ser maior que zero")]
+    public decimal Preco { get; set; }
+}
+
+var produto = new ProdutoModel { Nome = "", Preco = 0 };
+
+// Validar
+bool isValid = produto.DataAnnotationsIsValid();
+
+// Obter erros
+var erros = produto.GetNotifications();
+```
+
+#### ValidatedNotNullExtensionMethods
+
+Métodos para validação de null.
+
+```csharp
+public static class ValidatedNotNullExtensionMethods
+{
+    // Verifica se objeto não é null
+    public static bool NotNull<T>(this T value) where T : class;
+
+    // Verifica se coleção não é null ou vazia
+    public static bool NotNullOrZero<T>(this T value) where T : IEnumerable<object>;
+
+    // Verifica se enumerável não é null ou vazio
+    public static bool NotNullOrZero(this System.Collections.IEnumerable value);
+}
+```
+
+**Exemplo de uso**:
+```csharp
+string texto = "teste";
+List<int> lista = new List<int> { 1, 2, 3 };
+
+// Validações
+bool textoValido = texto.NotNull();        // true
+bool listaValida = lista.NotNullOrZero();  // true
+
+string textoNulo = null;
+bool nuloInvalido = textoNulo.NotNull();   // false
+```
+
+---
+
+### Advanced Extensions
+
+#### ExpressionExtension
+
+Métodos para manipulação de expressões LINQ.
+
+```csharp
+public static class ExpressionExtension
+{
+    // Combina expressões com operador AND ou OR
+    public static Expression<Func<T, bool>> CombineExpressions<T>(
+        this Expression<Func<T, bool>> expr1,
+        Expression<Func<T, bool>> expr2,
+        bool useOrOperator = false);
+}
+```
+
+**Exemplo de uso**:
+```csharp
+Expression<Func<Produto, bool>> expr1 = p => p.Ativo;
+Expression<Func<Produto, bool>> expr2 = p => p.Preco > 100;
+
+// Combinar com AND
+var combinadaAnd = expr1.CombineExpressions(expr2);
+// Resultado: p => p.Ativo && p.Preco > 100
+
+// Combinar com OR
+var combinadaOr = expr1.CombineExpressions(expr2, useOrOperator: true);
+// Resultado: p => p.Ativo || p.Preco > 100
+
+// Usar em query
+var produtos = dbContext.Produtos.Where(combinadaAnd).ToList();
+```
+
+#### ReflectionConstantsExtension
+
+Métodos para obter constantes via reflexão.
+
+```csharp
+public static class ReflectionConstantsExtension
+{
+    // Obtém todas as constantes públicas de um tipo
+    public static IEnumerable<FieldInfo> GetPublicConstants(this Type type);
+}
+```
+
+**Exemplo de uso**:
+```csharp
+public static class StatusCodes
+{
+    public const int OK = 200;
+    public const int NotFound = 404;
+    public const int ServerError = 500;
+}
+
+// Obter todas as constantes
+var constantes = typeof(StatusCodes).GetPublicConstants();
+
+foreach (var constante in constantes)
+{
+    var nome = constante.Name;
+    var valor = constante.GetValue(null);
+    Console.WriteLine($"{nome} = {valor}");
+}
+// Output:
+// OK = 200
+// NotFound = 404
+// ServerError = 500
+```
+
+#### DistinctExtension
+
+Métodos para Distinct customizado.
+
+```csharp
+public static class DistinctExtension
+{
+    // Distinct usando propriedade específica
+    public static IEnumerable<TSource> Distinct<TSource>(
+        this IEnumerable<TSource> source,
+        Func<TSource, object> keySelector);
+}
+```
+
+**Exemplo de uso**:
+```csharp
+var produtos = new List<Produto>
+{
+    new Produto { Id = 1, Nome = "Produto A", Categoria = "Cat1" },
+    new Produto { Id = 2, Nome = "Produto B", Categoria = "Cat1" },
+    new Produto { Id = 3, Nome = "Produto C", Categoria = "Cat2" }
+};
+
+// Distinct por categoria
+var categorias = produtos.Distinct(p => p.Categoria);
+// Resultado: 2 produtos (Cat1 e Cat2)
+```
+
+---
+
+### JSON & Converters
+
+#### JsonTypesExtensions
+
+Métodos para conversão de tipos JSON.
+
+```csharp
+public static class JsonTypesExtensions
+{
+    // Converte tipo JSON customizado
+    public static object ConvertJsonTypeCustom(
+        this ref Utf8JsonReader reader,
+        Type propertyType);
+}
+```
+
+**Exemplo de uso**:
+```csharp
+// Usado internamente pelos conversores JSON customizados
+// para converter tipos de forma inteligente durante deserialização
+```
+
+#### NullToDefaultValueConverter
+
+Conversor JSON que transforma null em valores padrão.
+
+```csharp
+public class NullToDefaultValueConverter<T> : JsonConverter<T>
+    where T : struct, IConvertible
+{
+    public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options);
+    public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options);
+}
+```
+
+**Exemplo de uso**:
+```csharp
+var options = new JsonSerializerOptions
+{
+    Converters = { new NullToDefaultValueConverter<int>() }
+};
+
+string json = "{\"idade\": null}";
+var obj = JsonSerializer.Deserialize<Pessoa>(json, options);
+// obj.Idade = 0 (valor padrão ao invés de exception)
+```
+
+#### JsonDateTimeConverters
+
+Conversores para DateTime e DateTimeOffset.
+
+```csharp
+// Converte DateTime para tipos inferidos
+public class JsonDateTimeToInferredTypesConverter : JsonConverter<DateTime>
+
+// Converte DateTimeOffset para tipos inferidos
+public class JsonDateTimeOffsetToInferredTypesConverter : JsonConverter<DateTimeOffset>
+
+// Converte objetos para tipos inferidos
+public class JsonObjectToInferredTypesConverter : JsonConverter<object>
+```
+
+**Exemplo de uso**:
+```csharp
+var options = new JsonSerializerOptions
+{
+    Converters =
+    {
+        new JsonDateTimeToInferredTypesConverter(),
+        new JsonDateTimeOffsetToInferredTypesConverter()
+    }
+};
+
+// Deserialização inteligente de datas
+string json = "{\"data\": \"2025-10-28T14:30:00\"}";
+var obj = JsonSerializer.Deserialize<MyObject>(json, options);
+```
+
+---
+
+### Logging
+
+#### NuuvifyLogFormatter
+
+Formatador customizado de logs com cores.
+
+```csharp
+public class NuuvifyLogFormatter : ConsoleFormatter
+{
+    public NuuvifyLogFormatter(IOptionsMonitor<NuuvifyLogFormatterOptions> options);
+
+    public override void Write<TState>(
+        in LogEntry<TState> logEntry,
+        IExternalScopeProvider scopeProvider,
+        TextWriter textWriter);
+}
+```
+
+#### NuuvifyLogSetupExtensions
+
+Extensões para configuração de logging customizado.
+
+```csharp
+public static class NuuvifyLogSetupExtensions
+{
+    // Adiciona console formatter customizado
+    public static ILoggingBuilder AddNuuvifyConsoleFormatter(
+        this ILoggingBuilder builder,
+        Action<NuuvifyLogFormatterOptions> configure = null);
+}
+```
+
+**Exemplo de uso**:
+```csharp
+// Program.cs
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole(options =>
+{
+    options.FormatterName = "nuuvify";
+});
+builder.Logging.AddNuuvifyConsoleFormatter(options =>
+{
+    options.IncludeScopes = true;
+    options.TimestampFormat = "yyyy-MM-dd HH:mm:ss ";
+});
+```
+
+---
+
+### Helpers & Utilities
+
+#### DomainEntity
+
+Classe base para entidades de domínio.
+
+```csharp
+public class DomainEntity
+{
+    public string Id { get; protected set; }
+    public virtual DateTimeOffset DataCadastro { get; protected set; }
+    public virtual string UsuarioCadastro { get; set; }
+    public virtual DateTimeOffset? DataAlteracao { get; set; }
+    public virtual string UsuarioAlteracao { get; set; }
+
+    public override bool Equals(object obj);
+    public override int GetHashCode();
+}
+```
+
+**Exemplo de uso**:
+```csharp
+public class Produto : DomainEntity
+{
+    public string Nome { get; private set; }
+    public decimal Preco { get; private set; }
+
+    public Produto(string nome, decimal preco)
+    {
+        // Id é gerado automaticamente
+        Nome = nome;
+        Preco = preco;
+        // DataCadastro é preenchido automaticamente
+    }
+}
+```
+
+#### CustomGenericComparer
+
+Comparador genérico customizado.
+
+```csharp
+public class CustomGenericComparer<T> : IEqualityComparer<T>
+{
+    public Func<T, object> KeySelector { get; set; }
+
+    public bool Equals(T x, T y);
+    public int GetHashCode(T obj);
+}
+```
+
+**Exemplo de uso**:
+```csharp
+var comparer = new CustomGenericComparer<Produto>
+{
+    KeySelector = p => p.Nome
+};
+
+var lista = produtos.Distinct(comparer).ToList();
+```
+
+#### CacheTimeService
+
+Serviço para gerenciamento de cache baseado em tempo.
+
+```csharp
+public class CacheTimeService
+{
+    // Implementação específica para cache temporal
+}
+```
+
+#### PathHelper
+
+Classe helper para manipulação e validação de caminhos de arquivos/diretórios com suporte cross-platform.
+
+```csharp
+public static class PathHelper
+{
+    // Sanitiza e normaliza um caminho de arquivo/diretório
+    public static string SanitizeAndNormalizePath(string rawPath);
+
+    // Verifica se um caminho existe (arquivo ou diretório)
+    public static bool PathExists(string path);
+
+    // Verifica se o caminho possui permissões de leitura e escrita
+    public static bool HasReadWriteAccess(string path);
+}
+```
+
+**Exemplo de uso**:
+```csharp
+using System.IO.Abstractions;
+
+public class FileManagerService
+{
+    public void ProcessarCaminhos()
+    {
+        // Normalizar caminhos com separadores misturados
+        string rawPath = @"C:\Users\Documents/MyApp\Data\\files/";
+        string normalized = PathHelper.SanitizeAndNormalizePath(rawPath);
+        // Windows: C:\Users\Documents\MyApp\Data\files
+        // Linux:   C:/Users/Documents/MyApp/Data/files
+
+        // Caminhos UNC também são suportados
+        string uncPath = @"\\server\share\folder";
+        string normalizedUnc = PathHelper.SanitizeAndNormalizePath(uncPath);
+        // Resultado: \\server\share\folder
+
+        // Verificar se caminho existe
+        string dirPath = @"C:\Temp";
+        bool exists = PathHelper.PathExists(dirPath);
+        Console.WriteLine($"Caminho existe: {exists}");
+
+        // Verificar permissões de leitura/escrita (cross-platform)
+        bool hasAccess = PathHelper.HasReadWriteAccess(dirPath);
+        if (hasAccess)
+        {
+            Console.WriteLine("Diretório possui permissões de leitura/escrita");
+            // Processar arquivos no diretório
+        }
+        else
+        {
+            Console.WriteLine("Acesso negado ao diretório");
+            // Tratar erro de permissão
+        }
+    }
+
+    public void ValidarDiretoriosAntesDeProcessar(string[] diretorios)
+    {
+        foreach (var dir in diretorios)
+        {
+            // Sanitizar caminho primeiro
+            string dirNormalizado = PathHelper.SanitizeAndNormalizePath(dir);
+
+            // Verificar existência
+            if (!PathHelper.PathExists(dirNormalizado))
+            {
+                Console.WriteLine($"Diretório não existe: {dirNormalizado}");
+                continue;
+            }
+
+            // Verificar permissões
+            if (!PathHelper.HasReadWriteAccess(dirNormalizado))
+            {
+                Console.WriteLine($"Sem permissão de acesso: {dirNormalizado}");
+                continue;
+            }
+
+            // Processar diretório
+            ProcessarArquivos(dirNormalizado);
+        }
+    }
+
+    private void ProcessarArquivos(string diretorio)
+    {
+        // Lógica de processamento
+        var files = Directory.GetFiles(diretorio);
+        Console.WriteLine($"Processando {files.Length} arquivos em {diretorio}");
+    }
+}
+```
+
+**Características importantes**:
+- ✅ **Cross-platform**: Funciona em Windows, Linux e macOS
+- ✅ **Normalização de separadores**: Converte `\` e `/` para o separador correto da plataforma
+- ✅ **Suporte a UNC paths**: Preserva caminhos de rede `\\server\share`
+- ✅ **Verificação de permissões**: Testa leitura/escrita criando arquivo temporário
+- ✅ **.NET Standard 2.1**: Compatível com versões antigas do framework
+- ✅ **Tratamento de exceções**: Captura erros de acesso, E/S e segurança
+
+**Observações sobre HasReadWriteAccess()**:
+- Cria um arquivo temporário com nome único (GUID) no diretório
+- Tenta escrever conteúdo no arquivo
+- Deleta o arquivo de teste
+- Se qualquer operação falhar, retorna `false`
+- Captura exceções: `UnauthorizedAccessException`, `IOException`, `SecurityException`, etc.
+
+#### Constants
+
+Constantes do sistema.
+
+```csharp
+public static class Constants
+{
+    // Header de correlação
+    public static string CorrelationHeader { get; }
+
+    // Header de claim do usuário
+    public static string UserClaimHeader { get; }
+
+    // Header de validação do usuário
+    public static string UserIsValidToApplication { get; }
+}
+```
+
+**Exemplo de uso**:
+```csharp
+// Em um middleware ou controller
+var correlationId = HttpContext.Request.Headers[Constants.CorrelationHeader];
+var userClaim = HttpContext.Request.Headers[Constants.UserClaimHeader];
+```
+
+#### FileData
+
+Classe para manipulação de dados de arquivo.
+
+```csharp
+public class FileData
+{
+    // Propriedades e métodos para manipulação de arquivos
+}
+```
+
+#### WebProxyConfigureMethod
+
+Configuração de proxy web.
+
+```csharp
+public class WebProxyConfigureMethod
+{
+    // Métodos para configurar proxy HTTP
+}
+```
+
+---
+
+### Interfaces
+
+#### IDataAnnotationCustom
+
+Interface para modelos com validação via Data Annotations.
+
+```csharp
+public interface IDataAnnotationCustom
+{
+    // Implementar para habilitar extensões de validação
+}
+```
+
+#### INotPersistingAsTable
+
+Marca uma entidade que não deve ser persistida como tabela.
+
+```csharp
+public interface INotPersistingAsTable
+{
+    // Interface de marcação (marker interface)
+}
+```
+
+#### IRepositoryValidation
+
+Interface para validações em repositórios.
+
+```csharp
+public interface IRepositoryValidation
+{
+    // Métodos de validação customizados para repositórios
+}
+```
+
+---
+
+### Métodos Legados (Notification Pattern)
+
+#### NotifiableR (Continuação)
 - `IReadOnlyCollection<NotificationR> Notifications`: Lista de notificações
 - `bool IsValid()`: Verifica se não há notificações
 - `void AddNotification(string property, string message, string aggregateId = null)`: Adiciona notificação
@@ -624,15 +1579,15 @@ public class PedidoService : NotifiableR
 - `void RemoveNotifications(bool removeAll = true)`: Remove todas as notificações
 - `IList<NotificationR> LoggerNotifications(ILogger logger, string logDescription)`: Log automático das notificações
 
-#### NotificationR
+#### NotificationR (Continuação)
 - `string Property`: Nome da propriedade
 - `string Message`: Mensagem de erro
 - `string AggregatorId`: ID do agregado
 - `DateTimeOffset DateOccurrence`: Data/hora da notificação
 
-### String Extensions
+### String Extensions (Continuação)
 
-#### StringExtensionMethods
+#### StringExtensionMethods (Continuação)
 - `string RemoveSpecialChars(this string text)`: Remove caracteres especiais ASCII
 - `string GetLettersAndNumbersOnly(this string text)`: Mantém apenas letras e números
 - `string GetNumbers(this string text)`: Extrai apenas números
@@ -642,17 +1597,17 @@ public class PedidoService : NotifiableR
 - `string ToLowerNotNull(this string value)`: ToLower seguro
 - `string TrimNotNull(this string value)`: Trim seguro
 
-### Enum Extensions
+### Enum Extensions (Continuação)
 
-#### EnumExtensionMethods
+#### EnumExtensionMethods (Continuação)
 - `string GetDescription(this Enum GenericEnum)`: Obtém descrição do enum
 - `int ToEnumNumero<T>(this string value)`: Converte string para número do enum
 - `string ToEnumTexto<T>(this int numero)`: Converte número para texto do enum
 - `bool IsEnum<T>(this string value, out int result)`: Verifica se string é enum válido
 
-### Domain Entity
+### Domain Entity (Continuação)
 
-#### DomainEntity
+#### DomainEntity (Continuação)
 - `string Id`: Identificador único (GUID)
 - `DateTimeOffset DataCadastro`: Data de cadastro
 - `string UsuarioCadastro`: Usuário que cadastrou
@@ -661,9 +1616,9 @@ public class PedidoService : NotifiableR
 - `override bool Equals(object obj)`: Comparação por Id
 - `override int GetHashCode()`: Hash baseado no tipo e Id
 
-### JSON Extensions
+### JSON Extensions (Continuação)
 
-#### NullToDefaultValueConverter
+#### NullToDefaultValueConverter (Continuação)
 - Converte valores null para valores padrão durante serialização JSON
 
 ## Troubleshooting

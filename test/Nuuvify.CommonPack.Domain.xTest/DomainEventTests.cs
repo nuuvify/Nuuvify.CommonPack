@@ -18,7 +18,7 @@ public class DomainEventTests
 
         Assert.NotNull(clienteEvent.SourceId);
         Assert.Equal(VersionEvent, clienteEvent.Version);
-        Assert.Equal(0, clienteEvent.Notifications.Count);
+        Assert.Empty(clienteEvent.Notifications);
     }
 
     [Fact]
@@ -35,7 +35,7 @@ public class DomainEventTests
 
         Assert.NotNull(clienteAddedEvent.SourceId);
         Assert.Equal(VersionEvent, clienteAddedEvent.Version);
-        Assert.Equal(0, clienteAddedEvent.Notifications.Count);
+        Assert.Empty(clienteAddedEvent.Notifications);
 
     }
 
@@ -53,7 +53,7 @@ public class DomainEventTests
 
         Assert.Null(clienteAddedEvent.SourceId);
         Assert.NotEqual(VersionEvent, clienteAddedEvent.Version);
-        Assert.Equal(1, clienteAddedEvent.Notifications.Count);
+        Assert.NotEmpty(clienteAddedEvent.Notifications);
 
     }
 

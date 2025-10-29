@@ -7,7 +7,8 @@ namespace Nuuvify.CommonPack.UnitOfWork;
 internal static class IQueryableExtensions
 {
 
-    public static IPagedList<T> ToPagedList<T>(this IQueryable<T> source,
+    public static IPagedList<T> ToPagedList<T>(
+        this IQueryable<T> source,
         int pageIndex,
         int pageSize,
         int indexFrom)
@@ -23,7 +24,8 @@ internal static class IQueryableExtensions
     /// <param name="indexFrom">The start index value. indexFrom must always be less than pageIndex</param>
     /// <param name="cancellationToken">to observe while waiting for the task to complete.</param>
     /// <returns>An instance of the inherited from <see cref="IPagedList{T}"/> interface.</returns>
-    public static async Task<IPagedList<T>> ToPagedListAsync<T>(this IQueryable<T> source,
+    public static async Task<IPagedList<T>> ToPagedListAsync<T>(
+        this IQueryable<T> source,
         int pageIndex,
         int pageSize,
         int indexFrom = 0,

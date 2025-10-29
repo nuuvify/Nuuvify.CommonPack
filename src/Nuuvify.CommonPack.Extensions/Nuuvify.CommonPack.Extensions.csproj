@@ -24,6 +24,8 @@
         <PackageReference Include="Microsoft.CSharp" />
         <PackageReference Include="System.ComponentModel.Annotations" />
         <PackageReference Include="System.Runtime.Extensions" />
+        <PackageReference Include="System.Security.AccessControl" />
+        <PackageReference Include="System.Security.Principal.Windows" />
         <PackageReference Include="System.Diagnostics.DiagnosticSource" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
         <PackageReference Include="Microsoft.Extensions.Logging.Configuration" />
