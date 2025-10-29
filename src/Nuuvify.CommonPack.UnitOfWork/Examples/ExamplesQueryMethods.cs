@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
-using Product = Nuuvify.CommonPack.UnitOfWork.Examples.Shared.Product;
-using ExampleDbContext = Nuuvify.CommonPack.UnitOfWork.Examples.Shared.ExampleDbContext;
+
+#nullable enable
 
 namespace Nuuvify.CommonPack.UnitOfWork.Examples;
 
@@ -20,16 +16,16 @@ namespace Nuuvify.CommonPack.UnitOfWork.Examples;
 /// - ✅ Uso correto do Unit of Work para transações
 /// - ✅ Projeções eficientes para DTOs
 /// </summary>
-public class QueryOperatorExamplesSimplified
+public class ExamplesQueryMethods
 {
     private readonly IRepository<Product> _productRepository;
     private readonly IUnitOfWork<ExampleDbContext> _unitOfWork;
-    private readonly ILogger<QueryOperatorExamplesSimplified> _logger;
+    private readonly ILogger<ExamplesQueryMethods> _logger;
 
-    public QueryOperatorExamplesSimplified(
+    public ExamplesQueryMethods(
         IRepository<Product> productRepository,
         IUnitOfWork<ExampleDbContext> unitOfWork,
-        ILogger<QueryOperatorExamplesSimplified> logger)
+        ILogger<ExamplesQueryMethods> logger)
     {
         _productRepository = productRepository;
         _unitOfWork = unitOfWork;
@@ -171,10 +167,10 @@ public class QueryOperatorExamplesSimplified
         };
 
         // ✅ IRepository<Product>.Add - adiciona à unidade de trabalho
-        await _productRepository.Add(product);
+        _ = await _productRepository.Add(product);
 
         // ✅ IUnitOfWork.SaveChangesAsync - confirma a transação
-        await _unitOfWork.SaveChangesAsync();
+        _ = await _unitOfWork.SaveChangesAsync();
 
         return new ProductDto
         {
@@ -210,7 +206,7 @@ public class QueryOperatorExamplesSimplified
         _productRepository.Update(product);
 
         // ✅ Unit of Work confirma a transação
-        await _unitOfWork.SaveChangesAsync();
+        _ = await _unitOfWork.SaveChangesAsync();
 
         return new ProductDto
         {
@@ -240,7 +236,7 @@ public class QueryOperatorExamplesSimplified
         product.LastUpdate = DateTime.UtcNow;
 
         _productRepository.Update(product);
-        await _unitOfWork.SaveChangesAsync();
+        _ = await _unitOfWork.SaveChangesAsync();
 
         return true;
     }
@@ -251,14 +247,17 @@ public class QueryOperatorExamplesSimplified
 
     /// <summary>
     /// Exemplo 7: Queries readonly via IRepository
-    /// Demonstra como usar GetAll(), GetFirstOrDefault(), etc.
+    /// Demonstra como usar GetAll() com ordenação múltipla e descendente
     /// </summary>
     public async Task<List<ProductDto>> GetProductsByCategoryAsync(string category)
     {
         // ✅ IRepository.GetAll() retorna IQueryable para queries readonly
+        // Ordenação: IsActive descendente, depois Price descendente, depois Name ascendente
         var products = await _productRepository.GetAll()
             .Where(p => p.Category == category && p.IsActive)
-            .OrderBy(p => p.Name)
+            .OrderByDescending(p => p.IsActive)
+            .ThenByDescending(p => p.Price)
+            .ThenBy(p => p.Name)
             .Select(p => new ProductDto
             {
                 Id = p.Id,
@@ -333,34 +332,3 @@ public class QueryOperatorExamplesSimplified
 
     #endregion
 }
-
-#region DTOs - específicos para este exemplo
-
-public class ProductDto
-{
-    public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string Category { get; set; } = string.Empty;
-    public decimal Price { get; set; }
-    public int Stock { get; set; }
-}
-
-public class ProductStatsDto
-{
-    public int TotalProducts { get; set; }
-    public decimal AveragePrice { get; set; }
-    public decimal MinPrice { get; set; }
-    public decimal MaxPrice { get; set; }
-    public long TotalStock { get; set; }
-    public ICollection<CategoryStatsDto> CategoryStats { get; set; } = new List<CategoryStatsDto>();
-}
-
-public class CategoryStatsDto
-{
-    public string Category { get; set; } = string.Empty;
-    public int Count { get; set; }
-    public decimal AveragePrice { get; set; }
-    public long TotalStock { get; set; }
-}
-
-#endregion

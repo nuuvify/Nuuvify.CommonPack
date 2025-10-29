@@ -4,7 +4,7 @@
 /// Provides the interface(s) for paged list of any type.
 /// </summary>
 /// <typeparam name="T">The type for paging.</typeparam>
-public interface IPagedList<T>
+public interface IPagedList<T> : IQueryableCustom
 {
     /// <summary>
     /// Gets the index start value.

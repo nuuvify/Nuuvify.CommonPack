@@ -111,24 +111,26 @@ public class ContainsWithLikeForListTest
         Assert.Contains(result, p => p.Name.Contains("Galaxy"));
         Assert.Contains(result, p => p.Name.Contains("Air"));
     }
+
+    // Classes auxiliares para os testes
+    private class Product
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty;
+    }
+
+    private class ProductSearchModel : IQueryableCustom
+    {
+        [QueryOperator(Operator = WhereOperator.ContainsWithLikeForList, HasName = nameof(Product.Name))]
+        public Collection<string>? SearchTerms { get; set; }
+
+        [Key]
+        public int PageIndex { get; set; } = 1;
+
+        [Key]
+        public int PageSize { get; set; } = 10;
+
+        public string Sort { get; set; } = string.Empty;
+    }
 }
 
-public class Product
-{
-    public string Name { get; set; } = string.Empty;
-    public string Category { get; set; } = string.Empty;
-}
-
-public class ProductSearchModel : IQueryableCustom
-{
-    [QueryOperator(Operator = WhereOperator.ContainsWithLikeForList, HasName = nameof(Product.Name))]
-    public Collection<string>? SearchTerms { get; set; }
-
-    [Key]
-    public string PageIndex { get; set; } = "1";
-
-    [Key]
-    public string PageSize { get; set; } = "10";
-
-    public string Sort { get; set; } = string.Empty;
-}

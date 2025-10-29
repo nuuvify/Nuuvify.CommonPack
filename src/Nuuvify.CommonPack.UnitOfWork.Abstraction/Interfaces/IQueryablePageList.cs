@@ -1,6 +1,6 @@
 ﻿namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 
-public interface IIQueryablePageList
+public interface IIQueryablePageList : IQueryableCustom
 {
     /// <summary>
     /// Converts the specified source to <see cref="IPagedList{T}"/> by the specified <paramref name="pageIndex"/> and <paramref name="pageSize"/>.

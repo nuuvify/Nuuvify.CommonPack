@@ -29,12 +29,16 @@
         <PackageVersion Include="Shouldly" Version="4.2.1" />
 
         <!-- Database packages specific to tests -->
+        <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.11" />
         <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.11" />
         <PackageVersion Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.11" />
         <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11" />
         <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.8" />
         <PackageVersion Include="EFCore.NamingConventions" Version="8.0.3" />
         <PackageVersion Include="Oracle.EntityFrameworkCore" Version="8.23.60" />
+
+        <!-- Testcontainers for integration tests -->
+        <PackageVersion Include="Testcontainers.MsSql" Version="3.10.0" />
 
         <!-- Code analysis packages -->
         <PackageVersion Include="Microsoft.CodeAnalysis" Version="4.7.0" />
