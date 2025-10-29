@@ -66,6 +66,7 @@ Biblioteca fundamental com implementação do Notification Pattern e extensões 
       - [DomainEntity](#domainentity)
       - [CustomGenericComparer](#customgenericcomparer)
       - [CacheTimeService](#cachetimeservice)
+      - [PathHelper](#pathhelper)
       - [Constants](#constants)
       - [FileData](#filedata)
       - [WebProxyConfigureMethod](#webproxyconfiguremethod)
@@ -103,6 +104,7 @@ Biblioteca fundamental com implementação do Notification Pattern e extensões 
 - ✅ **DateTime Extensions** para manipulações de data/hora
 - ✅ **Dictionary Extensions** para operações em dicionários
 - ✅ **Object Extensions** para reflexão e validações
+- ✅ **PathHelper** para manipulação e validação de caminhos cross-platform
 - ✅ **Logging Integration** com Microsoft.Extensions.Logging
 - ✅ **Data Annotations** com validações customizadas
 - ✅ **Compatibilidade .NET Standard 2.1** para máxima portabilidade
@@ -1373,6 +1375,112 @@ public class CacheTimeService
     // Implementação específica para cache temporal
 }
 ```
+
+#### PathHelper
+
+Classe helper para manipulação e validação de caminhos de arquivos/diretórios com suporte cross-platform.
+
+```csharp
+public static class PathHelper
+{
+    // Sanitiza e normaliza um caminho de arquivo/diretório
+    public static string SanitizeAndNormalizePath(string rawPath);
+
+    // Verifica se um caminho existe (arquivo ou diretório)
+    public static bool PathExists(string path);
+
+    // Verifica se o caminho possui permissões de leitura e escrita
+    public static bool HasReadWriteAccess(string path);
+}
+```
+
+**Exemplo de uso**:
+```csharp
+using System.IO.Abstractions;
+
+public class FileManagerService
+{
+    public void ProcessarCaminhos()
+    {
+        // Normalizar caminhos com separadores misturados
+        string rawPath = @"C:\Users\Documents/MyApp\Data\\files/";
+        string normalized = PathHelper.SanitizeAndNormalizePath(rawPath);
+        // Windows: C:\Users\Documents\MyApp\Data\files
+        // Linux:   C:/Users/Documents/MyApp/Data/files
+
+        // Caminhos UNC também são suportados
+        string uncPath = @"\\server\share\folder";
+        string normalizedUnc = PathHelper.SanitizeAndNormalizePath(uncPath);
+        // Resultado: \\server\share\folder
+
+        // Verificar se caminho existe
+        string dirPath = @"C:\Temp";
+        bool exists = PathHelper.PathExists(dirPath);
+        Console.WriteLine($"Caminho existe: {exists}");
+
+        // Verificar permissões de leitura/escrita (cross-platform)
+        bool hasAccess = PathHelper.HasReadWriteAccess(dirPath);
+        if (hasAccess)
+        {
+            Console.WriteLine("Diretório possui permissões de leitura/escrita");
+            // Processar arquivos no diretório
+        }
+        else
+        {
+            Console.WriteLine("Acesso negado ao diretório");
+            // Tratar erro de permissão
+        }
+    }
+
+    public void ValidarDiretoriosAntesDeProcessar(string[] diretorios)
+    {
+        foreach (var dir in diretorios)
+        {
+            // Sanitizar caminho primeiro
+            string dirNormalizado = PathHelper.SanitizeAndNormalizePath(dir);
+
+            // Verificar existência
+            if (!PathHelper.PathExists(dirNormalizado))
+            {
+                Console.WriteLine($"Diretório não existe: {dirNormalizado}");
+                continue;
+            }
+
+            // Verificar permissões
+            if (!PathHelper.HasReadWriteAccess(dirNormalizado))
+            {
+                Console.WriteLine($"Sem permissão de acesso: {dirNormalizado}");
+                continue;
+            }
+
+            // Processar diretório
+            ProcessarArquivos(dirNormalizado);
+        }
+    }
+
+    private void ProcessarArquivos(string diretorio)
+    {
+        // Lógica de processamento
+        var files = Directory.GetFiles(diretorio);
+        Console.WriteLine($"Processando {files.Length} arquivos em {diretorio}");
+    }
+}
+```
+
+**Características importantes**:
+- ✅ **Cross-platform**: Funciona em Windows, Linux e macOS
+- ✅ **Normalização de separadores**: Converte `\` e `/` para o separador correto da plataforma
+- ✅ **Suporte a UNC paths**: Preserva caminhos de rede `\\server\share`
+- ✅ **Verificação de permissões**: Testa leitura/escrita criando arquivo temporário
+- ✅ **.NET Standard 2.1**: Compatível com versões antigas do framework
+- ✅ **Tratamento de exceções**: Captura erros de acesso, E/S e segurança
+
+**Observações sobre HasReadWriteAccess()**:
+- Cria um arquivo temporário com nome único (GUID) no diretório
+- Tenta escrever conteúdo no arquivo
+- Deleta o arquivo de teste
+- Se qualquer operação falhar, retorna `false`
+- Captura exceções: `UnauthorizedAccessException`, `IOException`, `SecurityException`, etc.
 
 #### Constants
 

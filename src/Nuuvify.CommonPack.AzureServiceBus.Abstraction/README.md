@@ -317,7 +317,7 @@ Este projeto está licenciado sob a [Licença MIT](LICENSE).
 
 Para dúvidas e suporte técnico:
 
-- 📧 Email: [suporte@nuuvify.com](mailto:suporte@nuuvify.com)
+- 📧 Email: [suporte@zocate.li](mailto:suporte@zocate.li)
 - 📋 Issues: [GitHub Issues](https://github.com/nuuvify/Nuuvify.CommonPack/issues)
 - 📖 Documentação: [Wiki do Projeto](https://github.com/nuuvify/Nuuvify.CommonPack/wiki)
 - 💬 Discussões: [GitHub Discussions](https://github.com/nuuvify/Nuuvify.CommonPack/discussions)
