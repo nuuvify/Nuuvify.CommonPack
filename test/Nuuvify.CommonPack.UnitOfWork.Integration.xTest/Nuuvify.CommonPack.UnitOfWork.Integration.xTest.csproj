@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- Test framework packages (versions managed in Directory.Packages.props) -->
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="xunit" />
+        <PackageReference Include="xunit.runner.visualstudio" />
+        <PackageReference Include="coverlet.collector" />
+
+        <!-- Mocking and fake data packages -->
+        <PackageReference Include="AutoMoqCore" />
+        <PackageReference Include="Bogus" />
+        <PackageReference Include="Moq" />
+
+        <!-- Entity Framework Core for SQL Server -->
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" />
+
+        <!-- Configuration packages -->
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
+        <PackageReference Include="Microsoft.Extensions.Http" />
+
+        <!-- Testcontainers for Integration Tests -->
+        <PackageReference Include="Testcontainers.MsSql" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Nuuvify.CommonPack.AutoHistory\Nuuvify.CommonPack.AutoHistory.csproj" />
+        <ProjectReference Include="..\..\src\Nuuvify.CommonPack.Extensions\Nuuvify.CommonPack.Extensions.csproj" />
+        <ProjectReference Include="..\..\src\Nuuvify.CommonPack.Domain\Nuuvify.CommonPack.Domain.csproj" />
+        <ProjectReference Include="..\..\src\Nuuvify.CommonPack.Middleware.Abstraction\Nuuvify.CommonPack.Middleware.Abstraction.csproj" />
+        <ProjectReference Include="..\..\src\Nuuvify.CommonPack.UnitOfWork\Nuuvify.CommonPack.UnitOfWork.csproj" />
+        <ProjectReference Include="..\..\src\Nuuvify.CommonPack.UnitOfWork.Abstraction\Nuuvify.CommonPack.UnitOfWork.Abstraction.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="Configs\*.json" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
+</Project>

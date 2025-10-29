@@ -33,6 +33,47 @@ Cada pacote possui documentação detalhada:
 - 📚 [Extensions](src/Nuuvify.CommonPack.Extensions/README.md)
 - 📚 [UnitOfWork](src/Nuuvify.CommonPack.UnitOfWork/README.md)
 
+## 🧪 Testes
+
+O projeto possui uma estratégia de testes abrangente separada em dois tipos:
+
+### Testes Unitários (InMemory)
+**Projeto**: `Nuuvify.CommonPack.UnitOfWork.InMemory.xTest`
+
+- ⚡ **Rápidos**: Execução em < 1 segundo
+- 💚 **Leves**: Usa EF Core InMemory provider
+- ✅ **CI/CD Friendly**: Sem dependências externas (não requer Docker)
+- 🎯 **Uso**: TDD, desenvolvimento rápido, validação de lógica de negócio
+
+```powershell
+# Executar testes unitários
+dotnet test --filter "Category=Unit"
+```
+
+### Testes de Integração (SQL Server via Docker)
+**Projeto**: `Nuuvify.CommonPack.UnitOfWork.Integration.xTest`
+
+- 🐘 **SQL Server Real**: Usa Testcontainers com SQL Server 2022
+- ✅ **Alta Fidelidade**: Testa queries SQL específicas e collations
+- ⚠️ **Requer Docker**: Docker Desktop deve estar em execução
+- 🎯 **Uso**: Validação de features específicas do SQL Server, testes de regressão
+
+```powershell
+# Executar testes de integração (requer Docker)
+dotnet test --filter "Category=Integration"
+```
+
+📖 **Documentação Completa**: [Integration Tests README](test/Nuuvify.CommonPack.UnitOfWork.Integration.xTest/README.md)
+
+### Comparação Rápida
+
+| Aspecto    | Unit (InMemory) | Integration (SQL Server) |
+| ---------- | --------------- | ------------------------ |
+| Velocidade | ⚡ < 1s          | 🐢 2-4s                   |
+| Requisitos | ✅ Nenhum        | ⚠️ Docker                 |
+| Fidelidade | ⚠️ Simulado      | ✅ SQL Real               |
+| CI/CD      | ✅ Sempre        | ⚠️ Depende do Docker      |
+
 ## 🔗 Links
 
 - 📦 [Pacotes NuGet](https://www.nuget.org/packages?q=nuuvify)
