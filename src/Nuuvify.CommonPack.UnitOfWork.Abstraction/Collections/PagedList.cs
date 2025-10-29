@@ -92,7 +92,7 @@ public class PagedList<T> : IPagedList<T>
 
             Items = querable.Skip(Skip)
                             .Take(Take)
-                            .ToList();
+                            .ToArray();
         }
         else
         {
@@ -104,7 +104,7 @@ public class PagedList<T> : IPagedList<T>
 
             Items = source.Skip(Skip)
                           .Take(Take)
-                          .ToList();
+                          .ToArray();
 
         }
     }
