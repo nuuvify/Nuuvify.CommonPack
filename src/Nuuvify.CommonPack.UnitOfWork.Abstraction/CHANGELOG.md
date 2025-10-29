@@ -14,6 +14,149 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Suporte para agregações dinâmicas (SUM, COUNT, AVG)
 - Cache de queries compiladas para melhor performance
 
+## [3.2.0] - 2025-10-28
+
+### 🐛 Corrigido
+
+- **CRITICAL FIX**: Correção de 3 bugs críticos no operador `ContainsWithLikeForList`:
+  1. **Bug Expression.Constant(false)**: Filtros vazios geravam SQL inválido `WHERE 0 = 1`
+     - Solução: Retornar `null` ao invés de `Expression.Constant(false)`
+     - Permite que filtros vazios sejam ignorados corretamente
+  
+  2. **Bug Null Expression**: Expressões nulas causavam crashes em `Expression.And/Or`
+     - Solução: Adicionado check `if (actualExpression == null) continue;`
+     - Previne exceções ao processar filtros que retornam null
+  
+  3. **Bug UnaryExpression Wrapping**: `FilterBy` estava encapsulado em `UnaryExpression` (Convert)
+     - Problema: `ExpressionFactory.GetClosureOverConstant` encapsula `List<string>?` para conversão de tipo
+     - Solução: Unwrap do `UnaryExpression` para extrair o `ConstantExpression` interno
+     - Código adicionado em `ContainsWithLikeForListExpression`:
+       ```csharp
+       Expression filterExpression = expression.FilterBy;
+       if (filterExpression is UnaryExpression unaryExpression && 
+           unaryExpression.NodeType == ExpressionType.Convert)
+       {
+           filterExpression = unaryExpression.Operand;
+       }
+       ```
+
+- **Paginação**: Correção no `PageIndex` para ser 1-based em todos os cenários
+  - Anteriormente: `PageIndex` era 0-based internamente causando confusão
+  - Agora: `PageIndex = 1` representa a primeira página corretamente
+
+### 🔧 Melhorado
+
+- **Case-insensitive handling**: Melhor tratamento de busca case-insensitive em `ContainsWithLikeForList`
+  - `ToUpper()` aplicado individualmente em cada item da lista
+  - Não aplica `ToUpper()` no loop principal (evita erros com `List<string>`)
+  - Gera SQL otimizado: `WHERE Name LIKE '%IPHONE%' OR Name LIKE '%SAMSUNG%'`
+
+- **Null validation**: Validação robusta de valores nulos e listas vazias
+  - Filtros com listas vazias são ignorados (não geram WHERE)
+  - Filtros com valores null são pulados automaticamente
+  - Previne geração de SQL inválido
+
+- **Performance**: Queries mais eficientes com `ContainsWithLikeForList`
+  - Expressões compiladas de forma mais otimizada
+  - Redução de conversões desnecessárias
+  - Melhor uso de `Expression.OrElse` para OR logic
+
+### 🎨 Refatorado
+
+- **Partial Classes**: Classe `FiltersExtensions` dividida em arquivos separados
+  - `FiltersExtensions.cs`: Métodos públicos com documentação XML completa
+  - `FiltersExtensions.Private.cs`: Métodos privados de implementação
+  - Benefícios:
+    - Melhor organização e manutenibilidade
+    - Separação clara entre API pública e implementação
+    - Facilita navegação no código
+
+- **Documentação XML**: Documentação completa adicionada aos métodos públicos
+  - `Filter<TEntity>`: Documentação detalhada com exemplos de uso
+  - `FilterExpression<TEntity>`: Explicação do comportamento e casos de uso
+  - Exemplos práticos de código incluídos nos summaries
+  - Demonstração do SQL gerado em cada exemplo
+
+- **Code cleanup**: Removidos comentários inline do código
+  - Comentários técnicos substituídos por documentação XML
+  - Código mais limpo e profissional
+  - Comentários mantidos apenas onde necessário para contexto
+
+### 📚 Documentação
+
+- **README.md**: Atualizado com exemplos do operador `ContainsWithLikeForList`
+  - Casos de uso práticos e reais
+  - Exemplos de SQL gerado
+  - Guia de troubleshooting para bugs conhecidos
+
+- **CHANGELOG.md**: Documentação detalhada das correções
+  - Descrição técnica dos 3 bugs corrigidos
+  - Código de exemplo das soluções
+  - Impacto e benefícios de cada correção
+
+### ✅ Testes
+
+- **100% Coverage**: Todos os testes passando (12/12)
+  - `ExamplesQueryOperatorsTest`: Suite completa de testes
+  - Testes para `ContainsWithLikeForList` com múltiplos cenários
+  - Validação de SQL gerado
+  - Testes de paginação e ordenação
+
+- **Integration Tests**: Testes com Testcontainers.MsSql
+  - SQL Server 2022 em container Docker
+  - Testes end-to-end com banco de dados real
+  - Validação de queries complexas
+
+### 🔍 Detalhes Técnicos
+
+**Root Cause Analysis - Bug UnaryExpression:**
+
+O `ExpressionFactory.GetClosureOverConstant` cria um `UnaryExpression` (Convert node) ao converter `List<string>?` (nullable) para `List<string>` (non-nullable). Isso é um padrão normal do Expression Tree para conversões de tipo.
+
+Antes da correção:
+```csharp
+if (expression.FilterBy is ConstantExpression constantExpression)
+{
+    // ❌ NUNCA EXECUTAVA - FilterBy era UnaryExpression, não ConstantExpression
+}
+```
+
+Após a correção:
+```csharp
+Expression filterExpression = expression.FilterBy;
+
+// Unwrap UnaryExpression para acessar o ConstantExpression interno
+if (filterExpression is UnaryExpression unaryExpression && 
+    unaryExpression.NodeType == ExpressionType.Convert)
+{
+    filterExpression = unaryExpression.Operand; // ✅ Extrai o ConstantExpression
+}
+
+if (filterExpression is ConstantExpression constantExpression)
+{
+    // ✅ AGORA FUNCIONA - constantExpression.Value contém List<string>
+}
+```
+
+**SQL Gerado (Antes vs Depois):**
+
+Antes (bug):
+```sql
+SELECT COUNT(*) FROM [Products] AS [p]
+-- ❌ Sem WHERE clause - filtro completamente ignorado
+```
+
+Depois (corrigido):
+```sql
+SELECT COUNT(*) FROM [Products] AS [p]
+WHERE [p].[Name] LIKE N'%iPhone%' OR [p].[Name] LIKE N'%Samsung%'
+-- ✅ WHERE clause correto com OR logic
+```
+
+### ⚠️ Breaking Changes
+
+Nenhuma breaking change nesta versão. Todas as correções são backwards-compatible.
+
 ## [3.1.0] - 2024-01-15
 
 ### ✨ Adicionado

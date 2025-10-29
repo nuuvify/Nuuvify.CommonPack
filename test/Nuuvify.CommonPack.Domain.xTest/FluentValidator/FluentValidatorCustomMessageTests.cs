@@ -9,7 +9,7 @@ namespace Nuuvify.CommonPack.Domain.xTest.FluentValidator;
 public class FluentValidatorCustomMessageTests
 {
 
-    private Customer _customer = new Customer();
+    private Customer _customer = new();
 
     public FluentValidatorCustomMessageTests()
     {

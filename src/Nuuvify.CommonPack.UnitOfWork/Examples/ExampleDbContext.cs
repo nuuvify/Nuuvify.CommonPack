@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Nuuvify.CommonPack.UnitOfWork.Examples.Shared;
+namespace Nuuvify.CommonPack.UnitOfWork.Examples;
 
 /// <summary>
 /// Modelo de entidade Product compartilhado entre todos os exemplos.
