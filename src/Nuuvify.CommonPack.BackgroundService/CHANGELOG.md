@@ -96,7 +96,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 }
 ```
 
-## [1.0.0] - 2025-01-XX
+## 2025-01-XX
 
 ### Added
 - Versão inicial da classe `BackgroundServiceAbstract<T>`
