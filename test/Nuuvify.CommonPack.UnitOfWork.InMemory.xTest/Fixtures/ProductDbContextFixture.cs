@@ -6,14 +6,15 @@ namespace Nuuvify.CommonPack.UnitOfWork.InMemory.xTest.Fixtures;
 /// <summary>
 /// Fixture para testes com banco de dados EF Core In-Memory.
 /// Cada classe de teste recebe uma instância única do banco com nome GUID.
-/// 
+///
 /// IMPORTANTE: O banco é compartilhado entre TODOS os testes da mesma classe.
-/// Para garantir isolamento, cada teste deve limpar seus dados no Dispose().
+/// Um único contexto é mantido e reutilizado para garantir persistência dos dados.
 /// </summary>
 public sealed class ProductDbContextFixture : IDisposable
 {
     private readonly string _databaseName;
     private readonly DbContextOptions<ExampleDbContext> _options;
+    private readonly ExampleDbContext _sharedContext;
     private bool _disposed = false;
 
     public ProductDbContextFixture()
@@ -27,9 +28,9 @@ public sealed class ProductDbContextFixture : IDisposable
             .EnableDetailedErrors()
             .Options;
 
-        // Inicializa o schema do banco de dados
-        using var context = new ExampleDbContext(_options);
-        _ = context.Database.EnsureCreated();
+        // Cria um contexto compartilhado para todos os testes
+        _sharedContext = new ExampleDbContext(_options);
+        _ = _sharedContext.Database.EnsureCreated();
     }
 
     public ExampleDbContext CreateContext()
@@ -37,13 +38,15 @@ public sealed class ProductDbContextFixture : IDisposable
         if (_disposed)
             throw new ObjectDisposedException(nameof(ProductDbContextFixture));
 
-        return new ExampleDbContext(_options);
+        // Retorna o contexto compartilhado para manter os dados entre testes
+        return _sharedContext;
     }
 
     public void Dispose()
     {
         if (!_disposed)
         {
+            _sharedContext?.Dispose();
             _disposed = true;
             GC.SuppressFinalize(this);
         }

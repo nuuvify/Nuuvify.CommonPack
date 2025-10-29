@@ -14,7 +14,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Suporte para agregações dinâmicas (SUM, COUNT, AVG)
 - Cache de queries compiladas para melhor performance
 
-## [3.2.0] - 2025-10-28
+## 2025-10-28
 
 ### 🐛 Corrigido
 
@@ -22,18 +22,18 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   1. **Bug Expression.Constant(false)**: Filtros vazios geravam SQL inválido `WHERE 0 = 1`
      - Solução: Retornar `null` ao invés de `Expression.Constant(false)`
      - Permite que filtros vazios sejam ignorados corretamente
-  
+
   2. **Bug Null Expression**: Expressões nulas causavam crashes em `Expression.And/Or`
      - Solução: Adicionado check `if (actualExpression == null) continue;`
      - Previne exceções ao processar filtros que retornam null
-  
+
   3. **Bug UnaryExpression Wrapping**: `FilterBy` estava encapsulado em `UnaryExpression` (Convert)
      - Problema: `ExpressionFactory.GetClosureOverConstant` encapsula `List<string>?` para conversão de tipo
      - Solução: Unwrap do `UnaryExpression` para extrair o `ConstantExpression` interno
      - Código adicionado em `ContainsWithLikeForListExpression`:
        ```csharp
        Expression filterExpression = expression.FilterBy;
-       if (filterExpression is UnaryExpression unaryExpression && 
+       if (filterExpression is UnaryExpression unaryExpression &&
            unaryExpression.NodeType == ExpressionType.Convert)
        {
            filterExpression = unaryExpression.Operand;
@@ -126,7 +126,7 @@ Após a correção:
 Expression filterExpression = expression.FilterBy;
 
 // Unwrap UnaryExpression para acessar o ConstantExpression interno
-if (filterExpression is UnaryExpression unaryExpression && 
+if (filterExpression is UnaryExpression unaryExpression &&
     unaryExpression.NodeType == ExpressionType.Convert)
 {
     filterExpression = unaryExpression.Operand; // ✅ Extrai o ConstantExpression
@@ -157,7 +157,7 @@ WHERE [p].[Name] LIKE N'%iPhone%' OR [p].[Name] LIKE N'%Samsung%'
 
 Nenhuma breaking change nesta versão. Todas as correções são backwards-compatible.
 
-## [3.1.0] - 2024-01-15
+## 2024-01-15
 
 ### ✨ Adicionado
 
@@ -166,12 +166,12 @@ Nenhuma breaking change nesta versão. Todas as correções são backwards-compa
   - Ideal para implementar busca global, tags, categorias múltiplas
   - Suporte completo a `IEnumerable<string>`, `List<string>`, `Collection<string>`
   - Validação robusta de nulls e listas vazias
-  
+
 - **Enums tipados** para melhor type safety:
   - `ExpressionParameterName` - Nomes de parâmetros padronizados
   - `MethodName` - Nomes de métodos de expressão
   - Extensões de string para conversão automática
-  
+
 - **Documentação XML** completa em todos os métodos públicos
 - **Properties.cs** para configuração centralizada de `InternalsVisibleTo`
 - **README.md** abrangente com exemplos de todos os operadores
@@ -210,11 +210,11 @@ Nenhuma breaking change nesta versão. Todas as correções são backwards-compa
   - Seções de performance e otimização
   - Guias de troubleshooting
   - Referência completa da API
-  
+
 - CHANGELOG.md seguindo padrão Keep a Changelog
 - Examples com classes demonstrativas de uso
 
-## [3.0.1] - 2023-12-10
+## 2023-12-10
 
 ### 🐛 Corrigido
 
@@ -227,14 +227,14 @@ Nenhuma breaking change nesta versão. Todas as correções são backwards-compa
 - Atualização de exemplos no README
 - Correção de links quebrados na documentação
 
-## [3.0.0] - 2023-11-20
+## 2023-11-20
 
 ### ✨ Adicionado
 
 - Suporte completo ao .NET 8.0
 - Novos operadores de comparação:
   - `GreaterThanOrEqualWhenNullable`
-  - `LessThanOrEqualWhenNullable`  
+  - `LessThanOrEqualWhenNullable`
   - `EqualsWhenNullable`
 - Suporte a ordenação múltipla com sintaxe simples
 - Sistema de validação aprimorado para expressões
@@ -250,7 +250,7 @@ Nenhuma breaking change nesta versão. Todas as correções são backwards-compa
 - **BREAKING**: Descontinuado suporte ao .NET Standard 2.0
 - Removidos métodos obsoletos da versão 2.x
 
-## [2.5.0] - 2023-09-15
+## 2023-09-15
 
 ### ✨ Adicionado
 
@@ -270,7 +270,7 @@ Nenhuma breaking change nesta versão. Todas as correções são backwards-compa
 - Correção em filtros com valores null
 - Melhoria na estabilidade com DbContext concorrente
 
-## [2.4.2] - 2023-08-01
+## 2023-08-01
 
 ### 🐛 Corrigido
 
@@ -283,7 +283,7 @@ Nenhuma breaking change nesta versão. Todas as correções são backwards-compa
 - Otimização de memória em queries grandes
 - Melhoria nos logs de debug
 
-## [2.4.1] - 2023-07-10
+## 2023-07-10
 
 ### 🐛 Corrigido
 
@@ -291,7 +291,7 @@ Nenhuma breaking change nesta versão. Todas as correções são backwards-compa
 - Melhoria na serialização de modelos de filtro
 - Correção de comportamento inconsistente em ordenação
 
-## [2.4.0] - 2023-06-20
+## 2023-06-20
 
 ### ✨ Adicionado
 
@@ -311,7 +311,7 @@ Nenhuma breaking change nesta versão. Todas as correções são backwards-compa
 - Correção em filtros com DateTime e fusos horários
 - Melhoria na compatibilidade com diferentes providers de banco
 
-## [2.3.0] - 2023-04-15
+## 2023-04-15
 
 ### ✨ Adicionado
 
@@ -326,7 +326,7 @@ Nenhuma breaking change nesta versão. Todas as correções são backwards-compa
 - Melhor separação de responsabilidades
 - Documentação inicial das APIs públicas
 
-## [2.2.0] - 2023-03-01
+## 2023-03-01
 
 ### ✨ Adicionado
 
@@ -341,7 +341,7 @@ Nenhuma breaking change nesta versão. Todas as correções são backwards-compa
 - Testes unitários básicos
 - CI/CD pipeline configurado
 
-## [2.1.0] - 2023-02-10
+## 2023-02-10
 
 ### ✨ Adicionado
 
@@ -349,7 +349,7 @@ Nenhuma breaking change nesta versão. Todas as correções são backwards-compa
 - Estrutura base para filtros dinâmicos
 - Documentação inicial do projeto
 
-## [2.0.0] - 2023-01-15
+## 2023-01-15
 
 ### ✨ Adicionado
 

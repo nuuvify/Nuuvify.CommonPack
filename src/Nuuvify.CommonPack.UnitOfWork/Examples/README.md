@@ -49,6 +49,17 @@ Boas práticas para performance e otimização:
 - ✅ Profiling e monitoramento de queries
 - ✅ Cache de resultados
 
+### [`ExamplesPagedListConversion.cs`](./ExamplesPagedListConversion.cs)
+Demonstra o método **PagedList.From()** para conversão de listas paginadas:
+- ✅ Conversão simples de entidade para DTO
+- ✅ Conversão com lógica de negócio aplicada
+- ✅ Conversões em pipeline (múltiplas conversões)
+- ✅ Conversões com agregações
+- ✅ Tratamento de listas vazias
+- ✅ Caso de uso completo em Service (GetProductCardsAsync)
+- ✅ Preservação automática de metadados (PageIndex, TotalCount, TotalPages)
+- ✅ **29 testes unitários cobrindo todos os cenários**
+
 ## 🎯 Casos de Uso por Categoria
 
 ### 🔍 Buscas e Filtros
@@ -103,12 +114,12 @@ Todos os exemplos usam os mesmos modelos consistentes:
 public class ProductController : ControllerBase
 {
     private readonly IUnitOfWork<ExampleDbContext> _unitOfWork;
-    
+
     public ProductController(IUnitOfWork<ExampleDbContext> unitOfWork)
     {
         _unitOfWork = unitOfWork;
     }
-    
+
     // Use os exemplos diretamente aqui
 }
 ```
@@ -148,6 +159,7 @@ public class ProductController : ControllerBase
 - [x] Ordenação simples (`"Name asc"`)
 - [x] Ordenação múltipla (`"Category asc, Price desc"`)
 - [x] Validação de limites
+- [x] **🆕 Conversão de PagedList com PagedList.From()** (preserva metadados)
 
 ### ✅ Performance e Otimização
 - [x] Queries eficientes com projeção
@@ -159,14 +171,14 @@ public class ProductController : ControllerBase
 ## 🔗 Links Úteis
 
 - [📖 README Principal](../README.md) - Documentação completa
-- [📋 CHANGELOG](../CHANGELOG.md) - Histórico de mudanças  
+- [📋 CHANGELOG](../CHANGELOG.md) - Histórico de mudanças
 - [🧪 Testes](../../../test/Nuuvify.CommonPack.UnitOfWork.InMemory.xTest/) - Testes automatizados
 - [📦 NuGet Package](https://www.nuget.org/packages/Nuuvify.CommonPack.UnitOfWork/) - Pacote oficial
 
 ## 💡 Dicas Importantes
 
 1. **Sempre use paginação** para listas grandes
-2. **Projete para DTOs** para melhor performance  
+2. **Projete para DTOs** para melhor performance
 3. **Valide parâmetros** antes de executar queries
 4. **Use Include estrategicamente** para evitar N+1
 5. **Teste com dados reais** para validar performance

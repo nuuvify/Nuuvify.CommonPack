@@ -21,7 +21,7 @@ Uma biblioteca .NET poderosa e flexível para implementação do padrão **Unit 
 - **Nullable Support**: Suporte completo a Nullable Reference Types
 - **Expression Validation**: Validação robusta de expressões e parâmetros
 
-## 🆕 O Que Há de Novo na v3.2.0 (2025-10-28)
+## 🆕 O Que Há de Novo na v2.2.0 (2025-10-28)
 
 ### ✅ Correções Críticas
 
@@ -990,6 +990,293 @@ public class OrderReportDto
 }
 ```
 
+## 🔄 Conversão de PagedList - PagedList.From()
+
+O método `PagedList.From()` permite **converter** um `IPagedList<TSource>` existente para um novo `IPagedList<TResult>`, **preservando todos os metadados de paginação** (página atual, total de registros, total de páginas, etc.).
+
+### Por Que Usar?
+
+- ✅ **Preserva metadados**: Mantém PageIndex, TotalCount, TotalPages intactos
+- ✅ **Type-safe**: Conversão tipada entre entidades e DTOs
+- ✅ **Flexível**: Aceita qualquer função de conversão
+- ✅ **Clean Code**: Evita reconstrução manual de metadados
+- ✅ **Performance**: Converte apenas os itens da página atual
+
+### Assinatura do Método
+
+```csharp
+public static IPagedList<TResult> From<TResult, TSource>(
+    IPagedList<TSource> source,
+    Func<IEnumerable<TSource>, IEnumerable<TResult>> converter)
+```
+
+### Exemplos de Uso
+
+#### 1. Conversão Simples: Entidade → DTO
+
+```csharp
+// Obter lista paginada de produtos (entidades)
+var pagedProducts = await _unitOfWork.Repository<Product>()
+    .GetAll()
+    .Where(p => p.IsActive)
+    .ToPagedListAsync(pageIndex: 1, pageSize: 10);
+
+// Converter para DTOs preservando metadados
+var pagedProductDtos = PagedList.From<ProductDto, Product>(
+    pagedProducts,
+    products => products.Select(p => new ProductDto
+    {
+        Id = p.Id,
+        Name = p.Name,
+        Category = p.Category,
+        Price = p.Price
+    })
+);
+
+// Resultado: IPagedList<ProductDto> com os mesmos metadados
+// PageIndex, TotalCount, TotalPages, etc. permanecem inalterados
+```
+
+#### 2. Conversão com Lógica de Negócio
+
+```csharp
+// Aplicar regras de negócio durante a conversão
+var pagedProductCards = PagedList.From<ProductCardDto, Product>(
+    pagedProducts,
+    products => products.Select(p => new ProductCardDto
+    {
+        Id = p.Id,
+        Name = p.Name,
+        Price = p.Price,
+        // Lógica de negócio
+        DiscountPercentage = p.Price > 1000 ? 10 : 5,
+        Badge = p.Stock < 10 ? "LOW STOCK" : p.CreatedAt > DateTime.Now.AddDays(-7) ? "NEW" : null,
+        IsAvailable = p.Stock > 0 && p.IsActive
+    })
+);
+```
+
+#### 3. Conversão em Pipeline (Múltiplas Conversões)
+
+```csharp
+// Primeira conversão: Product → ProductDto
+var pagedProductDtos = PagedList.From<ProductDto, Product>(
+    pagedProducts,
+    products => products.Select(p => new ProductDto
+    {
+        Id = p.Id,
+        Name = p.Name,
+        Price = p.Price
+    })
+);
+
+// Segunda conversão: ProductDto → ProductSummaryDto
+var pagedSummaries = PagedList.From<ProductSummaryDto, ProductDto>(
+    pagedProductDtos,
+    dtos => dtos.Select(dto => new ProductSummaryDto
+    {
+        Id = dto.Id,
+        DisplayName = $"{dto.Name} - ${dto.Price:F2}"
+    })
+);
+```
+
+#### 4. Conversão com Agregações
+
+```csharp
+// Obter pedidos paginados
+var pagedOrders = await _unitOfWork.Repository<Order>()
+    .GetAll(include: source => source.Include(o => o.Items))
+    .ToPagedListAsync(pageIndex: 1, pageSize: 20);
+
+// Converter para resumo com agregações
+var pagedOrderSummaries = PagedList.From<OrderSummaryDto, Order>(
+    pagedOrders,
+    orders => orders.Select(o => new OrderSummaryDto
+    {
+        OrderId = o.Id,
+        CustomerName = o.CustomerName,
+        TotalAmount = o.TotalAmount,
+        // Agregações
+        ItemCount = o.Items.Count,
+        TotalQuantity = o.Items.Sum(i => i.Quantity),
+        AverageItemPrice = o.Items.Any() ? o.Items.Average(i => i.UnitPrice) : 0
+    })
+);
+```
+
+#### 5. Tratamento de Listas Vazias
+
+```csharp
+var pagedProducts = await _unitOfWork.Repository<Product>()
+    .GetAll()
+    .Where(p => p.Category == "NonExistent")
+    .ToPagedListAsync(pageIndex: 1, pageSize: 10);
+
+// PagedList.From() funciona corretamente com listas vazias
+var pagedDtos = PagedList.From<ProductDto, Product>(
+    pagedProducts,
+    products => products.Select(p => new ProductDto
+    {
+        Id = p.Id,
+        Name = p.Name
+    })
+);
+
+// Resultado:
+// - Items: [] (lista vazia)
+// - TotalCount: 0
+// - TotalPages: 0
+// - PageIndex: 1
+```
+
+### Caso de Uso Completo em Service
+
+```csharp
+public class ProductService
+{
+    private readonly IUnitOfWork<AppDbContext> _unitOfWork;
+
+    public ProductService(IUnitOfWork<AppDbContext> unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
+
+    /// <summary>
+    /// Busca produtos com filtros e retorna cards paginados
+    /// </summary>
+    public async Task<IPagedList<ProductCardDto>> GetProductCardsAsync(
+        string? category = null,
+        decimal? minPrice = null,
+        decimal? maxPrice = null,
+        int pageIndex = 1,
+        int pageSize = 12)
+    {
+        // 1. Buscar entidades com filtros
+        var query = _unitOfWork.Repository<Product>()
+            .GetAll()
+            .Where(p => p.IsActive);
+
+        if (!string.IsNullOrEmpty(category))
+            query = query.Where(p => p.Category == category);
+
+        if (minPrice.HasValue)
+            query = query.Where(p => p.Price >= minPrice.Value);
+
+        if (maxPrice.HasValue)
+            query = query.Where(p => p.Price <= maxPrice.Value);
+
+        var pagedProducts = await query
+            .OrderBy(p => p.Name)
+            .ToPagedListAsync(pageIndex, pageSize);
+
+        // 2. Converter para DTOs com lógica de negócio
+        var pagedCards = PagedList.From<ProductCardDto, Product>(
+            pagedProducts,
+            products => products.Select(p => new ProductCardDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Price = p.Price,
+                Category = p.Category,
+                ImageUrl = $"/images/products/{p.Id}.jpg",
+                // Lógica de desconto
+                DiscountPercentage = CalculateDiscount(p),
+                // Badge dinâmico
+                Badge = GetProductBadge(p),
+                // Disponibilidade
+                IsAvailable = p.Stock > 0
+            })
+        );
+
+        return pagedCards;
+    }
+
+    private decimal CalculateDiscount(Product product)
+    {
+        if (product.Price > 1000) return 15;
+        if (product.Price > 500) return 10;
+        if (product.Price > 100) return 5;
+        return 0;
+    }
+
+    private string? GetProductBadge(Product product)
+    {
+        if (product.Stock < 5) return "LAST UNITS";
+        if (product.CreatedAt > DateTime.Now.AddDays(-7)) return "NEW";
+        if (product.Price < 50) return "SALE";
+        return null;
+    }
+}
+```
+
+### Comparação: Com vs Sem PagedList.From()
+
+**❌ Sem PagedList.From() - Reconstrução Manual**:
+```csharp
+var pagedProducts = await query.ToPagedListAsync(pageIndex, pageSize);
+
+var productDtos = pagedProducts.Items.Select(p => new ProductDto
+{
+    Id = p.Id,
+    Name = p.Name
+}).ToList();
+
+// ⚠️ Precisa reconstruir manualmente todos os metadados
+var result = new PagedList<ProductDto>(
+    productDtos,
+    pagedProducts.PageIndex,
+    pagedProducts.PageSize,
+    pagedProducts.TotalCount,
+    pagedProducts.IndexFrom
+);
+```
+
+**✅ Com PagedList.From() - Conversão Direta**:
+```csharp
+var pagedProducts = await query.ToPagedListAsync(pageIndex, pageSize);
+
+// ✅ Metadados preservados automaticamente
+var result = PagedList.From<ProductDto, Product>(
+    pagedProducts,
+    products => products.Select(p => new ProductDto
+    {
+        Id = p.Id,
+        Name = p.Name
+    })
+);
+```
+
+### 📚 Exemplos Adicionais
+
+Para ver **6 exemplos completos e testados** do método `PagedList.From()`, consulte:
+- [`ExamplesPagedListConversion.cs`](./Examples/ExamplesPagedListConversion.cs) - 6 cenários práticos comentados
+- [`ExamplesPagedListConversionTest.cs`](../../../test/Nuuvify.CommonPack.UnitOfWork.InMemory.xTest/Tests/ExamplesPagedListConversionTest.cs) - 29 testes unitários
+
+### Quando NÃO Usar PagedList.From()?
+
+Use conversão direta no SQL quando:
+1. **Precisa filtrar após conversão**: Aplique filtros antes da paginação
+2. **Agregações complexas**: Use `GroupBy` e `Sum` direto no SQL
+3. **Joins necessários**: Faça joins antes de paginar
+
+```csharp
+// ✅ Melhor: Converter no SQL antes de paginar
+var pagedDtos = await _unitOfWork.Repository<Product>()
+    .GetAll()
+    .Where(p => p.IsActive)
+    .Select(p => new ProductDto  // Conversão no SQL
+    {
+        Id = p.Id,
+        Name = p.Name
+    })
+    .ToPagedListAsync(pageIndex, pageSize);
+
+// ❌ Evitar: Paginar entidades e converter depois (2 consultas)
+var pagedProducts = await query.ToPagedListAsync(pageIndex, pageSize);
+var pagedDtos = PagedList.From<ProductDto, Product>(pagedProducts, ...);
+```
+
 ## 🚀 Performance e Otimizações
 
 ### 1. Queries Eficientes
@@ -1217,10 +1504,10 @@ SELECT COUNT(*) FROM [Products] AS [p]
 -- ❌ Sem WHERE clause
 ```
 
-**Causa**: Este era um bug conhecido (corrigido na v3.2.0) onde `FilterBy` era um `UnaryExpression` ao invés de `ConstantExpression`.
+**Causa**: Este era um bug conhecido (corrigido na v2.2.0) onde `FilterBy` era um `UnaryExpression` ao invés de `ConstantExpression`.
 
 **Solução**:
-1. **Atualize para v3.2.0+**: `dotnet add package Nuuvify.CommonPack.UnitOfWork.Abstraction --version 3.2.0`
+1. **Atualize para v2.2.0+**: `dotnet add package Nuuvify.CommonPack.UnitOfWork.Abstraction --version 2.2.0`
 2. **Verifique sua lista não está vazia**:
    ```csharp
    filter.SearchTerms = new List<string> { "iPhone", "Samsung" }; // ✅ Correto
@@ -1237,18 +1524,18 @@ SELECT COUNT(*) FROM [Products] AS [p]
 
 **Sintoma**: `PageIndex = 1` retorna registros da segunda página.
 
-**Causa**: Confusão entre 0-based e 1-based index (corrigido na v3.2.0).
+**Causa**: Confusão entre 0-based e 1-based index (corrigido na v2.2.0).
 
 **Solução**:
-- **v3.2.0+**: `PageIndex = 1` é a primeira página (1-based)
+- **v2.2.0+**: `PageIndex = 1` é a primeira página (1-based)
 - **Versões anteriores**: Use `PageIndex = 0` para primeira página (0-based)
 
 ```csharp
-// v3.2.0+
+// v2.2.0+
 filter.PageIndex = 1; // ✅ Primeira página
 filter.PageIndex = 2; // ✅ Segunda página
 
-// Versões < 3.2.0
+// Versões < 2.2.0
 filter.PageIndex = 0; // Primeira página
 filter.PageIndex = 1; // Segunda página
 ```
@@ -1262,10 +1549,10 @@ System.NullReferenceException: Object reference not set to an instance of an obj
    at System.Linq.Expressions.Expression.And(Expression left, Expression right)
 ```
 
-**Causa**: Filtros retornando `null` (corrigido na v3.2.0).
+**Causa**: Filtros retornando `null` (corrigido na v2.2.0).
 
 **Solução**:
-1. **Atualize para v3.2.0+** onde null expressions são automaticamente ignoradas
+1. **Atualize para v2.2.0+** onde null expressions são automaticamente ignoradas
 2. **Valide valores antes de atribuir**:
    ```csharp
    // ✅ BOM - validação
@@ -1300,11 +1587,11 @@ WHERE [p].[Name] LIKE '%iphone%'
    public string? NameSearch { get; set; }
    ```
 
-2. **Para ContainsWithLikeForList** (v3.2.0+):
+2. **Para ContainsWithLikeForList** (v2.2.0+):
    ```csharp
    [QueryOperator(Operator = WhereOperator.ContainsWithLikeForList,
                   HasName = nameof(Product.Name),
-                  CaseSensitive = false)] // ✅ Funciona na v3.2.0+
+                  CaseSensitive = false)] // ✅ Funciona na v2.2.0+
    public List<string>? SearchTerms { get; set; }
 
    // SQL Gerado: WHERE Name LIKE '%IPHONE%' OR Name LIKE '%SAMSUNG%'
@@ -1319,10 +1606,10 @@ WHERE [p].[Name] LIKE '%iphone%'
 SELECT * FROM Products WHERE 0 = 1
 ```
 
-**Causa**: Bug em listas vazias (corrigido na v3.2.0).
+**Causa**: Bug em listas vazias (corrigido na v2.2.0).
 
 **Solução**:
-1. **Atualize para v3.2.0+**
+1. **Atualize para v2.2.0+**
 2. **Evite listas vazias**:
    ```csharp
    // ✅ BOM
@@ -1332,7 +1619,7 @@ SELECT * FROM Products WHERE 0 = 1
    }
    // Deixe null se não houver termos
 
-   // ❌ EVITAR em versões < 3.2.0
+   // ❌ EVITAR em versões < 2.2.0
    filter.SearchTerms = new List<string>(); // Gera WHERE 0 = 1
    ```
 
