@@ -4,9 +4,20 @@ using Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 
 namespace Nuuvify.CommonPack.UnitOfWork;
 
-internal static class IQueryableExtensions
+/// <summary>
+/// Extension methods for IQueryable to support pagination operations.
+/// </summary>
+public static class IQueryableExtensions
 {
-
+    /// <summary>
+    /// Converts the specified source to <see cref="IPagedList{T}"/> by the specified <paramref name="pageIndex"/> and <paramref name="pageSize"/>.
+    /// </summary>
+    /// <typeparam name="T">The type of the source.</typeparam>
+    /// <param name="source">The source to paging.</param>
+    /// <param name="pageIndex">The index of the page.</param>
+    /// <param name="pageSize">The size of the page.</param>
+    /// <param name="indexFrom">The start index value. indexFrom must always be less than or equal to pageIndex</param>
+    /// <returns>An instance of the inherited from <see cref="IPagedList{T}"/> interface.</returns>
     public static IPagedList<T> ToPagedList<T>(
         this IQueryable<T> source,
         int pageIndex,
