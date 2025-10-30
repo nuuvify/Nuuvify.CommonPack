@@ -13,13 +13,136 @@ Uma biblioteca .NET poderosa e flexível para implementação do padrão **Unit 
 - **Unit of Work Pattern**: Implementação completa do padrão Unit of Work
 - **Consultas Dinâmicas**: Sistema avançado de filtros com Expression Trees
 - **13 Operadores de Filtro**: From `Equals` to `ContainsWithLikeForList` (OR-based search)
+- **✨ ToPagedList/ToPagedListAsync**: Extension methods públicos para encadeamento fluente
 - **Paginação Inteligente**: Paginação otimizada com metadados completos
-- **Ordenação Flexível**: Múltiplos critérios de ordenação
+- **Ordenação Flexível**: Múltiplos critérios de ordenação encadeáveis com `.Sort()`
+- **Filtros Encadeáveis**: `.Filter()` pode ser combinado com `.Sort()` e `.ToPagedListAsync()`
 - **Thread-Safe**: Totalmente thread-safe para aplicações concorrentes
 - **Type-Safe**: Validação em tempo de compilação com enums tipados
 - **Performance Otimizada**: Queries eficientes com projection e defer loading
 - **Nullable Support**: Suporte completo a Nullable Reference Types
 - **Expression Validation**: Validação robusta de expressões e parâmetros
+
+## ✨ Extension Methods Públicos: ToPagedList e ToPagedListAsync
+
+**Novidade**: Os métodos `ToPagedList<T>` e `ToPagedListAsync<T>` agora são **extension methods públicos** no namespace `Nuuvify.CommonPack.UnitOfWork`!
+
+### O Que Mudou?
+
+Anteriormente, eram métodos internos. Agora você pode encadeá-los diretamente em qualquer `IQueryable<T>`:
+
+```csharp
+using Nuuvify.CommonPack.UnitOfWork; // ✨ Adicione este namespace!
+using Nuuvify.CommonPack.UnitOfWork.Abstraction.Extensions;
+
+// ✅ NOVO: Encadeamento fluente completo
+var result = await dbContext.Products
+    .Where(p => p.IsActive)         // Filtros EF Core
+    .Filter(filterModel)            // Filtros dinâmicos
+    .Sort("A-Name,D-Price")         // Ordenação múltipla
+    .Select(p => new ProductDto     // Projeção
+    {
+        Id = p.Id,
+        Name = p.Name,
+        Price = p.Price
+    })
+    .ToPagedListAsync(              // ✨ Extension method público!
+        pageIndex: 1,
+        pageSize: 20
+    );
+
+// Result é IPagedList<ProductDto> com metadados completos:
+// - Items: Lista de itens da página
+// - PageIndex: 1
+// - TotalCount: Total de registros
+// - TotalPages: Total de páginas
+// - HasNextPage/HasPreviousPage: Navegação
+```
+
+### Vantagens
+
+✅ **Encadeamento Fluente**: Combine com `.Filter()`, `.Sort()`, `.Select()` sem quebrar o pipeline
+✅ **Type-Safe**: IntelliSense completo e validação em compile-time
+✅ **Sem Breaking Changes**: Código legado continua funcionando
+✅ **Flexível**: Funciona com qualquer `IQueryable<T>`, não apenas com repositórios
+✅ **Performance**: Paginação executada no banco de dados (SQL Server, PostgreSQL, etc.)
+
+### Assinaturas
+
+```csharp
+// Versão síncrona (usa .Count() e .ToList())
+public static IPagedList<T> ToPagedList<T>(
+    this IQueryable<T> source,
+    int pageIndex,
+    int pageSize,
+    int indexFrom = 0)
+
+// Versão assíncrona (usa .CountAsync() e .ToListAsync())
+public static async Task<IPagedList<T>> ToPagedListAsync<T>(
+    this IQueryable<T> source,
+    int pageIndex,
+    int pageSize,
+    int indexFrom = 0,
+    CancellationToken cancellationToken = default)
+```
+
+### Exemplos de Uso
+
+#### 1. Com Repository Pattern
+```csharp
+var pagedProducts = await _unitOfWork.Repository<Product>()
+    .GetAll()
+    .Filter(filter)
+    .Sort("D-CreatedAt")
+    .ToPagedListAsync(pageIndex: 1, pageSize: 10);
+```
+
+#### 2. Com DbContext Direto
+```csharp
+var pagedOrders = await _dbContext.Orders
+    .Include(o => o.Items)
+    .Where(o => o.Status == OrderStatus.Pending)
+    .Filter(filter)
+    .ToPagedListAsync(pageIndex: 1, pageSize: 20);
+```
+
+#### 3. Com Select (Projeção)
+```csharp
+var pagedDtos = await _dbContext.Products
+    .Where(p => p.IsActive)
+    .Select(p => new ProductDto { Id = p.Id, Name = p.Name })
+    .ToPagedListAsync(pageIndex: 1, pageSize: 50);
+```
+
+#### 4. Pipeline Completo
+```csharp
+var result = await _dbContext.Products
+    .Where(p => p.Stock > 0)             // 1. Filtro fixo
+    .Filter(filterModel)                  // 2. Filtros dinâmicos
+    .Sort("A-Category,D-Price")           // 3. Ordenação
+    .Select(p => new { p.Id, p.Name })    // 4. Projeção
+    .ToPagedListAsync(1, 20);             // 5. Paginação
+```
+
+### Classes Obsoletas
+
+As classes abaixo estão marcadas como `[Obsolete]` e serão removidas em versões futuras:
+
+- ⚠️ `IIQueryablePageList` - Use extension methods diretamente
+- ⚠️ `QueryablePageList` - Use extension methods diretamente
+
+**Migração simples**:
+```csharp
+// ❌ Forma antiga (obsoleta)
+var queryablePageList = new QueryablePageList();
+var result = await queryablePageList.ToPagedListAsync(query, pageIndex, pageSize);
+
+// ✅ Nova forma (recomendada)
+using Nuuvify.CommonPack.UnitOfWork; // Adicione este namespace
+var result = await query.ToPagedListAsync(pageIndex, pageSize);
+```
+
+---
 
 ## 🆕 O Que Há de Novo na v2.2.0 (2025-10-28)
 
@@ -386,6 +509,9 @@ public class OrderSearchModel : IQueryableCustom
 ### Controller Básico com Todos os Recursos
 
 ```csharp
+using Nuuvify.CommonPack.UnitOfWork; // ✨ Namespace dos extension methods ToPagedList/ToPagedListAsync
+using Nuuvify.CommonPack.UnitOfWork.Abstraction.Extensions;
+
 [ApiController]
 [Route("api/[controller]")]
 public class ProductsController : ControllerBase
@@ -400,28 +526,31 @@ public class ProductsController : ControllerBase
     }
 
     /// <summary>
-    /// Busca produtos com filtros dinâmicos e paginação
+    /// ✨ Novo: Demonstra encadeamento completo com ToPagedListAsync como extension method
+    /// Filter() → Sort() → Select() → ToPagedListAsync()
     /// </summary>
     [HttpGet("search")]
     public async Task<ActionResult<IPagedList<ProductDto>>> SearchProducts([FromQuery] ProductSearchModel filter)
     {
         try
         {
-            // ✅ Query com filtros dinâmicos, paginação e ordenação
-            var query = _unitOfWork.Repository<Product>()
+            // ✅ Pipeline completo encadeado - ToPagedListAsync agora é extension method público!
+            var result = await _unitOfWork.Repository<Product>()
                 .GetAll()
-                .Where(p => p.IsActive) // Filtro fixo
-                .Filter(filter) // Filtros dinâmicos
-                .Sort(filter.Sort) // Ordenação
+                .Where(p => p.IsActive)     // Filtro fixo
+                .Filter(filter)             // Filtros dinâmicos
+                .Sort(filter.Sort)          // Ordenação: "A-Name,D-Price"
                 .Select(p => new ProductDto // Projeção para DTO
                 {
                     Id = p.Id,
                     Name = p.Name,
                     Category = p.Category,
                     Price = p.Price
-                });
-
-            var result = await query.ToPagedListAsync(filter.PageIndex, filter.PageSize);
+                })
+                .ToPagedListAsync(          // ✨ Extension method - pode encadear!
+                    pageIndex: filter.PageIndex,
+                    pageSize: filter.PageSize
+                );
 
             _logger.LogInformation("Produtos encontrados: {Count}/{Total}. Página: {Page}/{TotalPages}",
                 result.Items.Count, result.TotalCount, result.PageIndex, result.TotalPages);
@@ -443,11 +572,12 @@ public class ProductsController : ControllerBase
     {
         try
         {
-            // ✅ Query sem paginação - apenas filtros dinâmicos
+            // ✅ Query sem paginação - encadeamento Filter() → Sort() → Select()
             var products = await _unitOfWork.Repository<Product>()
                 .GetAll()
                 .Where(p => p.IsActive)
-                .Filter(filter) // Apenas filtros, sem paginação
+                .Filter(filter)             // Filtros dinâmicos
+                .Sort(filter.Sort)          // Ordenação
                 .Select(p => new ProductDto
                 {
                     Id = p.Id,
@@ -468,7 +598,7 @@ public class ProductsController : ControllerBase
     }
 
     /// <summary>
-    /// Demonstra o novo operador ContainsWithLikeForList
+    /// ✨ Demonstra o operador ContainsWithLikeForList + encadeamento completo
     /// </summary>
     [HttpGet("global-search")]
     public async Task<ActionResult<IPagedList<ProductDto>>> GlobalSearch([FromQuery] string[] terms)
@@ -481,19 +611,22 @@ public class ProductsController : ControllerBase
             PageSize = 10
         };
 
-        var query = _unitOfWork.Repository<Product>()
+        // ✅ Encadeamento completo: Filter() → Sort() → Select() → ToPagedListAsync()
+        var result = await _unitOfWork.Repository<Product>()
             .GetAll()
-            .Filter(filter)
-            .Sort(filter.Sort)
+            .Filter(filter)             // ContainsWithLikeForList aplicado
+            .Sort(filter.Sort)          // Ordenação
             .Select(p => new ProductDto
             {
                 Id = p.Id,
                 Name = p.Name,
                 Category = p.Category,
                 Price = p.Price
-            });
-
-        var result = await query.ToPagedListAsync(filter.PageIndex, filter.PageSize);
+            })
+            .ToPagedListAsync(          // ✨ Extension method encadeado!
+                pageIndex: filter.PageIndex,
+                pageSize: filter.PageSize
+            );
 
         return Ok(result);
     }
