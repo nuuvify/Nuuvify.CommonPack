@@ -18,7 +18,7 @@ else {
     $pathPublish = "~/software/$soluctionName"
 }
 
-$version = "2.2.0-alpha.1" #VersionPack.ps1 1 $False ../
+$version = "2.2.0-preview.25103002"
 
 if ($null -eq $version) {
     Write-Error "Não foi possivel determinar a versão !"

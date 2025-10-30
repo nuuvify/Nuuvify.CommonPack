@@ -29,7 +29,7 @@ public sealed class PagedListConversionTest : IClassFixture<ProductDbContextFixt
     private IRepository<Product> CreateProductRepository()
     {
         var context = CreateContext();
-        var unitOfWork = new UnitOfWork<ExampleDbContext>(context)
+        using var unitOfWork = new UnitOfWork<ExampleDbContext>(context)
         {
             UsernameContext = "PagedListTestUser"
         };
@@ -39,7 +39,7 @@ public sealed class PagedListConversionTest : IClassFixture<ProductDbContextFixt
     private IRepository<Order> CreateOrderRepository()
     {
         var context = CreateContext();
-        var unitOfWork = new UnitOfWork<ExampleDbContext>(context)
+        using var unitOfWork = new UnitOfWork<ExampleDbContext>(context)
         {
             UsernameContext = "PagedListTestUser"
         };

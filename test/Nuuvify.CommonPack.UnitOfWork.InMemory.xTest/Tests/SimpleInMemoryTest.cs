@@ -10,6 +10,8 @@ namespace Nuuvify.CommonPack.UnitOfWork.InMemory.xTest.Tests;
 [Trait("Category", "Unit")]
 public sealed class SimpleInMemoryTest : IClassFixture<AppDbContextFixture>, IDisposable
 {
+    private static readonly int[] TargetFaturaNumbers = [100, 150, 200];
+
     private readonly AppDbContext _context;
     private readonly Nuuvify.CommonPack.UnitOfWork.UnitOfWork<AppDbContext> _unitOfWork;
     private readonly Repository<Fatura> _faturaRepository;
@@ -353,7 +355,7 @@ public sealed class SimpleInMemoryTest : IClassFixture<AppDbContextFixture>, IDi
 
         // Assert
         Assert.True(ordered.Count >= 3);
-        var targetFaturas = ordered.Where(f => new[] { 100, 150, 200 }.Contains(f.NumeroFatura)).ToList();
+        var targetFaturas = ordered.Where(f => TargetFaturaNumbers.Contains(f.NumeroFatura)).ToList();
         Assert.Equal(3, targetFaturas.Count);
         Assert.Equal(100, targetFaturas[0].NumeroFatura);
         Assert.Equal(150, targetFaturas[1].NumeroFatura);
