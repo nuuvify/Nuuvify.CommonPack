@@ -3,6 +3,10 @@ using Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 
 namespace Nuuvify.CommonPack.UnitOfWork;
 
+/// <summary>
+/// This class is obsolete. Use the extension methods ToPagedList and ToPagedListAsync from IQueryableExtensions instead.
+/// </summary>
+[Obsolete("Use the extension methods ToPagedList and ToPagedListAsync from IQueryableExtensions (Nuuvify.CommonPack.UnitOfWork namespace) instead. This class will be removed in a future version.", false)]
 public class QueryablePageList : IIQueryablePageList
 {
     ///<inheritdoc/>

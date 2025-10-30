@@ -14,6 +14,305 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Suporte para agregações dinâmicas (SUM, COUNT, AVG)
 - Cache de queries compiladas para melhor performance
 
+## 2025-10-30
+
+### ✨ API Improvements
+
+#### Extension Methods Públicos - ToPagedList e ToPagedListAsync
+
+**Mudança importante**: `ToPagedList<T>` e `ToPagedListAsync<T>` agora são **extension methods públicos** no namespace `Nuuvify.CommonPack.UnitOfWork`!
+
+##### O Que Mudou
+
+- **Antes**: Métodos internos na classe `IQueryableExtensions` (não acessíveis externamente)
+- **Agora**: Extension methods públicos que podem ser encadeados com `.Filter()`, `.Sort()` e `.Select()`
+- **Namespace**: `Nuuvify.CommonPack.UnitOfWork` (deve ser adicionado ao `using`)
+
+##### Benefícios
+
+✅ **Encadeamento Fluente**: Combine filtros, ordenação, projeção e paginação em um pipeline único
+✅ **Type-Safe**: IntelliSense completo em cada etapa da cadeia
+✅ **Performance**: Query executada completamente no banco de dados
+✅ **Flexível**: Funciona com qualquer `IQueryable<T>`, não apenas repositórios
+✅ **Clean Code**: Pipeline de transformação claro e legível
+
+##### Exemplo de Uso
+
+```csharp
+using Nuuvify.CommonPack.UnitOfWork; // ✨ Adicione este namespace!
+using Nuuvify.CommonPack.UnitOfWork.Abstraction.Extensions;
+
+// ✅ Pipeline completo com encadeamento fluente
+var result = await dbContext.Products
+    .Where(p => p.IsActive)             // 1. Filtros EF Core
+    .Filter(filterModel)                // 2. Filtros dinâmicos com [QueryOperator]
+    .Sort("A-Name,D-Price")             // 3. Ordenação múltipla
+    .Select(p => new ProductDto         // 4. Projeção para DTO
+    {
+        Id = p.Id,
+        Name = p.Name,
+        Price = p.Price
+    })
+    .ToPagedListAsync(                  // 5. Paginação (extension method público!)
+        pageIndex: 1,
+        pageSize: 20
+    );
+
+// Retorna IPagedList<ProductDto> com metadados completos:
+// - Items: Lista de itens da página
+// - PageIndex: Página atual (1-based)
+// - TotalCount: Total de registros
+// - TotalPages: Total de páginas
+// - HasNextPage/HasPreviousPage: Navegação
+```
+
+##### Assinaturas dos Métodos
+
+```csharp
+// Versão síncrona (usa .Count() e .ToList())
+public static IPagedList<T> ToPagedList<T>(
+    this IQueryable<T> source,
+    int pageIndex,
+    int pageSize,
+    int indexFrom = 0)
+
+// Versão assíncrona (usa .CountAsync() e .ToListAsync())
+public static async Task<IPagedList<T>> ToPagedListAsync<T>(
+    this IQueryable<T> source,
+    int pageIndex,
+    int pageSize,
+    int indexFrom = 0,
+    CancellationToken cancellationToken = default)
+```
+
+##### Casos de Uso
+
+**1. Com Repository Pattern:**
+```csharp
+var pagedProducts = await _unitOfWork.Repository<Product>()
+    .GetAll()
+    .Filter(filter)
+    .Sort("D-CreatedAt")
+    .ToPagedListAsync(pageIndex: 1, pageSize: 10);
+```
+
+**2. Com DbContext Direto:**
+```csharp
+var pagedOrders = await _dbContext.Orders
+    .Include(o => o.Items)
+    .Where(o => o.Status == OrderStatus.Pending)
+    .Filter(filter)
+    .ToPagedListAsync(pageIndex: 1, pageSize: 20);
+```
+
+**3. Com Projeção (Select):**
+```csharp
+var pagedDtos = await _dbContext.Products
+    .Where(p => p.IsActive)
+    .Select(p => new ProductDto { Id = p.Id, Name = p.Name })
+    .ToPagedListAsync(pageIndex: 1, pageSize: 50);
+```
+
+**4. Pipeline Completo:**
+```csharp
+var result = await _dbContext.Products
+    .Where(p => p.Stock > 0)             // 1. Filtro fixo
+    .Filter(filterModel)                  // 2. Filtros dinâmicos
+    .Sort("A-Category,D-Price")           // 3. Ordenação
+    .Select(p => new { p.Id, p.Name })    // 4. Projeção
+    .ToPagedListAsync(1, 20);             // 5. Paginação
+```
+
+### ⚠️ Deprecated
+
+#### Classes e Interfaces Obsoletas
+
+As seguintes classes foram marcadas como `[Obsolete]` e serão removidas em uma versão futura (Major version bump):
+
+##### 1. IIQueryablePageList
+
+```csharp
+[Obsolete("Use the extension methods ToPagedList and ToPagedListAsync from IQueryableExtensions (Nuuvify.CommonPack.UnitOfWork namespace) instead. This interface will be removed in a future version.", false)]
+public interface IIQueryablePageList : IQueryableCustom
+```
+
+**Motivo**: Interface desnecessária com extension methods públicos disponíveis
+
+**Migração**:
+```csharp
+// ❌ Obsoleto
+IIQueryablePageList queryablePageList = new QueryablePageList();
+var result = await queryablePageList.ToPagedListAsync(query, 1, 20);
+
+// ✅ Recomendado
+using Nuuvify.CommonPack.UnitOfWork;
+var result = await query.ToPagedListAsync(1, 20);
+```
+
+##### 2. QueryablePageList
+
+```csharp
+[Obsolete("Use the extension methods ToPagedList and ToPagedListAsync from IQueryableExtensions (Nuuvify.CommonPack.UnitOfWork namespace) instead. This class will be removed in a future version.", false)]
+public class QueryablePageList : IIQueryablePageList
+```
+
+**Motivo**: Classe wrapper desnecessária - extension methods são mais idiomáticos em C#
+
+**Migração**:
+```csharp
+// ❌ Obsoleto
+var queryablePageList = new QueryablePageList();
+var result = await queryablePageList.ToPagedListAsync(query, pageIndex, pageSize);
+
+// ✅ Recomendado
+using Nuuvify.CommonPack.UnitOfWork;
+var result = await query.ToPagedListAsync(pageIndex, pageSize);
+```
+
+### 📚 Documentation
+
+#### README.md Atualizado
+
+- ✨ Nova seção: **"Extension Methods Públicos: ToPagedList e ToPagedListAsync"**
+- 📖 Exemplos de encadeamento fluente completo
+- 🔄 Comparação "Antes vs Agora" para migração
+- 📋 Casos de uso práticos (Repository, DbContext, Projeção, Pipeline)
+- ⚠️ Guia de migração das classes obsoletas
+- 💡 Seção "Quando NÃO Usar PagedList.From()"
+
+#### Características Principais Atualizadas
+
+- ✅ **ToPagedList/ToPagedListAsync**: Extension methods públicos para encadeamento fluente
+- ✅ **Filtros Encadeáveis**: `.Filter()` pode ser combinado com `.Sort()` e `.ToPagedListAsync()`
+- ✅ **Ordenação Flexível**: Múltiplos critérios de ordenação encadeáveis com `.Sort()`
+
+#### Controller Examples Atualizados
+
+Todos os exemplos de controllers foram atualizados para mostrar o uso dos extension methods:
+
+```csharp
+using Nuuvify.CommonPack.UnitOfWork; // ✨ Namespace dos extension methods
+
+[HttpGet("search")]
+public async Task<ActionResult<IPagedList<ProductDto>>> SearchProducts(
+    [FromQuery] ProductSearchModel filter)
+{
+    var result = await _unitOfWork.Repository<Product>()
+        .GetAll()
+        .Where(p => p.IsActive)
+        .Filter(filter)              // Filtros dinâmicos
+        .Sort(filter.Sort)           // Ordenação
+        .Select(p => new ProductDto  // Projeção
+        {
+            Id = p.Id,
+            Name = p.Name,
+            Price = p.Price
+        })
+        .ToPagedListAsync(           // ✨ Extension method encadeado!
+            pageIndex: filter.PageIndex,
+            pageSize: filter.PageSize
+        );
+
+    return Ok(result);
+}
+```
+
+### 🔄 Breaking Changes
+
+**Nenhuma breaking change nesta versão**. Todas as mudanças são **backwards-compatible**:
+
+- Classes obsoletas continuam funcionando (emitem warnings)
+- API antiga permanece disponível
+- Código existente não precisa ser modificado imediatamente
+- Migração pode ser feita gradualmente
+
+**Nota**: As classes obsoletas serão **removidas** em uma versão futura (Major version bump).
+
+### ⚙️ Technical Details
+
+#### Mudanças na Classe IQueryableExtensions
+
+**Arquivo**: `src/Nuuvify.CommonPack.UnitOfWork/Extensions/IQueryablePageListExtensions.cs`
+
+**Antes**:
+```csharp
+internal static class IQueryableExtensions
+{
+    public static IPagedList<T> ToPagedList<T>(...)
+    public static async Task<IPagedList<T>> ToPagedListAsync<T>(...)
+}
+```
+
+**Depois**:
+```csharp
+/// <summary>
+/// Extension methods for IQueryable to support pagination operations.
+/// </summary>
+public static class IQueryableExtensions
+{
+    /// <summary>
+    /// Converts the specified source to IPagedList by the specified pageIndex and pageSize.
+    /// </summary>
+    public static IPagedList<T> ToPagedList<T>(
+        this IQueryable<T> source,
+        int pageIndex,
+        int pageSize,
+        int indexFrom)
+        => new PagedList<T>(source, pageIndex, pageSize, indexFrom);
+
+    /// <summary>
+    /// Converts the specified source to IPagedList by the specified pageIndex and pageSize.
+    /// </summary>
+    public static async Task<IPagedList<T>> ToPagedListAsync<T>(
+        this IQueryable<T> source,
+        int pageIndex,
+        int pageSize,
+        int indexFrom = 0,
+        CancellationToken cancellationToken = default)
+    {
+        // Implementation with validation and async operations...
+    }
+}
+```
+
+**Mudanças**:
+- ✅ Classe mudou de `internal` para `public`
+- ✅ Adicionada documentação XML completa
+- ✅ Mantida compatibilidade total com código existente
+
+### 🎯 Recommendations
+
+#### Para Novo Código
+
+✅ **Sempre use extension methods diretamente**:
+```csharp
+using Nuuvify.CommonPack.UnitOfWork;
+
+var result = await query
+    .Filter(filter)
+    .Sort("A-Name")
+    .ToPagedListAsync(1, 20);
+```
+
+❌ **Evite usar classes obsoletas**:
+```csharp
+var queryablePageList = new QueryablePageList(); // ⚠️ Obsoleto
+```
+
+#### Para Código Existente
+
+1. ✅ Adicione `using Nuuvify.CommonPack.UnitOfWork;` aos arquivos
+2. ✅ Substitua instanciações de `QueryablePageList` por chamadas diretas aos extension methods
+3. ✅ Teste a migração em ambiente de desenvolvimento
+4. ✅ Remova warnings de compilação
+
+### 📊 Impact Assessment
+
+- **Compatibilidade**: 100% backwards-compatible
+- **Performance**: Mesma performance (ou melhor devido a eliminação de wrapper)
+- **Code Quality**: Melhoria significativa com API mais idiomática
+- **Developer Experience**: Melhor IntelliSense e encadeamento fluente
+
 ## 2025-10-28
 
 ### 🐛 Corrigido
