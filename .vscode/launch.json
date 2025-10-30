@@ -1,43 +1,50 @@
 {
-   // Use IntelliSense to find out which attributes exist for C# debugging
-   // Use hover for the description of the existing attributes
-   // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
-   "version": "0.2.0",
-   "configurations": [
-      {
-         "name": "NugetManagement",
-         "type": "coreclr",
-         "request": "launch",
-         "preLaunchTask": "build",
-         "program": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/Nuget.CustomManagement.dll",
-         "args": [],
-         "cwd": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/",
-         "env": {
-            "DOTNET_ENVIRONMENT": "Development"
-         },
-         "windows": {
-            "console": "externalTerminal",
+    // Use IntelliSense to find out which attributes exist for C# debugging
+    // Use hover for the description of the existing attributes
+    // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "NugetManagement",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
             "program": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/Nuget.CustomManagement.dll",
-            "cwd": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/"
-         },
-         "linux": {
-            "program": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/Nuget.CustomManagement.dll",
-            "cwd": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/"
-         }
-      },
-      {
-         "name": "PowerShell - Tests",
-         "type": "PowerShell",
-         "request": "launch",
-         "script": "${workspaceFolder}/test/run-tests.ps1",
-         "cwd": "${workspaceFolder}/test/"
-      },
-      {
-         "name": "PowerShell Launch Current File",
-         "type": "PowerShell",
-         "request": "launch",
-         "script": "${file}",
-         "cwd": "${file}"
-      }
-   ]
+            "args": [],
+            "cwd": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/",
+            "env": {
+                "DOTNET_ENVIRONMENT": "Development"
+            },
+            "windows": {
+                "console": "externalTerminal",
+                "program": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/Nuget.CustomManagement.dll",
+                "cwd": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/"
+            },
+            "linux": {
+                "program": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/Nuget.CustomManagement.dll",
+                "cwd": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/"
+            }
+        },
+        {
+            "name": "PowerShell - Tests",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${workspaceFolder}/test/run-tests.ps1",
+            "cwd": "${workspaceFolder}/test/"
+        },
+        {
+            "name": "PowerShell - CreatePack",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${workspaceFolder}/test/CreatePack.ps1",
+            "cwd": "${workspaceFolder}/test/"
+        },
+        {
+            "name": "PowerShell Launch Current File",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${file}",
+            "cwd": "${file}"
+        }
+    ]
 }

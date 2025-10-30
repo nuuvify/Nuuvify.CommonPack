@@ -1,5 +1,9 @@
 ﻿namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 
+/// <summary>
+/// This interface is obsolete. Use the extension methods ToPagedList and ToPagedListAsync from IQueryableExtensions instead.
+/// </summary>
+[Obsolete("Use the extension methods ToPagedList and ToPagedListAsync from IQueryableExtensions (Nuuvify.CommonPack.UnitOfWork namespace) instead. This interface will be removed in a future version.", false)]
 public interface IIQueryablePageList : IQueryableCustom
 {
     /// <summary>
