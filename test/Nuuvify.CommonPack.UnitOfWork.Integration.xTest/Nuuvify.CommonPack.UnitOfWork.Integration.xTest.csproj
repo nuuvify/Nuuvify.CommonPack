@@ -9,17 +9,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <!-- Test framework packages (versions managed in Directory.Packages.props) -->
-        <PackageReference Include="Microsoft.NET.Test.Sdk" />
-        <PackageReference Include="xunit" />
-        <PackageReference Include="xunit.runner.visualstudio" />
-        <PackageReference Include="coverlet.collector" />
-
-        <!-- Mocking and fake data packages -->
-        <PackageReference Include="AutoMoqCore" />
-        <PackageReference Include="Bogus" />
-        <PackageReference Include="Moq" />
-
         <!-- Entity Framework Core for SQL Server -->
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" />

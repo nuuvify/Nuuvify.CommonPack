@@ -88,67 +88,139 @@ public static partial class FiltersExtensions
         }
     }
 
+    /// <summary>
+    /// Creates a complex OR expression that checks if a field contains any of the patterns from a list.
+    /// Supports case-sensitive and case-insensitive matching based on criteria configuration.
+    /// </summary>
+    /// <typeparam name="TEntity">The entity type being filtered</typeparam>
+    /// <param name="expression">The expression parser containing field and filter information</param>
+    /// <returns>An OR expression combining all pattern matches, or null if no valid patterns found</returns>
     private static Expression ContainsWithLikeForListExpression<TEntity>(ExpressionParser expression)
     {
+        var patterns = ExtractPatternsFromExpression(expression.FilterBy);
+        if (patterns == null)
+            return null;
+
         Expression orExpression = null;
-
-        Expression filterExpression = expression.FilterBy;
-
-        if (filterExpression is UnaryExpression unaryExpression && unaryExpression.NodeType == ExpressionType.Convert)
-        {
-            filterExpression = unaryExpression.Operand;
-        }
-
-        if (filterExpression is not ConstantExpression constantExpression)
-        {
-            return null;
-        }
-
-        if (constantExpression.Value is not System.Collections.IEnumerable patterns)
-        {
-            return null;
-        }
 
         foreach (var pattern in patterns)
         {
-            if (pattern == null || string.IsNullOrEmpty(pattern.ToString()))
-                continue;
-
-            var patternString = pattern.ToString();
-
-            Expression likePattern;
-            Expression fieldToFilter = expression.FieldToFilter;
-
-            if (!expression.Criteria.CaseSensitive)
+            if (IsValidPattern(pattern))
             {
-                fieldToFilter = Expression.Call(expression.FieldToFilter,
-                    typeof(string).GetMethods()
-                        .First(m => m.Name == MethodName.ToUpper.ToMethodString() && m.GetParameters().Length == 0));
-
-                likePattern = Expression.Constant(patternString.ToUpper(), typeof(string));
-            }
-            else
-            {
-                likePattern = Expression.Constant(patternString, typeof(string));
-            }
-
-            var containsMethod = typeof(string).GetMethod(MethodName.Contains.ToMethodString(), new[] { typeof(string) });
-
-            if (containsMethod != null)
-            {
-                var containsExpression = Expression.Call(fieldToFilter, containsMethod, likePattern);
-
-                if (orExpression == null)
-                {
-                    orExpression = containsExpression;
-                }
-                else
-                {
-                    orExpression = Expression.OrElse(orExpression, containsExpression);
-                }
+                var containsExpression = CreateContainsExpressionForPattern(expression, pattern);
+                orExpression = CombineWithOrExpression(orExpression, containsExpression);
             }
         }
 
         return orExpression;
+    }
+
+    /// <summary>
+    /// Extracts the enumerable patterns from the filter expression, handling conversion expressions if necessary.
+    /// </summary>
+    /// <param name="filterExpression">The filter expression to extract patterns from</param>
+    /// <returns>Enumerable of patterns or null if extraction fails</returns>
+    private static System.Collections.IEnumerable ExtractPatternsFromExpression(Expression filterExpression)
+    {
+        var actualExpression = UnwrapConversionExpression(filterExpression);
+
+        if (actualExpression is not ConstantExpression constantExpression)
+            return null;
+
+        return constantExpression.Value as System.Collections.IEnumerable;
+    }
+
+    /// <summary>
+    /// Unwraps conversion expressions to get the underlying expression.
+    /// </summary>
+    /// <param name="expression">The expression to unwrap</param>
+    /// <returns>The unwrapped expression or the original if no conversion found</returns>
+    private static Expression UnwrapConversionExpression(Expression expression)
+    {
+        return expression is UnaryExpression { NodeType: ExpressionType.Convert } unaryExpression
+            ? unaryExpression.Operand
+            : expression;
+    }
+
+    /// <summary>
+    /// Validates if a pattern is valid (not null and not empty).
+    /// </summary>
+    /// <param name="pattern">The pattern to validate</param>
+    /// <returns>True if pattern is valid, false otherwise</returns>
+    private static bool IsValidPattern(object pattern)
+    {
+        return pattern != null && !string.IsNullOrEmpty(pattern.ToString());
+    }
+
+    /// <summary>
+    /// Creates a contains expression for a specific pattern, handling case sensitivity based on criteria.
+    /// </summary>
+    /// <param name="expression">The expression parser containing field and criteria information</param>
+    /// <param name="pattern">The pattern to create the contains expression for</param>
+    /// <returns>A contains expression or null if method cannot be found</returns>
+    private static Expression CreateContainsExpressionForPattern(ExpressionParser expression, object pattern)
+    {
+        var patternString = pattern.ToString();
+        var (fieldExpression, patternExpression) = CreateCaseSensitiveExpressions(expression, patternString);
+
+        var containsMethod = GetStringContainsMethod();
+        return containsMethod != null
+            ? Expression.Call(fieldExpression, containsMethod, patternExpression)
+            : null;
+    }
+
+    /// <summary>
+    /// Creates field and pattern expressions handling case sensitivity based on criteria configuration.
+    /// </summary>
+    /// <param name="expression">The expression parser containing field and criteria information</param>
+    /// <param name="patternString">The pattern string to process</param>
+    /// <returns>Tuple containing the field expression and pattern expression</returns>
+    private static (Expression fieldExpression, Expression patternExpression) CreateCaseSensitiveExpressions(
+        ExpressionParser expression, string patternString)
+    {
+        if (expression.Criteria.CaseSensitive)
+        {
+            return (expression.FieldToFilter, Expression.Constant(patternString, typeof(string)));
+        }
+
+        var upperFieldExpression = Expression.Call(expression.FieldToFilter, GetToUpperMethod());
+        var upperPatternExpression = Expression.Constant(patternString.ToUpper(), typeof(string));
+
+        return (upperFieldExpression, upperPatternExpression);
+    }
+
+    /// <summary>
+    /// Gets the string ToUpper method for case-insensitive comparisons.
+    /// </summary>
+    /// <returns>The ToUpper method info</returns>
+    private static MethodInfo GetToUpperMethod()
+    {
+        return typeof(string).GetMethods()
+            .First(m => m.Name == MethodName.ToUpper.ToMethodString() && m.GetParameters().Length == 0);
+    }
+
+    /// <summary>
+    /// Gets the string Contains method for pattern matching.
+    /// </summary>
+    /// <returns>The Contains method info</returns>
+    private static MethodInfo GetStringContainsMethod()
+    {
+        return typeof(string).GetMethod(MethodName.Contains.ToMethodString(), new[] { typeof(string) });
+    }
+
+    /// <summary>
+    /// Combines an existing OR expression with a new contains expression using OrElse.
+    /// </summary>
+    /// <param name="existingOrExpression">The existing OR expression (can be null)</param>
+    /// <param name="newContainsExpression">The new contains expression to add</param>
+    /// <returns>Combined OR expression or the new expression if existing was null</returns>
+    private static Expression CombineWithOrExpression(Expression existingOrExpression, Expression newContainsExpression)
+    {
+        if (newContainsExpression == null)
+            return existingOrExpression;
+
+        return existingOrExpression == null
+            ? newContainsExpression
+            : Expression.OrElse(existingOrExpression, newContainsExpression);
     }
 }

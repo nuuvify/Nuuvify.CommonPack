@@ -8,17 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <!-- Test framework packages (versions managed in Directory.Packages.props) -->
-        <PackageReference Include="Microsoft.NET.Test.Sdk" />
-        <PackageReference Include="xunit" />
-        <PackageReference Include="xunit.runner.visualstudio" />
-        <PackageReference Include="coverlet.collector" />
-
-        <!-- Mocking and fake data packages -->
-        <PackageReference Include="AutoMoqCore" />
-        <PackageReference Include="Bogus" />
-        <PackageReference Include="Moq" />
-
         <!-- Entity Framework Core para testes InMemory -->
         <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />

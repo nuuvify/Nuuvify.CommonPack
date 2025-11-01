@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Nuuvify.CommonPack.UnitOfWork.Abstraction.Collections;
-using Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 using Nuuvify.CommonPack.UnitOfWork.Examples;
 using Nuuvify.CommonPack.UnitOfWork.InMemory.xTest.Fakers;
 using Nuuvify.CommonPack.UnitOfWork.InMemory.xTest.Fixtures;
@@ -26,29 +25,9 @@ public sealed class PagedListConversionTest : IClassFixture<ProductDbContextFixt
 
     private ExampleDbContext CreateContext() => _fixture.CreateContext();
 
-    private IRepository<Product> CreateProductRepository()
-    {
-        var context = CreateContext();
-        var unitOfWork = new UnitOfWork<ExampleDbContext>(context)
-        {
-            UsernameContext = "PagedListTestUser"
-        };
-        return new Repository<Product>(context, unitOfWork);
-    }
-
-    private IRepository<Order> CreateOrderRepository()
-    {
-        var context = CreateContext();
-        var unitOfWork = new UnitOfWork<ExampleDbContext>(context)
-        {
-            UsernameContext = "PagedListTestUser"
-        };
-        return new Repository<Order>(context, unitOfWork);
-    }
-
     private async Task SeedDatabase()
     {
-        var context = CreateContext();
+        using var context = CreateContext();
         if (await context.Products.AnyAsync())
             return;
 
@@ -79,7 +58,10 @@ public sealed class PagedListConversionTest : IClassFixture<ProductDbContextFixt
     public async Task From_ShouldConvertPagedListToDto_PreservingMetadata()
     {
         // Arrange
-        var repository = CreateProductRepository();
+        using var context = CreateContext();
+        using var unitOfWork = new UnitOfWork<ExampleDbContext>(context) { UsernameContext = "PagedListTestUser" };
+        var repository = new Repository<Product>(context, unitOfWork);
+
         var pagedProducts = await repository.GetPagedListAsync(
             predicate: p => p.IsActive,
             orderBy: query => query.OrderBy(p => p.Name),
@@ -117,7 +99,10 @@ public sealed class PagedListConversionTest : IClassFixture<ProductDbContextFixt
     public async Task From_ShouldApplyCustomConverter_WithBusinessLogic()
     {
         // Arrange
-        var repository = CreateProductRepository();
+        using var context = CreateContext();
+        using var unitOfWork = new UnitOfWork<ExampleDbContext>(context) { UsernameContext = "PagedListTestUser" };
+        var repository = new Repository<Product>(context, unitOfWork);
+
         var pagedProducts = await repository.GetPagedListAsync(pageIndex: 1, pageSize: 20);
 
         // Act
@@ -148,7 +133,10 @@ public sealed class PagedListConversionTest : IClassFixture<ProductDbContextFixt
     public async Task From_ShouldHandleEmptyPagedList()
     {
         // Arrange
-        var repository = CreateProductRepository();
+        using var context = CreateContext();
+        using var unitOfWork = new UnitOfWork<ExampleDbContext>(context) { UsernameContext = "PagedListTestUser" };
+        var repository = new Repository<Product>(context, unitOfWork);
+
         var emptyPaged = await repository.GetPagedListAsync(
             predicate: p => p.Id < 0,
             pageIndex: 1,
@@ -204,7 +192,10 @@ public sealed class PagedListConversionTest : IClassFixture<ProductDbContextFixt
     public async Task From_ShouldSupportMultipleConversions()
     {
         // Arrange
-        var repository = CreateProductRepository();
+        using var context = CreateContext();
+        using var unitOfWork = new UnitOfWork<ExampleDbContext>(context) { UsernameContext = "PagedListTestUser" };
+        var repository = new Repository<Product>(context, unitOfWork);
+
         var pagedProducts = await repository.GetPagedListAsync(pageIndex: 1, pageSize: 10);
 
         // Act - Primeira conversão
@@ -243,7 +234,10 @@ public sealed class PagedListConversionTest : IClassFixture<ProductDbContextFixt
     public async Task From_ShouldPreserveMetadata_ThroughMultipleConversions()
     {
         // Arrange
-        var repository = CreateProductRepository();
+        using var context = CreateContext();
+        using var unitOfWork = new UnitOfWork<ExampleDbContext>(context) { UsernameContext = "PagedListTestUser" };
+        var repository = new Repository<Product>(context, unitOfWork);
+
         var pagedProducts = await repository.GetPagedListAsync(pageIndex: 2, pageSize: 15);
 
         // Act
@@ -273,7 +267,10 @@ public sealed class PagedListConversionTest : IClassFixture<ProductDbContextFixt
     public async Task From_ShouldConvertWithAggregation()
     {
         // Arrange
-        var repository = CreateOrderRepository();
+        using var context = CreateContext();
+        using var unitOfWork = new UnitOfWork<ExampleDbContext>(context) { UsernameContext = "PagedListTestUser" };
+        var repository = new Repository<Order>(context, unitOfWork);
+
         var pagedOrders = await repository.GetPagedListAsync(pageIndex: 1, pageSize: 10);
 
         // Act
@@ -301,7 +298,9 @@ public sealed class PagedListConversionTest : IClassFixture<ProductDbContextFixt
     public async Task GetPagedListAsync_ShouldFilterByPredicate()
     {
         // Arrange
-        var repository = CreateProductRepository();
+        using var context = CreateContext();
+        using var unitOfWork = new UnitOfWork<ExampleDbContext>(context) { UsernameContext = "PagedListTestUser" };
+        var repository = new Repository<Product>(context, unitOfWork);
 
         // Act
         var pagedActive = await repository.GetPagedListAsync(
@@ -318,7 +317,9 @@ public sealed class PagedListConversionTest : IClassFixture<ProductDbContextFixt
     public async Task GetPagedListAsync_ShouldOrderResults()
     {
         // Arrange
-        var repository = CreateProductRepository();
+        using var context = CreateContext();
+        using var unitOfWork = new UnitOfWork<ExampleDbContext>(context) { UsernameContext = "PagedListTestUser" };
+        var repository = new Repository<Product>(context, unitOfWork);
 
         // Act
         var pagedOrdered = await repository.GetPagedListAsync(
@@ -337,11 +338,17 @@ public sealed class PagedListConversionTest : IClassFixture<ProductDbContextFixt
     public async Task GetPagedListAsync_ShouldCalculatePagesCorrectly()
     {
         // Arrange
-        var repository = CreateProductRepository();
+        using var context1 = CreateContext();
+        using var unitOfWork1 = new UnitOfWork<ExampleDbContext>(context1) { UsernameContext = "PagedListTestUser" };
+        var repository1 = new Repository<Product>(context1, unitOfWork1);
+
+        using var context2 = CreateContext();
+        using var unitOfWork2 = new UnitOfWork<ExampleDbContext>(context2) { UsernameContext = "PagedListTestUser" };
+        var repository2 = new Repository<Product>(context2, unitOfWork2);
 
         // Act
-        var page1 = await repository.GetPagedListAsync(pageIndex: 1, pageSize: 10);
-        var page2 = await repository.GetPagedListAsync(pageIndex: 2, pageSize: 10);
+        var page1 = await repository1.GetPagedListAsync(pageIndex: 1, pageSize: 10);
+        var page2 = await repository2.GetPagedListAsync(pageIndex: 2, pageSize: 10);
 
         // Assert
         Assert.Equal(1, page1.PageIndex);
@@ -398,8 +405,11 @@ public sealed class PagedListConversionTest : IClassFixture<ProductDbContextFixt
     public async Task PagedList_ShouldCalculateTotalPagesCorrectly()
     {
         // Arrange
-        var repository = CreateProductRepository();
-        var totalCount = await CreateContext().Products.CountAsync();
+        using var context = CreateContext();
+        using var unitOfWork = new UnitOfWork<ExampleDbContext>(context) { UsernameContext = "PagedListTestUser" };
+        var repository = new Repository<Product>(context, unitOfWork);
+
+        var totalCount = await context.Products.CountAsync();
         var pageSize = 7;
 
         // Act

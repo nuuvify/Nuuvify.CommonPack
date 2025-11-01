@@ -8,13 +8,12 @@ namespace Nuuvify.CommonPack.UnitOfWork.InMemory.xTest.Fixtures;
 /// Cada classe de teste recebe uma instância única do banco com nome GUID.
 ///
 /// IMPORTANTE: O banco é compartilhado entre TODOS os testes da mesma classe.
-/// Um único contexto é mantido e reutilizado para garantir persistência dos dados.
+/// Novos contextos são criados para cada operação, mas compartilham o mesmo banco In-Memory.
 /// </summary>
 public sealed class ProductDbContextFixture : IDisposable
 {
     private readonly string _databaseName;
     private readonly DbContextOptions<ExampleDbContext> _options;
-    private readonly ExampleDbContext _sharedContext;
     private bool _disposed = false;
 
     public ProductDbContextFixture()
@@ -28,9 +27,9 @@ public sealed class ProductDbContextFixture : IDisposable
             .EnableDetailedErrors()
             .Options;
 
-        // Cria um contexto compartilhado para todos os testes
-        _sharedContext = new ExampleDbContext(_options);
-        _ = _sharedContext.Database.EnsureCreated();
+        // Cria um contexto inicial apenas para garantir que o banco seja criado
+        using var initialContext = new ExampleDbContext(_options);
+        _ = initialContext.Database.EnsureCreated();
     }
 
     public ExampleDbContext CreateContext()
@@ -38,15 +37,14 @@ public sealed class ProductDbContextFixture : IDisposable
         if (_disposed)
             throw new ObjectDisposedException(nameof(ProductDbContextFixture));
 
-        // Retorna o contexto compartilhado para manter os dados entre testes
-        return _sharedContext;
+        // Cria um novo contexto para cada chamada, mas usando o mesmo banco In-Memory
+        return new ExampleDbContext(_options);
     }
 
     public void Dispose()
     {
         if (!_disposed)
         {
-            _sharedContext?.Dispose();
             _disposed = true;
             GC.SuppressFinalize(this);
         }
