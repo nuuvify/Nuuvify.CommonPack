@@ -16,12 +16,12 @@ public class ExpressionExtensionTests
 
         var customers = new List<Customer>()
             {
-                new Customer() { Id = "AA1", Nome = "Fritz", Codigo = 3, Tipo = "A" },
-                new Customer() { Id = "XX1", Nome = "Giropopis", Codigo = 1, Tipo = "A" },
-                new Customer() { Id = "XA2", Nome = "Stradivarius", Codigo = 2, Tipo = "B" },
-                new Customer() { Id = "XB1", Nome = "Giropopis", Codigo = 1, Tipo = "C" },
-                new Customer() { Id = "DDD", Nome = "Fritz", Codigo = 3, Tipo = "D" },
-                new Customer() { Id = "XC3", Nome = "Fulano", Codigo = 1, Tipo = "E" },
+                new() { Id = "AA1", Nome = "Fritz", Codigo = 3, Tipo = "A" },
+                new() { Id = "XX1", Nome = "Giropopis", Codigo = 1, Tipo = "A" },
+                new() { Id = "XA2", Nome = "Stradivarius", Codigo = 2, Tipo = "B" },
+                new() { Id = "XB1", Nome = "Giropopis", Codigo = 1, Tipo = "C" },
+                new() { Id = "DDD", Nome = "Fritz", Codigo = 3, Tipo = "D" },
+                new() { Id = "XC3", Nome = "Fulano", Codigo = 1, Tipo = "E" },
             };
 
         Tipos = new string[] { "A", "E" };
