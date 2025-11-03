@@ -40,12 +40,11 @@ public static class HttpRetryPolicies
 
         if (message?.Exception?.Message != null)
         {
-
-            logger.LogWarning("{messageLog} - Request failed because network failure: {messageEx}", messageLog, message?.Exception?.Message);
+            logger.LogWarning("{MessageLog} - Request failed because network failure: {MessageEx}", messageLog, message?.Exception?.Message);
         }
         else
         {
-            logger.LogWarning("{messageLog}", messageLog);
+            logger.LogWarning("{MessageLog}", messageLog);
         }
 
         await Task.CompletedTask.ConfigureAwait(false);

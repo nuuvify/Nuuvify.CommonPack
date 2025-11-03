@@ -2,7 +2,7 @@
 
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
-## [2.1.0] - 2025-09-30
+## 2025-09-30
 
 ### 🔔 Sistema de Notificações Aprimorado
 
@@ -65,7 +65,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 - **Stability**: Maior estabilidade através de proper resource management
 - **Code Quality**: Conformidade com best practices para Class Libraries .NET
 
-## [2.0.0] - 2025-01-01
+## 2025-01-01
 
-## [1.0.0] - 2025-07-09
+## 2025-07-09
 

@@ -82,6 +82,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nuuvify.CommonPack.AzureSer
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nuuvify.CommonPack.AzureServiceBus.Abstraction", "src\Nuuvify.CommonPack.AzureServiceBus.Abstraction\Nuuvify.CommonPack.AzureServiceBus.Abstraction.csproj", "{B6D122F7-693A-48A0-9E6C-1E2408EF0C65}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nuuvify.CommonPack.UnitOfWork.Integration.xTest", "test\Nuuvify.CommonPack.UnitOfWork.Integration.xTest\Nuuvify.CommonPack.UnitOfWork.Integration.xTest.csproj", "{B242987F-E978-4F16-BD77-B2714F05A888}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -236,6 +238,10 @@ Global
 		{B6D122F7-693A-48A0-9E6C-1E2408EF0C65}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6D122F7-693A-48A0-9E6C-1E2408EF0C65}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6D122F7-693A-48A0-9E6C-1E2408EF0C65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B242987F-E978-4F16-BD77-B2714F05A888}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B242987F-E978-4F16-BD77-B2714F05A888}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B242987F-E978-4F16-BD77-B2714F05A888}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B242987F-E978-4F16-BD77-B2714F05A888}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -277,6 +283,7 @@ Global
 		{2A6B331C-C349-45CF-BA7C-3C7B78DCC60C} = {26E1D6A9-B75A-428E-A415-84DD88ADB59B}
 		{2A8266D6-91CB-4BC2-A0AF-14CB8385152A} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{B6D122F7-693A-48A0-9E6C-1E2408EF0C65} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{B242987F-E978-4F16-BD77-B2714F05A888} = {0C88DD14-F956-CE84-757C-A364CCF449FC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {41A1DBC1-D175-4A1C-8E44-BF14E885E244}

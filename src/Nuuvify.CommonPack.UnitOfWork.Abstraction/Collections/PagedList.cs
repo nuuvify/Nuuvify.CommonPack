@@ -53,13 +53,25 @@ public class PagedList<T> : IPagedList<T>
     public bool HasNextPage => PageIndex - IndexFrom + 1 < TotalPages;
 
     /// <summary>
+    /// Gets the number of items to skip before taking the page.
+    /// Calculated as (PageIndex - IndexFrom) * PageSize.
+    /// </summary>
+    public int Skip => (PageIndex - IndexFrom) * PageSize;
+
+    /// <summary>
+    /// Gets the number of items to take for the current page.
+    /// </summary>
+    public int Take => PageSize;
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="PagedList{T}" /> class.
     /// </summary>
     /// <param name="source">The source.</param>
     /// <param name="pageIndex">The index of the page</param>
     /// <param name="pageSize">The size of the page</param>
     /// <param name="indexFrom">The start index value</param>
-    public PagedList(IEnumerable<T> source,
+    public PagedList(
+        IEnumerable<T> source,
         int pageIndex,
         int pageSize,
         int indexFrom)
@@ -78,9 +90,9 @@ public class PagedList<T> : IPagedList<T>
             TotalCount = querable.Count();
             TotalPages = (int)Math.Ceiling(TotalCount / (double)PageSize);
 
-            Items = querable.Skip((PageIndex - IndexFrom) * PageSize)
-                            .Take(PageSize)
-                            .ToList();
+            Items = querable.Skip(Skip)
+                            .Take(Take)
+                            .ToArray();
         }
         else
         {
@@ -90,9 +102,9 @@ public class PagedList<T> : IPagedList<T>
             TotalCount = source.Count();
             TotalPages = (int)Math.Ceiling(TotalCount / (double)PageSize);
 
-            Items = source.Skip((PageIndex - IndexFrom) * PageSize)
-                          .Take(PageSize)
-                          .ToList();
+            Items = source.Skip(Skip)
+                          .Take(Take)
+                          .ToArray();
 
         }
     }
@@ -100,7 +112,7 @@ public class PagedList<T> : IPagedList<T>
     /// <summary>
     /// Initializes a new instance of the <see cref="PagedList{T}" /> class.
     /// </summary>
-    public PagedList() => Items = new T[0];
+    public PagedList() => Items = [];
 
 }
 
