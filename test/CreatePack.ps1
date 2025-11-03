@@ -9,7 +9,7 @@ Clear-Host
 # /home/lincoln/projs/Nuuvify.CommonPack/test
 
 $isOsWindows = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows))
-$soluctionName = "CommonPack"
+$soluctionName = "Nuuvify.CommonPack"
 
 if ($isOsWindows) {
     $pathPublish = "c:\software\$soluctionName"
@@ -18,24 +18,24 @@ else {
     $pathPublish = "~/software/$soluctionName"
 }
 
-$version = "1.2.0-alpha.1" #VersionPack.ps1 1 $False ../
+$version = "2.2.0-preview.25103002"
 
 if ($null -eq $version) {
-    Write-Error "Não foi possivel determinar a versão !" 
+    Write-Error "Não foi possivel determinar a versão !"
     Exit 1
 }
 
 
 if (Test-Path $pathPublish) {
-    Remove-Item -Path $pathPublish/Nuuvify.$soluctionName.*.$version -Recurse -Force
-    Remove-Item -Path "$($HOME)/.nuget/packages/Nuuvify.$soluctionName.*/$version" -Recurse -Force
+    Remove-Item -Path $pathPublish/$soluctionName.*.$version -Recurse -Force
+    Remove-Item -Path "$($HOME)/.nuget/packages/$soluctionName.*/$version" -Recurse -Force
 }
 
 Remove-Item -Recurse "../src/*/bin" ; Remove-Item -Recurse "../src/*/obj" ; Remove-Item -Recurse "../test/*/bin" ; Remove-Item -Recurse "../test/*/obj"
 
-dotnet pack "../$soluctionName.sln" -c Release -p:PackageVersion=$version -o $pathPublish 
+dotnet pack "../$soluctionName.sln" -c Release -p:PackageVersion=$version -o $pathPublish
 
-$pacotes = Get-ChildItem -Filter *.nupkg -LiteralPath $pathPublish 
+$pacotes = Get-ChildItem -Filter *.nupkg -LiteralPath $pathPublish
 if ($pacotes.Count -gt 0) {
 
     # Set-Location $pathPublish
@@ -44,11 +44,11 @@ if ($pacotes.Count -gt 0) {
 
     # foreach ($pacote in $pacotes) {
     #     Write-Host "Signing: $($pacote.Name)"
-    #     C:/Users/Lincoln/nuget.exe sign $pacote.Name -CertificatePath C:/Projetos/SecurityFiles/nuget-sign-package.pkt -Timestamper "http://timestamp.sectigo.com" 
+    #     C:/Users/Lincoln/nuget.exe sign $pacote.Name -CertificatePath C:/Projetos/SecurityFiles/nuget-sign-package.pkt -Timestamper "http://timestamp.sectigo.com"
     #     Start-Sleep -Seconds 15
     # }
-   
-    ## Não precisa executar o push porque o dotnet pack já esta gerando o pacote no mesmo caminho do 
+
+    ## Não precisa executar o push porque o dotnet pack já esta gerando o pacote no mesmo caminho do
     ## "TesteLocal" que esta no NuGet.Config
     #dotnet nuget push --source "TesteLocal" $pathPublish\*.nupkg
 
@@ -59,6 +59,6 @@ if ($pacotes.Count -gt 0) {
     Write-Host "Concluido"
 }
 else {
-    Write-Error "Pacotes nupkg não foram gerados !" 
+    Write-Error "Pacotes nupkg não foram gerados !"
     Exit 1
 }

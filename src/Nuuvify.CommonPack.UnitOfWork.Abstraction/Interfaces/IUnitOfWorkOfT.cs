@@ -30,7 +30,13 @@ public interface IUnitOfWork<TContext> : IUnitOfWork where TContext : class
     /// <param name="cancellationToken"></param>
     /// <param name="unitOfWorks">An optional <see cref="IUnitOfWork"/> array.</param>
     /// <returns>A <see cref="Task{TResult}"/> that represents the asynchronous save operation. The task result contains the number of state entities written to database.</returns>
-    Task<int> SaveChangesAsync(bool ensureAutoHistory = false, int actualRegistry = 1, int limitCommit = 1, bool toSave = true, CancellationToken cancellationToken = default, params IUnitOfWork[] unitOfWorks);
+    Task<int> SaveChangesAsync(
+        bool ensureAutoHistory = false,
+        int actualRegistry = 1,
+        int limitCommit = 1,
+        bool toSave = true,
+        CancellationToken cancellationToken = default,
+        params IUnitOfWork[] unitOfWorks);
 
 }
 
