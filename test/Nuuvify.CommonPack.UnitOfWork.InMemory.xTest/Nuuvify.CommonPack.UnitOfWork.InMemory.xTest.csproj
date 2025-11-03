@@ -8,17 +8,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" />
-        <PackageReference Include="xunit" />
-        <PackageReference Include="xunit.runner.visualstudio" />
-        <PackageReference Include="coverlet.collector" />
-        <PackageReference Include="AutoMoqCore" />
-
+        <!-- Entity Framework Core para testes InMemory -->
         <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" />
+
+        <!-- Configuration packages -->
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
         <PackageReference Include="Microsoft.Extensions.Http" />
-        <PackageReference Include="Moq" />
     </ItemGroup>
 
     <ItemGroup>

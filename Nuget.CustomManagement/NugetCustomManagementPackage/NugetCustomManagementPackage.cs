@@ -19,9 +19,15 @@ namespace Nuget.CustomManagement.NugetCustomManagementPackage;
 public class NugetCustomManagementPackage
 {
     public IDictionary<string, string> Packages { get; set; }
-    public string PackageVersion { get; set; } = "2.1.0-test.25100505";
+    private string PackageVersion { get; }
 
-    public NugetCustomManagementPackage()
+    public NugetCustomManagementPackage(string packageVersion)
+    {
+        PackageVersion = packageVersion;
+
+    }
+
+    public void SetPackageVersionToDelete()
     {
         Packages = new Dictionary<string, string>
         {

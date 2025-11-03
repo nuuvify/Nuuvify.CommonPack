@@ -199,7 +199,7 @@ Você pode copiar estes exemplos para seu projeto e adaptá-los conforme necess�
 
 ## ❓ **Precisa de Ajuda?**
 
-- 📧 **Email**: [suporte@nuuvify.com](mailto:suporte@nuuvify.com)
+- 📧 **Email**: [suporte@zocate.li](mailto:suporte@zocate.li)
 - 📋 **Issues**: [GitHub Issues](https://github.com/nuuvify/Nuuvify.CommonPack/issues)
 - 💬 **Discussões**: [GitHub Discussions](https://github.com/nuuvify/Nuuvify.CommonPack/discussions)
 

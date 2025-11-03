@@ -26,8 +26,6 @@ try
 
     logger.LogInformation("**** Environment: {EnvironmentName} ****", builder.Environment.EnvironmentName);
 
-    var nugetCustomManagementPackage = new NugetCustomManagementPackage();
-
     Console.WriteLine("Gerenciador de Pacotes NuGet");
     Console.WriteLine("Digite ':q' para sair a qualquer momento");
     Console.WriteLine();
@@ -96,7 +94,8 @@ try
         {
             try
             {
-                nugetCustomManagementPackage.PackageVersion = packageVersion;
+                var nugetCustomManagementPackage = new NugetCustomManagementPackage(packageVersion);
+                nugetCustomManagementPackage.SetPackageVersionToDelete();
                 await nugetCustomManagementPackage.DeletePackage(logger, builder.Environment.EnvironmentName, default);
                 Console.WriteLine($"✅ Pacote versão {packageVersion} processado com sucesso!");
             }

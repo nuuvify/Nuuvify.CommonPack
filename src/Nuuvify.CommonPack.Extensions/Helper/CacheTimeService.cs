@@ -32,53 +32,32 @@ public static class CacheTimeServiceExtension
     /// <inheritdoc cref="ExpireAt(IConfiguration, string)"/>
     public static TimeSpan ExpireAt(double time, CacheTime cacheTime)
     {
-        switch (cacheTime)
+        var expireTime = CalculateExpireTime(time, cacheTime);
+        var expireDiff = expireTime - DateTimeOffset.Now;
+
+        if (expireDiff <= TimeSpan.Zero)
         {
-            case CacheTime.minute:
-                {
-                    var expireTime = DateTimeOffset.Now.AddMinutes(time);
-                    TimeSpan expireDiff = expireTime - DateTimeOffset.Now;
-                    if (expireDiff <= TimeSpan.Zero)
-                    {
-                        time = Math.Abs(time) < 0.0001 ? 20 : time;
-                        expireTime = DateTimeOffset.Now.AddSeconds(time);
-                    }
-                    return expireTime - DateTimeOffset.Now;
-                }
-            case CacheTime.seconds:
-                {
-                    var expireTime = DateTimeOffset.Now.AddSeconds(time);
-                    TimeSpan expireDiff = expireTime - DateTimeOffset.Now;
-                    if (expireDiff <= TimeSpan.Zero)
-                    {
-                        time = Math.Abs(time) < 0.0001 ? 20 : time;
-                        expireTime = DateTimeOffset.Now.AddSeconds(time);
-                    }
-                    return expireTime - DateTimeOffset.Now;
-                }
-            case CacheTime.miliseconds:
-                {
-                    var expireTime = DateTimeOffset.Now.AddMilliseconds(time);
-                    TimeSpan expireDiff = expireTime - DateTimeOffset.Now;
-                    if (expireDiff <= TimeSpan.Zero)
-                    {
-                        time = Math.Abs(time) < 0.0001 ? 20 : time;
-                        expireTime = DateTimeOffset.Now.AddSeconds(time);
-                    }
-                    return expireTime - DateTimeOffset.Now;
-                }
-            default:
-                {
-                    var expireTime = DateTimeOffset.Now.AddHours(time);
-                    TimeSpan expireDiff = expireTime - DateTimeOffset.Now;
-                    if (expireDiff <= TimeSpan.Zero)
-                    {
-                        time = Math.Abs(time) < 0.0001 ? 20 : time;
-                        expireTime = DateTimeOffset.Now.AddSeconds(time);
-                    }
-                    return expireTime - DateTimeOffset.Now;
-                }
+            time = GetValidTime(time);
+            expireTime = DateTimeOffset.Now.AddSeconds(time);
         }
+
+        return expireTime - DateTimeOffset.Now;
+    }
+
+    private static DateTimeOffset CalculateExpireTime(double time, CacheTime cacheTime)
+    {
+        return cacheTime switch
+        {
+            CacheTime.minute => DateTimeOffset.Now.AddMinutes(time),
+            CacheTime.seconds => DateTimeOffset.Now.AddSeconds(time),
+            CacheTime.miliseconds => DateTimeOffset.Now.AddMilliseconds(time),
+            _ => DateTimeOffset.Now.AddHours(time)
+        };
+    }
+
+    private static double GetValidTime(double time)
+    {
+        return Math.Abs(time) < 0.0001 ? 20 : time;
     }
 
 }

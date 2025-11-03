@@ -1,11 +1,7 @@
 ﻿using MailKit.Net.Smtp;
 using Nuuvify.CommonPack.Email.Abstraction;
 using Nuuvify.CommonPack.Extensions.Notificator;
-using System.Collections.Generic;
-using System.IO;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Nuuvify.CommonPack.Email;
 
