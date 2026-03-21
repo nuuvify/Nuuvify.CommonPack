@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using Azure.Messaging.ServiceBus;
 
 /// <summary>
 /// Configurações para conexão e operações com o Azure Service Bus
@@ -109,6 +110,21 @@ public class ServiceBusConfiguration
     /// da entidade no Azure Service Bus.
     /// </remarks>
     public bool EnablePartitioning { get; set; } = false;
+
+    /// <summary>
+    /// Modo de recebimento de mensagens do Service Bus (padrão: PeekLock)
+    /// </summary>
+    /// <remarks>
+    /// Define como as mensagens são recebidas:
+    /// <list type="bullet">
+    /// <item><description><c>PeekLock</c> (padrão): A mensagem fica travada e deve ser explicitamente
+    /// completada, abandonada ou enviada para dead letter. Semântica at-least-once.</description></item>
+    /// <item><description><c>ReceiveAndDelete</c>: A mensagem é removida da fila assim que é recebida.
+    /// Não requer Complete/Abandon/DeadLetter. Semântica at-most-once. Use para cenários de
+    /// baixa criticidade ou alto throughput onde perda de mensagem é aceitável.</description></item>
+    /// </list>
+    /// </remarks>
+    public ServiceBusReceiveMode ReceiveMode { get; set; } = ServiceBusReceiveMode.PeekLock;
 
     /// <summary>
     /// TTL (Time To Live) padrão para mensagens em minutos (padrão: 60)

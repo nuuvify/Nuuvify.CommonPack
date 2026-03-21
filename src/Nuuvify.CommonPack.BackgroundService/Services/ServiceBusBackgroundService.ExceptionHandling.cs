@@ -23,8 +23,12 @@ public abstract partial class ServiceBusBackgroundService<T>
         CancellationToken cancellationToken)
     {
         _logger.LogError(ex, "Erro específico do Service Bus durante a execução do Worker: {Reason}", ex.Reason);
-        var deadLetterProperties = CreateDeadLetterProperties(args.Message, $"ServiceBus specific error: {ex.Reason} - {ex.Message}", ex.GetType().Name);
-        await args.DeadLetterMessageAsync(args.Message, propertiesToModify: deadLetterProperties, cancellationToken: cancellationToken);
+
+        if (_receiveMode != ServiceBusReceiveMode.ReceiveAndDelete)
+        {
+            var deadLetterProperties = CreateDeadLetterProperties(args.Message, $"ServiceBus specific error: {ex.Reason} - {ex.Message}", ex.GetType().Name);
+            await args.DeadLetterMessageAsync(args.Message, propertiesToModify: deadLetterProperties, cancellationToken: cancellationToken);
+        }
     }
 
     /// <summary>
@@ -47,7 +51,7 @@ public abstract partial class ServiceBusBackgroundService<T>
         _logger.LogError(ex, "Erro de comunicação no Service Bus. Verifique as configurações de rede. Reason: {Reason}, Resource: {EntityPath}",
             ex.Reason, args.Message?.Subject ?? UnknownValue);
 
-        if (args.Message != null)
+        if (_receiveMode != ServiceBusReceiveMode.ReceiveAndDelete && args.Message != null)
         {
             var deadLetterProperties = CreateDeadLetterProperties(args.Message, $"Service communication problem: {ex.Message}", ex.GetType().Name);
             await args.DeadLetterMessageAsync(args.Message, propertiesToModify: deadLetterProperties, cancellationToken: cancellationToken);
@@ -77,15 +81,18 @@ public abstract partial class ServiceBusBackgroundService<T>
     {
         _logger.LogWarning(ex, "Operação cancelada durante a execução do Worker");
 
-        if (AbandonMessageIfFailed)
+        if (_receiveMode != ServiceBusReceiveMode.ReceiveAndDelete)
         {
-            var abandonProperties = CreateAbandonProperties(args.Message, "Operation was cancelled");
-            await args.AbandonMessageAsync(args.Message, propertiesToModify: abandonProperties, cancellationToken: cancellationToken);
-        }
-        else
-        {
-            var deadLetterProperties = CreateDeadLetterProperties(args.Message, $"Operation cancelled: {ex.Message}", ex.GetType().Name);
-            await args.DeadLetterMessageAsync(args.Message, propertiesToModify: deadLetterProperties, cancellationToken: cancellationToken);
+            if (AbandonMessageIfFailed)
+            {
+                var abandonProperties = CreateAbandonProperties(args.Message, "Operation was cancelled");
+                await args.AbandonMessageAsync(args.Message, propertiesToModify: abandonProperties, cancellationToken: cancellationToken);
+            }
+            else
+            {
+                var deadLetterProperties = CreateDeadLetterProperties(args.Message, $"Operation cancelled: {ex.Message}", ex.GetType().Name);
+                await args.DeadLetterMessageAsync(args.Message, propertiesToModify: deadLetterProperties, cancellationToken: cancellationToken);
+            }
         }
     }
 
@@ -107,8 +114,13 @@ public abstract partial class ServiceBusBackgroundService<T>
         CancellationToken cancellationToken)
     {
         _logger.LogError(ex, "Houve um erro durante a execução do Worker.ExecuteAsync");
-        var deadLetterProperties = CreateDeadLetterProperties(args.Message, $"Unhandled exception: {ex.Message}", ex.GetType().Name);
-        await args.DeadLetterMessageAsync(args.Message, propertiesToModify: deadLetterProperties, cancellationToken: cancellationToken);
+
+        if (_receiveMode != ServiceBusReceiveMode.ReceiveAndDelete)
+        {
+            var deadLetterProperties = CreateDeadLetterProperties(args.Message, $"Unhandled exception: {ex.Message}", ex.GetType().Name);
+            await args.DeadLetterMessageAsync(args.Message, propertiesToModify: deadLetterProperties, cancellationToken: cancellationToken);
+        }
+
         throw new InvalidOperationException($"Erro não tratado durante processamento da mensagem {args.Message?.MessageId ?? UnknownValue}: {ex.Message}", ex);
     }
 
@@ -132,15 +144,18 @@ public abstract partial class ServiceBusBackgroundService<T>
         _logger.LogWarning("{MethodName} retornou {TrueOrFalse} para a mensagem {MessageId}. Verificando comportamento de falha.",
             nameof(ExecuteReceivedMessageAsync), false, args.Message.MessageId);
 
-        if (AbandonMessageIfFailed)
+        if (_receiveMode != ServiceBusReceiveMode.ReceiveAndDelete)
         {
-            var abandonProperties = CreateAbandonProperties(args.Message, "Business logic returned false");
-            await args.AbandonMessageAsync(message: args.Message, propertiesToModify: abandonProperties, cancellationToken: cancellationToken);
-        }
-        else
-        {
-            var deadLetterProperties = CreateDeadLetterProperties(args.Message, "Business logic returned false", "BusinessLogicFailure");
-            await args.DeadLetterMessageAsync(message: args.Message, propertiesToModify: deadLetterProperties, cancellationToken: cancellationToken);
+            if (AbandonMessageIfFailed)
+            {
+                var abandonProperties = CreateAbandonProperties(args.Message, "Business logic returned false");
+                await args.AbandonMessageAsync(message: args.Message, propertiesToModify: abandonProperties, cancellationToken: cancellationToken);
+            }
+            else
+            {
+                var deadLetterProperties = CreateDeadLetterProperties(args.Message, "Business logic returned false", "BusinessLogicFailure");
+                await args.DeadLetterMessageAsync(message: args.Message, propertiesToModify: deadLetterProperties, cancellationToken: cancellationToken);
+            }
         }
     }
 }

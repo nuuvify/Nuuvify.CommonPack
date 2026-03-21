@@ -351,11 +351,13 @@ public class ServiceBusClientConfigurationTests : IClassFixture<ServiceBusTestFi
         config.ConnectionString = connectionString;
         config.QueueName = queueName;
         config.OperationTimeoutSeconds = 45;
+        config.ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete;
 
         // Assert
         config.ConnectionString.ShouldBe(connectionString);
         config.QueueName.ShouldBe(queueName);
         config.OperationTimeoutSeconds.ShouldBe(45);
+        config.ReceiveMode.ShouldBe(ServiceBusReceiveMode.ReceiveAndDelete);
     }
 
     [Fact]

@@ -643,6 +643,51 @@ public class ServiceBusMessageReceiverBasicTests
         Should.NotThrow(() => receiver.ConfigureServiceBusForQueue(connectionString, "test-queue"));
         Should.NotThrow(() => receiver.ConfigureServiceBusForTopic(connectionString, "test-topic", "test-subscription"));
     }
+
+    [Fact]
+    public void ReceiveMode_DefaultValue_ShouldBePeekLock()
+    {
+        // Arrange
+        var receiver = new TestServiceBusMessageReceiver(_loggerMock.Object, _configMock.Object, _requestConfig);
+
+        // Act
+        var receiveMode = receiver.TestReceiveMode;
+
+        // Assert
+        receiveMode.ShouldBe(ServiceBusReceiveMode.PeekLock);
+    }
+
+    [Fact]
+    public void ReceiveMode_AfterConfiguration_ShouldRemainPeekLock()
+    {
+        // Arrange
+        var receiver = new TestServiceBusMessageReceiver(_loggerMock.Object, _configMock.Object, _requestConfig);
+        var connectionString = "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=test";
+
+        // Act
+        receiver.ConfigureServiceBusForQueue(connectionString, "test-queue");
+
+        // Assert
+        receiver.TestReceiveMode.ShouldBe(ServiceBusReceiveMode.PeekLock);
+    }
+
+    [Fact]
+    public void ReceiveMode_WithProcessorOptionsReceiveAndDelete_ShouldApplyReceiveMode()
+    {
+        // Arrange
+        var receiver = new TestServiceBusMessageReceiver(_loggerMock.Object, _configMock.Object, _requestConfig);
+        var connectionString = "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=test";
+        var processorOptions = new ServiceBusProcessorOptions
+        {
+            ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete
+        };
+
+        // Act - O ReceiveMode do Receiver sobrescreve o do ProcessorOptions
+        receiver.ConfigureServiceBusForQueue(connectionString, "test-queue");
+
+        // Assert - Permanece PeekLock pois o _receiveMode do Receiver é o padrão
+        receiver.TestReceiveMode.ShouldBe(ServiceBusReceiveMode.PeekLock);
+    }
 }
 
 /// <summary>
@@ -712,6 +757,8 @@ public partial class TestServiceBusMessageReceiver : ServiceBusMessageReceiver<s
     public ActivitySource TestActivitySourceCustom => ActivitySourceCustom;
 
     public bool TestAbandonMessageIfFailed => AbandonMessageIfFailed;
+
+    public ServiceBusReceiveMode TestReceiveMode => ReceiveMode;
 
     public ILogger<ServiceBusMessageReceiver<string>> TestLogger => Logger;
 

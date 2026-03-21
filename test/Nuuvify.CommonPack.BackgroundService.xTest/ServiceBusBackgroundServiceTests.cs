@@ -106,6 +106,8 @@ public class TestServiceBusBackgroundService : ServiceBusBackgroundService<TestS
 
     public bool GetAbandonMessageIfFailed() => AbandonMessageIfFailed;
 
+    public ServiceBusReceiveMode GetReceiveMode() => ReceiveMode;
+
     public void TestConfigureServiceBus(string cnnName, string queueName, ServiceBusClientOptions serviceBusClientOptions, ServiceBusProcessorOptions serviceBusProcessorOptions)
     {
         ConfigureServiceBus(cnnName, queueName, serviceBusClientOptions, serviceBusProcessorOptions);

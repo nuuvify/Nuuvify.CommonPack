@@ -21,11 +21,17 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
     private ServiceBusClient _serviceBusClient;
     [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed")]
     private ServiceBusProcessor _serviceBusProcessor;
+    private ServiceBusReceiveMode _receiveMode = ServiceBusReceiveMode.PeekLock;
 
     protected RequestConfiguration RequestConfiguration => _requestConfiguration;
     protected ILogger<ServiceBusBackgroundService<T>> Logger => _logger;
     protected IConfigurationCustom ConfigurationCustom => _configurationCustom;
     protected ActivitySource ActivitySourceCustom { get; set; } = null!;
+
+    /// <summary>
+    /// Modo de recebimento configurado para o processador
+    /// </summary>
+    protected ServiceBusReceiveMode ReceiveMode => _receiveMode;
 
     /// <summary>
     /// Configurar para abandonar mensagens em caso de falha em vez de enviá-las para dead letter
@@ -106,6 +112,8 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
             topicName: topicName,
             subscriptionName: subscription,
             options: serviceBusProcessorOptions);
+
+        _receiveMode = serviceBusProcessorOptions?.ReceiveMode ?? ServiceBusReceiveMode.PeekLock;
     }
 
     /// <summary>
@@ -152,6 +160,8 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
             topicName: topicName,
             subscriptionName: subscription,
             options: serviceBusProcessorOptions);
+
+        _receiveMode = serviceBusProcessorOptions?.ReceiveMode ?? ServiceBusReceiveMode.PeekLock;
     }
 
     /// <summary>
@@ -189,6 +199,8 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
         _serviceBusProcessor = _serviceBusClient.CreateProcessor(
             queueName: queueName,
             options: serviceBusProcessorOptions);
+
+        _receiveMode = serviceBusProcessorOptions?.ReceiveMode ?? ServiceBusReceiveMode.PeekLock;
     }
 
     /// <summary>
@@ -228,6 +240,8 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
         _serviceBusProcessor = _serviceBusClient.CreateProcessor(
             queueName: queueName,
             options: serviceBusProcessorOptions);
+
+        _receiveMode = serviceBusProcessorOptions?.ReceiveMode ?? ServiceBusReceiveMode.PeekLock;
     }
 
     /// <summary>
@@ -386,7 +400,10 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
 
             if (result)
             {
-                await args.CompleteMessageAsync(args.Message, cancellationToken);
+                if (_receiveMode != ServiceBusReceiveMode.ReceiveAndDelete)
+                {
+                    await args.CompleteMessageAsync(args.Message, cancellationToken);
+                }
             }
             else
             {

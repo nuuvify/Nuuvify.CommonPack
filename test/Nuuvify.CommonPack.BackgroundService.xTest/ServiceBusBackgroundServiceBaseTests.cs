@@ -252,6 +252,77 @@ public sealed class ServiceBusBackgroundServiceBaseTests : IDisposable
         Assert.True(true);
     }
 
+    [Fact]
+    public void ReceiveMode_DefaultValue_ShouldBePeekLock()
+    {
+        // Arrange
+        using var service = new TestServiceBusBackgroundService(_loggerMock.Object, _configurationMock.Object, _requestConfiguration);
+
+        // Act
+        var receiveMode = service.GetReceiveMode();
+
+        // Assert
+        Assert.Equal(ServiceBusReceiveMode.PeekLock, receiveMode);
+    }
+
+    [Fact]
+    public void ReceiveMode_WithReceiveAndDeleteProcessorOptions_ShouldCaptureReceiveMode()
+    {
+        // Arrange
+        _ = _configurationMock.Setup(x => x.GetSectionValue(It.IsAny<string>()))
+            .Returns("Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=test");
+
+        using var service = new TestServiceBusBackgroundService(_loggerMock.Object, _configurationMock.Object, _requestConfiguration);
+
+        var processorOptions = new ServiceBusProcessorOptions
+        {
+            ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete
+        };
+
+        // Act
+        service.TestConfigureServiceBus("TestConnection", "test-queue", null, processorOptions);
+
+        // Assert
+        Assert.Equal(ServiceBusReceiveMode.ReceiveAndDelete, service.GetReceiveMode());
+    }
+
+    [Fact]
+    public void ReceiveMode_WithPeekLockProcessorOptions_ShouldCapturePeekLock()
+    {
+        // Arrange
+        _ = _configurationMock.Setup(x => x.GetSectionValue(It.IsAny<string>()))
+            .Returns("Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=test");
+
+        using var service = new TestServiceBusBackgroundService(_loggerMock.Object, _configurationMock.Object, _requestConfiguration);
+
+        var processorOptions = new ServiceBusProcessorOptions
+        {
+            ReceiveMode = ServiceBusReceiveMode.PeekLock
+        };
+
+        // Act
+        service.TestConfigureServiceBus("TestConnection", "test-queue", null, processorOptions);
+
+        // Assert
+        Assert.Equal(ServiceBusReceiveMode.PeekLock, service.GetReceiveMode());
+    }
+
+    [Fact]
+    public void ReceiveMode_WithNullProcessorOptions_ShouldDefaultToPeekLock()
+    {
+        // Arrange
+        _ = _configurationMock.Setup(x => x.GetSectionValue(It.IsAny<string>()))
+            .Returns("Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=test");
+
+        using var service = new TestServiceBusBackgroundService(_loggerMock.Object, _configurationMock.Object, _requestConfiguration);
+
+        // Act
+        service.TestConfigureServiceBus("TestConnection", "test-queue", null, null);
+
+        // Assert
+        Assert.Equal(ServiceBusReceiveMode.PeekLock, service.GetReceiveMode());
+    }
+
     public void Dispose()
     {
         _activitySource?.Dispose();

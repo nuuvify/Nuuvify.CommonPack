@@ -32,6 +32,7 @@ public class ServiceBusConfigurationTests : IClassFixture<ServiceBusTestFixture>
         config.MaxBatchSize.ShouldBe(100);
         config.EnableSessions.ShouldBeFalse();
         config.EnablePartitioning.ShouldBeFalse();
+        config.ReceiveMode.ShouldBe(ServiceBusReceiveMode.PeekLock);
         config.DefaultMessageTtlMinutes.ShouldBe(60);
     }
 
@@ -384,5 +385,41 @@ public class ServiceBusConfigurationTests : IClassFixture<ServiceBusTestFixture>
         config.EnableSessions.ShouldBe(enableSessions);
         config.EnablePartitioning.ShouldBe(enablePartitioning);
         config.DefaultMessageTtlMinutes.ShouldBe(ttl);
+    }
+
+    [Fact]
+    public void ReceiveMode_DefaultValue_ShouldBePeekLock()
+    {
+        // Act
+        var config = new ServiceBusConfiguration();
+
+        // Assert
+        config.ReceiveMode.ShouldBe(ServiceBusReceiveMode.PeekLock);
+    }
+
+    [Fact]
+    public void ReceiveMode_WhenSetToReceiveAndDelete_ShouldReturnReceiveAndDelete()
+    {
+        // Arrange
+        var config = new ServiceBusConfiguration();
+
+        // Act
+        config.ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete;
+
+        // Assert
+        config.ReceiveMode.ShouldBe(ServiceBusReceiveMode.ReceiveAndDelete);
+    }
+
+    [Fact]
+    public void ReceiveMode_WhenSetToPeekLock_ShouldReturnPeekLock()
+    {
+        // Arrange
+        var config = new ServiceBusConfiguration();
+
+        // Act
+        config.ReceiveMode = ServiceBusReceiveMode.PeekLock;
+
+        // Assert
+        config.ReceiveMode.ShouldBe(ServiceBusReceiveMode.PeekLock);
     }
 }
