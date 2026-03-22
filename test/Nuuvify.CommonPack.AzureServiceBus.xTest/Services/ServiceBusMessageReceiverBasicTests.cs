@@ -682,10 +682,52 @@ public class ServiceBusMessageReceiverBasicTests
             ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete
         };
 
-        // Act - O ReceiveMode do Receiver sobrescreve o do ProcessorOptions
-        receiver.ConfigureServiceBusForQueue(connectionString, "test-queue");
+        // Act - O ReceiveMode do ProcessorOptions é aplicado ao Receiver
+        receiver.ConfigureServiceBusForQueue(connectionString, "test-queue", processorOptions);
 
-        // Assert - Permanece PeekLock pois o _receiveMode do Receiver é o padrão
+        // Assert - ReceiveAndDelete conforme definido nas ProcessorOptions
+        receiver.TestReceiveMode.ShouldBe(ServiceBusReceiveMode.ReceiveAndDelete);
+    }
+
+    [Fact]
+    public void ReceiveMode_WithTopicProcessorOptionsReceiveAndDelete_ShouldApplyReceiveMode()
+    {
+        // Arrange
+        var receiver = new TestServiceBusMessageReceiver(_loggerMock.Object, _configMock.Object, _requestConfig);
+        var connectionString = "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=test";
+        var processorOptions = new ServiceBusProcessorOptions
+        {
+            ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete
+        };
+
+        // Act
+        receiver.ConfigureServiceBusForTopic(connectionString, "test-topic", "test-subscription", processorOptions);
+
+        // Assert
+        receiver.TestReceiveMode.ShouldBe(ServiceBusReceiveMode.ReceiveAndDelete);
+    }
+
+    [Fact]
+    public void ReceiveMode_WhenReconfiguredWithDifferentOptions_ShouldUpdateReceiveMode()
+    {
+        // Arrange
+        var receiver = new TestServiceBusMessageReceiver(_loggerMock.Object, _configMock.Object, _requestConfig);
+        var connectionString = "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=test";
+
+        // Act - Configurar inicialmente com ReceiveAndDelete
+        var receiveAndDeleteOptions = new ServiceBusProcessorOptions
+        {
+            ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete
+        };
+        receiver.ConfigureServiceBusForQueue(connectionString, "test-queue", receiveAndDeleteOptions);
+
+        // Assert - Deve ser ReceiveAndDelete
+        receiver.TestReceiveMode.ShouldBe(ServiceBusReceiveMode.ReceiveAndDelete);
+
+        // Act - Reconfigurar com PeekLock (default das ProcessorOptions)
+        receiver.ConfigureServiceBusForQueue(connectionString, "test-queue-2");
+
+        // Assert - Deve retornar a PeekLock
         receiver.TestReceiveMode.ShouldBe(ServiceBusReceiveMode.PeekLock);
     }
 }
@@ -803,13 +845,13 @@ public partial class TestServiceBusMessageReceiver : ServiceBusMessageReceiver<s
         }
     }
 
-    public void ConfigureServiceBusForQueue(string connectionString, string queueName)
+    public void ConfigureServiceBusForQueue(string connectionString, string queueName, ServiceBusProcessorOptions serviceBusProcessorOptions = null)
     {
-        ConfigureServiceBus(connectionString, queueName);
+        ConfigureServiceBus(connectionString, queueName, serviceBusProcessorOptions: serviceBusProcessorOptions);
     }
 
-    public void ConfigureServiceBusForTopic(string connectionString, string topicName, string subscription)
+    public void ConfigureServiceBusForTopic(string connectionString, string topicName, string subscription, ServiceBusProcessorOptions serviceBusProcessorOptions = null)
     {
-        ConfigureServiceBus(connectionString, topicName, subscription);
+        ConfigureServiceBus(connectionString, topicName, subscription, serviceBusProcessorOptions: serviceBusProcessorOptions);
     }
 }

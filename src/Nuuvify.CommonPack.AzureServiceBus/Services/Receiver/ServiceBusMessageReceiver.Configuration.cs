@@ -54,7 +54,7 @@ public abstract partial class ServiceBusMessageReceiver<T>
             options: serviceBusClientOptions ?? new ServiceBusClientOptions());
 
         var processorOptions = serviceBusProcessorOptions ?? new ServiceBusProcessorOptions();
-        processorOptions.ReceiveMode = _receiveMode;
+        _receiveMode = processorOptions.ReceiveMode;
 
         _serviceBusProcessor = _serviceBusClient.CreateProcessor(
             topicName: topicName,
@@ -94,7 +94,7 @@ public abstract partial class ServiceBusMessageReceiver<T>
             options: serviceBusClientOptions ?? new ServiceBusClientOptions());
 
         var processorOptions = serviceBusProcessorOptions ?? new ServiceBusProcessorOptions();
-        processorOptions.ReceiveMode = _receiveMode;
+        _receiveMode = processorOptions.ReceiveMode;
 
         _serviceBusProcessor = _serviceBusClient.CreateProcessor(
             topicName: topicName,
@@ -130,7 +130,7 @@ public abstract partial class ServiceBusMessageReceiver<T>
             options: serviceBusClientOptions ?? new ServiceBusClientOptions());
 
         var processorOptions = serviceBusProcessorOptions ?? new ServiceBusProcessorOptions();
-        processorOptions.ReceiveMode = _receiveMode;
+        _receiveMode = processorOptions.ReceiveMode;
 
         _serviceBusProcessor = _serviceBusClient.CreateProcessor(
             queueName: queueName,
@@ -166,7 +166,7 @@ public abstract partial class ServiceBusMessageReceiver<T>
             options: serviceBusClientOptions ?? new ServiceBusClientOptions());
 
         var processorOptions = serviceBusProcessorOptions ?? new ServiceBusProcessorOptions();
-        processorOptions.ReceiveMode = _receiveMode;
+        _receiveMode = processorOptions.ReceiveMode;
 
         _serviceBusProcessor = _serviceBusClient.CreateProcessor(
             queueName: queueName,
