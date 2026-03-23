@@ -12,6 +12,7 @@
         <!-- Entity Framework Core for SQL Server -->
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
 
         <!-- Configuration packages -->
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
