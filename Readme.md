@@ -491,6 +491,81 @@ Contribuições são bem-vindas! Veja como você pode ajudar:
 - Mantenha **alta cobertura de testes**
 - Use **async/await** para operações I/O
 
+### Configuração de Credenciais Git
+
+Se você receber o erro abaixo ao tentar fazer push, significa que há credenciais de outra conta em cache:
+
+```
+remote: Permission to nuuvify/Nuuvify.CommonPack.git denied to usuario_anterior.
+fatal: unable to access 'https://github.com/nuuvify/Nuuvify.CommonPack.git/': The requested URL returned error: 403
+```
+
+**1. Configure o usuário local do repositório:**
+
+```powershell
+git config --local user.name "lzocateli"
+git config --local user.email "lzocateli@outlook.com"
+```
+
+**2. Troque o remote para HTTPS (se estiver usando SSH):**
+
+```powershell
+git remote set-url origin https://github.com/nuuvify/Nuuvify.CommonPack.git
+```
+
+**3. Liste e remova credenciais antigas do Windows:**
+
+```powershell
+# Listar credenciais relacionadas ao GitHub
+cmdkey /list | Select-String -Pattern "github"
+
+# Remover cada entrada encontrada (ajuste o target conforme listado)
+cmdkey /delete:git:https://github.com
+```
+
+**4. Limpe também pelo Git Credential Manager:**
+
+```powershell
+# Cole as 3 linhas abaixo e pressione Enter duas vezes
+git credential reject
+protocol=https
+host=github.com
+```
+
+**5. Se houver credenciais persistentes no Gerenciador de Credenciais do Windows:**
+
+- Pressione `Win + R` → digite `control /name Microsoft.CredentialManager` → Enter
+- Clique em **Credenciais do Windows**
+- Localize entradas com `github` no nome (ex: `GitHub for Visual Studio - https://usuario_anterior@github.com/`)
+- Clique na entrada e depois em **Remover**
+
+**6. (Opcional) Se usar GitHub CLI:**
+
+```powershell
+gh auth logout
+gh auth login
+# Selecione: GitHub.com → HTTPS → Autentique no navegador com a conta correta
+```
+
+**7. Faça o push — o Git Credential Manager abrirá o navegador para autenticar:**
+
+```powershell
+git push origin sua-branch
+```
+
+> ⚠️ **Dica:** Certifique-se de estar logado no GitHub com a conta correta (`lzocateli`) antes de autorizar no navegador. Se o navegador abrir já logado com outra conta, faça logout no GitHub primeiro.
+
+**8. Confirme que está tudo certo:**
+
+```powershell
+# Verificar configuração local
+git config user.name
+git config user.email
+
+# Se usar gh cli
+gh auth status
+```
+
 ## 📊 Status do Projeto
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nuuvify_CommonPack&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=nuuvify_CommonPack)
