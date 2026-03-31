@@ -30,6 +30,7 @@ Implementação robusta e completa do padrão **Unit of Work** e **Repository** 
 - ✅ **Unit of Work Pattern** com gerenciamento automático de transações
 - ✅ **Repository Pattern Genérico** para todas as entidades
 - ✅ **Filtros Dinâmicos** com Query Operators customizáveis
+- ✅ **✨ ToPagedList/ToPagedListAsync** como extension methods públicos encadeáveis
 - ✅ **Paginação Inteligente** com metadados completos
 - ✅ **Auditoria Automática** de criação e alteração
 - ✅ **Suporte a Múltiplos Bancos** (SQL Server, Oracle, DB2, PostgreSQL, MySQL)
@@ -39,7 +40,8 @@ Implementação robusta e completa do padrão **Unit of Work** e **Repository** 
 - ✅ **Filtros por Atributos** usando `[QueryOperator]`
 - ✅ **Operadores Avançados** (Contains, StartsWith, GreaterThan, etc.)
 - ✅ **Busca Global** em múltiplos campos simultaneamente
-- ✅ **Ordenação Dinâmica** com múltiplos critérios
+- ✅ **Ordenação Dinâmica** com múltiplos critérios via `.Sort()`
+- ✅ **✨ Encadeamento Fluente**: `.Filter()` → `.Sort()` → `.Select()` → `.ToPagedListAsync()`
 - ✅ **Projeções** para DTOs com Select otimizado
 - ✅ **Includes** para eager loading de relacionamentos
 
@@ -200,6 +202,85 @@ public class AppDbContext : DbContext
     }
 }
 ```
+
+## ✨ Extension Methods: ToPagedList e ToPagedListAsync
+
+**Novidade Importante**: Os métodos `ToPagedList<T>` e `ToPagedListAsync<T>` agora são **extension methods públicos**!
+
+### Como Usar
+
+```csharp
+using Nuuvify.CommonPack.UnitOfWork; // ✨ Adicione este namespace para os extension methods
+using Nuuvify.CommonPack.UnitOfWork.Abstraction.Extensions;
+
+// ✅ Encadeamento fluente completo
+var pagedResult = await _repository.GetAll()
+    .Where(p => p.IsActive)             // Filtros EF Core
+    .Filter(filterModel)                // Filtros dinâmicos com [QueryOperator]
+    .Sort("A-Name,D-Price")             // Ordenação múltipla
+    .Select(p => new ProductDto         // Projeção para DTO
+    {
+        Id = p.Id,
+        Name = p.Name,
+        Price = p.Price
+    })
+    .ToPagedListAsync(                  // ✨ Extension method público!
+        pageIndex: 1,
+        pageSize: 20
+    );
+
+// Retorna IPagedList<ProductDto> com:
+// - Items: Lista de itens da página atual
+// - PageIndex, PageSize, TotalCount, TotalPages
+// - HasNextPage, HasPreviousPage para navegação
+```
+
+### Vantagens do Encadeamento
+
+✅ **API Fluente**: Combina `.Filter()`, `.Sort()` e `.ToPagedListAsync()` naturalmente
+✅ **Type-Safe**: IntelliSense completo em cada etapa
+✅ **Performance**: Toda query executada no banco (não em memória)
+✅ **Flexível**: Funciona com `IQueryable<T>` de qualquer fonte
+✅ **Clean Code**: Pipeline de transformação claro e legível
+
+### Comparação: Antes vs Agora
+
+```csharp
+// ❌ Forma antiga (ainda funciona, mas verbosa)
+var pagedResult = await _repository.GetPagedListAsync(
+    predicate: filter,
+    selector: p => new ProductDto { Id = p.Id, Name = p.Name },
+    orderBy: "Name asc",
+    pageIndex: 1,
+    pageSize: 20
+);
+
+// ✅ Nova forma (recomendada - mais fluente)
+var pagedResult = await _repository.GetAll()
+    .Filter(filter)
+    .Sort("A-Name")
+    .Select(p => new ProductDto { Id = p.Id, Name = p.Name })
+    .ToPagedListAsync(1, 20);
+```
+
+### Classes Obsoletas
+
+⚠️ As seguintes classes estão marcadas como `[Obsolete]`:
+- `IIQueryablePageList` - Use extension methods diretamente
+- `QueryablePageList` - Use extension methods diretamente
+
+**Migração**:
+```csharp
+// ❌ Obsoleto
+var queryablePageList = new QueryablePageList();
+var result = await queryablePageList.ToPagedListAsync(query, 1, 20);
+
+// ✅ Recomendado
+using Nuuvify.CommonPack.UnitOfWork;
+var result = await query.ToPagedListAsync(1, 20);
+```
+
+---
 
 ## Uso
 
@@ -397,6 +478,8 @@ public class ProductSearchService
 ### Paginação
 
 ```csharp
+using Nuuvify.CommonPack.UnitOfWork; // Namespace dos extension methods
+using Nuuvify.CommonPack.UnitOfWork.Abstraction.Extensions;
 using Nuuvify.CommonPack.UnitOfWork.Abstraction.Filter;
 using Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 
@@ -409,53 +492,84 @@ public class ProductListService
         _repository = unitOfWork.Repository<Product>();
     }
 
+    /// <summary>
+    /// ✨ Novo: ToPagedListAsync agora é um extension method que pode ser encadeado com Filter() e Sort()
+    /// </summary>
     public async Task<IPagedList<Product>> GetProductsPagedAsync(
         ProductFilterModel filter,
-        int pageNumber = 1,
-        int pageSize = 20,
-        string sortBy = "Name asc")
+        int pageIndex = 1,
+        int pageSize = 20)
     {
-        // Aplicar filtros e paginação
-        var pagedResult = await _repository.GetPagedListAsync(
-            predicate: filter,
-            orderBy: sortBy,
-            pageNumber: pageNumber,
-            pageSize: pageSize
-        );
+        // ✅ Encadeamento direto de Filter(), Sort() e ToPagedListAsync()
+        var pagedResult = await _repository.GetAll()
+            .Filter(filter)              // Filtros dinâmicos
+            .Sort("A-Name,D-Price")      // Ordenação múltipla
+            .ToPagedListAsync(           // Extension method público!
+                pageIndex: pageIndex,
+                pageSize: pageSize
+            );
 
         return pagedResult;
     }
 
-    public async Task<PagedListDto<ProductDto>> GetProductsDtoPagedAsync(
+    /// <summary>
+    /// Paginação com projeção para DTO - encadeamento completo
+    /// </summary>
+    public async Task<IPagedList<ProductDto>> GetProductsDtoPagedAsync(
         ProductFilterModel filter,
-        int pageNumber = 1,
+        int pageIndex = 1,
         int pageSize = 20)
     {
-        // Paginação com projeção para DTO
-        var pagedResult = await _repository.GetPagedListAsync(
-            predicate: filter,
-            selector: p => new ProductDto
+        // ✅ Filtros → Ordenação → Projeção → Paginação (tudo encadeado!)
+        var pagedResult = await _repository.GetAll()
+            .Where(p => p.IsActive)      // Filtro fixo
+            .Filter(filter)              // Filtros dinâmicos
+            .Sort("A-Category,D-Price")  // Ordenação
+            .Select(p => new ProductDto  // Projeção para DTO
             {
                 Id = p.Id,
                 Name = p.Name,
                 Price = p.Price,
                 CategoryName = p.Category.Name
-            },
-            orderBy: "Name asc",
-            pageNumber: pageNumber,
-            pageSize: pageSize
-        );
+            })
+            .ToPagedListAsync(           // Paginação como extension method
+                pageIndex: pageIndex,
+                pageSize: pageSize
+            );
 
-        return new PagedListDto<ProductDto>
+        return pagedResult;
+    }
+
+    /// <summary>
+    /// Exemplo completo: todos os recursos encadeados
+    /// </summary>
+    public async Task<IPagedList<ProductCardDto>> GetProductCardsAsync(
+        string searchTerm,
+        string category,
+        decimal? minPrice,
+        int pageIndex = 1,
+        int pageSize = 12)
+    {
+        var filter = new ProductFilterModel
         {
-            Items = pagedResult.Items,
-            PageNumber = pagedResult.PageNumber,
-            PageSize = pagedResult.PageSize,
-            TotalCount = pagedResult.TotalCount,
-            TotalPages = pagedResult.TotalPages,
-            HasPreviousPage = pagedResult.HasPreviousPage,
-            HasNextPage = pagedResult.HasNextPage
+            Name = searchTerm,
+            Category = category,
+            MinPrice = minPrice
         };
+
+        // ✅ Pipeline completo: Where → Filter → Sort → Select → ToPagedListAsync
+        return await _repository.GetAll()
+            .Where(p => p.IsActive && p.Stock > 0)    // Filtros fixos
+            .Filter(filter)                           // Filtros dinâmicos
+            .Sort("A-Name")                           // Ordenação
+            .Select(p => new ProductCardDto           // Projeção
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Price = p.Price,
+                ImageUrl = $"/images/{p.Id}.jpg"
+            })
+            .ToPagedListAsync(pageIndex, pageSize);   // Paginação
     }
 }
 ```

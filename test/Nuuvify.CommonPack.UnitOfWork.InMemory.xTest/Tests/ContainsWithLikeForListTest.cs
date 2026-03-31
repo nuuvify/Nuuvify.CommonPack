@@ -113,13 +113,13 @@ public class ContainsWithLikeForListTest
     }
 
     // Classes auxiliares para os testes
-    private class Product
+    private sealed class Product
     {
         public string Name { get; set; } = string.Empty;
         public string Category { get; set; } = string.Empty;
     }
 
-    private class ProductSearchModel : IQueryableCustom
+    private sealed class ProductSearchModel : IQueryableCustom
     {
         [QueryOperator(Operator = WhereOperator.ContainsWithLikeForList, HasName = nameof(Product.Name))]
         public Collection<string>? SearchTerms { get; set; }

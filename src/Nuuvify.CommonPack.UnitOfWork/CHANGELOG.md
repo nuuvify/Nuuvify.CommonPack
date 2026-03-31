@@ -7,7 +7,101 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
-### Added
+### ✨ Added
+
+#### Extension Methods Públicos (2025-10-30)
+- **✨ ToPagedList e ToPagedListAsync agora são extension methods públicos**
+  - Anteriormente: Métodos internos na classe `IQueryableExtensions`
+  - Agora: Extension methods públicos acessíveis via namespace `Nuuvify.CommonPack.UnitOfWork`
+  - Benefício: Encadeamento fluente completo com `.Filter()`, `.Sort()` e `.Select()`
+  - Exemplo de uso:
+    ```csharp
+    using Nuuvify.CommonPack.UnitOfWork; // ✨ Adicione este namespace!
+
+    var result = await _repository.GetAll()
+        .Where(p => p.IsActive)         // Filtros EF Core
+        .Filter(filterModel)            // Filtros dinâmicos
+        .Sort("A-Name,D-Price")         // Ordenação múltipla
+        .Select(p => new ProductDto     // Projeção
+        {
+            Id = p.Id,
+            Name = p.Name,
+            Price = p.Price
+        })
+        .ToPagedListAsync(              // ✨ Extension method encadeável!
+            pageIndex: 1,
+            pageSize: 20
+        );
+    ```
+
+- **IQueryableExtensions tornada classe pública**
+  - Classe mudou de `internal static` para `public static`
+  - Adicionada documentação XML completa para todos os métodos
+  - Melhoria na visibilidade e usabilidade da API
+
+### ⚠️ Deprecated
+
+- **IIQueryablePageList** - Interface marcada como obsoleta
+  - Mensagem: "Use the extension methods ToPagedList and ToPagedListAsync from IQueryableExtensions (Nuuvify.CommonPack.UnitOfWork namespace) instead. This interface will be removed in a future version."
+  - Motivo: Extension methods públicos tornam a interface desnecessária
+  - Será removida em versão futura (Major version bump)
+
+- **QueryablePageList** - Classe marcada como obsoleta
+  - Mensagem: "Use the extension methods ToPagedList and ToPagedListAsync from IQueryableExtensions (Nuuvify.CommonPack.UnitOfWork namespace) instead. This class will be removed in a future version."
+  - Motivo: Classe wrapper desnecessária com extension methods públicos
+  - Será removida em versão futura (Major version bump)
+
+### 📚 Documentation
+
+- **README.md atualizado** com novos exemplos de extension methods
+  - Seção dedicada: "✨ Extension Methods: ToPagedList e ToPagedListAsync"
+  - Exemplos de encadeamento fluente completo
+  - Comparação "Antes vs Agora" para facilitar migração
+  - Guia de migração das classes obsoletas
+  - Exemplos práticos em Controllers e Services
+
+### 🔄 Migration Guide
+
+#### Migração das Classes Obsoletas
+
+**Antes (usando classes obsoletas)**:
+```csharp
+var queryablePageList = new QueryablePageList();
+var result = await queryablePageList.ToPagedListAsync(query, pageIndex, pageSize);
+```
+
+**Depois (usando extension methods - recomendado)**:
+```csharp
+using Nuuvify.CommonPack.UnitOfWork; // Adicione este namespace
+
+var result = await query.ToPagedListAsync(pageIndex, pageSize);
+```
+
+#### Pipeline Completo
+
+```csharp
+// ✅ Nova forma: Encadeamento fluente completo
+var pagedResult = await _repository.GetAll()
+    .Filter(filter)                     // Filtros dinâmicos
+    .Sort("A-Name,D-Price")             // Ordenação
+    .Select(p => new ProductDto         // Projeção
+    {
+        Id = p.Id,
+        Name = p.Name,
+        Price = p.Price
+    })
+    .ToPagedListAsync(1, 20);           // Paginação
+```
+
+### ⚙️ Technical Details
+
+- **Namespace**: `Nuuvify.CommonPack.UnitOfWork`
+- **Classe**: `IQueryableExtensions` (agora pública)
+- **Métodos**:
+  - `ToPagedList<T>(this IQueryable<T>, int pageIndex, int pageSize, int indexFrom = 0)`
+  - `ToPagedListAsync<T>(this IQueryable<T>, int pageIndex, int pageSize, int indexFrom = 0, CancellationToken cancellationToken = default)`
+
+### Added (Previous Features)
 - Implementação completa do padrão Unit of Work para Entity Framework Core 8.0
 - Repository Pattern genérico com suporte a todas operações CRUD
 - Sistema de filtros dinâmicos com `QueryOperatorAttribute`

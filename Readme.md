@@ -5,6 +5,10 @@
 
 Coleção de bibliotecas .NET para desenvolvimento de aplicações robustas, escaláveis e de alta performance.
 
+> 🎉 **Novidade!** Agora com suporte completo a **filtros dinâmicos com tipos complexos**!
+> Use propriedades de navegação como `Customer.Address.City` diretamente nos seus filtros.
+> [Ver exemplos ↓](#exemplo-avançado---filtros-dinâmicos-com-tipos-complexos)
+
 ## ✨ Características Principais
 
 ### 🚀 Performance e Escalabilidade
@@ -31,6 +35,13 @@ Coleção de bibliotecas .NET para desenvolvimento de aplicações robustas, esc
 - **Dependency Injection** nativa
 - **Unit of Work** e Repository patterns
 
+### 🔍 Filtros Dinâmicos Avançados
+- **Tipos complexos** com navegação aninhada (`Customer.Address.City`)
+- **Type-safe filters** com attributes declarativos
+- **Performance otimizada** com compiled expressions
+- **Operadores especializados** (Contains, StartsWith, Range, etc.)
+- **Validação automática** de propriedades de navegação
+
 ### 🧪 Testabilidade
 - **100% testável** com mocks e fakes
 - **InMemory providers** para testes rápidos
@@ -51,11 +62,12 @@ Coleção de bibliotecas .NET para desenvolvimento de aplicações robustas, esc
 - **🔍 Troubleshooting aprimorado** com metadados detalhados
 - **📊 Observabilidade avançada** para monitoramento e métricas
 
-### UnitOfWork - Dynamic Queries
-- **🔍 Queries dinâmicas** com expressões LINQ
-- **⚡ Performance otimizada** com compiled queries
-- **🎯 Filtros tipados** e type-safe
-- **📝 Documentação completa** com exemplos práticos
+### UnitOfWork - Dynamic Queries v3.0
+- **🔍 Filtros com tipos complexos** - Suporte a propriedades de navegação aninhadas
+- **🎯 Notação de ponto (dot notation)** - Ex: `Customer.Address.City`
+- **⚡ Performance otimizada** com compiled queries e parameterização EF Core
+- **🛠️ Validação aprimorada** - Detecção automática de propriedades aninhadas
+- **📝 Documentação completa** com exemplos de filtros complexos
 
 ### Email - SMTP Service
 - **📧 Envio via MailKit** com templates HTML
@@ -148,7 +160,7 @@ Cada pacote possui documentação detalhada em seu respectivo diretório:
 
 ### Persistência de Dados
 - 📚 [UnitOfWork](src/Nuuvify.CommonPack.UnitOfWork/README.md) - **Com queries dinâmicas**
-- 📚 [UnitOfWork.Abstraction](src/Nuuvify.CommonPack.UnitOfWork.Abstraction/README.md)
+- 📚 [UnitOfWork.Abstraction](src/Nuuvify.CommonPack.UnitOfWork.Abstraction/README.md) - **✨ Com filtros complexos**
 - 📚 [Domain](src/Nuuvify.CommonPack.Domain/README.md)
 - 📚 [AutoHistory](src/Nuuvify.CommonPack.AutoHistory/README.md)
 
@@ -225,6 +237,65 @@ public class ProductService
 }
 ```
 
+### Exemplo Avançado - Filtros Dinâmicos com Tipos Complexos
+
+```csharp
+// Modelo de filtro com propriedades de navegação
+public class OrderFilterModel : IQueryableCustom
+{
+    // Filtro simples
+    [QueryOperator(WhereOperator.GreaterThanOrEqualTo)]
+    public decimal? MinTotal { get; set; }
+
+    // Filtros com tipos complexos usando notação de ponto
+    [QueryOperator(WhereOperator.Contains, HasName = "Customer.Name", CaseSensitive = false)]
+    public string CustomerName { get; set; }
+
+    [QueryOperator(WhereOperator.Equals, HasName = "Customer.Address.City")]
+    public string City { get; set; }
+
+    [QueryOperator(WhereOperator.ContainsWithLikeForList, HasName = "Items.Product.Category", CaseSensitive = false)]
+    public List<string> ProductCategories { get; set; }
+
+    // Filtro aninhado de múltiplos níveis
+    [QueryOperator(WhereOperator.GreaterThan, HasName = "Customer.Profile.CreatedDate")]
+    public DateTime? CustomerSince { get; set; }
+}
+
+// Uso do serviço com filtros complexos
+public class OrderService
+{
+    private readonly IUnitOfWork _unitOfWork;
+
+    public async Task<IPagedList<Order>> GetFilteredOrdersAsync(OrderFilterModel filter)
+    {
+        return await _unitOfWork.Repository<Order>()
+            .Filter(filter)  // ✨ Aplica automaticamente todos os filtros
+            .OrderByDescending(o => o.OrderDate)
+            .GetPagedListAsync(pageIndex: 1, pageSize: 20);
+    }
+
+    // SQL gerado automaticamente:
+    // WHERE Orders.Total >= @p0
+    //   AND UPPER(Customer.Name) LIKE '%' + UPPER(@p1) + '%'
+    //   AND Customer.Address.City = @p2
+    //   AND (Items.Product.Category LIKE '%' + @p3 + '%' OR Items.Product.Category LIKE '%' + @p4 + '%')
+    //   AND Customer.Profile.CreatedDate > @p5
+}
+
+// Exemplo de uso
+var filter = new OrderFilterModel
+{
+    MinTotal = 100.00m,
+    CustomerName = "João",
+    City = "São Paulo",
+    ProductCategories = new List<string> { "Electronics", "Computers" },
+    CustomerSince = DateTime.Now.AddYears(-2)
+};
+
+var orders = await orderService.GetFilteredOrdersAsync(filter);
+```
+
 ### Exemplo Básico - Email
 
 ```csharp
@@ -295,6 +366,8 @@ public class MyApiClient
 ```
 
 ## 🧪 Testes
+
+> ✅ **Recentemente corrigido**: Problemas de `ObjectDisposedException` em testes foram resolvidos com gerenciamento adequado do ciclo de vida do EF Core.
 
 O projeto possui uma estratégia de testes abrangente com **12 projetos de teste** cobrindo todos os pacotes principais:
 
@@ -429,7 +502,7 @@ Contribuições são bem-vindas! Veja como você pode ajudar:
 
 ### Documentação e Recursos
 - 📦 [Pacotes NuGet](https://www.nuget.org/packages?q=nuuvify)
-- 📋 [Changelog](CHANGELOG.md)
+- 📋 [**Changelog**](CHANGELOG.md) - **🆕 Filtros com tipos complexos!**
 - 📖 [Wiki](https://github.com/nuuvify/CommonPack/wiki)
 - 💡 [Samples e Exemplos](Samples/README.md)
 
