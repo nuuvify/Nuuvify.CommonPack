@@ -670,14 +670,14 @@ public partial class TestServiceBusMessageReceiver : ServiceBusMessageReceiver<s
     }
 
     // Métodos de teste públicos para acessar funcionalidades protegidas
-    public void TestConfigureServiceBus(string connectionName, string topicName, string subscription)
+    public void TestConfigureServiceBus(string connectionName, string topicName, string subscription, ServiceBusProcessorOptions processorOptions = null)
     {
-        ConfigureServiceBus(connectionName, topicName, subscription);
+        ConfigureServiceBus(connectionName, topicName, subscription, serviceBusProcessorOptions: processorOptions);
     }
 
-    public void TestConfigureServiceBusQueue(string connectionName, string queueName)
+    public void TestConfigureServiceBusQueue(string connectionName, string queueName, ServiceBusProcessorOptions processorOptions = null)
     {
-        ConfigureServiceBus(connectionName, queueName);
+        ConfigureServiceBus(connectionName, queueName, serviceBusProcessorOptions: processorOptions);
     }
 
     public async Task TestStartProcessingAsync()
@@ -745,6 +745,11 @@ public partial class TestServiceBusMessageReceiver : ServiceBusMessageReceiver<s
         await HandleOperationCanceledExceptionAsync(args, ex, cancellationToken);
     }
 
+    public async Task TestHandleGenericExceptionAsync(ProcessMessageEventArgs args, Exception ex, CancellationToken cancellationToken)
+    {
+        await HandleGenericExceptionAsync(args, ex, cancellationToken);
+    }
+
     // Métodos para testar estados internos e configurações
     public bool IsProcessingPublic
     {
@@ -756,13 +761,17 @@ public partial class TestServiceBusMessageReceiver : ServiceBusMessageReceiver<s
         }
     }
 
-    public void ConfigureServiceBusForQueue(string connectionString, string queueName)
+    public void ConfigureServiceBusForQueue(string connectionString, string queueName, ServiceBusProcessorOptions processorOptions = null)
     {
-        ConfigureServiceBus(connectionString, queueName);
+        ConfigureServiceBus(connectionString, queueName, serviceBusProcessorOptions: processorOptions);
     }
 
-    public void ConfigureServiceBusForTopic(string connectionString, string topicName, string subscription)
+    public void ConfigureServiceBusForTopic(string connectionString, string topicName, string subscription, ServiceBusProcessorOptions processorOptions = null)
     {
-        ConfigureServiceBus(connectionString, topicName, subscription);
+        ConfigureServiceBus(connectionString, topicName, subscription, serviceBusProcessorOptions: processorOptions);
     }
+
+    public ServiceBusReceiveMode TestReceiveMode => ReceiveMode;
+
+    public bool TestIsReceiveAndDeleteMode => IsReceiveAndDeleteMode;
 }

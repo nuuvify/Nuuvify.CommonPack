@@ -7,8 +7,22 @@ using Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
 
 namespace Nuuvify.CommonPack.UnitOfWork.Abstraction.Filter;
 
+/// <summary>
+/// Factory class for creating dynamic LINQ expressions from query models with QueryOperator attributes.
+/// Provides comprehensive support for both direct properties and navigation properties,
+/// proper Entity Framework Core parameterization, and type-safe expression building.
+/// Handles nullable types, collections, and complex filtering scenarios for dynamic query generation.
+/// </summary>
 internal static class ExpressionFactory
 {
+    /// <summary>
+    /// Builds a collection of expression parsers from a query model for dynamic LINQ filtering.
+    /// Analyzes each property with QueryOperator attributes, validates accessibility for both direct and navigation properties,
+    /// and creates properly parameterized expressions for Entity Framework Core compatibility.
+    /// </summary>
+    /// <typeparam name="TEntity">The target entity type to filter against</typeparam>
+    /// <param name="model">The query model containing filter criteria and values</param>
+    /// <returns>Collection of expression parsers ready for dynamic LINQ query building</returns>
     internal static ExpressionParserCollection GetOperators<TEntity>(IQueryableCustom model)
     {
         var expressions = new ExpressionParserCollection();
@@ -22,8 +36,7 @@ internal static class ExpressionFactory
             if (criteria == null)
                 continue;
 
-            if (!typeof(TEntity).HasProperty(criteria.FieldName) &&
-                !criteria.FieldName.Contains("."))
+            if (!CanAccessProperty<TEntity>(criteria.FieldName))
                 continue;
 
             dynamic propertyValue = expressions.ParameterExpression;
@@ -48,6 +61,12 @@ internal static class ExpressionFactory
 
         return expressions;
     }
+    /// <summary>
+    /// Gets the underlying type from a nullable type, or returns the original type if not nullable.
+    /// Used to properly handle type conversions in expression building for both nullable and non-nullable types.
+    /// </summary>
+    /// <param name="propertyType">The type to analyze</param>
+    /// <returns>The underlying non-nullable type, or the original type if not nullable</returns>
     private static Type GetNonNullable(Type propertyType)
     {
         return propertyType.IsGenericType &&
@@ -55,10 +74,53 @@ internal static class ExpressionFactory
             ? Nullable.GetUnderlyingType(propertyType)
             : propertyType;
     }
-    private static bool IsNullableType(Type t)
+    /// <summary>
+    /// Validates if a property path can be accessed from the given entity type.
+    /// Supports both direct properties and navigation properties (e.g., "AzEnvironment.Name").
+    /// For simple properties, validates using the existing HasProperty method.
+    /// For navigation properties, validates each part of the path and handles nullable types automatically.
+    /// </summary>
+    /// <typeparam name="TEntity">The entity type to validate the property path against</typeparam>
+    /// <param name="propertyPath">The property path to validate, can be simple (Name) or navigation (AzEnvironment.Name)</param>
+    /// <returns>True if the property path is valid and accessible, false otherwise</returns>
+    private static bool CanAccessProperty<TEntity>(string propertyPath)
     {
-        return t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>);
+        if (string.IsNullOrWhiteSpace(propertyPath))
+            return false;
+
+        if (!propertyPath.Contains("."))
+            return typeof(TEntity).HasProperty(propertyPath);
+
+        var parts = propertyPath.Split('.');
+        var currentType = typeof(TEntity);
+
+        foreach (var part in parts)
+        {
+            var property = currentType.GetAllProperties()
+                .FirstOrDefault(p => p.Name.Equals(part, StringComparison.OrdinalIgnoreCase));
+
+            if (property == null)
+                return false;
+
+            currentType = property.PropertyType;
+
+            if (currentType.IsGenericType && currentType.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                currentType = Nullable.GetUnderlyingType(currentType);
+            }
+        }
+
+        return true;
     }
+    /// <summary>
+    /// Creates filtering criteria for a property based on its QueryOperator attributes and value.
+    /// Validates operator compatibility with collection types and ensures proper attribute configuration.
+    /// Returns null for properties with null values or empty collections to exclude them from filtering.
+    /// </summary>
+    /// <param name="model">The query model containing the property values</param>
+    /// <param name="propertyInfo">The property information to analyze</param>
+    /// <returns>WhereClause with filtering criteria, or null if property should be excluded</returns>
+    /// <exception cref="ArgumentException">Thrown when operator is incompatible with property type</exception>
     internal static WhereClause GetCriteria(IQueryableCustom model, PropertyInfo propertyInfo)
     {
         bool isCollection = propertyInfo.IsPropertyACollection();
@@ -80,17 +142,9 @@ internal static class ExpressionFactory
         if (customValue == null)
             return null;
 
-        // Check if the value is an empty collection
-        if (isCollection && customValue is System.Collections.IEnumerable enumerable)
+        if (isCollection && customValue is System.Collections.IEnumerable enumerable && !enumerable.Cast<object>().Any())
         {
-            bool hasItems = false;
-            foreach (var item in enumerable)
-            {
-                hasItems = true;
-                break;
-            }
-            if (!hasItems)
-                return null;
+            return null;
         }
 
         criteria.UpdateValues(propertyInfo);
@@ -101,7 +155,12 @@ internal static class ExpressionFactory
     /// Creates an expression that properly parameterizes constant values for Entity Framework Core.
     /// This ensures that values are passed as parameters in the generated SQL instead of being embedded as literals,
     /// which improves performance through query plan reuse and prevents SQL injection.
-    /// 
+    ///
+    /// For null/default values, returns a typed null constant.
+    /// For modern EF Core versions (5.0+), Expression.Constant with proper type works well as the closure pattern
+    /// is automatically handled by EF Core's expression visitor.
+    /// Handles type conversion for nullable types and other conversions when targetType differs from T.
+    ///
     /// The original EF Core issue (aspnet/EntityFrameworkCore#3361) regarding DateTime constants has been resolved
     /// since EF Core 1.0 RC2, but this approach is still the best practice for dynamic expressions.
     /// </summary>
@@ -111,23 +170,27 @@ internal static class ExpressionFactory
     /// <returns>An expression that will be properly parameterized by EF Core</returns>
     internal static Expression GetClosureOverConstant<T>(T constant, Type targetType)
     {
-        // For null values, return a typed null constant
-        if (constant == null)
+        if (EqualityComparer<T>.Default.Equals(constant, default(T)))
         {
             return Expression.Constant(null, targetType);
         }
 
-        // For modern EF Core versions (5.0+), Expression.Constant with proper type works well
-        // The closure pattern is automatically handled by EF Core's expression visitor
         if (targetType != typeof(T) && targetType != null)
         {
-            // Handle type conversion for nullable types and other conversions
             return Expression.Convert(Expression.Constant(constant, typeof(T)), targetType);
         }
 
         return Expression.Constant(constant, targetType ?? typeof(T));
     }
 
+    /// <summary>
+    /// Extracts and validates filtering criteria from a search model.
+    /// Processes properties with QueryOperator attributes, validates operator compatibility with collection types,
+    /// and ensures proper configuration for filtering operations. Returns criteria ordered by UseOr flag.
+    /// </summary>
+    /// <param name="searchModel">The search model containing filter criteria</param>
+    /// <returns>List of WhereClause objects representing valid filtering criteria, ordered by UseOr flag</returns>
+    /// <exception cref="ArgumentException">Thrown when operator is incompatible with collection properties</exception>
     internal static List<WhereClause> GetCriterias(IQueryableCustom searchModel)
     {
         var type = searchModel.GetType();
