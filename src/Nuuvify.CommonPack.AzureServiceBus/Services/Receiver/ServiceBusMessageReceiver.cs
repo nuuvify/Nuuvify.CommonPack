@@ -23,6 +23,7 @@ public abstract partial class ServiceBusMessageReceiver<T> : IServiceBusMessageR
 
     private bool _isProcessing = false;
     private readonly object _lockObject = new();
+    private ServiceBusReceiveMode _receiveMode = ServiceBusReceiveMode.PeekLock;
 
     #endregion
 
@@ -32,6 +33,17 @@ public abstract partial class ServiceBusMessageReceiver<T> : IServiceBusMessageR
     protected ILogger<ServiceBusMessageReceiver<T>> Logger => _logger;
     protected IConfigurationCustom ConfigurationCustom => _configurationCustom;
     protected ActivitySource ActivitySourceCustom { get; set; }
+
+    /// <summary>
+    /// Modo de recebimento configurado para o processador do Service Bus
+    /// </summary>
+    protected ServiceBusReceiveMode ReceiveMode => _receiveMode;
+
+    /// <summary>
+    /// Indica se o modo de recebimento é ReceiveAndDelete
+    /// Nesse modo, operações de settlement (Complete, Abandon, DeadLetter) não são permitidas
+    /// </summary>
+    protected bool IsReceiveAndDeleteMode => _receiveMode == ServiceBusReceiveMode.ReceiveAndDelete;
 
     /// <summary>
     /// Configurar para abandonar mensagens em caso de falha em vez de enviá-las para dead letter
@@ -212,7 +224,11 @@ public abstract partial class ServiceBusMessageReceiver<T> : IServiceBusMessageR
 
             if (result)
             {
-                await args.CompleteMessageAsync(args.Message, cancellationToken);
+                if (!IsReceiveAndDeleteMode)
+                {
+                    await args.CompleteMessageAsync(args.Message, cancellationToken);
+                }
+
                 _logger.LogDebug("Mensagem {MessageId} processada com sucesso", args.Message.MessageId);
             }
             else

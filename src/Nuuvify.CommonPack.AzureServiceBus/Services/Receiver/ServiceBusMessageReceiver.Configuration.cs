@@ -53,10 +53,13 @@ public abstract partial class ServiceBusMessageReceiver<T>
             connectionString: connectionString,
             options: serviceBusClientOptions ?? new ServiceBusClientOptions());
 
+        var processorOptions = serviceBusProcessorOptions ?? new ServiceBusProcessorOptions();
+        _receiveMode = processorOptions.ReceiveMode;
+
         _serviceBusProcessor = _serviceBusClient.CreateProcessor(
             topicName: topicName,
             subscriptionName: subscription,
-            options: serviceBusProcessorOptions ?? new ServiceBusProcessorOptions());
+            options: processorOptions);
     }
 
     /// <summary>
@@ -90,10 +93,13 @@ public abstract partial class ServiceBusMessageReceiver<T>
             credential: credential,
             options: serviceBusClientOptions ?? new ServiceBusClientOptions());
 
+        var processorOptions = serviceBusProcessorOptions ?? new ServiceBusProcessorOptions();
+        _receiveMode = processorOptions.ReceiveMode;
+
         _serviceBusProcessor = _serviceBusClient.CreateProcessor(
             topicName: topicName,
             subscriptionName: subscription,
-            options: serviceBusProcessorOptions ?? new ServiceBusProcessorOptions());
+            options: processorOptions);
     }
 
     /// <summary>
@@ -123,9 +129,12 @@ public abstract partial class ServiceBusMessageReceiver<T>
             connectionString: connectionString,
             options: serviceBusClientOptions ?? new ServiceBusClientOptions());
 
+        var processorOptions = serviceBusProcessorOptions ?? new ServiceBusProcessorOptions();
+        _receiveMode = processorOptions.ReceiveMode;
+
         _serviceBusProcessor = _serviceBusClient.CreateProcessor(
             queueName: queueName,
-            options: serviceBusProcessorOptions ?? new ServiceBusProcessorOptions());
+            options: processorOptions);
     }
 
     /// <summary>
@@ -156,9 +165,12 @@ public abstract partial class ServiceBusMessageReceiver<T>
             credential: credential,
             options: serviceBusClientOptions ?? new ServiceBusClientOptions());
 
+        var processorOptions = serviceBusProcessorOptions ?? new ServiceBusProcessorOptions();
+        _receiveMode = processorOptions.ReceiveMode;
+
         _serviceBusProcessor = _serviceBusClient.CreateProcessor(
             queueName: queueName,
-            options: serviceBusProcessorOptions ?? new ServiceBusProcessorOptions());
+            options: processorOptions);
     }
 
     #endregion
