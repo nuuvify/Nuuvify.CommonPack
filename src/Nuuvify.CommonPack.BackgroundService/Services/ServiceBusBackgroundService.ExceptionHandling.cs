@@ -64,6 +64,8 @@ public abstract partial class ServiceBusBackgroundService<T>
         {
             _logger.LogWarning("Modo ReceiveAndDelete: mensagem {MessageId} já foi removida da fila. Não é possível enviar para Dead Letter.",
                 args.Message?.MessageId ?? UnknownValue);
+
+            return;
         }
 
         throw new InvalidOperationException($"Erro de comunicação no Service Bus para mensagem {args.Message?.MessageId ?? UnknownValue}: {ex.Reason}", ex);
@@ -137,6 +139,8 @@ public abstract partial class ServiceBusBackgroundService<T>
         {
             _logger.LogWarning("Modo ReceiveAndDelete: mensagem {MessageId} já foi removida da fila. Não é possível enviar para Dead Letter.",
                 args.Message?.MessageId ?? UnknownValue);
+
+            return;
         }
 
         throw new InvalidOperationException($"Erro não tratado durante processamento da mensagem {args.Message?.MessageId ?? UnknownValue}: {ex.Message}", ex);
