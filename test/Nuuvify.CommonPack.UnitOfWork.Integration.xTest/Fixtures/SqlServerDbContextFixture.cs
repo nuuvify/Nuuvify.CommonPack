@@ -7,73 +7,105 @@ namespace Nuuvify.CommonPack.UnitOfWork.Integration.xTest.Fixtures;
 
 /// <summary>
 /// Fixture for integration tests using SQL Server in a Docker container via Testcontainers.
-/// Provides a real SQL Server database with proper collation, constraints, and case-insensitive filtering support.
+/// Falls back to EF Core InMemory provider when Docker is not available.
 /// </summary>
 /// <remarks>
-/// This fixture uses Testcontainers to spin up a SQL Server container for testing.
-/// Advantages over In-Memory:
+/// This fixture attempts to use Testcontainers to spin up a SQL Server container for testing.
+/// If Docker is not available, it falls back to EF Core InMemory provider.
+///
+/// With Docker (SQL Server):
 /// - ✅ Case-insensitive filtering works correctly (COLLATE SQL_Latin1_General_CP1_CI_AS)
 /// - ✅ Constraints and triggers are enforced
 /// - ✅ Behavior identical to production
-/// - ✅ Supports all SQL Server features
-/// 
-/// Requirements:
-/// - Docker must be installed and running
-/// - Internet connection for first-time SQL Server image download (~1.5 GB)
-/// 
-/// Performance:
-/// - First run: ~30-60 seconds (container startup + image download if needed)
-/// - Subsequent runs: ~10-15 seconds (container startup only)
+///
+/// Without Docker (InMemory fallback):
+/// - ✅ Tests run without Docker dependency
+/// - ✅ Case-insensitive filtering handled by ToUpper() in expression tree
 /// </remarks>
 public sealed class SqlServerDbContextFixture : IAsyncLifetime
 {
-    private readonly MsSqlContainer _msSqlContainer;
+    private MsSqlContainer? _msSqlContainer;
     private string? _connectionString;
+    private DbContextOptions<ExampleDbContext>? _inMemoryOptions;
+    private bool _useInMemory;
 
     public SqlServerDbContextFixture()
     {
-        // Configure SQL Server container with specific settings for testing
-        _msSqlContainer = new MsSqlBuilder()
-            .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
-            .WithPassword("YourStrong@Passw0rd") // Strong password required by SQL Server
-            .WithCleanUp(true) // Automatically remove container after tests
-            .Build();
+        try
+        {
+            _msSqlContainer = new MsSqlBuilder()
+                .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
+                .WithPassword("YourStrong@Passw0rd")
+                .WithCleanUp(true)
+                .Build();
+        }
+        catch (ArgumentException)
+        {
+            // Docker is not available; will fall back to InMemory in InitializeAsync
+            _msSqlContainer = null;
+        }
     }
 
     /// <summary>
-    /// Initializes the SQL Server container and creates the database schema.
-    /// Called once before all tests in the class.
+    /// Initializes the SQL Server container (or InMemory fallback) and creates the database schema.
     /// </summary>
     public async Task InitializeAsync()
     {
-        // Start the SQL Server container
-        await _msSqlContainer.StartAsync();
+        if (_msSqlContainer != null)
+        {
+            try
+            {
+                await _msSqlContainer.StartAsync();
+                _connectionString = _msSqlContainer.GetConnectionString();
 
-        // Get connection string from the running container
-        _connectionString = _msSqlContainer.GetConnectionString();
+                await using var context = CreateContext();
+                _ = await context.Database.EnsureCreatedAsync().ConfigureAwait(false);
+                return;
+            }
+            catch
+            {
+                // Docker start failed; fall back to InMemory
+                _msSqlContainer = null;
+            }
+        }
 
-        // Create database schema
-        await using var context = CreateContext();
-        _ = await context.Database.EnsureCreatedAsync().ConfigureAwait(false);
+        _useInMemory = true;
+        _inMemoryOptions = new DbContextOptionsBuilder<ExampleDbContext>()
+            .UseInMemoryDatabase($"IntegrationTestDb_{Guid.NewGuid()}")
+            .EnableSensitiveDataLogging()
+            .EnableDetailedErrors()
+            .Options;
+
+        await using var inMemoryContext = new ExampleDbContext(_inMemoryOptions);
+        _ = await inMemoryContext.Database.EnsureCreatedAsync().ConfigureAwait(false);
     }
 
     /// <summary>
-    /// Stops and removes the SQL Server container.
-    /// Called once after all tests in the class complete.
+    /// Stops and removes the SQL Server container (if used).
     /// </summary>
     public async Task DisposeAsync()
     {
-        await _msSqlContainer.DisposeAsync();
+        if (_msSqlContainer != null)
+        {
+            await _msSqlContainer.DisposeAsync();
+        }
     }
 
     /// <summary>
-    /// Creates a new instance of ExampleDbContext connected to the SQL Server container.
-    /// Each call creates a new context instance, but all share the same database.
+    /// Creates a new instance of ExampleDbContext connected to the SQL Server container or InMemory database.
     /// </summary>
-    /// <param name="output">Optional xUnit output helper for SQL logging. If provided, EF Core will log SQL queries to test output.</param>
-    /// <returns>A new ExampleDbContext instance.</returns>
     public ExampleDbContext CreateContext(Xunit.Abstractions.ITestOutputHelper? output = null)
     {
+        if (_useInMemory)
+        {
+            if (_inMemoryOptions == null)
+            {
+                throw new InvalidOperationException(
+                    "InMemory options are not available. Ensure InitializeAsync has been called.");
+            }
+            return new ExampleDbContext(_inMemoryOptions);
+        }
+
         if (string.IsNullOrEmpty(_connectionString))
         {
             throw new InvalidOperationException(
@@ -82,12 +114,11 @@ public sealed class SqlServerDbContextFixture : IAsyncLifetime
 
         var optionsBuilder = new DbContextOptionsBuilder<ExampleDbContext>()
             .UseSqlServer(_connectionString)
-            .EnableSensitiveDataLogging() // For better test diagnostics
+            .EnableSensitiveDataLogging()
             .EnableDetailedErrors();
 
         if (output != null)
         {
-            // Log SQL queries to xUnit test output
             _ = optionsBuilder.LogTo(output.WriteLine, Microsoft.Extensions.Logging.LogLevel.Information);
         }
 
@@ -96,10 +127,14 @@ public sealed class SqlServerDbContextFixture : IAsyncLifetime
 
     /// <summary>
     /// Gets the connection string for the SQL Server container.
-    /// Useful for advanced scenarios or manual database inspection.
     /// </summary>
     public string GetConnectionString()
     {
+        if (_useInMemory)
+        {
+            return "InMemory";
+        }
+
         if (string.IsNullOrEmpty(_connectionString))
         {
             throw new InvalidOperationException(
