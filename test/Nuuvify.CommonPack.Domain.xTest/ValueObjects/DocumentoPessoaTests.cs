@@ -86,4 +86,20 @@ public class DocumentoPessoaTests
         Assert.False(documento.IsValid());
     }
 
+    [Theory]
+    [Trait("CommonApi.Domain-ValueObjects", nameof(DocumentoPessoa))]
+    [InlineData("123456", "12.ABC.345/0001-88")]
+    public void DocumentoPessoaComCnpjAlfanumericoCorreto(string cpf, string cnpj)
+    {
+        var _cpf = new Cpf(cpf);
+        var _cnpj = new Cnpj(cnpj);
+        var _tipoPessoa = new TipoPessoa("J", null);
+
+        var documento = new DocumentoPessoa(_cpf, _cnpj, _tipoPessoa);
+
+        Assert.Equal(documento.Codigo, _cnpj.Codigo);
+        Assert.Equal(documento.TipoDaPessoa, _tipoPessoa.Codigo);
+        Assert.True(documento.IsValid());
+    }
+
 }
