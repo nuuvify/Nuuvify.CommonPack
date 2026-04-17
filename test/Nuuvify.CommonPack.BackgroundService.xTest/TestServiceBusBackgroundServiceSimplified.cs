@@ -101,6 +101,9 @@ public class TestServiceBusBackgroundServiceSimplified : ServiceBusBackgroundSer
 
     public bool GetAbandonMessageIfFailed() => AbandonMessageIfFailed;
 
+    public ServiceBusReceiveMode GetReceiveMode() => ReceiveMode;
+    public bool GetIsReceiveAndDeleteMode() => IsReceiveAndDeleteMode;
+
     public void TestConfigureServiceBus(string cnnName, string queueName, Azure.Messaging.ServiceBus.ServiceBusClientOptions serviceBusClientOptions, Azure.Messaging.ServiceBus.ServiceBusProcessorOptions serviceBusProcessorOptions)
     {
         ConfigureServiceBus(cnnName, queueName, serviceBusClientOptions, serviceBusProcessorOptions);

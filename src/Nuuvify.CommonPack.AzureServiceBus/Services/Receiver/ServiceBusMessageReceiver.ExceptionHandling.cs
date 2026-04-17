@@ -25,6 +25,14 @@ public abstract partial class ServiceBusMessageReceiver<T>
         CancellationToken cancellationToken)
     {
         _logger.LogError(ex, "Erro específico do Service Bus durante o processamento: {Reason}", ex.Reason);
+
+        if (IsReceiveAndDeleteMode)
+        {
+            _logger.LogWarning("Modo ReceiveAndDelete: mensagem {MessageId} já foi removida da fila. Não é possível enviar para Dead Letter.",
+                args.Message.MessageId);
+            return;
+        }
+
         var deadLetterProperties = CreateDeadLetterProperties(args.Message, $"ServiceBus specific error: {ex.Reason} - {ex.Message}", ex.GetType().Name);
         await args.DeadLetterMessageAsync(args.Message, propertiesToModify: deadLetterProperties, cancellationToken: cancellationToken);
     }
@@ -49,10 +57,15 @@ public abstract partial class ServiceBusMessageReceiver<T>
         _logger.LogError(ex, "Erro de comunicação no Service Bus. Verifique as configurações de rede. Reason: {Reason}, Resource: {EntityPath}",
             ex.Reason, args.Message?.Subject ?? UnknownValue);
 
-        if (args.Message != null)
+        if (!IsReceiveAndDeleteMode && args.Message != null)
         {
             var deadLetterProperties = CreateDeadLetterProperties(args.Message, $"Service communication problem: {ex.Message}", ex.GetType().Name);
             await args.DeadLetterMessageAsync(args.Message, propertiesToModify: deadLetterProperties, cancellationToken: cancellationToken);
+        }
+        else if (IsReceiveAndDeleteMode)
+        {
+            _logger.LogWarning("Modo ReceiveAndDelete: mensagem {MessageId} já foi removida da fila. Não é possível enviar para Dead Letter.",
+                args.Message?.MessageId ?? UnknownValue);
         }
 
         throw new InvalidOperationException($"Erro de comunicação no Service Bus para mensagem {args.Message?.MessageId ?? UnknownValue}: {ex.Reason}", ex);
@@ -78,6 +91,13 @@ public abstract partial class ServiceBusMessageReceiver<T>
         CancellationToken cancellationToken)
     {
         _logger.LogWarning(ex, "Operação cancelada durante o processamento da mensagem {MessageId}", args.Message.MessageId);
+
+        if (IsReceiveAndDeleteMode)
+        {
+            _logger.LogWarning("Modo ReceiveAndDelete: mensagem {MessageId} já foi removida da fila. Não é possível abandonar ou enviar para Dead Letter.",
+                args.Message.MessageId);
+            return;
+        }
 
         if (AbandonMessageIfFailed)
         {
@@ -110,10 +130,15 @@ public abstract partial class ServiceBusMessageReceiver<T>
     {
         _logger.LogError(ex, "Houve um erro durante o processamento da mensagem {MessageId}", args.Message?.MessageId ?? UnknownValue);
 
-        if (args.Message != null)
+        if (!IsReceiveAndDeleteMode && args.Message != null)
         {
             var deadLetterProperties = CreateDeadLetterProperties(args.Message, $"Unhandled exception: {ex.Message}", ex.GetType().Name);
             await args.DeadLetterMessageAsync(args.Message, propertiesToModify: deadLetterProperties, cancellationToken: cancellationToken);
+        }
+        else if (IsReceiveAndDeleteMode)
+        {
+            _logger.LogWarning("Modo ReceiveAndDelete: mensagem {MessageId} já foi removida da fila. Não é possível enviar para Dead Letter.",
+                args.Message?.MessageId ?? UnknownValue);
         }
 
         throw new InvalidOperationException($"Erro não tratado durante processamento da mensagem {args.Message?.MessageId ?? UnknownValue}: {ex.Message}", ex);
@@ -138,6 +163,13 @@ public abstract partial class ServiceBusMessageReceiver<T>
     {
         _logger.LogWarning("{MethodName} retornou {TrueOrFalse} para a mensagem {MessageId}. Verificando comportamento de falha.",
             nameof(ExecuteReceivedMessageAsync), false, args.Message.MessageId);
+
+        if (IsReceiveAndDeleteMode)
+        {
+            _logger.LogWarning("Modo ReceiveAndDelete: mensagem {MessageId} já foi removida da fila. Não é possível abandonar ou enviar para Dead Letter.",
+                args.Message.MessageId);
+            return;
+        }
 
         if (AbandonMessageIfFailed)
         {
