@@ -22,10 +22,23 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
     [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed")]
     private ServiceBusProcessor _serviceBusProcessor;
 
+    private ServiceBusReceiveMode _receiveMode = ServiceBusReceiveMode.PeekLock;
+
     protected RequestConfiguration RequestConfiguration => _requestConfiguration;
     protected ILogger<ServiceBusBackgroundService<T>> Logger => _logger;
     protected IConfigurationCustom ConfigurationCustom => _configurationCustom;
     protected ActivitySource ActivitySourceCustom { get; set; } = null!;
+
+    /// <summary>
+    /// Modo de recebimento configurado para o processador do Service Bus
+    /// </summary>
+    protected ServiceBusReceiveMode ReceiveMode => _receiveMode;
+
+    /// <summary>
+    /// Indica se o modo de recebimento é ReceiveAndDelete
+    /// Nesse modo, operações de settlement (Complete, Abandon, DeadLetter) não são permitidas
+    /// </summary>
+    protected bool IsReceiveAndDeleteMode => _receiveMode == ServiceBusReceiveMode.ReceiveAndDelete;
 
     /// <summary>
     /// Configurar para abandonar mensagens em caso de falha em vez de enviá-las para dead letter
@@ -102,6 +115,8 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
             connectionString: connectionString,
             options: serviceBusClientOptions);
 
+        _receiveMode = serviceBusProcessorOptions?.ReceiveMode ?? ServiceBusReceiveMode.PeekLock;
+
         _serviceBusProcessor = _serviceBusClient.CreateProcessor(
             topicName: topicName,
             subscriptionName: subscription,
@@ -148,6 +163,8 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
             credential: credential,
             options: serviceBusClientOptions);
 
+        _receiveMode = serviceBusProcessorOptions?.ReceiveMode ?? ServiceBusReceiveMode.PeekLock;
+
         _serviceBusProcessor = _serviceBusClient.CreateProcessor(
             topicName: topicName,
             subscriptionName: subscription,
@@ -185,6 +202,8 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
         _serviceBusClient = new ServiceBusClient(
             connectionString: connectionString,
             options: serviceBusClientOptions);
+
+        _receiveMode = serviceBusProcessorOptions?.ReceiveMode ?? ServiceBusReceiveMode.PeekLock;
 
         _serviceBusProcessor = _serviceBusClient.CreateProcessor(
             queueName: queueName,
@@ -224,6 +243,8 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
             fullyQualifiedNamespace: fullyQualifiedNamespace,
             credential: credential,
             options: serviceBusClientOptions);
+
+        _receiveMode = serviceBusProcessorOptions?.ReceiveMode ?? ServiceBusReceiveMode.PeekLock;
 
         _serviceBusProcessor = _serviceBusClient.CreateProcessor(
             queueName: queueName,
@@ -386,7 +407,12 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
 
             if (result)
             {
-                await args.CompleteMessageAsync(args.Message, cancellationToken);
+                if (!IsReceiveAndDeleteMode)
+                {
+                    await args.CompleteMessageAsync(args.Message, cancellationToken);
+                }
+
+                _logger.LogDebug("Mensagem {MessageId} processada com sucesso", args.Message.MessageId);
             }
             else
             {

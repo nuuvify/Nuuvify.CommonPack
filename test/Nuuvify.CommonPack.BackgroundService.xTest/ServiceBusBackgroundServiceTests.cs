@@ -106,6 +106,9 @@ public class TestServiceBusBackgroundService : ServiceBusBackgroundService<TestS
 
     public bool GetAbandonMessageIfFailed() => AbandonMessageIfFailed;
 
+    public ServiceBusReceiveMode GetReceiveMode() => ReceiveMode;
+    public bool GetIsReceiveAndDeleteMode() => IsReceiveAndDeleteMode;
+
     public void TestConfigureServiceBus(string cnnName, string queueName, ServiceBusClientOptions serviceBusClientOptions, ServiceBusProcessorOptions serviceBusProcessorOptions)
     {
         ConfigureServiceBus(cnnName, queueName, serviceBusClientOptions, serviceBusProcessorOptions);
@@ -132,4 +135,19 @@ public class TestServiceBusBackgroundService : ServiceBusBackgroundService<TestS
 
     public Task TestHandleErrorAsync(ProcessErrorEventArgs args)
         => HandleErrorAsync(args);
+
+    public Task TestHandleBusinessLogicFailureAsync(ProcessMessageEventArgs args, CancellationToken cancellationToken)
+        => HandleBusinessLogicFailureAsync(args, cancellationToken);
+
+    public Task TestHandleServiceBusSpecificExceptionAsync(ProcessMessageEventArgs args, ServiceBusException ex, CancellationToken cancellationToken)
+        => HandleServiceBusSpecificExceptionAsync(args, ex, cancellationToken);
+
+    public Task TestHandleServiceBusCommunicationExceptionAsync(ProcessMessageEventArgs args, ServiceBusException ex, CancellationToken cancellationToken)
+        => HandleServiceBusCommunicationExceptionAsync(args, ex, cancellationToken);
+
+    public Task TestHandleOperationCanceledExceptionAsync(ProcessMessageEventArgs args, OperationCanceledException ex, CancellationToken cancellationToken)
+        => HandleOperationCanceledExceptionAsync(args, ex, cancellationToken);
+
+    public Task TestHandleGenericExceptionAsync(ProcessMessageEventArgs args, Exception ex, CancellationToken cancellationToken)
+        => HandleGenericExceptionAsync(args, ex, cancellationToken);
 }
