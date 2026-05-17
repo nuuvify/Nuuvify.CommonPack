@@ -25,6 +25,7 @@
     <ItemGroup>
         <PackageReference Include="AutoMapper" />
         <PackageReference Include="MediatR" />
+        <PackageReference Include="UUIDNext" />
     </ItemGroup>
 
     <ItemGroup>

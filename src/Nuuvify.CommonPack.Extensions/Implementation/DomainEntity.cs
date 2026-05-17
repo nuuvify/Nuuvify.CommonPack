@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using UUIDNext;
 using Nuuvify.CommonPack.Extensions.Notificator;
 
 namespace Nuuvify.CommonPack.Domain;
@@ -16,7 +17,7 @@ public abstract class DomainEntity : NotifiableR
 
     protected DomainEntity()
     {
-        Id = Guid.NewGuid().ToString();
+        Id = Uuid.NewDatabaseFriendly(Database.Other).ToString();
     }
 
     public string Id { get; protected set; }
