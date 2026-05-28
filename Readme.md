@@ -1,7 +1,7 @@
 # Nuuvify.CommonPack
 
-[![Build Status - Main](https://dev.azure.com/nuuvers/Nuuvify/_apis/build/status/CI-Github-Nuuvify.CommonPack?repoName=lzocateli00%2FNuuvify.CommonPack&branchName=main)](https://dev.azure.com/nuuvers/Nuuvify/_build/latest?definitionId=23&repoName=lzocateli00%2FNuuvify.CommonPack&branchName=main)
-[![Build Status - QAS](https://dev.azure.com/nuuvers/Nuuvify/_apis/build/status/CI-Github-Nuuvify.CommonPack?repoName=lzocateli00%2FNuuvify.CommonPack&branchName=qas)](https://dev.azure.com/nuuvers/Nuuvify/_build/latest?definitionId=23&repoName=lzocateli00%2FNuuvify.CommonPack&branchName=qas)
+[![PR Validation](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/pr-validation.yml/badge.svg)](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/pr-validation.yml)
+[![Publish and Release](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/publish-release.yml/badge.svg?branch=main)](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/publish-release.yml)
 
 Coleção de bibliotecas .NET para desenvolvimento de aplicações robustas, escaláveis e de alta performance.
 
@@ -462,109 +462,53 @@ O projeto mantém alta cobertura de código:
 
 ## 🤝 Contribuindo
 
-Contribuições são bem-vindas! Veja como você pode ajudar:
+Contribuições são bem-vindas, desde pequenas melhorias em documentação até novas capacidades nos pacotes.
 
-### Como Contribuir
+### Começo rápido para contribuidores
 
-1. **Fork** o repositório
-2. **Clone** seu fork: `git clone https://github.com/seu-usuario/Nuuvify.CommonPack.git`
-3. **Crie uma branch**: `git checkout -b feature/minha-feature`
-4. **Faça suas alterações** seguindo as convenções do projeto
-5. **Execute os testes**: `dotnet test`
-6. **Commit** suas mudanças: `git commit -m 'feat: adiciona nova feature'`
-7. **Push** para a branch: `git push origin feature/minha-feature`
-8. **Abra um Pull Request**
-
-### Convenções
-
-- ✅ **Conventional Commits**: Use commits semânticos (feat, fix, docs, etc.)
-- ✅ **EditorConfig**: Siga as regras do `.editorconfig`
-- ✅ **Testes**: Escreva testes para novas funcionalidades
-- ✅ **Documentação**: Atualize o README quando necessário
-- ✅ **Code Review**: Aguarde aprovação antes do merge
-
-### Diretrizes de Código
-
-- Siga os princípios **SOLID**
-- Escreva código **limpo e legível**
-- Adicione **comentários** onde necessário
-- Mantenha **alta cobertura de testes**
-- Use **async/await** para operações I/O
-
-### Configuração de Credenciais Git
-
-Se você receber o erro abaixo ao tentar fazer push, significa que há credenciais de outra conta em cache:
-
-```
-remote: Permission to nuuvify/Nuuvify.CommonPack.git denied to usuario_anterior.
-fatal: unable to access 'https://github.com/nuuvify/Nuuvify.CommonPack.git/': The requested URL returned error: 403
-```
-
-**1. Configure o usuário local do repositório:**
+1. Faça um fork do repositório.
+2. Clone o seu fork.
+3. Crie uma branch a partir de `main`.
+4. Restaure dependências, gere build e execute os testes relevantes.
+5. Abra um pull request com descrição objetiva do problema e da solução.
 
 ```powershell
-git config --local user.name "lzocateli"
-git config --local user.email "lzocateli@outlook.com"
+git clone https://github.com/<seu-usuario>/Nuuvify.CommonPack.git
+cd Nuuvify.CommonPack-policy
+git checkout -b feat/minha-alteracao
+dotnet restore
+dotnet build Nuuvify.CommonPack.sln
+dotnet test --filter "Category=Unit"
 ```
 
-**2. Troque o remote para HTTPS (se estiver usando SSH):**
+### Documentos importantes
 
-```powershell
-git remote set-url origin https://github.com/nuuvify/Nuuvify.CommonPack.git
-```
+- [Guia de contribuição](.github/CONTRIBUTING.md)
+- [Código de conduta](.github/CODE_OF_CONDUCT.md)
+- [Política de segurança](.github/SECURITY.md)
+- [Suporte](.github/SUPPORT.md)
+- [Setup local](docs/contributing/local-setup.md)
+- [Testes](docs/contributing/testing.md)
+- [Arquitetura](docs/maintainers/architecture.md)
+- [Processo de release](docs/maintainers/release-process.md)
+- [Política de depreciação](docs/maintainers/deprecation-policy.md)
+- [Configuração do GitHub](docs/maintainers/github-setup.md)
+- [Checklist de cutover GitHub](docs/maintainers/github-cutover-checklist.md)
+- [Checklist de go live GitHub](docs/maintainers/github-go-live-checklist.md)
 
-**3. Liste e remova credenciais antigas do Windows:**
+### Expectativas para pull requests
 
-```powershell
-# Listar credenciais relacionadas ao GitHub
-cmdkey /list | Select-String -Pattern "github"
+- Use Conventional Commits.
+- Siga as regras de `.editorconfig`.
+- Inclua testes ou ajuste os testes existentes quando houver mudança de comportamento.
+- Atualize documentação e changelog quando necessário.
+- Não use issues públicas para reportar vulnerabilidades.
 
-# Remover cada entrada encontrada (ajuste o target conforme listado)
-cmdkey /delete:git:https://github.com
-```
+### Canais da comunidade
 
-**4. Limpe também pelo Git Credential Manager:**
-
-```powershell
-# Cole as 3 linhas abaixo e pressione Enter duas vezes
-git credential reject
-protocol=https
-host=github.com
-```
-
-**5. Se houver credenciais persistentes no Gerenciador de Credenciais do Windows:**
-
-- Pressione `Win + R` → digite `control /name Microsoft.CredentialManager` → Enter
-- Clique em **Credenciais do Windows**
-- Localize entradas com `github` no nome (ex: `GitHub for Visual Studio - https://usuario_anterior@github.com/`)
-- Clique na entrada e depois em **Remover**
-
-**6. (Opcional) Se usar GitHub CLI:**
-
-```powershell
-gh auth logout
-gh auth login
-# Selecione: GitHub.com → HTTPS → Autentique no navegador com a conta correta
-```
-
-**7. Faça o push — o Git Credential Manager abrirá o navegador para autenticar:**
-
-```powershell
-git push origin sua-branch
-```
-
-> ⚠️ **Dica:** Certifique-se de estar logado no GitHub com a conta correta (`lzocateli`) antes de autorizar no navegador. Se o navegador abrir já logado com outra conta, faça logout no GitHub primeiro.
-
-**8. Confirme que está tudo certo:**
-
-```powershell
-# Verificar configuração local
-git config user.name
-git config user.email
-
-# Se usar gh cli
-gh auth status
-```
+- Use **GitHub Discussions** para dúvidas, ideias e suporte de uso.
+- Use **GitHub Issues** para bugs reproduzíveis e solicitações bem definidas.
+- Use o fluxo privado descrito em `SECURITY.md` para segurança.
 
 ## 📊 Status do Projeto
 
@@ -578,18 +522,20 @@ gh auth status
 ### Documentação e Recursos
 - 📦 [Pacotes NuGet](https://www.nuget.org/packages?q=nuuvify)
 - 📋 [**Changelog**](CHANGELOG.md) - **🆕 Filtros com tipos complexos!**
-- 📖 [Wiki](https://github.com/nuuvify/CommonPack/wiki)
+- 📖 [Guia de contribuição](.github/CONTRIBUTING.md)
+- 📖 [Wiki](https://github.com/nuuvify/Nuuvify.CommonPack/wiki)
 - 💡 [Samples e Exemplos](Samples/README.md)
 
 ### Desenvolvimento
-- 🐛 [Issues](https://github.com/nuuvify/CommonPack/issues)
-- 🔄 [Pull Requests](https://github.com/nuuvify/CommonPack/pulls)
-- 🚀 [Releases](https://github.com/nuuvify/CommonPack/releases)
+- 🐛 [Issues](https://github.com/nuuvify/Nuuvify.CommonPack/issues)
+- 🔄 [Pull Requests](https://github.com/nuuvify/Nuuvify.CommonPack/pulls)
+- 🚀 [Releases](https://github.com/nuuvify/Nuuvify.CommonPack/releases)
 - 📊 [SonarCloud](https://sonarcloud.io/summary/new_code?id=nuuvify_CommonPack)
 
 ### Comunidade
-- 💬 [Discussions](https://github.com/nuuvify/CommonPack/discussions)
-- 📧 [Email](mailto:suporte@zocate.li)
+- 💬 [Discussions](https://github.com/nuuvify/Nuuvify.CommonPack/discussions)
+- 🛡️ [Security Policy](.github/SECURITY.md)
+- 🤝 [Código de Conduta](.github/CODE_OF_CONDUCT.md)
 - 🌐 [Website](https://www.nuuvify.com)
 
 ## 📄 Licença
@@ -600,7 +546,7 @@ Este projeto está licenciado sob a [MIT License](LICENSE).
 
 Desenvolvido e mantido pela equipe **Nuuvify**.
 
-Agradecimentos especiais a todos os [colaboradores](https://github.com/nuuvify/CommonPack/graphs/contributors) que ajudaram a tornar este projeto melhor!
+Agradecimentos especiais a todos os [colaboradores](https://github.com/nuuvify/Nuuvify.CommonPack/graphs/contributors) que ajudaram a tornar este projeto melhor!
 
 ---
 

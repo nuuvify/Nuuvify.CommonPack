@@ -1,7 +1,7 @@
 # Nuuvify.CommonPack.StandardHttpClient
 
-[![Build Status - Main](https://dev.azure.com/nuuvers/Nuuvify/_apis/build/status/CI-Github-Nuuvify.CommonPack?repoName=lzocateli00%2FNuuvify.CommonPack&branchName=main)](https://dev.azure.com/nuuvers/Nuuvify/_build/latest?definitionId=23&repoName=lzocateli00%2FNuuvify.CommonPack&branchName=main)
-[![Build Status - QAS](https://dev.azure.com/nuuvers/Nuuvify/_apis/build/status/CI-Github-Nuuvify.CommonPack?repoName=lzocateli00%2FNuuvify.CommonPack&branchName=qas)](https://dev.azure.com/nuuvers/Nuuvify/_build/latest?definitionId=23&repoName=lzocateli00%2FNuuvify.CommonPack&branchName=qas)
+[![PR Validation](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/pr-validation.yml/badge.svg)](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/pr-validation.yml)
+[![Publish and Release](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/publish-release.yml/badge.svg?branch=main)](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/publish-release.yml)
 [![NuGet](https://img.shields.io/nuget/v/Nuuvify.CommonPack.StandardHttpClient.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.StandardHttpClient/)
 [![Downloads](https://img.shields.io/nuget/dt/Nuuvify.CommonPack.StandardHttpClient.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.StandardHttpClient/)
 
