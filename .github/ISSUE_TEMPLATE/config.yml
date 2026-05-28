@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Dúvidas e suporte
+    url: https://github.com/nuuvify/Nuuvify.CommonPack/discussions
+    about: Use GitHub Discussions para perguntas de uso, arquitetura e suporte.
+  - name: Política de segurança
+    url: https://github.com/nuuvify/Nuuvify.CommonPack/security/policy
+    about: Para vulnerabilidades, siga a política de segurança e use relato privado.
