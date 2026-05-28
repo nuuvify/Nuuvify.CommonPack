@@ -1,0 +1,6 @@
+version=2.4.0
+tag=v2.4.0
+is_prerelease=false
+create_release=true
+nuget_source=https://api.nuget.org/v3/index.json
+environment_name=production

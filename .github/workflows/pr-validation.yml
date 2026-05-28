@@ -1,0 +1,67 @@
+name: PR Validation
+
+on:
+    pull_request:
+        branches:
+            - main
+            - qas
+            - nugettest/qas
+
+permissions:
+    contents: read
+
+jobs:
+    build-and-unit-tests:
+        name: Build and unit tests
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup .NET SDK
+              uses: actions/setup-dotnet@v4
+              with:
+                  global-json-file: global.json
+
+            - name: Cache NuGet packages
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      ~/.nuget/packages
+                      ~/.local/share/NuGet/v3-cache
+                  key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.props', '**/*.targets', 'global.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-nuget-
+
+            - name: Restore solution
+              run: dotnet restore Nuuvify.CommonPack.sln
+
+            - name: Build solution
+              run: dotnet build Nuuvify.CommonPack.sln --configuration Release --no-restore
+
+            - name: Run unit tests
+              run: dotnet test Nuuvify.CommonPack.sln --configuration Release --no-build --filter "Category=Unit"
+
+    integration-tests:
+        name: Integration tests
+        runs-on: ubuntu-latest
+        if: ${{ github.base_ref != 'nugettest/qas' }}
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup .NET SDK
+              uses: actions/setup-dotnet@v4
+              with:
+                  global-json-file: global.json
+
+            - name: Restore solution
+              run: dotnet restore Nuuvify.CommonPack.sln
+
+            - name: Build solution
+              run: dotnet build Nuuvify.CommonPack.sln --configuration Release --no-restore
+
+            - name: Run integration tests
+              run: dotnet test Nuuvify.CommonPack.sln --configuration Release --no-build --filter "Category=Integration"

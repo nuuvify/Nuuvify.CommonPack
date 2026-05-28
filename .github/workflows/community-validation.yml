@@ -1,0 +1,81 @@
+name: Community Validation
+
+on:
+    pull_request:
+        paths:
+            - ".github/**"
+            - "docs/**"
+            - "Readme.md"
+            - "CHANGELOG.md"
+    push:
+        branches:
+            - main
+        paths:
+            - ".github/**"
+            - "docs/**"
+            - "Readme.md"
+            - "CHANGELOG.md"
+
+permissions:
+    contents: read
+
+jobs:
+    validate-community-assets:
+        name: Validate community assets
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Validate required files
+              shell: pwsh
+              run: |
+                  $requiredFiles = @(
+                    '.github/CONTRIBUTING.md',
+                    '.github/CODE_OF_CONDUCT.md',
+                    '.github/SECURITY.md',
+                    '.github/SUPPORT.md',
+                    '.github/CODEOWNERS',
+                    '.github/PULL_REQUEST_TEMPLATE.md',
+                    '.github/ISSUE_TEMPLATE/bug_report.yml',
+                    '.github/ISSUE_TEMPLATE/feature_request.yml',
+                    '.github/ISSUE_TEMPLATE/config.yml',
+                    'docs/contributing/local-setup.md',
+                    'docs/contributing/testing.md',
+                    'docs/maintainers/architecture.md',
+                    'docs/maintainers/release-process.md',
+                    'docs/maintainers/deprecation-policy.md',
+                    'docs/maintainers/github-setup.md',
+                    'Readme.md'
+                  )
+
+                  $missing = $requiredFiles | Where-Object { -not (Test-Path $_) }
+
+                  if ($missing.Count -gt 0) {
+                    Write-Error ("Arquivos obrigatorios ausentes:`n- " + ($missing -join "`n- "))
+                  }
+
+            - name: Validate README references
+              shell: pwsh
+              run: |
+                  $readme = Get-Content -Path 'Readme.md' -Raw
+
+                  $expectedReferences = @(
+                    '.github/CONTRIBUTING.md',
+                    '.github/CODE_OF_CONDUCT.md',
+                    '.github/SECURITY.md',
+                    '.github/SUPPORT.md',
+                    'docs/contributing/local-setup.md',
+                    'docs/contributing/testing.md',
+                    'docs/maintainers/architecture.md',
+                    'docs/maintainers/release-process.md',
+                    'docs/maintainers/deprecation-policy.md',
+                    'docs/maintainers/github-setup.md'
+                  )
+
+                  $missingReferences = $expectedReferences | Where-Object { $readme -notmatch [regex]::Escape($_) }
+
+                  if ($missingReferences.Count -gt 0) {
+                    Write-Error ("README sem referencias esperadas:`n- " + ($missingReferences -join "`n- "))
+                  }
