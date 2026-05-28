@@ -1,0 +1,15 @@
+# Owners padrão
+* @lzocateli
+
+# Comunidade e automações
+/.github/ @lzocateli
+
+# Código-fonte e testes
+/src/ @lzocateli
+/test/ @lzocateli
+/docs/ @lzocateli
+
+# Documentação e exemplos
+/Samples/ @lzocateli
+/Readme.md @lzocateli
+/CHANGELOG.md @lzocateli

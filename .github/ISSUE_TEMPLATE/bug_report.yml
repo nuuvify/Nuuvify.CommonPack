@@ -1,0 +1,102 @@
+name: Reportar bug
+description: Abra um bug reproduzível com contexto técnico suficiente para análise.
+title: "bug: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por reportar um problema.
+
+        Antes de enviar, confirme se você já consultou a documentação do pacote afetado e se o problema não é uma vulnerabilidade de segurança. Para vulnerabilidades, use o fluxo descrito em `SECURITY.md`.
+
+  - type: input
+    id: package
+    attributes:
+      label: Pacote afetado
+      description: Informe o pacote Nuuvify.CommonPack impactado.
+      placeholder: Ex. Nuuvify.CommonPack.UnitOfWork
+    validations:
+      required: true
+
+  - type: input
+    id: package-version
+    attributes:
+      label: Versão do pacote
+      description: Informe a versão publicada ou usada localmente.
+      placeholder: Ex. 2.4.0
+    validations:
+      required: true
+
+  - type: input
+    id: dotnet-version
+    attributes:
+      label: Versão do .NET SDK
+      description: Use o resultado de `dotnet --version`.
+      placeholder: Ex. 8.0.303
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Sistema operacional
+      options:
+        - Windows
+        - Linux
+        - macOS
+        - Outro
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamento esperado
+      description: Descreva o que deveria acontecer.
+    validations:
+      required: true
+
+  - type: textarea
+    id: current
+    attributes:
+      label: Comportamento atual
+      description: Descreva o que aconteceu de fato.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Passos para reproduzir
+      description: Liste os passos mínimos para reproduzir o problema.
+      placeholder: |
+        1. Configure ...
+        2. Execute ...
+        3. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: code-sample
+    attributes:
+      label: Código ou payload mínimo
+      description: Inclua um exemplo mínimo reproduzível, se possível.
+      render: csharp
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs, stack trace ou evidências
+      description: Cole logs, stack trace, screenshots ou qualquer evidência relevante.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirmações
+      options:
+        - label: Li a documentação e conferi se já existe issue semelhante.
+          required: true
+        - label: Este relato não expõe vulnerabilidade de segurança em público.
+          required: true

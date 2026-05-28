@@ -1,0 +1,132 @@
+name: Publish and Release
+
+on:
+    pull_request_target:
+        types:
+            - closed
+        branches:
+            - main
+            - qas
+            - nugettest/qas
+
+permissions:
+    contents: write
+
+jobs:
+    publish:
+        name: Publish packages and release
+        if: ${{ github.event.pull_request.merged == true }}
+        runs-on: ubuntu-latest
+        environment: ${{ github.event.pull_request.base.ref == 'main' && 'production' || github.event.pull_request.base.ref == 'qas' && 'preview' || 'nugettest' }}
+
+        steps:
+            - name: Checkout merged commit
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.merge_commit_sha }}
+                  fetch-depth: 0
+
+            - name: Setup .NET SDK
+              uses: actions/setup-dotnet@v4
+              with:
+                  global-json-file: global.json
+
+            - name: Resolve release channel
+              id: channel
+              shell: pwsh
+              run: |
+                  switch ('${{ github.event.pull_request.base.ref }}') {
+                    'main' { $channel = 'stable' }
+                    'qas' { $channel = 'preview' }
+                    'nugettest/qas' { $channel = 'dev' }
+                    default { throw 'Branch de release nao suportada.' }
+                  }
+
+                  "value=$channel" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+            - name: Compute version
+              id: version
+              shell: pwsh
+              run: ./.github/scripts/compute-version.ps1 -Channel '${{ steps.channel.outputs.value }}' -VersionFile 'src/Directory.Build.props' -RunNumber '${{ github.run_number }}'
+
+            - name: Restore solution
+              run: dotnet restore Nuuvify.CommonPack.sln
+
+            - name: Build solution
+              run: dotnet build Nuuvify.CommonPack.sln --configuration Release --no-restore /p:Version=${{ steps.version.outputs.version }}
+
+            - name: Run unit tests
+              run: dotnet test Nuuvify.CommonPack.sln --configuration Release --no-build --filter "Category=Unit"
+
+            - name: Run integration tests
+              if: ${{ steps.channel.outputs.value != 'dev' }}
+              run: dotnet test Nuuvify.CommonPack.sln --configuration Release --no-build --filter "Category=Integration"
+
+            - name: Pack solution
+              run: dotnet pack Nuuvify.CommonPack.sln --configuration Release --no-build -o ./artifacts /p:Version=${{ steps.version.outputs.version }} /p:PackageVersion=${{ steps.version.outputs.version }}
+
+            - name: Build release notes
+              if: ${{ steps.version.outputs.create_release == 'true' }}
+              shell: pwsh
+              run: ./.github/scripts/build-release-notes.ps1 -Version '${{ steps.version.outputs.version }}' -Channel '${{ steps.channel.outputs.value }}' -BaseBranch '${{ github.event.pull_request.base.ref }}' -OutputPath './artifacts/release-notes.md'
+
+            - name: Publish to NuGet.org
+              if: ${{ steps.channel.outputs.value != 'dev' }}
+              shell: pwsh
+              env:
+                  NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+              run: |
+                  Get-ChildItem -Path ./artifacts -Filter *.nupkg |
+                    Where-Object { $_.Name -notlike '*.snupkg' } |
+                    ForEach-Object {
+                      dotnet nuget push $_.FullName --api-key $env:NUGET_API_KEY --source '${{ steps.version.outputs.nuget_source }}' --skip-duplicate
+                    }
+
+            - name: Publish to nugettest
+              if: ${{ steps.channel.outputs.value == 'dev' }}
+              shell: pwsh
+              env:
+                  NUGETTEST_API_KEY: ${{ secrets.NUGETTEST_API_KEY }}
+              run: |
+                  Get-ChildItem -Path ./artifacts -Filter *.nupkg |
+                    Where-Object { $_.Name -notlike '*.snupkg' } |
+                    ForEach-Object {
+                      dotnet nuget push $_.FullName --api-key $env:NUGETTEST_API_KEY --source '${{ steps.version.outputs.nuget_source }}' --skip-duplicate
+                    }
+
+            - name: Create git tag
+              if: ${{ steps.version.outputs.create_release == 'true' }}
+              shell: bash
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                  if git rev-parse "${{ steps.version.outputs.tag }}" >/dev/null 2>&1; then
+                    echo "Tag ${{ steps.version.outputs.tag }} ja existe."
+                  else
+                    git tag "${{ steps.version.outputs.tag }}"
+                    git push origin "${{ steps.version.outputs.tag }}"
+                  fi
+
+            - name: Create GitHub release
+              if: ${{ steps.version.outputs.create_release == 'true' }}
+              shell: bash
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  if gh release view "${{ steps.version.outputs.tag }}" >/dev/null 2>&1; then
+                    echo "Release ${{ steps.version.outputs.tag }} ja existe."
+                  else
+                    prerelease_flag=""
+                    if [ "${{ steps.version.outputs.is_prerelease }}" = "true" ]; then
+                      prerelease_flag="--prerelease"
+                    fi
+
+                    gh release create "${{ steps.version.outputs.tag }}" \
+                      artifacts/*.nupkg \
+                      artifacts/*.snupkg \
+                      --target "${{ github.event.pull_request.merge_commit_sha }}" \
+                      --title "${{ steps.version.outputs.tag }}" \
+                      --notes-file ./artifacts/release-notes.md \
+                      --generate-notes \
+                      $prerelease_flag
+                  fi

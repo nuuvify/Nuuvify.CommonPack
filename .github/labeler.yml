@@ -1,0 +1,32 @@
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'docs/**'
+          - '*.md'
+          - '.github/*.md'
+          - '.github/ISSUE_TEMPLATE/**'
+
+test:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'test/**'
+
+security:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/**/Security*/**'
+          - '.github/SECURITY.md'
+
+dependencies:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/Directory.Packages.props'
+          - '**/*.csproj'
+          - 'global.json'
+
+quality:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.editorconfig'
+          - '.github/workflows/**'
+          - '.github/scripts/**'

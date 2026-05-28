@@ -1,0 +1,75 @@
+- name: bug
+  color: d73a4a
+  description: Erro reproduzível ou comportamento incorreto.
+
+- name: enhancement
+  color: a2eeef
+  description: Melhoria incremental em comportamento existente.
+
+- name: feature
+  color: 1d76db
+  description: Nova capacidade ou feature relevante para release notes.
+
+- name: documentation
+  color: 0075ca
+  description: Mudança apenas documental.
+
+- name: docs
+  color: 0e8a16
+  description: Ajustes de documentação curta ou localizada.
+
+- name: test
+  color: fbca04
+  description: Mudanças em testes automatizados.
+
+- name: quality
+  color: c2e0c6
+  description: Qualidade interna, manutenção e higiene técnica.
+
+- name: refactor
+  color: cfd3d7
+  description: Refatoração sem mudança funcional esperada.
+
+- name: dependencies
+  color: 5319e7
+  description: Atualização ou ajuste de dependências.
+
+- name: security
+  color: b60205
+  description: Tema de segurança ou hardening.
+
+- name: breaking change
+  color: 000000
+  description: Mudança incompatível com versões anteriores.
+
+- name: major
+  color: 8b0000
+  description: Mudança de alto impacto para release major.
+
+- name: needs reproduction
+  color: f9d0c4
+  description: Necessita cenário mínimo reproduzível.
+
+- name: good first issue
+  color: 7057ff
+  description: Boa issue para primeira contribuição.
+
+- name: help wanted
+  color: 008672
+  description: Item aberto para contribuições externas.
+
+- name: duplicate
+  color: cfd3d7
+  description: Issue ou PR duplicado.
+
+- name: invalid
+  color: e4e669
+  description: Issue ou PR inválido para o escopo do projeto.
+
+- name: question
+  color: d876e3
+  description: Pergunta ou discussão que não representa bug/feature.
+
+- name: skip-release-notes
+  color: ffffff
+  description: Mudança que não deve entrar nas notas de release.
