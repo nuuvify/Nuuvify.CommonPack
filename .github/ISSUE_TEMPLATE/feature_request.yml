@@ -1,0 +1,77 @@
+name: Solicitar funcionalidade
+description: Proponha uma melhoria ou nova funcionalidade com contexto técnico e de produto.
+title: "feat: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use este formulário para propostas claras e objetivas.
+
+        Se a ideia ainda estiver em exploração ou você quiser validar a abordagem antes de abrir uma issue formal, prefira GitHub Discussions.
+
+  - type: input
+    id: package
+    attributes:
+      label: Pacote ou área impactada
+      description: Informe o pacote principal ou a área do repositório afetada.
+      placeholder: Ex. Nuuvify.CommonPack.BackgroundService
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema a resolver
+      description: Explique a dor atual, limitação ou oportunidade.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposta
+      description: Descreva a solução desejada.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas consideradas
+      description: Descreva abordagens descartadas, workarounds ou opções já avaliadas.
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impacto esperado
+      description: Explique impactos em API, comportamento, compatibilidade, performance ou segurança.
+
+  - type: dropdown
+    id: breaking-change
+    attributes:
+      label: Existe potencial de breaking change?
+      options:
+        - Não
+        - Sim
+        - Não sei
+    validations:
+      required: true
+
+  - type: textarea
+    id: example
+    attributes:
+      label: Exemplo de uso
+      description: Compartilhe exemplo de API, pseudocódigo ou cenário real.
+      render: csharp
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirmações
+      options:
+        - label: Verifiquei se já existe request semelhante aberta.
+          required: true
+        - label: Esta solicitação está alinhada ao escopo público do projeto.
+          required: true
