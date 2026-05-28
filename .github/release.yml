@@ -1,0 +1,33 @@
+changelog:
+  exclude:
+    labels:
+      - skip-release-notes
+      - duplicate
+      - invalid
+      - question
+  categories:
+    - title: Breaking Changes
+      labels:
+        - breaking change
+        - major
+    - title: New Features
+      labels:
+        - enhancement
+        - feature
+    - title: Bug Fixes
+      labels:
+        - bug
+        - fix
+    - title: Documentation
+      labels:
+        - documentation
+        - docs
+    - title: Tests and Quality
+      labels:
+        - test
+        - quality
+        - refactor
+    - title: Dependencies
+      labels:
+        - dependencies
+        - security
