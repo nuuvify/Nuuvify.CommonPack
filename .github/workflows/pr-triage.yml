@@ -15,7 +15,7 @@ permissions:
 jobs:
     label-by-path:
         name: Label PR by path
-        runs-on: ubuntu-latest
+        runs-on: ${{ vars.GH_ACTIONS_UBUNTU_RUNNER != '' && vars.GH_ACTIONS_UBUNTU_RUNNER || 'ubuntu-24.04' }}
 
         steps:
             - name: Auto label PR
