@@ -9,6 +9,7 @@ Este documento descreve o fluxo recomendado para preparar e publicar uma nova ve
 - A versão principal dos pacotes é definida em `src/Directory.Build.props`.
 - O CI/CD oficial está em GitHub Actions.
 - O versionamento de publicação é calculado por branch no workflow `publish-release.yml`.
+- O runner Linux dos workflows é parametrizado pela variável de repositório `GH_ACTIONS_UBUNTU_RUNNER`, com fallback para `ubuntu-24.04`.
 
 ## Antes do release
 
@@ -74,6 +75,19 @@ Os environments recomendados são:
 - `production`
 - `preview`
 - `nugettest`
+
+## Runner do GitHub Actions (fixo por versão)
+
+Para evitar alterações manuais em vários arquivos de workflow, todos os `runs-on` usam a mesma variável de repositório:
+
+- `GH_ACTIONS_UBUNTU_RUNNER` (exemplo: `ubuntu-24.04`)
+
+Comportamento:
+
+- Se a variável estiver definida, os workflows usam o valor dela.
+- Se a variável não estiver definida, o fallback é `ubuntu-24.04`.
+
+Ao trocar de versão, atualize apenas essa variável em `Settings > Secrets and variables > Actions > Variables`.
 
 ## Checklist de mantenedor
 

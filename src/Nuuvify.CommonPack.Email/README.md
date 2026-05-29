@@ -1398,12 +1398,32 @@ Ver arquivo [CHANGELOG.md](CHANGELOG.md) para histórico detalhado de alteraçõ
 
 ---
 
-## 📞 Suporte
+## Funcionalidades planejadas
 
-Para dúvidas, issues ou contribuições:
-- 🐛 **Issues**: [GitHub Issues](https://github.com/nuuvify/CommonPack/issues)
-- 📧 **Email**: [suporte@zocate.li](mailto:suporte@zocate.li)
-- 📖 **Documentação**: [Wiki do Projeto](https://github.com/nuuvify/CommonPack/wiki)
+### v1.1.0
+- Suporte a templates Razor para e-mails dinâmicos com cache de templates compilados
+- Sistema de fila para processamento assíncrono com prioridades e agendamento
+- Métricas e telemetria de envio via OpenTelemetry
+- Health check endpoint para validar SMTP
+
+### v1.2.0
+- Suporte a provedores alternativos (SendGrid SDK, AWS SES SDK) com fallback automático
+- Imagens inline (embedded images) no HTML
+- Validação avançada de e-mails (syntax, MX records)
+- Limitação de taxa de envio
+
+### v2.0.0
+- API async-only (breaking change — remoção de métodos síncronos)
+- Suporte a multi-tenant
+- Streaming assíncrono de anexos grandes
 
 ---
-**Nuuvify CommonPack** - Construindo soluções robustas para .NET 🚀
+
+## Suporte
+
+Para dúvidas, issues ou contribuições:
+- **Issues**: [GitHub Issues](https://github.com/nuuvify/CommonPack/issues)
+- **Documentação**: [Wiki do Projeto](https://github.com/nuuvify/CommonPack/wiki)
+
+---
+**Nuuvify CommonPack** - Construindo soluções robustas para .NET
