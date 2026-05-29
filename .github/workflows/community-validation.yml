@@ -22,7 +22,7 @@ permissions:
 jobs:
     validate-community-assets:
         name: Validate community assets
-        runs-on: ubuntu-latest
+        runs-on: ${{ vars.GH_ACTIONS_UBUNTU_RUNNER != '' && vars.GH_ACTIONS_UBUNTU_RUNNER || 'ubuntu-24.04' }}
 
         steps:
             - name: Checkout
@@ -78,4 +78,24 @@ jobs:
 
                   if ($missingReferences.Count -gt 0) {
                     Write-Error ("README sem referencias esperadas:`n- " + ($missingReferences -join "`n- "))
+                  }
+
+            - name: Validate CHANGELOG format
+              shell: pwsh
+              run: |
+                  $content = Get-Content -Path 'CHANGELOG.md' -Raw
+
+                  if ($content -notmatch '## \[Não Lançado\]') {
+                    Write-Error "CHANGELOG.md não contém a seção '## [Não Lançado]'"
+                  }
+
+                  if ($content -notmatch '## \[\d+\.\d+\.\d+\] - \d{4}-\d{2}-\d{2}') {
+                    Write-Error "CHANGELOG.md não contém nenhuma release no formato '## [x.y.z] - yyyy-mm-dd'"
+                  }
+
+                  $forbidden = @('Planned Features', 'Aguardando', 'Current Version', 'Technical Debt')
+                  foreach ($section in $forbidden) {
+                    if ($content -match [regex]::Escape("### $section")) {
+                      Write-Error "CHANGELOG.md contém seção proibida: '### $section'"
+                    }
                   }

@@ -26,3 +26,77 @@ Considere, conforme o caso:
 
 Use também:
 - [Nuuvify Package Docs](../instructions/package-docs.instructions.md)
+
+---
+
+## Templates canônicos de CHANGELOG
+
+Ao atualizar qualquer `CHANGELOG.md`, use **exatamente** um dos templates abaixo — nunca improvise o formato.
+
+### CHANGELOG raiz
+
+```markdown
+# Changelog
+
+Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
+
+O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-br/1.0.0/),
+e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec/v2.0.0.html).
+
+## [Não Lançado]
+
+### Adicionado
+
+### Alterado
+
+### Corrigido
+
+### Removido
+
+### Segurança
+
+### Performance
+
+### Documentação
+
+## [x.y.z] - yyyy-mm-dd
+
+### Adicionado
+- Descrição voltada ao consumidor.
+```
+
+### CHANGELOG de pacote
+
+```markdown
+# Changelog - Nuuvify.CommonPack.<Pacote>
+
+Todas as mudanças notáveis deste pacote serão documentadas neste arquivo.
+
+O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-br/1.0.0/),
+e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec/v2.0.0.html).
+
+## [Não Lançado]
+
+### Adicionado
+
+### Alterado
+
+### Corrigido
+
+### Removido
+
+### Segurança
+
+## [x.y.z] - yyyy-mm-dd
+
+### Adicionado
+- Descrição curta voltada ao consumidor da API pública.
+```
+
+### Regras inegociáveis
+
+- Categorias permitidas: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Segurança`.
+- **NUNCA** adicionar: `Planned Features`, `Aguardando`, `Current Version`, `Technical Debt`, `Roadmap`, `Known Issues`, `Observability & Debugging`.
+- **NUNCA** escrever em inglês — todo o conteúdo deve estar em pt-BR.
+- **NUNCA** incluir blocos de código extensos, exemplos de uso ou explicações técnicas internas (pertencem ao README).
+- Cada item deve responder: "o que o consumidor NuGet precisa saber para atualizar com segurança?"
