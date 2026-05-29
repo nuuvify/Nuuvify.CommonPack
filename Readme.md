@@ -464,26 +464,23 @@ O projeto mantém alta cobertura de código:
 
 Contribuições são bem-vindas, desde pequenas melhorias em documentação até novas capacidades nos pacotes.
 
-### Começo rápido para contribuidores
+Se você está começando, siga este roteiro: [Roteiro para novos contribuidores](docs/contributing/new-contributor-roadmap.md).
 
-1. Faça um fork do repositório.
-2. Clone o seu fork.
-3. Crie uma branch a partir de `main`.
-4. Restaure dependências, gere build e execute os testes relevantes.
-5. Abra um pull request com descrição objetiva do problema e da solução.
+### Roteiro passo a passo para novos contribuidores
 
-```powershell
-git clone https://github.com/<seu-usuario>/Nuuvify.CommonPack.git
-cd Nuuvify.CommonPack-policy
-git checkout -b feat/minha-alteracao
-dotnet restore
-dotnet build Nuuvify.CommonPack.sln
-dotnet test --filter "Category=Unit"
-```
+Use o passo a passo completo em [docs/contributing/new-contributor-roadmap.md](docs/contributing/new-contributor-roadmap.md).
+
+Resumo rápido:
+
+1. Faça fork, clone e crie uma branch a partir de `main`.
+2. Execute `dotnet restore`, `dotnet build Nuuvify.CommonPack.sln` e os testes relevantes.
+3. Mantenha a mudança pequena, focada e com testes.
+4. Abra PR com descrição objetiva e evidências quando necessário.
 
 ### Documentos importantes
 
 - [Guia de contribuição](.github/CONTRIBUTING.md)
+- [Roteiro para novos contribuidores](docs/contributing/new-contributor-roadmap.md)
 - [Código de conduta](.github/CODE_OF_CONDUCT.md)
 - [Política de segurança](.github/SECURITY.md)
 - [Suporte](.github/SUPPORT.md)
@@ -522,6 +519,7 @@ dotnet test --filter "Category=Unit"
 ### Documentação e Recursos
 - 📦 [Pacotes NuGet](https://www.nuget.org/packages?q=nuuvify)
 - 📋 [**Changelog**](CHANGELOG.md) - **🆕 Filtros com tipos complexos!**
+- 🧭 [Roteiro para novos contribuidores](docs/contributing/new-contributor-roadmap.md)
 - 📖 [Guia de contribuição](.github/CONTRIBUTING.md)
 - 📖 [Wiki](https://github.com/nuuvify/Nuuvify.CommonPack/wiki)
 - 💡 [Samples e Exemplos](Samples/README.md)
