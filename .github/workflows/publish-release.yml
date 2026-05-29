@@ -16,7 +16,7 @@ jobs:
     publish:
         name: Publish packages and release
         if: ${{ github.event.pull_request.merged == true }}
-        runs-on: ubuntu-latest
+        runs-on: ${{ vars.GH_ACTIONS_UBUNTU_RUNNER != '' && vars.GH_ACTIONS_UBUNTU_RUNNER || 'ubuntu-24.04' }}
         environment: ${{ github.event.pull_request.base.ref == 'main' && 'production' || github.event.pull_request.base.ref == 'qas' && 'preview' || 'nugettest' }}
 
         steps:
@@ -65,8 +65,48 @@ jobs:
             - name: Pack solution
               run: dotnet pack Nuuvify.CommonPack.sln --configuration Release --no-build -o ./artifacts /p:Version=${{ steps.version.outputs.version }} /p:PackageVersion=${{ steps.version.outputs.version }}
 
-            - name: Build release notes
+            - name: Generate changelog via Commitizen
+              id: cz_changelog
               if: ${{ steps.version.outputs.create_release == 'true' }}
+              continue-on-error: true
+              shell: bash
+              run: |
+                  pip install commitizen --quiet
+                  cz changelog --incremental --file-name CHANGELOG.md
+                  if [ $? -ne 0 ] || [ -z "$(git diff --name-only CHANGELOG.md)" ]; then
+                    echo "cz_changed=false" >> $GITHUB_OUTPUT
+                  else
+                    echo "cz_changed=true" >> $GITHUB_OUTPUT
+                  fi
+
+            - name: Fallback changelog via PR labels
+              if: ${{ steps.version.outputs.create_release == 'true' && steps.cz_changelog.outputs.cz_changed == 'false' }}
+              shell: pwsh
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  $lastTag = git tag --list 'v[0-9]*' | Sort-Object { [version]($_ -replace '^v','') } | Select-Object -Last 1
+                  $lastTagDate = git log -1 --format="%aI" $lastTag
+                  ./.github/scripts/build-release-notes.ps1 `
+                    -Mode 'labels-fallback' `
+                    -Version '${{ steps.version.outputs.version }}' `
+                    -Channel '${{ steps.channel.outputs.value }}' `
+                    -BaseBranch '${{ github.event.pull_request.base.ref }}' `
+                    -OutputPath './artifacts/release-notes.md' `
+                    -LastTagDate $lastTagDate
+
+            - name: Commit changelog update
+              if: ${{ steps.version.outputs.create_release == 'true' && steps.cz_changelog.outputs.cz_changed == 'true' }}
+              shell: bash
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                  git add CHANGELOG.md
+                  git commit -m "docs(changelog): atualiza para v${{ steps.version.outputs.version }} [skip ci]"
+                  git push origin HEAD
+
+            - name: Build release notes
+              if: ${{ steps.version.outputs.create_release == 'true' && steps.cz_changelog.outputs.cz_changed != 'false' }}
               shell: pwsh
               run: ./.github/scripts/build-release-notes.ps1 -Version '${{ steps.version.outputs.version }}' -Channel '${{ steps.channel.outputs.value }}' -BaseBranch '${{ github.event.pull_request.base.ref }}' -OutputPath './artifacts/release-notes.md'
 
@@ -127,6 +167,5 @@ jobs:
                       --target "${{ github.event.pull_request.merge_commit_sha }}" \
                       --title "${{ steps.version.outputs.tag }}" \
                       --notes-file ./artifacts/release-notes.md \
-                      --generate-notes \
                       $prerelease_flag
                   fi

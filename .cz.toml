@@ -7,5 +7,14 @@ annotated_tag = true
 version_files = [
     "src/Directory.Build.props:Version"
 ]
+changelog_file = "CHANGELOG.md"
 changelog_incremental = true
 changelog_merge_prerelease = true
+
+[tool.commitizen.change_type_map]
+feat = "Adicionado"
+fix = "Corrigido"
+refactor = "Alterado"
+docs = "Documentação"
+perf = "Performance"
+"breaking change" = "Removido"
