@@ -117,6 +117,20 @@ Configure os secrets:
 
 Se quiser endurecer a produção, adicione regra de approval no environment `production`.
 
+## 6.2 Variável de runner do GitHub Actions
+
+Para padronizar o SO de execução dos workflows sem editar múltiplos arquivos, configure uma variável de repositório:
+
+- `GH_ACTIONS_UBUNTU_RUNNER` = `ubuntu-24.04`
+
+Onde configurar:
+
+- `Settings > Secrets and variables > Actions > Variables`
+
+Observação operacional:
+
+- Os workflows possuem fallback para `ubuntu-24.04`, mas manter a variável definida facilita upgrades futuros (por exemplo, `ubuntu-26.04`) com uma única alteração.
+
 ## 7. Templates e formulários
 
 Confirme o reconhecimento automático de:

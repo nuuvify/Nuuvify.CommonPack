@@ -11,9 +11,47 @@ permissions:
     contents: read
 
 jobs:
+    changelog-check:
+        name: Verify package CHANGELOG updated
+        runs-on: ${{ vars.GH_ACTIONS_UBUNTU_RUNNER != '' && vars.GH_ACTIONS_UBUNTU_RUNNER || 'ubuntu-24.04' }}
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Check CHANGELOG updated for modified packages
+              shell: pwsh
+              run: |
+                  $baseBranch = '${{ github.event.pull_request.base.ref }}'
+                  $changedFiles = (git diff --name-only "origin/$baseBranch") -split "`n" | Where-Object { $_ -ne '' }
+
+                  $modifiedPackages = $changedFiles |
+                    Where-Object { $_ -match '^src/([^/]+)/.*\.(cs|csproj)$' } |
+                    ForEach-Object { ($_ -split '/')[1] } |
+                    Select-Object -Unique
+
+                  $failures = @()
+                  foreach ($pkg in $modifiedPackages) {
+                    $changelogPath = "src/$pkg/CHANGELOG.md"
+                    if ($changedFiles -notcontains $changelogPath) {
+                      $failures += $pkg
+                    }
+                  }
+
+                  if ($failures.Count -gt 0) {
+                    $msg = "Os seguintes pacotes tiveram código alterado mas o CHANGELOG.md não foi atualizado:`n"
+                    $msg += ($failures | ForEach-Object { "  - src/$_/CHANGELOG.md" }) -join "`n"
+                    Write-Error $msg
+                    exit 1
+                  }
+
+                  Write-Host "Todos os pacotes com código alterado têm CHANGELOG.md atualizado."
+
     build-and-unit-tests:
         name: Build and unit tests
-        runs-on: ubuntu-latest
+        runs-on: ${{ vars.GH_ACTIONS_UBUNTU_RUNNER != '' && vars.GH_ACTIONS_UBUNTU_RUNNER || 'ubuntu-24.04' }}
 
         steps:
             - name: Checkout
@@ -45,7 +83,7 @@ jobs:
 
     integration-tests:
         name: Integration tests
-        runs-on: ubuntu-latest
+        runs-on: ${{ vars.GH_ACTIONS_UBUNTU_RUNNER != '' && vars.GH_ACTIONS_UBUNTU_RUNNER || 'ubuntu-24.04' }}
         if: ${{ github.base_ref != 'nugettest/qas' }}
 
         steps:
