@@ -3,6 +3,7 @@ using Xunit;
 
 namespace Nuuvify.CommonPack.Domain.xTest;
 
+[Trait("Category", "Unit")]
 public class DomainEntityTests
 {
 
@@ -64,3 +65,5 @@ public class DomainEntityTests
     }
 
 }
+
+

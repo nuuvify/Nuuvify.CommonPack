@@ -1,9 +1,10 @@
-﻿using Nuuvify.CommonPack.Domain.ValueObjects;
+using Nuuvify.CommonPack.Domain.ValueObjects;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using Xunit;
 
 namespace Nuuvify.CommonPack.Domain.xTest.ValueObjects;
 
+[Trait("Category", "Unit")]
 public class FuncaoOpcaoTests
 {
     [Theory]
@@ -42,3 +43,5 @@ public class FuncaoOpcaoTests
     }
 
 }
+
+

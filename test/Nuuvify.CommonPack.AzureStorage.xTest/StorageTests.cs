@@ -9,6 +9,7 @@ using Xunit;
 
 namespace Nuuvify.CommonPack.AzureStorage.xTest;
 
+[Trait("Category", "Integration")]
 public class StorageTests
 {
     private Mock<IConfiguration> mockIConfigurationCustom;
@@ -51,3 +52,5 @@ public class StorageTests
 
     }
 }
+
+

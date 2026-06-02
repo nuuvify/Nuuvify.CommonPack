@@ -1,9 +1,10 @@
-﻿using Nuuvify.CommonPack.Domain.ValueObjects;
+using Nuuvify.CommonPack.Domain.ValueObjects;
 using System.Linq;
 using Xunit;
 
 namespace Nuuvify.CommonPack.Domain.xTest.ValueObjects;
 
+[Trait("Category", "Unit")]
 public class CnpjTestes
 {
     [Theory]
@@ -129,3 +130,5 @@ public class CnpjTestes
         Assert.Null(_cnpj.Mascara());
     }
 }
+
+
