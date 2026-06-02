@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Nuuvify.CommonPack.UnitOfWork.Integration.xTest": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:59935;http://localhost:59936"
+    }
+  }
+}
