@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Extensions.Configuration;
 using Nuuvify.CommonPack.Security.Abstraction;
 using Nuuvify.CommonPack.Security.Jwt;
@@ -6,6 +6,7 @@ using Xunit;
 
 namespace Nuuvify.CommonPack.Security.xTest;
 
+[Trait("Category", "Unit")]
 public class GerarValidarTokenUsuarioTests
 {
 
@@ -53,3 +54,5 @@ public class GerarValidarTokenUsuarioTests
     }
 
 }
+
+

@@ -1,8 +1,9 @@
-﻿using Nuuvify.CommonPack.Domain.ValueObjects;
+using Nuuvify.CommonPack.Domain.ValueObjects;
 using Xunit;
 
 namespace Nuuvify.CommonPack.Domain.xTest.ValueObjects;
 
+[Trait("Category", "Unit")]
 public class DocumentoPessoaEstrangeiroTests
 {
     [Theory]
@@ -31,3 +32,5 @@ public class DocumentoPessoaEstrangeiroTests
 
     }
 }
+
+

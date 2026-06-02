@@ -1,9 +1,10 @@
-﻿using Nuuvify.CommonPack.Domain.ValueObjects;
+using Nuuvify.CommonPack.Domain.ValueObjects;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using Xunit;
 
 namespace Nuuvify.CommonPack.Domain.xTest;
 
+[Trait("Category", "Unit")]
 public class EnumHelperTests
 {
     [Fact]
@@ -76,3 +77,5 @@ public class EnumHelperTests
     }
 
 }
+
+

@@ -1,8 +1,9 @@
-﻿using Nuuvify.CommonPack.Extensions.Implementation;
+using Nuuvify.CommonPack.Extensions.Implementation;
 using Xunit;
 
 namespace Nuuvify.CommonPack.Domain.xTest;
 
+[Trait("Category", "Unit")]
 public class TextoHelperTests
 {
     [Theory]
@@ -325,3 +326,5 @@ public class TextoHelperTests
 
     }
 }
+
+

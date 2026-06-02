@@ -3,6 +3,7 @@ using Xunit;
 
 namespace Nuuvify.CommonPack.Security.xTest;
 
+[Trait("Category", "Unit")]
 public class PersonResultTest
 {
 
@@ -37,3 +38,5 @@ public class PersonResultTest
     }
 
 }
+
+

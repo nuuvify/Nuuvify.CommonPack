@@ -1,7 +1,8 @@
-﻿using Nuuvify.CommonPack.StandardHttpClient.Results;
+using Nuuvify.CommonPack.StandardHttpClient.Results;
 
 namespace Nuuvify.CommonPack.StandardHttpClientService.xTest;
 
+[Trait("Category", "Unit")]
 public class StandardHttpClientServiceStreamTests
 {
 
@@ -105,3 +106,5 @@ public class StandardHttpClientServiceStreamTests
     }
 
 }
+
+

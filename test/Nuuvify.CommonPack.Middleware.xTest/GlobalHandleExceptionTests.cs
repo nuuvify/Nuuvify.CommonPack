@@ -1,4 +1,4 @@
-﻿using Nuuvify.CommonPack.Middleware.Handle;
+using Nuuvify.CommonPack.Middleware.Handle;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
 using System;
@@ -7,6 +7,7 @@ using Xunit;
 
 namespace Nuuvify.CommonPack.Middleware.xTest;
 
+[Trait("Category", "Unit")]
 public class GlobalHandleExceptionTests
 {
 
@@ -24,3 +25,5 @@ public class GlobalHandleExceptionTests
         Assert.True(taskException.IsCompleted);
     }
 }
+
+
