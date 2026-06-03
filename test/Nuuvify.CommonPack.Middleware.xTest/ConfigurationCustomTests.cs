@@ -1,4 +1,4 @@
-﻿using Nuuvify.CommonPack.Middleware.Abstraction;
+using Nuuvify.CommonPack.Middleware.Abstraction;
 using Nuuvify.CommonPack.Middleware.xTest.Configs;
 using Nuuvify.CommonPack.Middleware.xTest.Entities;
 using Microsoft.Extensions.Configuration;
@@ -8,6 +8,7 @@ using Xunit;
 
 namespace Nuuvify.CommonPack.Middleware.xTest;
 
+[Trait("Category", "Unit")]
 public class ConfigurationCustomTests
 {
 
@@ -147,3 +148,5 @@ public class ConfigurationCustomTests
     }
 
 }
+
+

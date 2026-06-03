@@ -4,6 +4,7 @@ using Xunit;
 
 namespace Nuuvify.CommonPack.Domain.xTest;
 
+[Trait("Category", "Unit")]
 public class WebProxyConfigureMethodTests
 {
 
@@ -22,3 +23,5 @@ public class WebProxyConfigureMethodTests
     }
 
 }
+
+

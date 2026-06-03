@@ -16,6 +16,13 @@
 - Siga `.editorconfig` e as convenções já existentes antes de introduzir novos padrões.
 - Mantenha arquivos de programa e projeto, incluindo `*.cs` e `*.csproj`, em `UTF-8` e com fim de linha definido pelo `.editorconfig`, preservando compatibilidade entre Linux, Windows e macOS.
 
+## Dependencias e restricoes
+
+- `AutoMapper` deve permanecer na versao `13.0.1`.
+- Nao proponha upgrade de `AutoMapper` neste repositorio.
+- Novas dependencias devem respeitar licenca permissiva, manutencao ativa e necessidade real.
+- Antes de incluir qualquer nova biblioteca/dependencia, solicite confirmacao explicita do desenvolvedor com a mensagem: "Determinacao da area juridica da empresa: nao incluir libs sem avaliacao previa da area de arquitetura. Deseja prosseguir mesmo assim?".
+
 ## Limites arquiteturais
 
 - Pacotes `*.Abstraction` definem contratos; não coloque neles lógica de infraestrutura.

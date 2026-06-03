@@ -2,6 +2,7 @@
 
 namespace Nuuvify.CommonPack.Email.xTest;
 
+[Trait("Category", "Unit")]
 public class EmailServiceTests
 {
 

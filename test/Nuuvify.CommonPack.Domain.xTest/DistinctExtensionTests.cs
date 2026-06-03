@@ -3,6 +3,7 @@ using Xunit;
 
 namespace Nuuvify.CommonPack.Domain.xTest;
 
+[Trait("Category", "Unit")]
 public class DistinctExtensionTests
 {
     [Fact]
@@ -32,6 +33,7 @@ public class DistinctExtensionTests
     }
 }
 
+[Trait("Category", "Unit")]
 public class Customer
 {
 
@@ -40,3 +42,5 @@ public class Customer
     public int Codigo { get; set; }
     public string Tipo { get; set; }
 }
+
+
