@@ -7,22 +7,29 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ## [Não Lançado]
 
-### 🆕 Adicionado
-- **Filtros com tipos complexos** - Suporte completo a propriedades de navegação aninhadas
-- **Notação de ponto (dot notation)** para filtros em relacionamentos (ex: `Customer.Address.City`)
-- **Validação automática** de propriedades aninhadas no ExpressionFactory
-- **Parameterização otimizada** para EF Core com `GetClosureOverConstant`
-- **Documentação avançada** com exemplos de filtros complexos
+### Adicionado
+- Suporte a `ReceiveMode` em componentes de consumo do Azure Service Bus (`Nuuvify.CommonPack.AzureServiceBus` e `Nuuvify.CommonPack.BackgroundService`).
+- Suporte a CNPJ alfanumérico no pacote `Nuuvify.CommonPack.Domain`.
 
-### 🔧 Alterado
-- **ExpressionFactory** refatorado para suportar propriedades aninhadas de múltiplos níveis
-- **FiltersExtensions** aprimorado com melhor tratamento de case-sensitivity
-- **Testes** reestruturados com gerenciamento adequado de recursos EF Core
+### Alterado
+- Geração de Id em `DomainEntity` no pacote `Nuuvify.CommonPack.Extensions` alterada para UUID orientado a banco de dados (UUID v7).
+- Fluxo de processamento de mensagens ajustado para evitar operações de settlement (`Complete`, `Abandon`, `DeadLetter`) quando `ReceiveMode` for `ReceiveAndDelete`.
+- Scripts e organização de execução de testes revisados para melhorar seleção por traits e execução local/CI.
 
-### 🐛 Corrigido
-- **ObjectDisposedException** em testes com contextos EF Core
-- **Gerenciamento de ciclo de vida** de DbContext e UnitOfWork nos testes
-- **Memory leaks** em fixtures de teste
+### Corrigido
+- Tratamento de exceções em `ReceiveAndDelete` ajustado para evitar falhas secundárias ao processar mensagens já removidas da fila.
+- Validação do CNPJ reforçada para rejeitar entradas inválidas (formato, tamanho e repetição total de caracteres).
+
+### Removido
+
+### Segurança
+
+### Performance
+- Adoção de UUID v7 em `DomainEntity` para melhor ordenação de inserções e menor probabilidade de page split em banco de dados.
+
+### Documentação
+- Padronização dos `CHANGELOG.md` dos pacotes e atualização dos changelogs de `Domain`, `AzureServiceBus`, `BackgroundService` e `Extensions` com alterações recentes.
+- Atualização de documentação de mantenedores e contribuição (onboarding, setup e processo de release).
 
 ## [3.0.0] - 2025-11-01
 
