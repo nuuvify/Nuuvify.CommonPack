@@ -1,4 +1,4 @@
-﻿namespace Nuuvify.CommonPack.Email.xTest;
+namespace Nuuvify.CommonPack.Email.xTest;
 
 [Collection(nameof(EmailDataCollection))]
 public class EmailTests
@@ -39,6 +39,7 @@ public class EmailTests
     }
 
     [Fact]
+    [Trait("Category", "Unit")]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
     public async Task EmailComRemetenteNuloInvalido()
     {
@@ -63,6 +64,7 @@ public class EmailTests
     }
 
     [Fact]
+    [Trait("Category", "Unit")]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
     public async Task EmailComEnderecoDoDestinatarioNuloDeveSerInvalido()
     {
@@ -87,6 +89,7 @@ public class EmailTests
     }
 
     [Fact]
+    [Trait("Category", "Unit")]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
     public async Task EnviarEmailSemAnexoIncorreto()
     {
@@ -110,6 +113,7 @@ public class EmailTests
     }
 
     [ServerTestFact]
+    [Trait("Category", "Integration")]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
     public async Task EnviarEmailSemAnexoCorrreto()
     {
@@ -131,6 +135,7 @@ public class EmailTests
     }
 
     [Fact]
+    [Trait("Category", "Unit")]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
     public async Task EmailComVariosDestinatariosConcatenadosIncorreto()
     {
@@ -152,6 +157,7 @@ public class EmailTests
     }
 
     [ServerTestFact]
+    [Trait("Category", "Integration")]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
     public async Task EmailComVariosDestinatariosERemetentesConcatenadosCorreto()
     {
@@ -173,6 +179,7 @@ public class EmailTests
     }
 
     [Fact]
+    [Trait("Category", "Unit")]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
     public async Task EmailComVariosDestinatariosERemetentesConcatenadosIncorreto()
     {
@@ -199,6 +206,7 @@ public class EmailTests
     }
 
     [Fact]
+    [Trait("Category", "Unit")]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
     public async Task EmailComVariosDestinatariosENenhumRemetenteConcatenadosIncorreto()
     {
@@ -224,6 +232,7 @@ public class EmailTests
     }
 
     [Fact]
+    [Trait("Category", "Unit")]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
     public async Task EmailSemDestinatariosENenhumRemetenteConcatenadosDeveSerInvalido()
     {
@@ -245,6 +254,7 @@ public class EmailTests
     }
 
     [Fact]
+    [Trait("Category", "Unit")]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
     public async Task EmailComHostNuloDeveSerInvalido()
     {
@@ -269,6 +279,7 @@ public class EmailTests
     }
 
     [Fact]
+    [Trait("Category", "Unit")]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
     public async Task EmailComHostIncorretoDeveGerarException()
     {
@@ -303,3 +314,5 @@ public class EmailTests
     }
 
 }
+
+

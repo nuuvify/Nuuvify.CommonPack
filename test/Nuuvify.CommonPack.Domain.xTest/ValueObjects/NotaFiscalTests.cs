@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using Nuuvify.CommonPack.Domain.ValueObjects;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using Xunit;
 
 namespace Nuuvify.CommonPack.Domain.xTest.ValueObjects;
 
+[Trait("Category", "Unit")]
 public class NotaFiscalTests
 {
     [Theory]
@@ -50,3 +51,5 @@ public class NotaFiscalTests
     }
 
 }
+
+

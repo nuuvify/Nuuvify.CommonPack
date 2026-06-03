@@ -3,7 +3,7 @@
 
     <PropertyGroup>
         <!-- Override default target framework -->
-        <TargetFramework>netstandard2.1</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
 
         <!-- Project Specific Configuration -->
         <RootNamespace>Nuuvify.CommonPack.Domain</RootNamespace>
@@ -25,6 +25,7 @@
     <ItemGroup>
         <PackageReference Include="AutoMapper" />
         <PackageReference Include="MediatR" />
+        <PackageReference Include="UUIDNext" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,4 +1,4 @@
-﻿namespace Nuuvify.CommonPack.Email.xTest;
+namespace Nuuvify.CommonPack.Email.xTest;
 
 [Collection(nameof(EmailDataCollection))]
 public class EmailTemplateTests
@@ -45,6 +45,7 @@ public class EmailTemplateTests
     }
 
     [Fact]
+    [Trait("Category", "Unit")]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
     public async Task EnviaEmailComTemplateComAnexoMocado()
     {
@@ -87,6 +88,7 @@ public class EmailTemplateTests
     }
 
     [LocalTestFact]
+    [Trait("Category", "Integration")]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
     public async Task EnviaEmailComTemplateComAnexoReal()
     {
@@ -143,6 +145,7 @@ public class EmailTemplateTests
     }
 
     [LocalTestFact]
+    [Trait("Category", "Integration")]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
     public async Task EnviaEmailComTemplateStreamComAnexoReal()
     {
@@ -199,3 +202,5 @@ public class EmailTemplateTests
     }
 
 }
+
+
