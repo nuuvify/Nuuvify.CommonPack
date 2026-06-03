@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Script para executar testes de unidade e gerar relatório de cobertura de código
 .DESCRIPTION
@@ -11,6 +11,8 @@
     Caminho para salvar o relatório de cobertura (padrão: .\TestResults\Coverage)
 .PARAMETER Filter
     Filtro para executar apenas testes específicos (opcional)
+.PARAMETER TestCategory
+    Categoria de testes a executar (All, Unit ou Integration)
 .PARAMETER NoBuild
     Se especificado, não executa o build antes dos testes
 .PARAMETER Verbosity
@@ -44,6 +46,12 @@
     .\Test-UnitExecute.ps1 -Filter "CBL.MqClient.Domain.Tests" -Verbosity detailed
     Executa apenas testes do projeto Domain com output detalhado
 .EXAMPLE
+    .\Test-UnitExecute.ps1 -TestCategory Unit
+    Executa apenas testes com Trait Category=Unit
+.EXAMPLE
+    .\Test-UnitExecute.ps1 -TestCategory Integration
+    Executa apenas testes com Trait Category=Integration
+.EXAMPLE
     .\Test-UnitExecute.ps1 -NoBuild
     Executa testes sem fazer rebuild do projeto
 .EXAMPLE
@@ -60,6 +68,7 @@ param (
                 $PSDefaultParameterValues.Remove("*:Configuration")
                 $PSDefaultParameterValues.Remove("*:OutputPath")
                 $PSDefaultParameterValues.Remove("*:Filter")
+                $PSDefaultParameterValues.Remove("*:TestCategory")
                 $PSDefaultParameterValues.Remove("*:Verbosity")
                 $PSDefaultParameterValues.Remove("*:MinimumCoverage")
                 $PSDefaultParameterValues.Remove("*:Clean")
@@ -68,6 +77,7 @@ param (
                 $PSDefaultParameterValues.Add("*:Configuration", "Debug")
                 $PSDefaultParameterValues.Add("*:OutputPath", ".\TestResults\Coverage")
                 $PSDefaultParameterValues.Add("*:Filter", "")
+                $PSDefaultParameterValues.Add("*:TestCategory", "All")
                 $PSDefaultParameterValues.Add("*:Verbosity", "normal")
                 $PSDefaultParameterValues.Add("*:MinimumCoverage", 95)
                 $PSDefaultParameterValues.Add("*:Clean", $true)
@@ -88,20 +98,24 @@ param (
     [string]$Filter = "",
 
     [Parameter(Position = 4)]
-    [switch]$NoBuild,
+    [ValidateSet("All", "Unit", "Integration")]
+    [string]$TestCategory = "Unit",
 
     [Parameter(Position = 5)]
+    [switch]$NoBuild,
+
+    [Parameter(Position = 6)]
     [ValidateSet("quiet", "minimal", "normal", "detailed", "diagnostic")]
     [string]$Verbosity = "normal",
 
-    [Parameter(Position = 6)]
+    [Parameter(Position = 7)]
     [ValidateRange(0, 100)]
     [int]$MinimumCoverage = 95,
 
-    [Parameter(Position = 7)]
+    [Parameter(Position = 8)]
     [bool]$Clean = $true,
 
-    [Parameter(Position = 8)]
+    [Parameter(Position = 9)]
     [switch]$RecreateTestResults
 )
 
@@ -228,6 +242,7 @@ else {
 Write-ColorOutput "Diretório do projeto: $projectRoot" "Cyan"
 Write-ColorOutput "Solution: $($solutionFiles | Where-Object { $_.FullName -eq $solutionFile } | Select-Object -ExpandProperty Name)" "Cyan"
 Write-ColorOutput "Configuração: $Configuration" "Cyan"
+Write-ColorOutput "Categoria de teste: $TestCategory" "Cyan"
 Write-ColorOutput "Cobertura mínima: $MinimumCoverage%" "Cyan"
 Write-Host ""
 
@@ -319,18 +334,36 @@ if ($NoBuild) {
     $testCommand += " --no-build"
 }
 
-if ($Filter) {
-    $testCommand += " --filter `"$Filter`""
+$effectiveFilter = $Filter
+
+$categoryFilter = $null
+switch ($TestCategory) {
+    "Unit" { $categoryFilter = 'Category=Unit' }
+    "Integration" { $categoryFilter = 'Category=Integration' }
+    default { $categoryFilter = $null }
+}
+
+if (-not [string]::IsNullOrWhiteSpace($categoryFilter)) {
+    if ([string]::IsNullOrWhiteSpace($effectiveFilter)) {
+        $effectiveFilter = $categoryFilter
+    }
+    else {
+        $effectiveFilter = "($effectiveFilter)&($categoryFilter)"
+    }
+}
+
+if (-not [string]::IsNullOrWhiteSpace($effectiveFilter)) {
+    $testCommand += " --filter `"$effectiveFilter`""
 }
 
 # Adicionar coleta de cobertura
 $coverageFile = Join-Path $fullOutputPath "coverage.cobertura.xml"
 $testCommand += " --collect:`"XPlat Code Coverage`""
 $testCommand += " --results-directory `"$fullOutputPath`""
-$testCommand += " --settings `"$(Join-Path $projectRoot 'test.runsettings')`""
+$testCommand += " --settings `"$(Join-Path $projectRoot 'test.runsettings.xml')`""
 
 Write-ColorOutput "════════════════════════════════════════════════════════════════" "Cyan"
-Write-ColorOutput "Executando Testes de Unidade..." "Cyan"
+Write-ColorOutput "Executando Testes..." "Cyan"
 Write-ColorOutput "════════════════════════════════════════════════════════════════" "Cyan"
 Write-Host ""
 
@@ -451,26 +484,26 @@ if (Test-Path $tempLogFile) {
     }
 
     # Padrões para capturar estatísticas em português (formato completo)
-    if ($outputString -match "Aprovado!\s*-\s*Com falha:\s*(\d+),\s*Aprovado:\s*(\d+),\s*Ignorado:\s*(\d+),\s*Total:\s*(\d+)") {
+    if ($outputString -match "Aprovado!\s*[–-]\s*Com falha:\s*(\d+),\s*Aprovado:\s*(\d+),\s*Ignorado:\s*(\d+),\s*Total:\s*(\d+)") {
         $failedTests = [int]$matches[1]
         $passedTests = [int]$matches[2]
         $skippedTests = [int]$matches[3]
         $totalTests = [int]$matches[4]
     }
-    elseif ($outputString -match "Com falha!\s*-\s*Com falha:\s*(\d+),\s*Aprovado:\s*(\d+),\s*Ignorado:\s*(\d+),\s*Total:\s*(\d+)") {
+    elseif ($outputString -match "Com falha!\s*[–-]\s*Com falha:\s*(\d+),\s*Aprovado:\s*(\d+),\s*Ignorado:\s*(\d+),\s*Total:\s*(\d+)") {
         $failedTests = [int]$matches[1]
         $passedTests = [int]$matches[2]
         $skippedTests = [int]$matches[3]
         $totalTests = [int]$matches[4]
     }
     # Padrões para capturar estatísticas em inglês (formato completo)
-    elseif ($outputString -match "Passed!\s*-\s*Failed:\s*(\d+),\s*Passed:\s*(\d+),\s*Skipped:\s*(\d+),\s*Total:\s*(\d+)") {
+    elseif ($outputString -match "Passed!\s*[–-]\s*Failed:\s*(\d+),\s*Passed:\s*(\d+),\s*Skipped:\s*(\d+),\s*Total:\s*(\d+)") {
         $failedTests = [int]$matches[1]
         $passedTests = [int]$matches[2]
         $skippedTests = [int]$matches[3]
         $totalTests = [int]$matches[4]
     }
-    elseif ($outputString -match "Failed!\s*-\s*Failed:\s*(\d+),\s*Passed:\s*(\d+),\s*Skipped:\s*(\d+),\s*Total:\s*(\d+)") {
+    elseif ($outputString -match "Failed!\s*[–-]\s*Failed:\s*(\d+),\s*Passed:\s*(\d+),\s*Skipped:\s*(\d+),\s*Total:\s*(\d+)") {
         $failedTests = [int]$matches[1]
         $passedTests = [int]$matches[2]
         $skippedTests = [int]$matches[3]
