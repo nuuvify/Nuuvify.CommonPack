@@ -21,6 +21,9 @@
     Percentual mínimo de cobertura aceitável (padrão: 95)
 .PARAMETER Clean
     Se especificado, limpa o diretório de output antes da execução (padrão: $true)
+.PARAMETER OpenReport
+    Abre o relatório de cobertura no navegador ao final da execução.
+    Padrão: $true. Quando executado sem console interativo (CI, pipelines), o relatório não é aberto independentemente deste parâmetro.
 .PARAMETER RecreateTestResults
     Se especificado, remove e recria completamente a pasta TestResults do script (test-automation\TestResults)
     antes de qualquer outra operação. Use quando houver arquivos corrompidos ou travados.
@@ -57,6 +60,9 @@
 .EXAMPLE
     .\Test-UnitExecute.ps1 -RecreateTestResults
     Remove e recria completamente a pasta TestResults antes de executar os testes
+.EXAMPLE
+    .\Test-UnitExecute.ps1 -OpenReport:$false
+    Executa os testes sem abrir o relatório no navegador ao final
 #>
 
 [CmdletBinding()]
@@ -116,7 +122,10 @@ param (
     [bool]$Clean = $true,
 
     [Parameter(Position = 9)]
-    [switch]$RecreateTestResults
+    [switch]$RecreateTestResults,
+
+    [Parameter(Position = 10)]
+    [bool]$OpenReport = $true
 )
 
 # Verificar se --help foi passado como argumento
@@ -698,8 +707,8 @@ Write-Host ""
 # Abrir relatório no navegador
 $indexFile = Join-Path $reportPath "index.html"
 if (Test-Path $indexFile) {
-    $openReport = Read-Host "Deseja abrir o relatório no navegador? (S/N)"
-    if ($openReport -eq "S" -or $openReport -eq "s") {
+    $hasInteractiveConsole = [Environment]::UserInteractive -and -not [Console]::IsInputRedirected
+    if ($OpenReport -and $hasInteractiveConsole) {
         Start-Process $indexFile
     }
 }
