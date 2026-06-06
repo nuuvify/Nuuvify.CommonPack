@@ -6,6 +6,7 @@ using Xunit;
 
 namespace Nuuvify.CommonPack.Domain.xTest;
 
+[Trait("Category", "Unit")]
 public class CollectionsGenericsIsNullTests
 {
     [Fact]
@@ -139,3 +140,5 @@ public class CollectionsGenericsIsNullTests
     }
 
 }
+
+

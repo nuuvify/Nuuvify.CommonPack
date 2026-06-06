@@ -14,6 +14,7 @@ using Xunit;
 
 namespace Nuuvify.CommonPack.Middleware.xTest;
 
+[Trait("Category", "Unit")]
 public class ApiKeyAttributeTests
 {
 
@@ -226,3 +227,5 @@ public class ApiKeyAttributeTests
     }
 
 }
+
+

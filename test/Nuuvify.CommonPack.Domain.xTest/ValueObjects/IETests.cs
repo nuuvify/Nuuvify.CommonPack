@@ -1,10 +1,11 @@
-﻿using Nuuvify.CommonPack.Domain.ValueObjects;
+using Nuuvify.CommonPack.Domain.ValueObjects;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using System.Linq;
 using Xunit;
 
 namespace Nuuvify.CommonPack.Domain.xTest.ValueObjects;
 
+[Trait("Category", "Unit")]
 public class IETests
 {
     [Theory]
@@ -62,3 +63,5 @@ public class IETests
         Assert.Equal(_ie.UF, uf.ToUpper());
     }
 }
+
+

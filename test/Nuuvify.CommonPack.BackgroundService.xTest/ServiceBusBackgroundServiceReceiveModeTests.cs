@@ -283,7 +283,7 @@ public sealed class ServiceBusBackgroundServiceReceiveModeTests : IDisposable
     }
 
     [Fact]
-    public async Task HandleServiceBusCommunicationException_ReceiveAndDelete_ShouldThrowWithoutDeadLetter()
+    public async Task HandleServiceBusCommunicationException_ReceiveAndDelete_ShouldNotThrowWithoutDeadLetter()
     {
         // Arrange
         using var service = new TestServiceBusBackgroundService(_loggerMock.Object, _configurationMock.Object, _requestConfiguration);
@@ -301,11 +301,9 @@ public sealed class ServiceBusBackgroundServiceReceiveModeTests : IDisposable
         var args = CreateProcessMessageEventArgs(message);
         var ex = new ServiceBusException("Communication error", ServiceBusFailureReason.ServiceCommunicationProblem);
 
-        // Act & Assert - Deve lançar InvalidOperationException mas sem chamar DeadLetter
-        var exception = await Should.ThrowAsync<InvalidOperationException>(
+        // Act & Assert - Não deve lançar exceção no modo ReceiveAndDelete
+        await Should.NotThrowAsync(
             () => service.TestHandleServiceBusCommunicationExceptionAsync(args, ex, CancellationToken.None));
-
-        exception.Message.ShouldContain("Erro de comunicação no Service Bus");
     }
 
     [Fact]
@@ -356,7 +354,7 @@ public sealed class ServiceBusBackgroundServiceReceiveModeTests : IDisposable
     }
 
     [Fact]
-    public async Task HandleGenericException_ReceiveAndDelete_ShouldThrowWithoutDeadLetter()
+    public async Task HandleGenericException_ReceiveAndDelete_ShouldNotThrowWithoutDeadLetter()
     {
         // Arrange
         using var service = new TestServiceBusBackgroundService(_loggerMock.Object, _configurationMock.Object, _requestConfiguration);
@@ -374,11 +372,9 @@ public sealed class ServiceBusBackgroundServiceReceiveModeTests : IDisposable
         var args = CreateProcessMessageEventArgs(message);
         var ex = new InvalidOperationException("Generic test error");
 
-        // Act & Assert - Deve lançar InvalidOperationException mas sem chamar DeadLetter
-        var exception = await Should.ThrowAsync<InvalidOperationException>(
+        // Act & Assert - Não deve lançar exceção no modo ReceiveAndDelete
+        await Should.NotThrowAsync(
             () => service.TestHandleGenericExceptionAsync(args, ex, CancellationToken.None));
-
-        exception.Message.ShouldContain("Erro não tratado durante processamento da mensagem");
     }
 
     #endregion
@@ -386,7 +382,7 @@ public sealed class ServiceBusBackgroundServiceReceiveModeTests : IDisposable
     #region HandleMessageAsync - Exception in ReceiveAndDelete Tests
 
     [Fact]
-    public async Task HandleMessageAsync_ReceiveAndDelete_WhenExecuteThrows_ShouldThrowWithoutDeadLetter()
+    public async Task HandleMessageAsync_ReceiveAndDelete_WhenExecuteThrows_ShouldNotThrowWithoutDeadLetter()
     {
         // Arrange
         using var service = new TestServiceBusBackgroundService(_loggerMock.Object, _configurationMock.Object, _requestConfiguration);
@@ -404,11 +400,9 @@ public sealed class ServiceBusBackgroundServiceReceiveModeTests : IDisposable
 
         var args = CreateProcessMessageEventArgs(message);
 
-        // Act & Assert - Deve propagar a exceção sem tentar DeadLetter
-        var exception = await Should.ThrowAsync<InvalidOperationException>(
+        // Act & Assert - Não deve lançar exceção no modo ReceiveAndDelete
+        await Should.NotThrowAsync(
             () => service.TestHandleMessageAsync(args, CancellationToken.None));
-
-        exception.Message.ShouldContain("Erro não tratado durante processamento da mensagem");
     }
 
     [Fact]

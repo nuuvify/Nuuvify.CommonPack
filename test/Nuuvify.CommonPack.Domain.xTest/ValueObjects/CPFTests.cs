@@ -1,9 +1,10 @@
-﻿using Nuuvify.CommonPack.Domain.ValueObjects;
+using Nuuvify.CommonPack.Domain.ValueObjects;
 using System.Linq;
 using Xunit;
 
 namespace Nuuvify.CommonPack.Domain.xTest.ValueObjects;
 
+[Trait("Category", "Unit")]
 public class CpfTests
 {
 
@@ -56,3 +57,5 @@ public class CpfTests
         Assert.Equal(cpfFormatado, _cpf.Mascara());
     }
 }
+
+
