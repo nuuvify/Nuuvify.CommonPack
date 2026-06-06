@@ -30,6 +30,52 @@ public static class UnitOfWorkSetup
     }
 
     /// <summary>
+    /// Registers an opt-in factory that creates short-lived <see cref="IUnitOfWork{TContext}"/> instances.
+    /// </summary>
+    /// <typeparam name="TContext">The type of the db context.</typeparam>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add services to.</param>
+    /// <returns>The same service collection so that multiple calls can be chained.</returns>
+    /// <remarks>
+    /// This registration does not replace <see cref="AddUnitOfWork{TContext}(IServiceCollection)"/> behavior.
+    /// It adds an explicit opt-in path for short-lived units of work backed by <see cref="IDbContextFactory{TContext}"/>.
+    /// </remarks>
+    public static IServiceCollection AddUnitOfWorkFactory<TContext>(this IServiceCollection services)
+        where TContext : DbContext
+    {
+        _ = services.AddScoped<IUnitOfWorkFactory<TContext>, UnitOfWorkFactory<TContext>>();
+
+        return services;
+    }
+
+    /// <summary>
+    /// Registers an opt-in factory that creates short-lived <see cref="DbContext"/> instances.
+    /// </summary>
+    /// <typeparam name="TContext">The type of the db context.</typeparam>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add services to.</param>
+    /// <returns>The same service collection so that multiple calls can be chained.</returns>
+    public static IServiceCollection AddShortLivedDbContextFactory<TContext>(this IServiceCollection services)
+        where TContext : DbContext
+    {
+        _ = services.AddScoped<IShortLivedDbContextFactory<TContext>, ShortLivedDbContextFactory<TContext>>();
+
+        return services;
+    }
+
+    /// <summary>
+    /// Registers an opt-in factory that creates short-lived db context instances for worker/background flows.
+    /// </summary>
+    /// <typeparam name="TContext">The type of the db context.</typeparam>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add services to.</param>
+    /// <returns>The same service collection so that multiple calls can be chained.</returns>
+    public static IServiceCollection AddWorkerDbContextFactory<TContext>(this IServiceCollection services)
+        where TContext : DbContext
+    {
+        _ = services.AddScoped<IWorkerDbContextFactory<TContext>, WorkerDbContextFactory<TContext>>();
+
+        return services;
+    }
+
+    /// <summary>
     /// Registers the unit of work given context as a service in the <see cref="IServiceCollection"/>.
     /// </summary>
     /// <typeparam name="TContext1">The type of the db context.</typeparam>

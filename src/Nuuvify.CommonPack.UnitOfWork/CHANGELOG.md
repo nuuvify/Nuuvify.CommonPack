@@ -8,14 +8,30 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 ## [Não Lançado]
 
 ### Adicionado
+- Nova implementação `ShortLivedDbContextFactory<TContext>` para criação de `DbContext` curto por operação, com aplicação opcional de auditoria no contexto criado.
+- Nova extensão de DI `AddShortLivedDbContextFactory<TContext>()` para registrar a factory genérica de contexto curto.
+- Nova implementação `WorkerDbContextFactory<TContext>` para cenários de worker/background e extensão de DI `AddWorkerDbContextFactory<TContext>()`.
 
 ### Alterado
+- Documentação de migração ampliada para cenários de worker/background com contexto curto por operação.
 
 ### Corrigido
 
 ### Removido
 
 ### Segurança
+
+### ⚠️ Depreciação (Controlada)
+
+- Deprecado o padrão de construtor de repository concreto que recebe simultaneamente `DbContext` e `IDbContextFactory<TContext>`.
+- O caminho legado permanece compatível nesta versão para transição gradual.
+- A remoção do padrão legado está planejada para major version futura.
+
+### 🧭 Guia de Migração
+
+- Em repository concreto, preferir construtor orientado a `IUnitOfWork<TContext>`.
+- Inicializar base com `unitOfWork.DbContext`.
+- Para contexto curto por operação, usar factory dedicada e aplicar auditoria (`UsernameContext`/`UserIdContext`) no contexto criado.
 
 ## [Sem versão registrada] - 2025-10-30
 
