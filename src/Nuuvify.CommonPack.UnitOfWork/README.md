@@ -166,6 +166,15 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Registrar Unit of Work
 builder.Services.AddUnitOfWork<AppDbContext>();
 
+// Opcional: habilitar factory para UnitOfWork curto por operação
+builder.Services.AddUnitOfWorkFactory<AppDbContext>();
+
+// Opcional: habilitar factory para DbContext curto por operação
+builder.Services.AddShortLivedDbContextFactory<AppDbContext>();
+
+// Opcional: habilitar factory para cenários de worker/background
+builder.Services.AddWorkerDbContextFactory<AppDbContext>();
+
 // Ou com configurações customizadas
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork<AppDbContext>>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -180,6 +189,93 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
+```
+
+### 2.1 UnitOfWork Curto com Factory (Opt-in)
+
+Quando o fluxo exige contexto EF curto por operação (ex.: worker/background processing), use a factory opt-in sem alterar o contrato atual de `IUnitOfWork<TContext>`.
+
+```csharp
+using Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
+
+public sealed class WorkerProcessor
+{
+    private readonly IUnitOfWorkFactory<AppDbContext> _unitOfWorkFactory;
+
+    public WorkerProcessor(IUnitOfWorkFactory<AppDbContext> unitOfWorkFactory)
+    {
+        _unitOfWorkFactory = unitOfWorkFactory;
+    }
+
+    public async Task ProcessAsync(CancellationToken cancellationToken)
+    {
+        using var unitOfWork = await _unitOfWorkFactory.CreateAsync(
+            usernameContext: "worker-user",
+            userIdContext: "worker-id",
+            cancellationToken: cancellationToken);
+
+        var repository = new Repository<Product>(unitOfWork.DbContext, unitOfWork);
+        // ... operações no contexto curto
+        await unitOfWork.SaveChangesAsync(cancellationToken: cancellationToken);
+    }
+}
+```
+
+### 2.2 DbContext Curto com Factory Genérica (Opt-in)
+
+Quando o fluxo precisa apenas de um contexto EF curto por operação (sem `IUnitOfWork<TContext>`), use a factory genérica.
+
+```csharp
+using Nuuvify.CommonPack.UnitOfWork.Abstraction.Interfaces;
+
+public sealed class WorkerProcessor
+{
+    private readonly IShortLivedDbContextFactory<AppDbContext> _dbContextFactory;
+
+    public WorkerProcessor(IShortLivedDbContextFactory<AppDbContext> dbContextFactory)
+    {
+        _dbContextFactory = dbContextFactory;
+    }
+
+    public async Task ProcessAsync(CancellationToken cancellationToken)
+    {
+        await using var dbContext = await _dbContextFactory.CreateAsync(
+            usernameContext: "worker-user",
+            userIdContext: "worker-id",
+            cancellationToken: cancellationToken);
+
+        // ... operações no contexto curto
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
+}
+```
+
+### 2.3 Deprecação Controlada de Construtor de Repository
+
+- Está deprecado o padrão de construtor concreto que recebe ao mesmo tempo `DbContext` e `IDbContextFactory<TContext>`.
+- O padrão legado continua funcional nesta versão para garantir compatibilidade durante a migração.
+- A remoção definitiva do padrão legado está planejada para major version futura.
+
+#### Migração Recomendada
+
+1. Repository concreto deve receber `IUnitOfWork<TContext>` no construtor.
+2. A base deve ser inicializada com `unitOfWork.DbContext`.
+3. Para fluxo de worker/background com contexto curto por operação, criar factory dedicada para o provider/contexto.
+4. Aplicar auditoria (`UsernameContext` e `UserIdContext`) no contexto curto criado.
+
+```csharp
+public class PedidoRepository : BaseRepository<Pedido>, IPedidoRepository
+{
+    public PedidoRepository(
+        IUnitOfWork<AppDbContext> unitOfWork,
+        IUserAuthenticated userAuthenticated,
+        IMapper mapper,
+        IOptions<RequestConfiguration> requestConfiguration,
+        IDistributedCache cache)
+        : base(unitOfWork.DbContext, unitOfWork, userAuthenticated, mapper, requestConfiguration, cache)
+    {
+    }
+}
 ```
 
 ### 3. Configurar AutoHistory (Opcional)
