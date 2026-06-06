@@ -3,6 +3,7 @@ using Xunit;
 
 namespace Nuuvify.CommonPack.Domain.xTest;
 
+[Trait("Category", "Unit")]
 public class DomainEntityTests
 {
 
@@ -49,4 +50,20 @@ public class DomainEntityTests
 
     }
 
+    [Fact]
+    [Trait("CommonPack.Domain", nameof(DomainEntityTests))]
+    public void DomainEntity_ComObjetosEmOrdemPeloId_DevemEstarNaMesmaOrdem()
+    {
+
+        List<Cliente> clientes = [new Cliente(1, "Lincoln"), new Cliente(2, "Lincoln"), new Cliente(3, "Lincoln"), new Cliente(4, "Lincoln"), new Cliente(5, "Lincoln")];
+
+        var listaOrdenada = clientes.OrderBy(c => c.Id).ToList();
+
+        // Verificar se a ordem dos objetos é igual, mesmo que os IDs sejam iguais
+        Assert.Equal(clientes, listaOrdenada);
+
+    }
+
 }
+
+

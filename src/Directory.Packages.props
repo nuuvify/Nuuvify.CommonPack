@@ -8,7 +8,6 @@
         <PackageVersion Include="Azure.Messaging.ServiceBus" Version="7.18.1" />
         <PackageVersion Include="Azure.Storage.Blobs" Version="12.22.0" />
         <PackageVersion Include="Azure.Monitor.OpenTelemetry.AspNetCore" Version="1.2.0" />
-
         <!-- Microsoft Extensions packages -->
         <PackageVersion Include="Microsoft.Extensions.Logging" Version="8.0.1" />
         <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
@@ -24,20 +23,16 @@
         <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.1" />
         <PackageVersion Include="Microsoft.Extensions.Http.Polly" Version="8.0.10" />
         <PackageVersion Include="Microsoft.Extensions.Caching.SqlServer" Version="8.0.11" />
-
         <!-- Microsoft EntityFramework packages -->
         <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="8.0.11" />
         <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.11" />
-
         <!-- Microsoft AspNetCore packages -->
         <PackageVersion Include="Microsoft.AspNetCore.Authorization" Version="8.0.11" />
         <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
         <PackageVersion Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.11" />
-
         <!-- Microsoft Identity packages -->
         <PackageVersion Include="Microsoft.IdentityModel.Tokens" Version="8.2.1" />
         <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.2.1" />
-
         <!-- System packages -->
         <PackageVersion Include="System.ComponentModel.Annotations" Version="5.0.0" />
         <PackageVersion Include="System.Runtime.Extensions" Version="4.3.1" />
@@ -46,13 +41,11 @@
         <PackageVersion Include="Microsoft.CSharp" Version="4.7.0" />
         <PackageVersion Include="System.Security.AccessControl" Version="6.0.1" />
         <PackageVersion Include="System.Security.Principal.Windows" Version="5.0.0" />
-
         <!-- OpenAPI / Swagger packages -->
         <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
         <PackageVersion Include="Swashbuckle.AspNetCore" Version="7.2.0" />
         <PackageVersion Include="Swashbuckle.AspNetCore.Annotations" Version="7.2.0" />
         <PackageVersion Include="Swashbuckle.AspNetCore.Filters" Version="8.0.2" />
-
         <!-- HealthCheck packages -->
         <PackageVersion Include="AspNetCore.HealthChecks.UI" Version="8.0.2" />
         <PackageVersion Include="AspnetCore.HealthChecks.UI.Client" Version="8.0.1" />
@@ -60,17 +53,15 @@
         <PackageVersion Include="AspNetCore.HealthChecks.UI.SqlServer.Storage" Version="8.0.1" />
         <PackageVersion Include="AspNetCore.HealthChecks.AzureKeyVault" Version="8.0.1" />
         <PackageVersion Include="AspNetCore.HealthChecks.Azure.Storage.Blobs" Version="8.0.1" />
-
         <!-- Email packages -->
         <PackageVersion Include="MailKit" Version="4.8.0" />
-
         <!-- Database packages -->
         <PackageVersion Include="Oracle.ManagedDataAccess.Core" Version="23.6.1" />
         <PackageVersion Include="Net.IBM.Data.Db2" Version="8.0.0.400" />
         <PackageVersion Include="Net.IBM.Data.Db2-lnx" Version="8.0.0.400" />
-
         <!-- Other packages -->
-        <PackageVersion Include="AutoMapper" Version="12.0.1" />
+        <PackageVersion Include="AutoMapper" Version="13.0.1" />
         <PackageVersion Include="MediatR" Version="12.4.1" />
+        <PackageVersion Include="UUIDNext" Version="4.2.4" />
     </ItemGroup>
 </Project>

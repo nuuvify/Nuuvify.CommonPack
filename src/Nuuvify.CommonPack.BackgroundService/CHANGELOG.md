@@ -8,10 +8,14 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 ## [Não Lançado]
 
 ### Adicionado
+- Suporte a `ReceiveMode` no `ServiceBusBackgroundService`, com identificação explícita do modo `ReceiveAndDelete` para classes derivadas.
 
 ### Alterado
+- Fluxo de sucesso ajustado para não executar `CompleteMessageAsync` quando o processor estiver em `ReceiveAndDelete`.
+- Tratamento de exceções e retorno de regra de negócio ajustado para não tentar `DeadLetter`/`Abandon` em modos sem lock da mensagem.
 
 ### Corrigido
+- Corrigido o fluxo de tratamento para mensagens já removidas em `ReceiveAndDelete`, evitando exceções secundárias durante o error handling.
 
 ### Removido
 
