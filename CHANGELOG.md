@@ -10,6 +10,8 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 ### Adicionado
 - Suporte a `ReceiveMode` em componentes de consumo do Azure Service Bus (`Nuuvify.CommonPack.AzureServiceBus` e `Nuuvify.CommonPack.BackgroundService`).
 - Suporte a CNPJ alfanumérico no pacote `Nuuvify.CommonPack.Domain`.
+- Suporte opt-in a `IUnitOfWorkFactory<TContext>` no pacote `Nuuvify.CommonPack.UnitOfWork` para criação de `UnitOfWork` curto por operação com `IDbContextFactory<TContext>`.
+- Suporte opt-in a `IShortLivedDbContextFactory<TContext>` e `IWorkerDbContextFactory<TContext>` no pacote `Nuuvify.CommonPack.UnitOfWork` para criação de `DbContext` curto com auditoria em cenários de worker/background.
 
 ### Alterado
 - Geração de Id em `DomainEntity` no pacote `Nuuvify.CommonPack.Extensions` alterada para UUID orientado a banco de dados (UUID v7).
