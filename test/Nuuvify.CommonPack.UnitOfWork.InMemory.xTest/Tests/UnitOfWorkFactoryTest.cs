@@ -8,6 +8,7 @@ using Xunit;
 namespace Nuuvify.CommonPack.UnitOfWork.InMemory.xTest.Tests;
 
 [Trait("Category", "Unit")]
+[Collection("DbContextExtensionsStaticState")]
 public sealed class UnitOfWorkFactoryTest
 {
     [Fact]
