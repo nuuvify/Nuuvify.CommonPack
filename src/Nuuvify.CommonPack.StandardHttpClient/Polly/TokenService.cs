@@ -1,5 +1,8 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Net.Sockets;
+using System.Security.Authentication;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http;
@@ -47,6 +50,11 @@ public class TokenService : ITokenService
 
     private string GetHttpClientTokenName { get; set; }
 
+    private static string Origin([CallerMemberName] string method = "")
+    {
+        return $"{nameof(TokenService)}.{method}";
+    }
+
     public string HttpClientTokenName(string httpClientName = "CredentialApi")
     {
         GetHttpClientTokenName = string.IsNullOrWhiteSpace(httpClientName)
@@ -74,53 +82,97 @@ public class TokenService : ITokenService
         string userClaim = null,
         CancellationToken cancellationToken = default)
     {
-        var messageLog = $"{nameof(TokenService.GetNewToken)}";
+        var messageLog = Origin();
 
-        var messageBody = new
+        try
         {
-            Login = login,
-            Password = password
-        };
+            var messageBody = new
+            {
+                Login = login,
+                Password = password
+            };
 
-        var userName = _accessor?.HttpContext?.User.GetLogin();
-        userClaim ??= userName;
+            var userName = _accessor?.HttpContext?.User.GetLogin();
+            userClaim ??= userName;
 
-        _standardHttpClient.CreateClient(GetHttpClientTokenName ?? HttpClientTokenName());
-        _standardHttpClient.ResetStandardHttpClient();
+            _standardHttpClient.CreateClient(GetHttpClientTokenName ?? HttpClientTokenName());
+            _standardHttpClient.ResetStandardHttpClient();
 
-        if (!string.IsNullOrWhiteSpace(userClaim))
-            _ = _standardHttpClient.WithHeader(Constants.UserClaimHeader, userClaim);
+            if (!string.IsNullOrWhiteSpace(userClaim))
+                _ = _standardHttpClient.WithHeader(Constants.UserClaimHeader, userClaim);
 
-        _logger.LogDebug("{MessageLog} - User Claim: {UserClaim}", messageLog, userClaim);
+            _logger.LogDebug("{MessageLog} - User Claim: {UserClaim}", messageLog, userClaim);
 
-        var response = await _standardHttpClient.Post(
-            urlRoute: urlToken,
-            messageBody: messageBody,
-            cancellationToken: cancellationToken).ConfigureAwait(false);
+            var response = await _standardHttpClient.Post(
+                urlRoute: urlToken,
+                messageBody: messageBody,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        _credentialToken = ReturnClass<CredentialToken>(response);
+            _credentialToken = ReturnClass<CredentialToken>(response);
 
-        if (_credentialToken is null || string.IsNullOrWhiteSpace(_credentialToken.Token))
+            if (_credentialToken is null || string.IsNullOrWhiteSpace(_credentialToken.Token))
+            {
+                _credentialToken = new CredentialToken();
+                _credentialToken.Warnings["ResponseMessage"] = response?.ReturnMessage ?? "Token nao retornado pela API de credenciais.";
+
+                _notifications.Add(new NotificationR(Origin(), _credentialToken.Warnings["ResponseMessage"]));
+                _logger.LogWarning("{MessageLog} - Response message invalid: {ReturnCode} {ReturnMessage}", messageLog, response?.ReturnCode, response?.ReturnMessage);
+
+                return false;
+            }
+
+            var tempToken = _credentialToken.Token;
+            var tempCreated = _credentialToken.Created;
+            var tempExpire = _credentialToken.Expires;
+
+            _credentialToken.LoginId ??= login;
+            _credentialToken.Password = password;
+            _credentialToken.Expires = tempExpire;
+            _credentialToken.Created = tempCreated;
+            _credentialToken.Token = tempToken;
+
+            return true;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
-            _credentialToken = new CredentialToken();
-            _credentialToken.Warnings.Add("ResponseMessage", response.ReturnMessage);
-
-            _logger.LogWarning("{MessageLog} - Response message invalid: {ReturnCode} {ReturnMessage}", messageLog, response?.ReturnCode, response?.ReturnMessage);
-
+            throw;
+        }
+        catch (TaskCanceledException ex)
+        {
+            _notifications.Add(new NotificationR(Origin(), $"Timeout ao obter token na API de credenciais: {ex.Message}"));
+            _logger.LogError(ex, "{MessageLog} - Timeout ao obter token.", messageLog);
             return false;
         }
-
-        var tempToken = _credentialToken.Token;
-        var tempCreated = _credentialToken.Created;
-        var tempExpire = _credentialToken.Expires;
-
-        _credentialToken.LoginId ??= login;
-        _credentialToken.Password = password;
-        _credentialToken.Expires = tempExpire;
-        _credentialToken.Created = tempCreated;
-        _credentialToken.Token = tempToken;
-
-        return true;
+        catch (TimeoutException ex)
+        {
+            _notifications.Add(new NotificationR(Origin(), $"Timeout ao obter token na API de credenciais: {ex.Message}"));
+            _logger.LogError(ex, "{MessageLog} - Timeout ao obter token.", messageLog);
+            return false;
+        }
+        catch (HttpRequestException ex)
+        {
+            _notifications.Add(new NotificationR(Origin(), $"Falha HTTP ao obter token: {ex.Message}"));
+            _logger.LogError(ex, "{MessageLog} - Falha HTTP ao obter token.", messageLog);
+            return false;
+        }
+        catch (SocketException ex)
+        {
+            _notifications.Add(new NotificationR(Origin(), $"Falha de rede ao obter token: {ex.Message}"));
+            _logger.LogError(ex, "{MessageLog} - Falha de rede ao obter token.", messageLog);
+            return false;
+        }
+        catch (AuthenticationException ex)
+        {
+            _notifications.Add(new NotificationR(Origin(), $"Falha de autenticacao TLS ao obter token: {ex.Message}"));
+            _logger.LogError(ex, "{MessageLog} - Falha de autenticacao TLS ao obter token.", messageLog);
+            return false;
+        }
+        catch (JsonException ex)
+        {
+            _notifications.Add(new NotificationR(Origin(), $"Falha ao processar resposta de token: {ex.Message}"));
+            _logger.LogError(ex, "{MessageLog} - Falha ao processar resposta de token.", messageLog);
+            return false;
+        }
     }
 
     ///<inheritdoc/>
@@ -130,10 +182,9 @@ public class TokenService : ITokenService
         string userClaim = null,
         CancellationToken cancellationToken = default)
     {
-
         _notifications.Clear();
 
-        var messageLog = $"{nameof(TokenService.GetToken)}";
+        var messageLog = Origin();
         _logger.LogDebug("{MessageLog} - Inicio", messageLog);
 
         if (string.IsNullOrWhiteSpace(login))
@@ -157,14 +208,29 @@ public class TokenService : ITokenService
             string.IsNullOrWhiteSpace(urlLogin) ||
             string.IsNullOrWhiteSpace(urlToken))
         {
-            _notifications.Add(new NotificationR(nameof(GetToken), "Algum dos dados a seguir não deveria estar branco: login ou password ou urlLogin ou urlToken"));
+            _notifications.Add(new NotificationR(Origin(), "Algum dos dados a seguir não deveria estar branco: login ou password ou urlLogin ou urlToken"));
 
             _logger.LogWarning("{MessageLog} - Algum dos dados a seguir não deveria estar branco: login ou password ou urlLogin ou urlToken", messageLog);
 
             return null;
         }
 
-        _ = await GetNewToken(urlToken, login, password, userClaim, cancellationToken).ConfigureAwait(false);
+        var tokenGenerated = await GetNewToken(urlToken, login, password, userClaim, cancellationToken).ConfigureAwait(false);
+
+        if (!tokenGenerated)
+        {
+            var warningMessage = _credentialToken?.Warnings.TryGetValue("ResponseMessage", out var responseMessage) == true
+                ? responseMessage
+                : "Falha ao obter token na API de credenciais.";
+
+            if (_notifications.All(n => !string.Equals(n.Property, Origin(), StringComparison.Ordinal)))
+            {
+                _notifications.Add(new NotificationR(Origin(), warningMessage));
+            }
+
+            _logger.LogWarning("{MessageLog} - Falha ao obter token: {WarningMessage}", messageLog, warningMessage);
+            return null;
+        }
 
         if (_credentialToken != null && !string.IsNullOrWhiteSpace(_credentialToken.Token))
         {
@@ -208,12 +274,17 @@ public class TokenService : ITokenService
             token = item?.Replace("bearer", "").Replace("Bearer", "").Trim();
         }
 
-        if (_accessor?.HttpContext == null) return false;
-        return _accessor.HttpContext.User.Identity.IsAuthenticated;
+        return _accessor?.HttpContext?.User?.Identity?.IsAuthenticated == true;
     }
 
     private T ReturnClass<T>(HttpStandardReturn returnResult) where T : class
     {
+        if (returnResult == null)
+        {
+            _notifications.Add(new NotificationR(Origin(), "Retorno HTTP nulo ao obter token."));
+            return (T)Convert.ChangeType(null, typeof(T), CultureInfo.InvariantCulture);
+        }
+
         _notifications.Clear();
 
         if (returnResult.Success)

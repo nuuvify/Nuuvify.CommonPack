@@ -159,6 +159,18 @@ public abstract partial class BaseStandardHttpClient
         string api,
         int jsonDataDepth = 1) where T : class
     {
+        if (standardReturn is null)
+        {
+            AddNotification(new NotificationR(
+                property: "BaseStandardHttpClient.ReturnClass",
+                message: $"Retorno HTTP nulo para a classe {typeof(T).Name}-Correlation: {_standardHttpClient.CorrelationId}",
+                aggregatorId: api,
+                type: ApplicationErrorType,
+                originNotification: null));
+
+            return (T)Convert.ChangeType(null, typeof(T), CultureInfo.InvariantCulture);
+        }
+
         if (standardReturn.Success)
         {
             var messageClean = standardReturn.GetReturnMessageWithoutRn();
@@ -226,6 +238,18 @@ public abstract partial class BaseStandardHttpClient
         string api,
         int jsonDataDepth = 1) where T : class
     {
+
+        if (standardReturn is null)
+        {
+            AddNotification(new NotificationR(
+                property: "BaseStandardHttpClient.ReturnList",
+                message: $"Retorno HTTP nulo para a classe {typeof(T).Name}-Correlation: {_standardHttpClient.CorrelationId}",
+                aggregatorId: api,
+                type: ApplicationErrorType,
+                originNotification: null));
+
+            return new List<T>();
+        }
 
         if (standardReturn.Success)
         {
