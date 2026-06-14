@@ -5,9 +5,6 @@ namespace System.Collections.Generic;
 
 public static class CustomDictionaryExtensions
 {
-
-    private static StringBuilder _query;
-
     /// <summary>
     /// QueryString não pode exceder 128 caracteres
     /// </summary>
@@ -15,24 +12,25 @@ public static class CustomDictionaryExtensions
     /// <returns></returns>
     public static string ToQueryString(this IDictionary<string, string> dic)
     {
-        _query = new StringBuilder();
-        if (_query.Capacity > 128)
+        var query = new StringBuilder(capacity: 128);
+
+        if (query.Capacity > 128)
         {
-            _query.Capacity = 128;
+            query.Capacity = 128;
         }
 
-        if (_query.Length == 0 || _query[0] != '?')
+        if (query.Length == 0 || query[0] != '?')
         {
-            _ = _query.Insert(0, '?');
+            _ = query.Insert(0, '?');
         }
 
         for (int i = 0; i < dic.Count; i++)
         {
-            _ = _query.Append(CultureInfo.InvariantCulture, $"{dic.ElementAtOrDefault(i).Key}={dic.ElementAtOrDefault(i).Value}&");
+            _ = query.Append(CultureInfo.InvariantCulture, $"{dic.ElementAtOrDefault(i).Key}={dic.ElementAtOrDefault(i).Value}&");
 
         }
 
-        return QueryString(_query.ToString());
+        return QueryString(query.ToString());
 
     }
 
