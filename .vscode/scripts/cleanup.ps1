@@ -10,6 +10,18 @@ Write-Host "Workspace: $WorkspaceRoot" -ForegroundColor Cyan
 $FoldersToRemove = @("bin", "obj", "Docs")
 $TotalRemoved = 0
 
+function Test-IsRootDocsFolder {
+    param (
+        [Parameter(Mandatory = $true)]
+        [System.IO.DirectoryInfo]$Directory,
+
+        [Parameter(Mandatory = $true)]
+        [string]$RootPath
+    )
+
+    return $Directory.Name -ieq "docs" -and $Directory.Parent.FullName -ieq $RootPath
+}
+
 foreach ($FolderName in $FoldersToRemove) {
     Write-Host "Searching for $FolderName folders..." -ForegroundColor White
 
@@ -20,6 +32,11 @@ foreach ($FolderName in $FoldersToRemove) {
 
         foreach ($Dir in $FoundFolders) {
             try {
+                if (Test-IsRootDocsFolder -Directory $Dir -RootPath $WorkspaceRoot) {
+                    Write-Host "Skipping root docs folder: $($Dir.FullName)" -ForegroundColor DarkYellow
+                    continue
+                }
+
                 Write-Host "Removing: $($Dir.FullName)" -ForegroundColor Red
                 Remove-Item -Path $Dir.FullName -Recurse -Force -ErrorAction Stop
                 $TotalRemoved++
