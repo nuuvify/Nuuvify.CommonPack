@@ -21,6 +21,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 ### Corrigido
 - Tratamento de exceções em `ReceiveAndDelete` ajustado para evitar falhas secundárias ao processar mensagens já removidas da fila.
 - Validação do CNPJ reforçada para rejeitar entradas inválidas (formato, tamanho e repetição total de caracteres).
+- `TokenService.GetToken` no pacote `Nuuvify.CommonPack.StandardHttpClient` agora resolve `ClientId`/`ClientSecret` também a partir de chaves planas com separador `--` (ex.: `AzureAdOpenID--cc--ClientId`), cobrindo cenários em que segredos do Key Vault são carregados via `AddKeyPerFile` sem tradução de `--` para `:`. Isso corrige falha de obtenção de token em workers/produção.
 
 ### Removido
 
