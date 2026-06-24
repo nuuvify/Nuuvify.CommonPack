@@ -191,11 +191,13 @@ public class TokenService : ITokenService
         {
             login = _configuration.GetSection("ApisCredentials:Username")?.Value;
             login ??= _configuration.GetSection("AzureAdOpenID:cc:ClientId")?.Value;
+            login ??= _configuration.GetSection("AzureAdOpenID--cc--ClientId")?.Value;
         }
         if (string.IsNullOrWhiteSpace(password))
         {
             password = _configuration.GetSection("ApisCredentials:Password")?.Value;
             password ??= _configuration.GetSection("AzureAdOpenID:cc:ClientSecret")?.Value;
+            password ??= _configuration.GetSection("AzureAdOpenID--cc--ClientSecret")?.Value;
         }
 
         var urlLogin = _configuration.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value;
