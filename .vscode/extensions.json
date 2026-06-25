@@ -1,0 +1,21 @@
+﻿{
+    "recommendations":  [
+                            "eamodio.gitlens",
+                            "editorconfig.editorconfig",
+                            "github.copilot-chat",
+                            "gruntfuggly.todo-tree",
+                            "humao.rest-client",
+                            "ms-azure-devops.azure-pipelines",
+                            "ms-azuretools.vscode-azureresourcegroups",
+                            "ms-azuretools.vscode-containers",
+                            "ms-azuretools.vscode-docker",
+                            "ms-dotnettools.csdevkit",
+                            "ms-dotnettools.csharp",
+                            "ms-vscode.powershell",
+                            "ms-vscode-remote.remote-containers",
+                            "redhat.vscode-xml",
+                            "redhat.vscode-yaml",
+                            "sonarsource.sonarlint-vscode",
+                            "vscode-icons-team.vscode-icons"
+                        ]
+}
