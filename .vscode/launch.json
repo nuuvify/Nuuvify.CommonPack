@@ -13,7 +13,7 @@
             "args": [],
             "cwd": "${workspaceFolder}/Nuget.CustomManagement/bin/Debug/net8.0/",
             "env": {
-                "DOTNET_ENVIRONMENT": "Development"
+                "DOTNET_ENVIRONMENT": "Production"
             },
             "windows": {
                 "console": "externalTerminal",
