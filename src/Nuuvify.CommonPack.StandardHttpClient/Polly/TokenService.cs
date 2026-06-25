@@ -203,7 +203,7 @@ public class TokenService : ITokenService
         var urlLogin = _configuration.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value;
         var urlToken = $"{urlLogin}{_configuration.GetSection("AppConfig:AppURLs:UrlLoginApiToken")?.Value}";
 
-        _logger.LogDebug("{MessageLog} - urlToken: {UrlToken}", messageLog, urlToken);
+        _logger.LogInformation("============ {MessageLog} urlToken: {UrlToken} login: {Login} ============", messageLog, urlToken, login);
 
         if (string.IsNullOrWhiteSpace(login) ||
             string.IsNullOrWhiteSpace(password) ||
