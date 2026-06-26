@@ -94,19 +94,27 @@ public class TokenService : ITokenService
 
             var userName = _accessor?.HttpContext?.User.GetLogin();
             userClaim ??= userName;
+            var logRequestConfigured = _configuration.GetSection("AppConfig:LogRequest")?.Value;
+            var logRequest = bool.TryParse(logRequestConfigured, out var shouldLogRequest) && shouldLogRequest;
 
             _standardHttpClient.CreateClient(GetHttpClientTokenName ?? HttpClientTokenName());
             _standardHttpClient.ResetStandardHttpClient();
+            _standardHttpClient.LogRequest = logRequest;
 
             if (!string.IsNullOrWhiteSpace(userClaim))
                 _ = _standardHttpClient.WithHeader(Constants.UserClaimHeader, userClaim);
 
             _logger.LogDebug("{MessageLog} - User Claim: {UserClaim}", messageLog, userClaim);
+            if (logRequest)
+                _logger.LogInformation(_standardHttpClient.AuthorizationLog);
 
             var response = await _standardHttpClient.Post(
                 urlRoute: urlToken,
                 messageBody: messageBody,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
+
+            if (logRequest)
+                _logger.LogInformation(_standardHttpClient.AuthorizationLog);
 
             _credentialToken = ReturnClass<CredentialToken>(response);
 
