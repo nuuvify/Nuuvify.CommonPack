@@ -26,6 +26,10 @@ Considere, conforme o caso:
 
 Use também:
 - [Nuuvify Package Docs](../instructions/package-docs.instructions.md)
+- [Nuuvify Package README NuGet](../instructions/package-readme-nuget.instructions.md)
+
+Para criação/reescrita de README de pacote no padrão nuget.org, prefira:
+- [Create Package README NuGet](./create-package-readme-nuget.prompt.md)
 
 ---
 
