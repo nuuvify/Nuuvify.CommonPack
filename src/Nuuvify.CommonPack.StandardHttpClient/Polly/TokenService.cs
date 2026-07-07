@@ -106,7 +106,7 @@ public class TokenService : ITokenService
 
             _logger.LogDebug("{MessageLog} - User Claim: {UserClaim}", messageLog, userClaim);
             if (logRequest)
-                _logger.LogInformation(_standardHttpClient.AuthorizationLog);
+                _logger.LogInformation("Log Authorization: {AuthorizationLog}", _standardHttpClient.AuthorizationLog);
 
             var response = await _standardHttpClient.Post(
                 urlRoute: urlToken,
@@ -114,7 +114,7 @@ public class TokenService : ITokenService
                 cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (logRequest)
-                _logger.LogInformation(_standardHttpClient.AuthorizationLog);
+                _logger.LogInformation("Log Authorization: {AuthorizationLog}", _standardHttpClient.AuthorizationLog);
 
             _credentialToken = ReturnClass<CredentialToken>(response);
 
