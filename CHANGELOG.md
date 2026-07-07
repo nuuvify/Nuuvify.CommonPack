@@ -12,6 +12,8 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 - Suporte a CNPJ alfanumérico no pacote `Nuuvify.CommonPack.Domain`.
 - Suporte opt-in a `IUnitOfWorkFactory<TContext>` no pacote `Nuuvify.CommonPack.UnitOfWork` para criação de `UnitOfWork` curto por operação com `IDbContextFactory<TContext>`.
 - Suporte opt-in a `IShortLivedDbContextFactory<TContext>` e `IWorkerDbContextFactory<TContext>` no pacote `Nuuvify.CommonPack.UnitOfWork` para criação de `DbContext` curto com auditoria em cenários de worker/background.
+- Novos pacotes para integração MFT Mailbox: `Nuuvify.CommonPack.MftMailbox.Abstraction`, `Nuuvify.CommonPack.MftMailbox`, `Nuuvify.CommonPack.MftMailbox.Sftp` e `Nuuvify.CommonPack.MftMailbox.Http`.
+- Implementação de fluxos bidirecionais com envio/recebimento por streaming, consulta de status, ACK/NACK, idempotência e auditoria para SFTP e HTTPS Mailbox.
 
 ### Alterado
 - Geração de Id em `DomainEntity` no pacote `Nuuvify.CommonPack.Extensions` alterada para UUID orientado a banco de dados (UUID v7).
@@ -33,6 +35,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 ### Documentação
 - Padronização dos `CHANGELOG.md` dos pacotes e atualização dos changelogs de `Domain`, `AzureServiceBus`, `BackgroundService` e `Extensions` com alterações recentes.
 - Atualização de documentação de mantenedores e contribuição (onboarding, setup e processo de release).
+- Criação do guia central de consumo em projetos de terceiros em `docs/consumo-em-projetos-terceiros.md`, com onboarding, matriz de pacotes, configuração e exemplos de integração.
 
 ## [3.0.0] - 2025-11-01
 

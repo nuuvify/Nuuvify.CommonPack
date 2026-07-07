@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <PackageId>Nuuvify.CommonPack.MftMailbox.Abstraction</PackageId>
+        <Title>Nuuvify CommonPack MFT Mailbox Abstraction</Title>
+        <PackageTags>Nuuvify;MFT;Mailbox;SFTP;HTTPS;Abstraction;.NET</PackageTags>
+        <Description>Contratos e modelos compartilhados para integracao com MFT Mailbox.</Description>
+        <Product>Nuuvify CommonPack MFT Mailbox Abstraction</Product>
+        <RootNamespace>Nuuvify.CommonPack.MftMailbox.Abstraction</RootNamespace>
+    </PropertyGroup>
+
+</Project>
