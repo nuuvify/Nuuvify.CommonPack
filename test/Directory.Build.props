@@ -38,6 +38,7 @@
         <PackageReference Include="AutoMoqCore" />
         <PackageReference Include="Bogus" />
         <PackageReference Include="CountryData.Bogus" />
+        <PackageReference Include="Shouldly" />
     </ItemGroup>
 
 </Project>
