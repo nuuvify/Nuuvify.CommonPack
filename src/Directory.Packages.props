@@ -60,6 +60,7 @@
         <!-- MFT packages -->
         <PackageVersion Include="SSH.NET" Version="2024.2.0" />
         <PackageVersion Include="Microsoft.Extensions.Http" Version="8.0.1" />
+        <PackageVersion Include="StackExchange.Redis" Version="2.8.9" />
         <!-- Database packages -->
         <PackageVersion Include="Oracle.ManagedDataAccess.Core" Version="23.6.1" />
         <PackageVersion Include="Net.IBM.Data.Db2" Version="8.0.0.400" />
