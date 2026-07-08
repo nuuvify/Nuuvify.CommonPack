@@ -47,7 +47,6 @@
 
         <!-- Configuration packages -->
         <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="8.0.1" />
-        <PackageVersion Include="Microsoft.Extensions.Http" Version="8.0.1" />
     </ItemGroup>
 
 </Project>

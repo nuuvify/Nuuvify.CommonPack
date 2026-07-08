@@ -12,6 +12,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 ### Alterado
 
 ### Corrigido
+- `TokenService.GetToken` agora resolve `ClientId`/`ClientSecret` também a partir de chaves planas com separador `--` (ex.: `AzureAdOpenID--cc--ClientId` e `AzureAdOpenID--cc--ClientSecret`), além das chaves hierárquicas `:` e de `ApisCredentials`. Cobre cenários em que segredos do Azure Key Vault chegam à configuração sem tradução de `--` para `:` (ex.: `AddKeyPerFile`/secrets montados), corrigindo falha de obtenção de token em workers e produção.
 
 ### Removido
 
