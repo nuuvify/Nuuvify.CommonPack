@@ -12,7 +12,7 @@ namespace Nuuvify.CommonPack.MftMailbox.Redis.Services;
 /// <remarks>
 /// Garante que múltiplas instâncias não processem o mesmo arquivo mesmo que rodando em paralelo.
 /// Usa SET NX (Set If Not eXists) para atomicidade e TTL para auto-cleanup.
-/// 
+///
 /// Ciclo de vida de uma chave:
 /// <list type="bullet">
 /// <item><c>TryStartAsync</c>: Tenta criar chave com valor "started" e TTL. Retorna <see langword="true"/> se criada.</item>
@@ -46,12 +46,9 @@ public sealed class RedisMftIdempotencyStore : IMftIdempotencyStore
         IOptions<RedisMftMailboxOptions> options,
         ILogger<RedisMftIdempotencyStore> logger)
     {
-        if (connectionMultiplexer == null)
-            throw new ArgumentNullException(nameof(connectionMultiplexer));
-        if (options == null)
-            throw new ArgumentNullException(nameof(options));
-        if (logger == null)
-            throw new ArgumentNullException(nameof(logger));
+        ArgumentNullException.ThrowIfNull(connectionMultiplexer);
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(logger);
 
         _redis = connectionMultiplexer.GetDatabase();
         _options = options.Value;
@@ -154,7 +151,7 @@ public sealed class RedisMftIdempotencyStore : IMftIdempotencyStore
             var ttl = (ttlTimeSpan > TimeSpan.Zero) ? ttlTimeSpan : _options.IdempotencyTtl;
 
             // Atualizar valor mantendo TTL
-            await _redis.StringSetAsync(redisKey, "completed", ttl);
+            _ = await _redis.StringSetAsync(redisKey, "completed", ttl);
 
             _logger.LogDebug(
                 "Chave de idempotência marcada como concluída: {IdempotencyKey}",
@@ -210,7 +207,7 @@ public sealed class RedisMftIdempotencyStore : IMftIdempotencyStore
             var ttl = (ttlTimeSpan > TimeSpan.Zero) ? ttlTimeSpan : _options.IdempotencyTtl;
 
             // Armazenar falha com motivo
-            await _redis.StringSetAsync(redisKey, $"failed:{reason}", ttl);
+            _ = await _redis.StringSetAsync(redisKey, $"failed:{reason}", ttl);
 
             _logger.LogDebug(
                 "Chave de idempotência marcada como falha: {IdempotencyKey}, Motivo: {Reason}",

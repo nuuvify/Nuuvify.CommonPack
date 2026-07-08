@@ -12,7 +12,7 @@ namespace Nuuvify.CommonPack.MftMailbox.Redis.Utilities;
 /// </remarks>
 public sealed class RedisStatusSerializer
 {
-    private static readonly JsonSerializerOptions JsonOptions = new()
+    private static readonly JsonSerializerOptions s_jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
@@ -23,10 +23,9 @@ public sealed class RedisStatusSerializer
     /// </summary>
     public string Serialize(TransferStatus status)
     {
-        if (status == null)
-            throw new ArgumentNullException(nameof(status));
+        ArgumentNullException.ThrowIfNull(status);
 
-        return JsonSerializer.Serialize(status, JsonOptions);
+        return JsonSerializer.Serialize(status, s_jsonOptions);
     }
 
     /// <summary>
@@ -39,7 +38,7 @@ public sealed class RedisStatusSerializer
 
         try
         {
-            return JsonSerializer.Deserialize<TransferStatus>(value.ToString(), JsonOptions);
+            return JsonSerializer.Deserialize<TransferStatus>(value.ToString(), s_jsonOptions);
         }
         catch (JsonException)
         {

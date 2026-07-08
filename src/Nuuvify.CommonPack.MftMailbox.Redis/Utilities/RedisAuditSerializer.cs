@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using Nuuvify.CommonPack.MftMailbox.Abstraction.Models;
 using StackExchange.Redis;
@@ -12,7 +13,7 @@ namespace Nuuvify.CommonPack.MftMailbox.Redis.Utilities;
 /// </remarks>
 public sealed class RedisAuditSerializer
 {
-    private static readonly JsonSerializerOptions JsonOptions = new()
+    private static readonly JsonSerializerOptions s_jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
@@ -23,12 +24,11 @@ public sealed class RedisAuditSerializer
     /// </summary>
     public NameValueEntry[] Serialize(TransferAuditEntry entry)
     {
-        if (entry == null)
-            throw new ArgumentNullException(nameof(entry));
+        ArgumentNullException.ThrowIfNull(entry);
 
         return new[]
         {
-            new NameValueEntry("timestamp", entry.TimestampUtc.UtcTicks.ToString()),
+            new NameValueEntry("timestamp", entry.TimestampUtc.UtcTicks.ToString(CultureInfo.InvariantCulture)),
             new NameValueEntry("integrationKey", entry.IntegrationKey),
             new NameValueEntry("correlationId", entry.CorrelationId),
             new NameValueEntry("itemId", entry.ItemId),
@@ -51,7 +51,9 @@ public sealed class RedisAuditSerializer
 
             return new TransferAuditEntry
             {
-                TimestampUtc = new DateTimeOffset(long.Parse(nameValues.GetValueOrDefault("timestamp", "0")), TimeSpan.Zero),
+                TimestampUtc = new DateTimeOffset(
+                    long.Parse(nameValues.GetValueOrDefault("timestamp", "0") ?? "0", CultureInfo.InvariantCulture),
+                    TimeSpan.Zero),
                 IntegrationKey = nameValues.GetValueOrDefault("integrationKey", string.Empty) ?? string.Empty,
                 CorrelationId = nameValues.GetValueOrDefault("correlationId", string.Empty) ?? string.Empty,
                 ItemId = nameValues.GetValueOrDefault("itemId", string.Empty) ?? string.Empty,
@@ -62,8 +64,9 @@ public sealed class RedisAuditSerializer
                 Metadata = DeserializeMetadata(nameValues.GetValueOrDefault("metadata", "{}") ?? "{}")
             };
         }
-        catch
+        catch (Exception ex) when (ex is FormatException or ArgumentException or KeyNotFoundException or InvalidOperationException)
         {
+            // Falha ao desserializar stream entry malformado; retorna null para ignorar
             return null;
         }
     }
@@ -73,19 +76,20 @@ public sealed class RedisAuditSerializer
         if (metadata == null || metadata.Count == 0)
             return "{}";
 
-        return JsonSerializer.Serialize(metadata, JsonOptions);
+        return JsonSerializer.Serialize(metadata, s_jsonOptions);
     }
 
     private static IDictionary<string, string> DeserializeMetadata(string json)
     {
         try
         {
-            var result = JsonSerializer.Deserialize<Dictionary<string, string>>(json, JsonOptions)
+            var result = JsonSerializer.Deserialize<Dictionary<string, string>>(json, s_jsonOptions)
                 ?? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             return new Dictionary<string, string>(result, StringComparer.OrdinalIgnoreCase);
         }
-        catch
+        catch (JsonException)
         {
+            // JSON inválido; retorna dicionário vazio
             return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         }
     }
