@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <PackageId>Nuuvify.CommonPack.MftMailbox.Sftp</PackageId>
+        <Title>Nuuvify CommonPack MFT Mailbox SFTP Adapter</Title>
+        <PackageTags>Nuuvify;MFT;Mailbox;SFTP;SSH.NET;Streaming;.NET</PackageTags>
+        <Description>Adapter SFTP para envio, recebimento e ACK/NACK em MFT Mailbox.</Description>
+        <Product>Nuuvify CommonPack MFT Mailbox SFTP Adapter</Product>
+        <RootNamespace>Nuuvify.CommonPack.MftMailbox.Sftp</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="SSH.NET" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+        <PackageReference Include="Microsoft.Extensions.Options" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference
+            Include="..\Nuuvify.CommonPack.MftMailbox\Nuuvify.CommonPack.MftMailbox.csproj" />
+        <ProjectReference
+            Include="..\Nuuvify.CommonPack.MftMailbox.Abstraction\Nuuvify.CommonPack.MftMailbox.Abstraction.csproj" />
+    </ItemGroup>
+
+</Project>

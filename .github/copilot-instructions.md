@@ -15,6 +15,7 @@
 - Atualize `README.md` e `CHANGELOG.md` do pacote quando o contrato público, uso ou comportamento observável mudar.
 - Siga `.editorconfig` e as convenções já existentes antes de introduzir novos padrões.
 - Mantenha arquivos de programa e projeto, incluindo `*.cs` e `*.csproj`, em `UTF-8` e com fim de linha definido pelo `.editorconfig`, preservando compatibilidade entre Linux, Windows e macOS.
+- **Todo tipo público e membro público ou protegido criado ou alterado deve ter documentação XML completa no mesmo ciclo.** Siga `.github/instructions/xml-docs-source.instructions.md`.
 
 ## Dependencias e restricoes
 
@@ -40,6 +41,7 @@
 ## Uso eficiente de contexto
 
 - Não replique documentação longa aqui; carregue instruções sob demanda em `.github/instructions/`.
+- Para criação/atualização de `src/**/README.md`, aplicar a regra dedicada em `.github/instructions/package-readme-nuget.instructions.md`.
 - Use prompts de `.github/prompts/` para tarefas repetíveis.
 - Use agentes em `.github/agents/` quando a tarefa pedir revisão somente leitura ou refatoração com ferramentas restritas.
 - Use a skill `library-maintenance` para fluxos maiores de criar, alterar, refatorar, testar, revisar e documentar.

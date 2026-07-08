@@ -94,19 +94,27 @@ public class TokenService : ITokenService
 
             var userName = _accessor?.HttpContext?.User.GetLogin();
             userClaim ??= userName;
+            var logRequestConfigured = _configuration.GetSection("AppConfig:LogRequest")?.Value;
+            var logRequest = bool.TryParse(logRequestConfigured, out var shouldLogRequest) && shouldLogRequest;
 
             _standardHttpClient.CreateClient(GetHttpClientTokenName ?? HttpClientTokenName());
             _standardHttpClient.ResetStandardHttpClient();
+            _standardHttpClient.LogRequest = logRequest;
 
             if (!string.IsNullOrWhiteSpace(userClaim))
                 _ = _standardHttpClient.WithHeader(Constants.UserClaimHeader, userClaim);
 
             _logger.LogDebug("{MessageLog} - User Claim: {UserClaim}", messageLog, userClaim);
+            if (logRequest)
+                _logger.LogInformation("Log Authorization: {AuthorizationLog}", _standardHttpClient.AuthorizationLog);
 
             var response = await _standardHttpClient.Post(
                 urlRoute: urlToken,
                 messageBody: messageBody,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
+
+            if (logRequest)
+                _logger.LogInformation("Log Authorization: {AuthorizationLog}", _standardHttpClient.AuthorizationLog);
 
             _credentialToken = ReturnClass<CredentialToken>(response);
 
@@ -191,17 +199,19 @@ public class TokenService : ITokenService
         {
             login = _configuration.GetSection("ApisCredentials:Username")?.Value;
             login ??= _configuration.GetSection("AzureAdOpenID:cc:ClientId")?.Value;
+            login ??= _configuration.GetSection("AzureAdOpenID--cc--ClientId")?.Value;
         }
         if (string.IsNullOrWhiteSpace(password))
         {
             password = _configuration.GetSection("ApisCredentials:Password")?.Value;
             password ??= _configuration.GetSection("AzureAdOpenID:cc:ClientSecret")?.Value;
+            password ??= _configuration.GetSection("AzureAdOpenID--cc--ClientSecret")?.Value;
         }
 
         var urlLogin = _configuration.GetSection("AppConfig:AppURLs:UrlLoginApi")?.Value;
         var urlToken = $"{urlLogin}{_configuration.GetSection("AppConfig:AppURLs:UrlLoginApiToken")?.Value}";
 
-        _logger.LogDebug("{MessageLog} - urlToken: {UrlToken}", messageLog, urlToken);
+        _logger.LogInformation("============ {MessageLog} urlToken: {UrlToken} login: {Login} ============", messageLog, urlToken, login);
 
         if (string.IsNullOrWhiteSpace(login) ||
             string.IsNullOrWhiteSpace(password) ||
