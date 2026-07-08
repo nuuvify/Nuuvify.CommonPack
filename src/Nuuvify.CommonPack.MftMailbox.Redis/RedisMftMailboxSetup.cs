@@ -21,7 +21,7 @@ namespace Nuuvify.CommonPack.MftMailbox.Redis;
 /// Uso recomendado:
 /// <code>
 /// // 1. Registrar Redis (conexão existing)
-/// services.AddStackExchangeRedisCache(opts => 
+/// services.AddStackExchangeRedisCache(opts =>
 ///     opts.Configuration = "localhost:6379");
 ///
 /// // 2. Registrar core MftMailbox
@@ -64,7 +64,7 @@ public static class RedisMftMailboxSetup
     /// <item><see cref="RedisStatusSerializer"/> → Serializador para status (Singleton).</item>
     /// <item><see cref="RedisAuditSerializer"/> → Serializador para auditoria (Singleton).</item>
     /// </list>
-    /// 
+    ///
     /// <c>AddMftMailboxRedis</c> deve ser chamado APÓS <c>AddMftMailboxCore</c>,
     /// de modo que as substituições de Singleton funcionem corretamente.
     /// </remarks>
@@ -75,8 +75,7 @@ public static class RedisMftMailboxSetup
         this IServiceCollection services,
         Action<RedisMftMailboxOptions>? configureOptions = null)
     {
-        if (services == null)
-            throw new ArgumentNullException(nameof(services));
+        ArgumentNullException.ThrowIfNull(services);
 
         // Validar que Redis já está registrado
         if (!services.Any(sd => sd.ServiceType == typeof(StackExchange.Redis.IConnectionMultiplexer)))
@@ -113,15 +112,15 @@ public static class RedisMftMailboxSetup
             // Nota: Esta implementação assume que IMftStatusClient já está registrado
             // (e.g., por AddMftMailboxSftp ou AddMftMailboxHttp).
             // Esta factory envolve o cliente existente com um camada de cache Redis.
-            
+
             // Para preservar o cliente original, guardamos uma referência temporária
             var mftStatusClientDescriptor = services.FirstOrDefault(sd => sd.ServiceType == typeof(IMftStatusClient));
-            
+
             if (mftStatusClientDescriptor is not null)
             {
                 // Remover o registro anterior (será re-adicionado via factory)
-                services.Remove(mftStatusClientDescriptor);
-                
+                _ = services.Remove(mftStatusClientDescriptor);
+
                 // Registrar o cliente com decorador de cache
                 _ = services.AddSingleton<IMftStatusClient>(sp =>
                 {

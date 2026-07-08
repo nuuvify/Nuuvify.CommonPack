@@ -14,7 +14,7 @@ namespace Nuuvify.CommonPack.MftMailbox.Redis.Services;
 /// <remarks>
 /// Grava cada operação MFT (envio, recepção, ACK/NACK) em uma stream Redis que pode ser
 /// consumida por aplicações externas (logging, telemetria, banco de dados).
-/// 
+///
 /// Padrão: Fire-and-forget assíncrono (não bloqueia fluxo de transferência).
 /// Consumidores externos leem da stream com <c>XREAD</c> ou grupos de consumo.
 ///
@@ -44,14 +44,10 @@ public sealed class RedisAuditStreamSink : ITransferAuditSink
         RedisAuditSerializer serializer,
         ILogger<RedisAuditStreamSink> logger)
     {
-        if (connectionMultiplexer == null)
-            throw new ArgumentNullException(nameof(connectionMultiplexer));
-        if (options == null)
-            throw new ArgumentNullException(nameof(options));
-        if (serializer == null)
-            throw new ArgumentNullException(nameof(serializer));
-        if (logger == null)
-            throw new ArgumentNullException(nameof(logger));
+        ArgumentNullException.ThrowIfNull(connectionMultiplexer);
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(serializer);
+        ArgumentNullException.ThrowIfNull(logger);
 
         _redis = connectionMultiplexer.GetDatabase();
         _options = options.Value;
@@ -67,14 +63,13 @@ public sealed class RedisAuditStreamSink : ITransferAuditSink
     /// <remarks>
     /// Operação é fire-and-forget: não aguarda conclusão. Se falhar, apenas loga
     /// warning e continua. Falhas não interrompem o fluxo de transferência MFT.
-    /// 
+    ///
     /// Stream é trimada automaticamente para <c>RedisMftMailboxOptions.AuditStreamMaxLength</c>
     /// (padrão 100k entradas) para evitar crescimento indefinido.
     /// </remarks>
     public async Task WriteAsync(TransferAuditEntry entry, CancellationToken cancellationToken = default)
     {
-        if (entry == null)
-            throw new ArgumentNullException(nameof(entry));
+        ArgumentNullException.ThrowIfNull(entry);
 
         cancellationToken.ThrowIfCancellationRequested();
 

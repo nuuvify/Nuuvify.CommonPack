@@ -15,7 +15,7 @@ namespace Nuuvify.CommonPack.MftMailbox.Redis.Services;
 /// Decora outro <see cref="IMftStatusClient"/> (SFTP ou HTTP), adicionando cache em Redis.
 /// Padrão: Verificar cache primeiro (Redis), fallback para cliente original se miss,
 /// e cachear resultado para futuras consultas.
-/// 
+///
 /// Reduz carga em servidores SFTP/HTTP remotos, mas pode retornar dados até
 /// <c>RedisMftMailboxOptions.StatusCacheTtl</c> (padrão 5min) stale.
 ///
@@ -47,16 +47,11 @@ public sealed class RedisCachedStatusClient : IMftStatusClient
         RedisStatusSerializer serializer,
         ILogger<RedisCachedStatusClient> logger)
     {
-        if (innerClient == null)
-            throw new ArgumentNullException(nameof(innerClient));
-        if (connectionMultiplexer == null)
-            throw new ArgumentNullException(nameof(connectionMultiplexer));
-        if (options == null)
-            throw new ArgumentNullException(nameof(options));
-        if (serializer == null)
-            throw new ArgumentNullException(nameof(serializer));
-        if (logger == null)
-            throw new ArgumentNullException(nameof(logger));
+        ArgumentNullException.ThrowIfNull(innerClient);
+        ArgumentNullException.ThrowIfNull(connectionMultiplexer);
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(serializer);
+        ArgumentNullException.ThrowIfNull(logger);
 
         _innerClient = innerClient;
         _redis = connectionMultiplexer.GetDatabase();
@@ -72,7 +67,7 @@ public sealed class RedisCachedStatusClient : IMftStatusClient
     /// <param name="itemId">Identificador do item.</param>
     /// <param name="cancellationToken">Token de cancelamento.</param>
     /// <returns>
-    /// <see cref="TransferStatus"/> com estado atual (do cache ou fonte), 
+    /// <see cref="TransferStatus"/> com estado atual (do cache ou fonte),
     /// ou <see langword="null"/> se não encontrado.
     /// </returns>
     /// <remarks>
@@ -192,7 +187,7 @@ public sealed class RedisCachedStatusClient : IMftStatusClient
         try
         {
             var serialized = _serializer.Serialize(status);
-            await _redis.StringSetAsync(cacheKey, serialized, ttl);
+            _ = await _redis.StringSetAsync(cacheKey, serialized, ttl);
         }
         catch (Exception ex)
         {
@@ -211,7 +206,7 @@ public sealed class RedisCachedStatusClient : IMftStatusClient
     {
         try
         {
-            await _redis.StringSetAsync(cacheKey, "null", ttl);
+            _ = await _redis.StringSetAsync(cacheKey, "null", ttl);
         }
         catch (Exception ex)
         {

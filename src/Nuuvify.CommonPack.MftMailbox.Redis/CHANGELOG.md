@@ -1,40 +1,47 @@
 # Changelog - Nuuvify.CommonPack.MftMailbox.Redis
 
-All notable changes to this project will be documented in this file.
+Todas as mudanças notáveis deste pacote serão documentadas neste arquivo.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-br/1.0.0/),
+e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec/v2.0.0.html).
+
+## [Não Lançado]
+
+### Documentação
+- Adicionado `README.md` completo em português brasileiro para publicação no nuget.org.
+- Documentação inclui: instalação, configuração, exemplos práticos, boas práticas, troubleshooting e compatibilidade.
+- Exemplos de código funcionais alinhados aos contratos públicos atuais.
 
 ## [1.0.0] - 2025-01-13
 
-### Added
-- Initial release of Redis integration package for MFT Mailbox.
-- **RedisMftIdempotencyStore**: Distributed idempotency store using atomic SET NX EX operations to prevent file duplication across multi-instance deployments.
-- **RedisCachedStatusClient**: Decorator pattern cache layer for status queries with 5-minute TTL and graceful fallback to inner client on Redis failures.
-- **RedisAuditStreamSink**: Fire-and-forget audit stream sink using Redis Streams (XADD) for external telemetry consumers.
-- **RedisMftMailboxOptions**: Configuration class with 9 options for feature toggles (idempotency, status cache, audit stream) and resource tuning (TTL, timeout, stream retention).
-- **RedisStatusSerializer**: JSON serialization for TransferStatus objects in cache.
-- **RedisAuditSerializer**: Stream entry serialization (XADD format) for audit records.
-- **RedisMftMailboxSetup**: Dependency injection orchestration extension method with prerequisite validation.
-- Comprehensive unit test coverage (17 test cases) with full mock-based isolation.
-- Complete XML documentation on all public types and members.
+### Adicionado
+- Release inicial do pacote de integração Redis para MFT Mailbox.
+- **RedisMftIdempotencyStore**: Armazenamento de idempotência distribuído usando operações atômicas SET NX EX para prevenir duplicação de arquivos em ambientes multi-instância.
+- **RedisCachedStatusClient**: Camada de cache decorator pattern para consultas de status com TTL de 5 minutos e fallback gracioso ao cliente original em falhas do Redis.
+- **RedisAuditStreamSink**: Sink de auditoria fire-and-forget usando Redis Streams (XADD) para consumidores de telemetria externos.
+- **RedisMftMailboxOptions**: Classe de configuração com 9 opções para feature toggles (idempotência, cache de status, stream de auditoria) e tuning de recursos (TTL, timeout, retenção de stream).
+- **RedisStatusSerializer**: Serialização JSON para objetos TransferStatus no cache.
+- **RedisAuditSerializer**: Serialização de entradas de stream (formato XADD) para registros de auditoria.
+- **RedisMftMailboxSetup**: Método de extensão para orquestração de dependency injection com validação de pré-requisitos.
+- Cobertura completa de testes unitários (17 casos de teste) com isolamento baseado em mocks.
+- Documentação XML completa em todos os tipos e membros públicos.
 
-### Dependencies
-- StackExchange.Redis: Distributed connection pooling and atomic operations.
-- Microsoft.Extensions.Options: Configuration binding and validation.
-- Microsoft.Extensions.DependencyInjection.Abstractions: Service registration.
-- Microsoft.Extensions.Logging: Diagnostic logging (DEBUG/ERROR/WARNING).
+### Dependências
+- StackExchange.Redis: Connection pooling distribuído e operações atômicas.
+- Microsoft.Extensions.Options: Binding e validação de configuração.
+- Microsoft.Extensions.DependencyInjection.Abstractions: Registro de serviços.
+- Microsoft.Extensions.Logging: Logging de diagnóstico (DEBUG/ERROR/WARNING).
 
-### Design Principles
-- **Atomicity**: SET NX EX prevents double-processing in multi-instance scenarios.
-- **Resilience**: Cache fallback and non-blocking audit ensure Redis unavailability does not interrupt transfers.
-- **Configuration-Driven**: Feature toggles allow selective enablement of idempotency, caching, and audit without code changes.
-- **Observability**: Structured logging at key decision points (cache hit/miss, idempotency decision, audit drop).
-- **Clean Architecture**: Services implement domain interfaces (IMftIdempotencyStore, IMftStatusClient, ITransferAuditSink).
+### Princípios de Design
+- **Atomicidade**: SET NX EX previne processamento duplicado em cenários multi-instância.
+- **Resiliência**: Fallback de cache e auditoria não-bloqueante garantem que indisponibilidade do Redis não interrompe transferências.
+- **Configuração Orientada**: Feature toggles permitem habilitação seletiva de idempotência, caching e auditoria sem mudanças de código.
+- **Observabilidade**: Logging estruturado em pontos-chave de decisão (cache hit/miss, decisão de idempotência, drop de auditoria).
+- **Clean Architecture**: Serviços implementam interfaces de domínio (IMftIdempotencyStore, IMftStatusClient, ITransferAuditSink).
 
-### Constraints & Notes
-- **Prerequisite**: IConnectionMultiplexer must already be registered in DI (AddStackExchangeRedisCache or equivalent).
-- **Idempotency TTL**: 24-hour default ensures compliance with retry windows while auto-cleaning old entries.
-- **Status Cache**: 5-minute TTL acceptable for most MFT scenarios; configurable per deployment.
-- **Audit Retention**: 100k stream entries default balances audit trail completeness vs. Redis memory usage.
-- **Error Semantics**: Idempotency throws on Redis failure (hard stop); audit/cache gracefully degrade on failure.
+### Restrições e Notas
+- **Pré-requisito**: IConnectionMultiplexer deve estar previamente registrado no DI (AddStackExchangeRedisCache ou equivalente).
+- **TTL de Idempotência**: Padrão de 24 horas garante compliance com janelas de retry enquanto limpa entradas antigas automaticamente.
+- **Cache de Status**: TTL de 5 minutos aceitável para maioria dos cenários MFT; configurável por deployment.
+- **Retenção de Auditoria**: Padrão de 100k entradas balanceia completude de trilha de auditoria vs. uso de memória do Redis.
+- **Semântica de Erros**: Idempotência lança em falha do Redis (hard stop); auditoria/cache degradam graciosamente em falha.
