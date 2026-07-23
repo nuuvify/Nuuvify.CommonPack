@@ -1,0 +1,9 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <ItemGroup>
+        <SourceCustomFilesMftMailboxSftpXml Include="$(MSBuildThisFileDirectory)..\content\*.xml" />
+    </ItemGroup>
+    <Target Name="MftMailboxSftpCopyFilesToProject" BeforeTargets="Build">
+        <Copy SourceFiles="@(SourceCustomFilesMftMailboxSftpXml)"
+            DestinationFolder="$(ProjectDir)\Docs" />
+    </Target>
+</Project>
