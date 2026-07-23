@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
     <PropertyGroup>
-        <OsPlatform
-            Condition="$(OsPlatform) == '' AND '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">
-            Windows</OsPlatform>
-        <OsPlatform
-            Condition="$(OsPlatform) == '' AND '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">
-            Linux</OsPlatform>
-        <OsPlatform
-            Condition="$(OsPlatform) == '' AND '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'">
-            OSX</OsPlatform>
+        <OsPlatform Condition="$(OsPlatform) == '' AND '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'"> Windows</OsPlatform>
+        <OsPlatform Condition="$(OsPlatform) == '' AND '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'"> Linux</OsPlatform>
+        <OsPlatform Condition="$(OsPlatform) == '' AND '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'"> OSX</OsPlatform>
         <LangVersion>latest</LangVersion>
         <IsPackable>true</IsPackable>
         <Authors>Lincoln Zocateli</Authors>
@@ -19,7 +13,7 @@
         <PackageProjectUrl>https://github.com/lzocateli/Nuuvify.CommonPack</PackageProjectUrl>
         <PackageIcon>logonuuvify.jpg</PackageIcon>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-        <Version>2.6.0</Version>
+        <Version>2.7.0</Version>
         <FileVersion>1520</FileVersion>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>1701;1702;1705;1591</NoWarn>
@@ -62,15 +56,12 @@
     </ItemGroup>
 
     <ItemGroup Label="Common Package Content">
-        <None Include="README.md" Pack="true" PackagePath="\"
-            Condition="Exists('$(MSBuildProjectDirectory)/README.md')" />
-        <None Include="CHANGELOG.md" Pack="true" PackagePath="\"
-            Condition="Exists('$(MSBuildProjectDirectory)/CHANGELOG.md')" />
+        <None Include="README.md" Pack="true" PackagePath="\" Condition="Exists('$(MSBuildProjectDirectory)/README.md')" />
+        <None Include="CHANGELOG.md" Pack="true" PackagePath="\" Condition="Exists('$(MSBuildProjectDirectory)/CHANGELOG.md')" />
     </ItemGroup>
 
     <ItemGroup Label="Packaging">
-        <Content Include="./$(MSBuildProjectName).targets"
-            PackagePath="build\$(MSBuildProjectName).targets" />
+        <Content Include="./$(MSBuildProjectName).targets" PackagePath="build\$(MSBuildProjectName).targets" />
 
         <Content Include="./Docs/$(MSBuildProjectName).xml">
             <Pack>true</Pack>
