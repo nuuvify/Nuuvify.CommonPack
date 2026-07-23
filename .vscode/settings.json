@@ -1,4 +1,8 @@
 {
+  "xml.format.legacy": false,
+  "xml.format.maxLineWidth": 0,
+  "xml.format.preserveAttributeLineBreaks": false,
+  "xml.format.splitAttributes": "preserve",
   "dotnet.defaultSolution": "Nuuvify.CommonPack.sln",
   "todo-tree.highlights.defaultHighlight": {
     "icon": "alert",
