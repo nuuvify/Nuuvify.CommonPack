@@ -5,23 +5,36 @@ using Microsoft.Extensions.Options;
 
 namespace Nuuvify.CommonPack.Logging;
 
+/// <summary>
+/// Formata logs de console com prefixo configurável e cores por nível de severidade.
+/// </summary>
+/// <remarks>
+/// A instância observa alterações dinâmicas em <see cref="NuuvifyLogFormatterOptions"/> e
+/// <see cref="NuuvifyLogColorConfiguration"/> por meio de <see cref="IOptionsMonitor{TOptions}"/>.
+/// </remarks>
 public class NuuvifyLogFormatter : ConsoleFormatter, IDisposable
 {
 
-    private readonly IDisposable _optionsReloadToken;
+    private readonly IDisposable _formatterOptionsReloadToken;
+    private readonly IDisposable _colorOptionsReloadToken;
     private NuuvifyLogFormatterOptions _nuuvifyLogOptions;
     private NuuvifyLogColorConfiguration _nuuvifyLogColorConfiguration;
 
+    /// <summary>
+    /// Inicializa uma nova instância de <see cref="NuuvifyLogFormatter"/>.
+    /// </summary>
+    /// <param name="nuuvifyLogOptions">Monitor das opções de formatação do logger.</param>
+    /// <param name="nuuvifyLogColorConfiguration">Monitor da configuração de cores por nível de log.</param>
     public NuuvifyLogFormatter(
         IOptionsMonitor<NuuvifyLogFormatterOptions> nuuvifyLogOptions,
         IOptionsMonitor<NuuvifyLogColorConfiguration> nuuvifyLogColorConfiguration)
         : base(nameof(NuuvifyLogFormatter))
     {
 
-        _optionsReloadToken = nuuvifyLogOptions.OnChange(ReloadLoggerOptions);
+        _formatterOptionsReloadToken = nuuvifyLogOptions.OnChange(ReloadLoggerOptions);
         _nuuvifyLogOptions = nuuvifyLogOptions.CurrentValue;
 
-        _optionsReloadToken = nuuvifyLogColorConfiguration.OnChange(ReloadLoggerColorConfiguration);
+        _colorOptionsReloadToken = nuuvifyLogColorConfiguration.OnChange(ReloadLoggerColorConfiguration);
         _nuuvifyLogColorConfiguration = nuuvifyLogColorConfiguration.CurrentValue;
 
     }
@@ -32,13 +45,25 @@ public class NuuvifyLogFormatter : ConsoleFormatter, IDisposable
     private void ReloadLoggerColorConfiguration(NuuvifyLogColorConfiguration config) =>
         _nuuvifyLogColorConfiguration = config;
 
+    /// <summary>
+    /// Escreve uma entrada de log formatada com o prefixo e as cores configuradas.
+    /// </summary>
+    /// <typeparam name="TState">Tipo do estado associado ao log.</typeparam>
+    /// <param name="logLevel">Nível do log.</param>
+    /// <param name="eventId">Identificador do evento.</param>
+    /// <param name="state">Estado associado à entrada de log.</param>
+    /// <param name="exception">Exceção opcional associada ao log.</param>
+    /// <param name="message">Mensagem já formatada a ser escrita.</param>
+    /// <param name="scopeProvider">Provider de escopo ativo.</param>
+    /// <param name="textWriter">Destino do texto formatado.</param>
+    /// <param name="name">Categoria ou nome do logger.</param>
     public virtual void Write<TState>(
         LogLevel logLevel,
         EventId eventId,
         TState state,
         Exception exception,
         string message,
-        IExternalScopeProvider? scopeProvider,
+        IExternalScopeProvider scopeProvider,
         TextWriter textWriter,
         string name)
     {
@@ -63,9 +88,10 @@ public class NuuvifyLogFormatter : ConsoleFormatter, IDisposable
 
     }
 
+    /// <inheritdoc />
     public override void Write<TState>(in
         LogEntry<TState> logEntry,
-        IExternalScopeProvider? scopeProvider,
+        IExternalScopeProvider scopeProvider,
         TextWriter textWriter)
     {
 
@@ -101,13 +127,17 @@ public class NuuvifyLogFormatter : ConsoleFormatter, IDisposable
         {
             if (disposing)
             {
-                _optionsReloadToken?.Dispose();
+                _formatterOptionsReloadToken?.Dispose();
+                _colorOptionsReloadToken?.Dispose();
             }
 
             disposed = true;
         }
     }
 
+    /// <summary>
+    /// Libera os monitors de opções observados por esta instância.
+    /// </summary>
     public void Dispose()
     {
         Dispose(true);
