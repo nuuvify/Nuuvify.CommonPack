@@ -24,6 +24,9 @@
 .PARAMETER OpenReport
     Abre o relatório de cobertura no navegador ao final da execução.
     Padrão: $true. Quando executado sem console interativo (CI, pipelines), o relatório não é aberto independentemente deste parâmetro.
+.PARAMETER LogOnlyFailedTests
+    Define se o arquivo de log persistente deve conter apenas testes com falha.
+    Padrão: $true. Quando $false, o log completo da execução é persistido.
 .PARAMETER RecreateTestResults
     Se especificado, remove e recria completamente a pasta TestResults do script (test-automation\TestResults)
     antes de qualquer outra operação. Use quando houver arquivos corrompidos ou travados.
@@ -63,6 +66,9 @@
 .EXAMPLE
     .\Test-UnitExecute.ps1 -OpenReport:$false
     Executa os testes sem abrir o relatório no navegador ao final
+.EXAMPLE
+    .\Test-UnitExecute.ps1 -LogOnlyFailedTests:$false
+    Persiste o log completo da execução, em vez de somente falhas
 #>
 
 [CmdletBinding()]
@@ -125,7 +131,10 @@ param (
     [switch]$RecreateTestResults,
 
     [Parameter(Position = 10)]
-    [bool]$OpenReport = $true
+    [bool]$OpenReport = $true,
+
+    [Parameter(Position = 11)]
+    [bool]$LogOnlyFailedTests = $true
 )
 
 # Verificar se --help foi passado como argumento
@@ -188,6 +197,179 @@ function Test-CommandExists {
     }
 }
 
+function Get-ProjectRoot {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$StartPath
+    )
+
+    $currentPath = (Resolve-Path -LiteralPath $StartPath).Path
+
+    while ($true) {
+        $slnFiles = @(Get-ChildItem -LiteralPath $currentPath -Filter "*.sln" -ErrorAction SilentlyContinue)
+        $slxFiles = @(Get-ChildItem -LiteralPath $currentPath -Filter "*.slx" -ErrorAction SilentlyContinue)
+
+        if ($slnFiles.Count -gt 0 -or $slxFiles.Count -gt 0) {
+            return $currentPath
+        }
+
+        $parentPath = Split-Path -Parent $currentPath
+        if ([string]::IsNullOrWhiteSpace($parentPath) -or $parentPath -eq $currentPath) {
+            break
+        }
+
+        $currentPath = $parentPath
+    }
+
+    throw "Não foi possível localizar a raiz do projeto a partir de '$StartPath'."
+}
+
+function Resolve-RelativePathFromBase {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$BasePath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Path
+    )
+
+    if ([System.IO.Path]::IsPathRooted($Path)) {
+        return $Path
+    }
+
+    $normalizedPath = $Path.TrimStart('.').TrimStart('\').TrimStart('/')
+    return Join-Path $BasePath $normalizedPath
+}
+
+function Get-FailedTestsLogContent {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$RawOutput
+    )
+
+    if ([string]::IsNullOrWhiteSpace($RawOutput)) {
+        return "Sem saída de execução para processar."
+    }
+
+    $lines = $RawOutput -split "`r?`n"
+    $filteredLines = New-Object System.Collections.Generic.List[string]
+    $capturedAny = $false
+    $captureFailureDetails = $false
+    $captureBuildErrors = $false
+
+    for ($i = 0; $i -lt $lines.Count; $i++) {
+        $line = $lines[$i]
+
+        # Padrões de erros de compilação/build
+        $isBuildErrorLine = $line -match ":\s*error\s+[A-Z]+\d+:"
+        $isBuildFailureLine = $line -match "(FALHA da compila[çc][ãa]o|Build FAILED|\d+\s+Erro\(s\))"
+
+        if ($isBuildErrorLine) {
+            if (-not $captureBuildErrors) {
+                if ($filteredLines.Count -gt 0 -and $filteredLines[$filteredLines.Count - 1] -ne "") {
+                    $filteredLines.Add("")
+                }
+                $filteredLines.Add("[Erros de compilação]")
+                # Capturar até 10 linhas anteriores para contexto do projeto/destino
+                $contextStart = [Math]::Max(0, $i - 10)
+                for ($k = $contextStart; $k -lt $i; $k++) {
+                    if ($lines[$k] -match '"[^"]+\.(?:csproj|sln)"' -or $lines[$k] -match '->\s*$' -or $lines[$k] -match '\(\w[\w\s]+destino\)') {
+                        $filteredLines.Add($lines[$k])
+                    }
+                }
+            }
+            $filteredLines.Add($line)
+            $capturedAny = $true
+            $captureBuildErrors = $true
+            $captureFailureDetails = $false
+            continue
+        }
+
+        if ($isBuildFailureLine) {
+            if ($filteredLines.Count -gt 0 -and $filteredLines[$filteredLines.Count - 1] -ne "") {
+                $filteredLines.Add("")
+            }
+            $filteredLines.Add($line)
+            $capturedAny = $true
+            $captureBuildErrors = $false
+            continue
+        }
+
+        if ($captureBuildErrors) {
+            # Capturar linhas de contagem de avisos/erros (ex.: "    4 Aviso(s)")
+            if ($line -match "^\s+\d+\s+(Aviso|Warning|Erro|Error)") {
+                $filteredLines.Add($line)
+                continue
+            }
+            # Parar captura em linha em branco
+            if ([string]::IsNullOrWhiteSpace($line)) {
+                $filteredLines.Add("")
+                $captureBuildErrors = $false
+                continue
+            }
+            # Continuar capturando linhas de erro adicionais do mesmo bloco
+            if ($line -match ":\s*error\s+[A-Z]+\d+:" -or $line -match "^\s+") {
+                $filteredLines.Add($line)
+                continue
+            }
+            $captureBuildErrors = $false
+        }
+
+        $isFailedTestLine = $line -match "^\s*(Com falha|Failed|FALHOU)\s+.+\[[^\]]+\]\s*$"
+        $isFailureSummaryLine = $line -match "(Com falha!|Failed!)\s*[–-]\s*(Com falha|Failed):\s*\d+"
+
+        if ($isFailedTestLine) {
+            if ($filteredLines.Count -gt 0 -and $filteredLines[$filteredLines.Count - 1] -ne "") {
+                $filteredLines.Add("")
+            }
+
+            $filteredLines.Add($line)
+            $capturedAny = $true
+            $captureFailureDetails = $true
+            continue
+        }
+
+        if ($isFailureSummaryLine) {
+            if ($filteredLines.Count -gt 0 -and $filteredLines[$filteredLines.Count - 1] -ne "") {
+                $filteredLines.Add("")
+            }
+
+            $filteredLines.Add($line)
+            $capturedAny = $true
+            continue
+        }
+
+        if ($captureFailureDetails) {
+            $isDetailLine =
+            ($line -match "^\s+") -or
+            ($line -match "^(Error Message:|Mensagem de erro:|Stack Trace:|Rastreamento de pilha:|Expected:|Actual:|Esperado:|Atual:)")
+
+            if ($isDetailLine) {
+                $filteredLines.Add($line)
+                continue
+            }
+
+            if ([string]::IsNullOrWhiteSpace($line)) {
+                $filteredLines.Add("")
+                $captureFailureDetails = $false
+                continue
+            }
+
+            $captureFailureDetails = $false
+        }
+    }
+
+    if (-not $capturedAny) {
+        if ($RawOutput -match "(Com falha!|Failed!)\s*[–-]\s*(Com falha|Failed):\s*0") {
+            return "Nenhum teste com falha foi encontrado nesta execução."
+        }
+
+        return "Nenhum bloco de falha pôde ser extraído do output. Para persistir saída completa, use -LogOnlyFailedTests `$false."
+    }
+
+    return ($filteredLines -join [Environment]::NewLine).Trim()
+}
+
 # Verificar se dotnet está instalado
 if (-not (Test-CommandExists "dotnet")) {
     Write-ColorOutput "ERRO: .NET SDK não está instalado ou não está no PATH." "Red"
@@ -220,7 +402,8 @@ if (-not (Test-CommandExists "reportgenerator")) {
 }
 
 # Verificar diretório raiz do projeto
-$projectRoot = Split-Path -Parent $PSScriptRoot
+$projectRoot = Get-ProjectRoot -StartPath $PSScriptRoot
+$testRoot = Join-Path $projectRoot "test"
 
 # Buscar arquivo .sln na raiz do projeto
 Write-ColorOutput "Procurando arquivo de solution (.sln)..." "Cyan"
@@ -257,7 +440,7 @@ Write-Host ""
 
 # Remover e recriar a pasta TestResults raiz do script se -RecreateTestResults for especificado
 if ($RecreateTestResults) {
-    $testResultsRoot = Join-Path $PSScriptRoot "TestResults"
+    $testResultsRoot = Join-Path $testRoot "TestResults"
     Write-ColorOutput "════════════════════════════════════════════════════════════════" "Cyan"
     Write-ColorOutput "Removendo e recriando pasta TestResults..." "Cyan"
     if (Test-Path $testResultsRoot) {
@@ -276,35 +459,8 @@ if ($RecreateTestResults) {
     Write-Host ""
 }
 
-# Limpar pastas TestResults do diretório /test/ se Clean estiver habilitado
-if ($Clean) {
-    $testDir = Join-Path (Split-Path $PSScriptRoot -Parent) "test"
-    if (Test-Path $testDir) {
-        Write-ColorOutput "Limpando pastas TestResults dos projetos de teste..." "Cyan"
-        $testResultsFolders = Get-ChildItem -Path $testDir -Filter "TestResults" -Directory -Recurse -ErrorAction SilentlyContinue
-        $removedCount = 0
-        foreach ($folder in $testResultsFolders) {
-            try {
-                Remove-Item -Path $folder.FullName -Recurse -Force -ErrorAction Stop
-                Write-ColorOutput "  ✓ Removido: $($folder.FullName)" "Green"
-                $removedCount++
-            }
-            catch {
-                Write-ColorOutput "  Aviso: Não foi possível remover $($folder.FullName): $_" "Yellow"
-            }
-        }
-        if ($removedCount -gt 0) {
-            Write-ColorOutput "✓ $removedCount pasta(s) TestResults removida(s) com sucesso!" "Green"
-        }
-        else {
-            Write-ColorOutput "Nenhuma pasta TestResults encontrada." "Gray"
-        }
-        Write-Host ""
-    }
-}
-
 # Limpar diretório de output se Clean estiver habilitado
-$fullOutputPath = Join-Path $PSScriptRoot $OutputPath
+$fullOutputPath = Resolve-RelativePathFromBase -BasePath $testRoot -Path $OutputPath
 if ($Clean -and (Test-Path $fullOutputPath)) {
     Write-ColorOutput "Limpando diretório de output anterior..." "Cyan"
     try {
@@ -326,6 +482,12 @@ if ($Clean -and (Test-Path $fullOutputPath)) {
 # Criar diretório de output se não existir
 if (-not (Test-Path $fullOutputPath)) {
     New-Item -ItemType Directory -Path $fullOutputPath -Force | Out-Null
+}
+
+# Criar diretório persistente para logs completos de execução
+$executionLogPath = Join-Path $testRoot "TestResults\ExecutionLogs"
+if (-not (Test-Path $executionLogPath)) {
+    New-Item -ItemType Directory -Path $executionLogPath -Force | Out-Null
 }
 
 # Garantir que o arquivo temporário de log não existe de execuções anteriores
@@ -381,8 +543,29 @@ $startTime = Get-Date
 $tempLogFile = Join-Path $fullOutputPath "test-output.log"
 
 # Executar comando e salvar output em arquivo
-Invoke-Expression $testCommand | Tee-Object -FilePath $tempLogFile
+# Redirecionar stderr para stdout (2>&1) garante que erros de build/compilação
+# sejam capturados no log, não apenas exibidos no console.
+$PSNativeCommandUseErrorActionPreference = $false
+Invoke-Expression "$testCommand 2>&1" | Tee-Object -FilePath $tempLogFile
 $testExitCode = $LASTEXITCODE
+
+$rawExecutionOutput = ""
+if (Test-Path $tempLogFile) {
+    $rawExecutionOutput = Get-Content $tempLogFile -Raw -Encoding UTF8
+}
+
+# Persistir o log completo da execução em uma pasta estável para facilitar a investigação de falhas
+$runTimestamp = Get-Date -Format "yyyyMMdd-HHmmss"
+$persistentLogFile = Join-Path $executionLogPath "test-output-$runTimestamp.log"
+if (Test-Path $tempLogFile) {
+    if ($LogOnlyFailedTests) {
+        $failedTestsLogContent = Get-FailedTestsLogContent -RawOutput $rawExecutionOutput
+        Set-Content -Path $persistentLogFile -Value $failedTestsLogContent -Encoding UTF8
+    }
+    else {
+        Copy-Item -Path $tempLogFile -Destination $persistentLogFile -Force
+    }
+}
 
 $endTime = Get-Date
 $duration = $endTime - $startTime
@@ -398,7 +581,12 @@ $skippedTests = 0
 $assemblyTestStats = @()
 
 if (Test-Path $tempLogFile) {
-    $outputString = Get-Content $tempLogFile -Raw -Encoding UTF8
+    $outputString = if ([string]::IsNullOrWhiteSpace($rawExecutionOutput)) {
+        Get-Content $tempLogFile -Raw -Encoding UTF8
+    }
+    else {
+        $rawExecutionOutput
+    }
 
     # Extrair estatísticas por assembly
     $lines = $outputString -split "`r?`n"
@@ -583,7 +771,7 @@ if ($totalTests -gt 0) {
     }
 }
 
-# Limpar arquivo temporário
+# Manter o log persistente e remover apenas o arquivo temporário usado para parsing
 if (Test-Path $tempLogFile) {
     Remove-Item $tempLogFile -Force -ErrorAction SilentlyContinue
 }
@@ -703,6 +891,16 @@ Write-ColorOutput "════════════════════�
 Write-ColorOutput "Execução Concluída!" "Green"
 Write-ColorOutput "════════════════════════════════════════════════════════════════" "Cyan"
 Write-Host ""
+
+if (Test-Path $persistentLogFile) {
+    if ($LogOnlyFailedTests) {
+        Write-ColorOutput "Log de falhas da execução salvo em: $persistentLogFile" "Cyan"
+    }
+    else {
+        Write-ColorOutput "Log completo da execução salvo em: $persistentLogFile" "Cyan"
+    }
+    Write-Host ""
+}
 
 # Abrir relatório no navegador
 $indexFile = Join-Path $reportPath "index.html"
