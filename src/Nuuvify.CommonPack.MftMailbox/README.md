@@ -22,6 +22,7 @@ Núcleo de orquestração para integração com MFT Mailbox, com foco em:
 - [Exemplo de uso](#exemplo-de-uso)
 - [Componentes principais](#componentes-principais)
 - [Boas práticas em produção](#boas-práticas-em-produção)
+- [Troubleshooting](#troubleshooting)
 - [Compatibilidade](#compatibilidade)
 
 ## Quando usar
@@ -122,6 +123,34 @@ public sealed class MftStatusService
 - Troque NullTransferAuditSink por sink de observabilidade (log, fila ou banco).
 - Ajuste retry/circuit breaker por SLA da integração.
 - Defina limites de lote/arquivo compatíveis com throughput do ambiente.
+
+## Troubleshooting
+
+### Nenhum cliente de protocolo foi resolvido
+
+Verifique se o protocolo específico foi registrado após o core:
+
+```csharp
+builder.Services.AddMftMailboxCore();
+builder.Services.AddMftMailboxSftp(/* ... */);
+// ou
+builder.Services.AddMftMailboxHttp(/* ... */);
+```
+
+### Erros de idempotência em produção com múltiplas instâncias
+
+A implementação padrão é em memória. Em cenários distribuídos, substitua por um store persistente:
+
+- Nuuvify.CommonPack.MftMailbox.Redis para Redis distribuído.
+- Implementação própria de IMftIdempotencyStore para outros backends.
+
+### Auditoria não está sendo registrada
+
+O core registra NullTransferAuditSink por padrão. Substitua por um sink real:
+
+```csharp
+builder.Services.AddSingleton<ITransferAuditSink, SeuAuditSink>();
+```
 
 ## Compatibilidade
 

@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Runtime.ExceptionServices;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nuuvify.CommonPack.MftMailbox.Abstraction.Interfaces;
@@ -260,6 +261,7 @@ public sealed class HttpMftMailboxClient : IProtocolMftClient
             FileName = item.FileName,
             State = TransferState.Pending
         };
+        ExceptionDispatchInfo? capturedException = null;
 
         if (!await _idempotencyStore.TryStartAsync(idempotencyKey, cancellationToken).ConfigureAwait(false))
         {
@@ -312,6 +314,11 @@ public sealed class HttpMftMailboxClient : IProtocolMftClient
             await _idempotencyStore.MarkCompletedAsync(idempotencyKey, cancellationToken).ConfigureAwait(false);
             _resilienceGate.RegisterSuccess();
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            _resilienceGate.RegisterFailure();
+            throw;
+        }
         catch (Exception ex)
         {
             _resilienceGate.RegisterFailure();
@@ -323,6 +330,11 @@ public sealed class HttpMftMailboxClient : IProtocolMftClient
 
             await _idempotencyStore.MarkFailedAsync(idempotencyKey, ex.Message, cancellationToken).ConfigureAwait(false);
             _logger.LogError(ex, "MFT HTTP transfer failed for integration {IntegrationKey} item {ItemId}", envelope.IntegrationKey, item.ItemId);
+
+            if (!IsTransient(ex))
+            {
+                capturedException = ExceptionDispatchInfo.Capture(ex);
+            }
         }
 
         _status[statusKey] = BuildStatus(envelope, item, idempotencyKey, result);
@@ -337,6 +349,8 @@ public sealed class HttpMftMailboxClient : IProtocolMftClient
             State = result.State,
             Message = result.Message
         }, cancellationToken).ConfigureAwait(false);
+
+        capturedException?.Throw();
 
         return result;
     }

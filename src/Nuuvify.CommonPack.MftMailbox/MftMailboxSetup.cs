@@ -44,16 +44,15 @@ public static class MftMailboxSetup
     /// <item><see cref="IMftClientFactory"/> → <see cref="MftClientFactory"/>.</item>
     /// </list>
     /// </remarks>
+    /// <exception cref="ArgumentNullException">
+    /// Lançado quando <paramref name="services"/> é <see langword="null"/>.
+    /// </exception>
     public static IServiceCollection AddMftMailboxCore(this IServiceCollection services, Action<MftMailboxOptions>? configureOptions = null)
     {
-        if (configureOptions is null)
-        {
-            _ = services.Configure<MftMailboxOptions>(_ => { });
-        }
-        else
-        {
-            _ = services.Configure(configureOptions);
-        }
+        ArgumentNullException.ThrowIfNull(services);
+
+        configureOptions ??= _ => { };
+        _ = services.Configure(configureOptions);
 
         _ = services.AddSingleton<IMftIdempotencyStore, InMemoryMftIdempotencyStore>();
         _ = services.AddSingleton<ITransferAuditSink, NullTransferAuditSink>();

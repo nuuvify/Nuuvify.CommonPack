@@ -199,7 +199,8 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
             {
                 await Task.Run(() =>
                 {
-                    using var sftp = CreateClient();
+                    using var sftpScope = CreateClientScope();
+                    var sftp = sftpScope.Client;
                     sftp.Connect();
 
                     if (_options.AckNackMode == SftpAckNackMode.Metadata)
@@ -300,7 +301,8 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
 
                     await Task.Run(() =>
                     {
-                        using var sftp = CreateClient();
+                        using var sftpScope = CreateClientScope();
+                        var sftp = sftpScope.Client;
                         sftp.Connect();
 
                         EnsureDirectory(sftp, _options.OutboundDirectory);
@@ -380,25 +382,17 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
         };
     }
 
-    private SftpClient CreateClient()
+    private SftpClientScope CreateClientScope()
     {
         var connectionInfo = BuildConnectionInfo();
-        var client = new SftpClient(connectionInfo);
+        var client = new SftpClient(connectionInfo.ConnectionInfo);
 
-        if (!string.IsNullOrWhiteSpace(_options.HostKeyFingerprint))
-        {
-            client.HostKeyReceived += (_, args) =>
-            {
-                var fingerprint = Convert.ToHexString(args.FingerPrint).ToLowerInvariant();
-                var expected = _options.HostKeyFingerprint.Replace(":", string.Empty, StringComparison.Ordinal).ToLowerInvariant();
-                args.CanTrust = string.Equals(fingerprint, expected, StringComparison.OrdinalIgnoreCase);
-            };
-        }
+        ConfigureHostKeyValidation(client);
 
-        return client;
+        return new SftpClientScope(client, connectionInfo.OwnedDisposables);
     }
 
-    private ConnectionInfo BuildConnectionInfo()
+    private ConnectionInfoContext BuildConnectionInfo()
     {
         if (!string.IsNullOrWhiteSpace(_options.PrivateKeyPath))
         {
@@ -406,15 +400,73 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
                 ? new PrivateKeyFile(_options.PrivateKeyPath)
                 : new PrivateKeyFile(_options.PrivateKeyPath, _options.PrivateKeyPassphrase);
 
-            return new ConnectionInfo(_options.Host, _options.Port, _options.Username, new PrivateKeyAuthenticationMethod(_options.Username, keyFile));
+            var authenticationMethod = new PrivateKeyAuthenticationMethod(_options.Username, keyFile);
+            var connectionInfo = new ConnectionInfo(_options.Host, _options.Port, _options.Username, authenticationMethod);
+
+            return new ConnectionInfoContext(
+                connectionInfo,
+                keyFile,
+                authenticationMethod);
         }
 
         if (!string.IsNullOrWhiteSpace(_options.Password))
         {
-            return new PasswordConnectionInfo(_options.Host, _options.Port, _options.Username, _options.Password);
+            return new ConnectionInfoContext(
+                new PasswordConnectionInfo(_options.Host, _options.Port, _options.Username, _options.Password));
         }
 
         throw new InvalidOperationException("SFTP credentials are not configured. Configure Password or PrivateKeyPath.");
+    }
+
+    private void ConfigureHostKeyValidation(SftpClient client)
+    {
+        if (string.IsNullOrWhiteSpace(_options.HostKeyFingerprint))
+        {
+            return;
+        }
+
+        client.HostKeyReceived += (_, args) =>
+        {
+            var fingerprint = Convert.ToHexString(args.FingerPrint).ToLowerInvariant();
+            var expected = _options.HostKeyFingerprint.Replace(":", string.Empty, StringComparison.Ordinal).ToLowerInvariant();
+            args.CanTrust = string.Equals(fingerprint, expected, StringComparison.OrdinalIgnoreCase);
+        };
+    }
+
+    private sealed class ConnectionInfoContext
+    {
+        public ConnectionInfoContext(ConnectionInfo connectionInfo, params IDisposable[] ownedDisposables)
+        {
+            ConnectionInfo = connectionInfo;
+            OwnedDisposables = ownedDisposables;
+        }
+
+        public ConnectionInfo ConnectionInfo { get; }
+
+        public IReadOnlyCollection<IDisposable> OwnedDisposables { get; }
+    }
+
+    private sealed class SftpClientScope : IDisposable
+    {
+        private readonly IReadOnlyCollection<IDisposable> _ownedDisposables;
+
+        public SftpClientScope(SftpClient client, IReadOnlyCollection<IDisposable> ownedDisposables)
+        {
+            Client = client;
+            _ownedDisposables = ownedDisposables;
+        }
+
+        public SftpClient Client { get; }
+
+        public void Dispose()
+        {
+            Client.Dispose();
+
+            foreach (var disposable in _ownedDisposables)
+            {
+                disposable.Dispose();
+            }
+        }
     }
 
     private static bool IsTransient(Exception ex)
@@ -453,7 +505,8 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
             {
                 return await Task.Run(() =>
                 {
-                    using var sftp = CreateClient();
+                    using var sftpScope = CreateClientScope();
+                    var sftp = sftpScope.Client;
                     sftp.Connect();
 
                     var files = sftp.ListDirectory(_options.InboundDirectory)
@@ -480,8 +533,9 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
             var tempPath = Path.GetTempFileName();
             var fileName = Path.GetFileName(remotePath);
 
-            using (var sftp = CreateClient())
+            using (var sftpScope = CreateClientScope())
             {
+                var sftp = sftpScope.Client;
                 sftp.Connect();
                 await using var writeStream = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.Read, 81920, FileOptions.Asynchronous | FileOptions.SequentialScan);
                 sftp.DownloadFile(remotePath, writeStream);

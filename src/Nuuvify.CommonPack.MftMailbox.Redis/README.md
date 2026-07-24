@@ -71,20 +71,22 @@ Ou via `PackageReference` no `.csproj`:
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 
-// Opção 1: Via AddStackExchangeRedisCache (recomendado)
-services.AddStackExchangeRedisCache(options =>
-{
-    options.Configuration = "localhost:6379";
-    options.InstanceName = "MftMailbox:";
-});
-
-// Opção 2: Via AddSingleton<IConnectionMultiplexer> (controle total)
+// Opção 1: Registrar IConnectionMultiplexer explicitamente (recomendado para este pacote)
 services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
     var configuration = ConfigurationOptions.Parse("localhost:6379");
     configuration.AbortOnConnectFail = false;
     return ConnectionMultiplexer.Connect(configuration);
 });
+
+// Opção 2: Se usar AddStackExchangeRedisCache, registre também o IConnectionMultiplexer
+services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = "localhost:6379";
+    options.InstanceName = "MftMailbox:";
+});
+
+services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect("localhost:6379"));
 ```
 
 ### Registrar MftMailbox com Redis
@@ -157,8 +159,8 @@ using Microsoft.Extensions.Hosting;
 var builder = Host.CreateApplicationBuilder(args);
 
 // Redis connection
-builder.Services.AddStackExchangeRedisCache(options =>
-    options.Configuration = "localhost:6379");
+builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
+    ConnectionMultiplexer.Connect("localhost:6379"));
 
 // MftMailbox core
 builder.Services.AddMftMailboxCore();
