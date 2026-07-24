@@ -1,3 +1,5 @@
+using Nuuvify.CommonPack.MftMailbox.Configuration;
+
 namespace Nuuvify.CommonPack.MftMailbox.Http.Configuration;
 
 /// <summary>
@@ -75,4 +77,28 @@ public sealed class HttpMftMailboxOptions
     /// Padrão: 2 segundos.
     /// </summary>
     public TimeSpan StatusPollingBaseDelay { get; set; } = TimeSpan.FromSeconds(2);
+
+    /// <summary>
+    /// Estratégia de ordenação aplicada à lista inbound retornada pelo endpoint de listagem.
+    /// Padrão: <see cref="InboundFileOrdering.None"/>.
+    /// </summary>
+    public InboundFileOrdering InboundFileOrdering { get; set; } = InboundFileOrdering.None;
+
+    /// <summary>
+    /// Quando <see langword="true"/>, metadados do envelope/item são enviados como campos
+    /// adicionais no multipart do upload.
+    /// </summary>
+    public bool IncludeMetadataInUploadForm { get; set; }
+
+    /// <summary>
+    /// Prefixo dos campos de metadados do envelope enviados no multipart.
+    /// Exemplo de campo final: <c>envMeta:chave</c>.
+    /// </summary>
+    public string EnvelopeMetadataFieldPrefix { get; set; } = "envMeta:";
+
+    /// <summary>
+    /// Prefixo dos campos de metadados do item enviados no multipart.
+    /// Exemplo de campo final: <c>itemMeta:chave</c>.
+    /// </summary>
+    public string ItemMetadataFieldPrefix { get; set; } = "itemMeta:";
 }

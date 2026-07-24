@@ -27,23 +27,18 @@ public static class RetryExecutor
     /// <param name="options">Parâmetros de retry (número máximo, atraso base, atraso máximo e jitter).</param>
     /// <param name="cancellationToken">Token de cancelamento propagado para cada tentativa e para os atrasos.</param>
     /// <returns>Resultado da operação quando executada com êxito.</returns>
-    /// <exception cref="ArgumentNullException">Lançado quando <paramref name="operation"/> ou <paramref name="transientPredicate"/> são nulos.</exception>
+    /// <exception cref="ArgumentNullException">Lançado quando <paramref name="operation"/>, <paramref name="transientPredicate"/> ou <paramref name="options"/> são nulos.</exception>
     /// <exception cref="OperationCanceledException">Lançado quando o token de cancelamento é acionado durante uma tentativa ou atraso.</exception>
     public static async Task<T> ExecuteAsync<T>(Func<Task<T>> operation, Func<Exception, bool> transientPredicate, RetryOptions options, CancellationToken cancellationToken)
     {
-        if (operation is null)
-        {
-            throw new ArgumentNullException(nameof(operation));
-        }
-
-        if (transientPredicate is null)
-        {
-            throw new ArgumentNullException(nameof(transientPredicate));
-        }
+        ArgumentNullException.ThrowIfNull(operation);
+        ArgumentNullException.ThrowIfNull(transientPredicate);
+        ArgumentNullException.ThrowIfNull(options);
 
         var random = options.UseJitter ? new Random() : null;
+        var attempt = 0;
 
-        for (var attempt = 0; ; attempt++)
+        while (true)
         {
             cancellationToken.ThrowIfCancellationRequested();
             try
@@ -61,6 +56,7 @@ public static class RetryExecutor
                 }
 
                 await Task.Delay(TimeSpan.FromMilliseconds(delayMs), cancellationToken).ConfigureAwait(false);
+                attempt++;
             }
         }
     }

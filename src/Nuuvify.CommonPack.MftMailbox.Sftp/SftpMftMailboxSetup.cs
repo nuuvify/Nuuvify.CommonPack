@@ -30,8 +30,12 @@ public static class SftpMftMailboxSetup
     /// <param name="services">Coleção de serviços da aplicação.</param>
     /// <param name="configureOptions">Delegate obrigatório para configurar <see cref="SftpMftMailboxOptions"/>.</param>
     /// <returns>A mesma <see cref="IServiceCollection"/> para encadeamento de chamadas.</returns>
+    /// <exception cref="ArgumentNullException">Lançado quando <paramref name="services"/> ou <paramref name="configureOptions"/> são <see langword="null"/>.</exception>
     public static IServiceCollection AddMftMailboxSftp(this IServiceCollection services, Action<SftpMftMailboxOptions> configureOptions)
     {
+        ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(configureOptions);
+
         _ = services.Configure(configureOptions);
         _ = services.AddSingleton<IProtocolMftClient, SftpMftMailboxClient>();
         return services;
