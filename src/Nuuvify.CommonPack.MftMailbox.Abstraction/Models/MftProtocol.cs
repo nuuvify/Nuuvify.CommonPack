@@ -5,6 +5,9 @@ namespace Nuuvify.CommonPack.MftMailbox.Abstraction.Models;
 /// </summary>
 public enum MftProtocol
 {
+    /// <summary>Não especifica protocolo de transferência.</summary>
+    None = 0,
+
     /// <summary>Transferência via SSH File Transfer Protocol (SFTP). Utiliza SSH na porta 22 por padrão.</summary>
     Sftp = 1,
 
