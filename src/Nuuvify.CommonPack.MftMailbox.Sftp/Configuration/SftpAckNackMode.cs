@@ -6,6 +6,11 @@ namespace Nuuvify.CommonPack.MftMailbox.Sftp.Configuration;
 public enum SftpAckNackMode
 {
     /// <summary>
+    /// Não executa confirmação ACK/NACK no servidor remoto.
+    /// </summary>
+    None = 0,
+
+    /// <summary>
     /// Move o arquivo do diretório inbound para o diretório de arquivo de sucesso (ACK)
     /// ou de erro (NACK) usando renomeação SFTP.
     /// Requer que os diretórios <c>ArchiveSuccessDirectory</c> e <c>ArchiveErrorDirectory</c> existam
@@ -18,5 +23,11 @@ public enum SftpAckNackMode
     /// <c>&lt;filename&gt;.ack</c> ou <c>&lt;filename&gt;.nack</c>.
     /// Útil quando o servidor MFT monitora esse diretório para confirmações externas.
     /// </summary>
-    MarkerFile = 2
+    MarkerFile = 2,
+
+    /// <summary>
+    /// Executa ambos os comportamentos: move o arquivo para sucesso/erro e também
+    /// cria o arquivo de marcador correspondente.
+    /// </summary>
+    MetadataAndMarkerFile = 3
 }

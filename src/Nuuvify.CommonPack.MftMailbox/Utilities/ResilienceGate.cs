@@ -23,8 +23,22 @@ public sealed class ResilienceGate
     /// Inicializa o circuit breaker com as opções fornecidas.
     /// </summary>
     /// <param name="options">Parâmetros de threshold e duração do break.</param>
+    /// <exception cref="ArgumentNullException">Lançado quando <paramref name="options"/> é <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Lançado quando o threshold de falha ou a duração do break são inválidos.</exception>
     public ResilienceGate(CircuitBreakerOptions options)
     {
+        ArgumentNullException.ThrowIfNull(options);
+
+        if (options.FailureThreshold <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(options), "FailureThreshold must be greater than zero.");
+        }
+
+        if (options.BreakDuration <= TimeSpan.Zero)
+        {
+            throw new ArgumentOutOfRangeException(nameof(options), "BreakDuration must be greater than zero.");
+        }
+
         _options = options;
     }
 

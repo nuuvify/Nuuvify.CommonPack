@@ -21,8 +21,11 @@ public static class ChecksumCalculator
     /// </param>
     /// <param name="cancellationToken">Token de cancelamento da operação.</param>
     /// <returns>String hexadecimal minúscula com 64 caracteres representando o SHA-256 do conteúdo.</returns>
+    /// <exception cref="ArgumentNullException">Lançado quando <paramref name="stream"/> é <see langword="null"/>.</exception>
     public static async Task<string> Sha256Async(Stream stream, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(stream);
+
         if (stream.CanSeek)
         {
             stream.Position = 0;

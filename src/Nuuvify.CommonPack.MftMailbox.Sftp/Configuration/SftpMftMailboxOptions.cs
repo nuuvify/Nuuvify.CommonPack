@@ -1,3 +1,5 @@
+#nullable enable
+
 namespace Nuuvify.CommonPack.MftMailbox.Sftp.Configuration;
 
 /// <summary>
@@ -69,4 +71,11 @@ public sealed class SftpMftMailboxOptions
     /// Escolha <see cref="SftpAckNackMode.MarkerFile"/> quando o servidor MFT exigir arquivos de marcador.
     /// </summary>
     public SftpAckNackMode AckNackMode { get; set; } = SftpAckNackMode.Metadata;
+
+    /// <summary>
+    /// Encoding usado para escrever o conteúdo dos arquivos de marcador ACK/NACK.
+    /// Valores válidos são os nomes aceitos por <see cref="System.Text.Encoding.GetEncoding(string)" /> no runtime .NET.
+    /// Padrão: <c>utf-8</c>. Para mainframe, pode ser configurado com code pages como <c>ibm037</c>.
+    /// </summary>
+    public string AckMarkerEncodingName { get; set; } = "utf-8";
 }
