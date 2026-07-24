@@ -29,8 +29,12 @@ public static class HttpMftMailboxSetup
     /// <param name="services">Coleção de serviços da aplicação.</param>
     /// <param name="configureOptions">Delegate obrigatório para configurar <see cref="HttpMftMailboxOptions"/>.</param>
     /// <returns>A mesma <see cref="IServiceCollection"/> para encadeamento de chamadas.</returns>
+    /// <exception cref="ArgumentNullException">Lançado quando <paramref name="services"/> ou <paramref name="configureOptions"/> são <see langword="null"/>.</exception>
     public static IServiceCollection AddMftMailboxHttp(this IServiceCollection services, Action<HttpMftMailboxOptions> configureOptions)
     {
+        ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(configureOptions);
+
         _ = services.Configure(configureOptions);
         _ = services.AddHttpClient<HttpMftMailboxClient>();
         _ = services.AddSingleton<IProtocolMftClient>(provider => provider.GetRequiredService<HttpMftMailboxClient>());

@@ -5,6 +5,9 @@ namespace Nuuvify.CommonPack.MftMailbox.Abstraction.Models;
 /// </summary>
 public enum AckNackType
 {
+    /// <summary>Não especifica decisão de confirmação.</summary>
+    None = 0,
+
     /// <summary>Confirmação positiva: o arquivo foi processado com sucesso e pode ser arquivado ou removido.</summary>
     Ack = 1,
 

@@ -83,11 +83,13 @@ public sealed class RedisMftIdempotencyStore : IMftIdempotencyStore
             var redisKey = BuildRedisKey(idempotencyKey);
 
             // SET NX EX: Set if Not eXists, with EXpiry
-            var started = await _redis.StringSetAsync(
-                redisKey,
-                "started",
-                _options.IdempotencyTtl,
-                When.NotExists);
+            var started = await ExecuteRedisAsync(
+                _redis.StringSetAsync(
+                    redisKey,
+                    "started",
+                    _options.IdempotencyTtl,
+                    When.NotExists),
+                cancellationToken).ConfigureAwait(false);
 
             if (!started)
             {
@@ -147,11 +149,11 @@ public sealed class RedisMftIdempotencyStore : IMftIdempotencyStore
             var redisKey = BuildRedisKey(idempotencyKey);
 
             // Obter TTL restante
-            var ttlTimeSpan = await _redis.KeyTimeToLiveAsync(redisKey);
+            var ttlTimeSpan = await ExecuteRedisAsync(_redis.KeyTimeToLiveAsync(redisKey), cancellationToken).ConfigureAwait(false);
             var ttl = (ttlTimeSpan > TimeSpan.Zero) ? ttlTimeSpan : _options.IdempotencyTtl;
 
             // Atualizar valor mantendo TTL
-            _ = await _redis.StringSetAsync(redisKey, "completed", ttl);
+            _ = await ExecuteRedisAsync(_redis.StringSetAsync(redisKey, "completed", ttl), cancellationToken).ConfigureAwait(false);
 
             _logger.LogDebug(
                 "Chave de idempotência marcada como concluída: {IdempotencyKey}",
@@ -203,11 +205,11 @@ public sealed class RedisMftIdempotencyStore : IMftIdempotencyStore
         try
         {
             var redisKey = BuildRedisKey(idempotencyKey);
-            var ttlTimeSpan = await _redis.KeyTimeToLiveAsync(redisKey);
+            var ttlTimeSpan = await ExecuteRedisAsync(_redis.KeyTimeToLiveAsync(redisKey), cancellationToken).ConfigureAwait(false);
             var ttl = (ttlTimeSpan > TimeSpan.Zero) ? ttlTimeSpan : _options.IdempotencyTtl;
 
             // Armazenar falha com motivo
-            _ = await _redis.StringSetAsync(redisKey, $"failed:{reason}", ttl);
+            _ = await ExecuteRedisAsync(_redis.StringSetAsync(redisKey, $"failed:{reason}", ttl), cancellationToken).ConfigureAwait(false);
 
             _logger.LogDebug(
                 "Chave de idempotência marcada como falha: {IdempotencyKey}, Motivo: {Reason}",
@@ -237,4 +239,9 @@ public sealed class RedisMftIdempotencyStore : IMftIdempotencyStore
     /// </summary>
     private string BuildRedisKey(string idempotencyKey) =>
         $"{_options.IdempotencyKeyPrefix}{idempotencyKey}";
+
+    private async Task<T> ExecuteRedisAsync<T>(Task<T> operation, CancellationToken cancellationToken)
+    {
+        return await operation.WaitAsync(_options.OperationTimeout, cancellationToken).ConfigureAwait(false);
+    }
 }
