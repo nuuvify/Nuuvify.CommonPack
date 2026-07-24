@@ -17,4 +17,4 @@ Verifique principalmente:
 
 Use também:
 - [BackgroundService Source Instruction](../instructions/backgroundservice-source.instructions.md)
-- [Library Tests Instruction](../instructions/library-tests.instructions.md)
+- [Library Tests Instruction](../instructions/nuuvify-tests.instructions.md)

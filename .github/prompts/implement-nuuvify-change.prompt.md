@@ -24,5 +24,5 @@ Checklist de saída:
 4. Riscos residuais declarados, se existirem.
 
 Use também:
-- [Nuuvify Library Source](../instructions/library-source.instructions.md)
-- [Nuuvify Library Tests](../instructions/library-tests.instructions.md)
+- [Nuuvify Library Source](../instructions/nuuvify-source.instructions.md)
+- [Nuuvify Library Tests](../instructions/nuuvify-tests.instructions.md)

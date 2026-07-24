@@ -1,5 +1,5 @@
 ---
-name: "library-reviewer"
+name: "nuuvify-reviewer"
 description: "Use when reviewing pull requests, diffs, refactorings, tests, documentation, or package changes in Nuuvify.CommonPack with read-only analysis. Focus on bugs, regressions, public API breaks, missing tests, package boundary violations, and security risks without editing files or running commands."
 tools: [read, search]
 model: ["Claude Sonnet 4.5 (copilot)", "GPT-5 (copilot)"]

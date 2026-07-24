@@ -20,5 +20,5 @@ Entregue testes prontos para rodar no padrão do repositório.
 Se o teste estiver concentrado em `UnitOfWork`, `BackgroundService` ou `Security`, prefira o prompt especializado do pacote correspondente em `.github/prompts/`.
 
 Use também:
-- [Nuuvify Library Tests](../instructions/library-tests.instructions.md)
+- [Nuuvify Library Tests](../instructions/nuuvify-tests.instructions.md)
 - [Testes do repositório](../../docs/contributing/testing.md)

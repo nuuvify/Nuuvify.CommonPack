@@ -2,7 +2,7 @@
 description: "Revisar mudanças em bibliotecas Nuuvify.CommonPack com foco em bugs, regressões, quebras de API, lacunas de teste e documentação."
 name: "Review Library Change"
 argument-hint: "PR, pacote, arquivo ou diff para revisar"
-agent: "library-reviewer"
+agent: "nuuvify-reviewer"
 model: ["Claude Sonnet 4.5 (copilot)", "GPT-5 (copilot)"]
 ---
 
@@ -23,4 +23,4 @@ Formato esperado:
 - Se não houver achados, diga isso explicitamente e aponte riscos residuais.
 
 Use também:
-- [Nuuvify Library Review](../instructions/library-review.instructions.md)
+- [Nuuvify Library Review](../instructions/nuuvify-review.instructions.md)
