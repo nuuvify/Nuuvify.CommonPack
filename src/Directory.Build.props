@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
     <PropertyGroup>
-        <OsPlatform Condition="$(OsPlatform) == '' AND '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'"> Windows</OsPlatform>
-        <OsPlatform Condition="$(OsPlatform) == '' AND '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'"> Linux</OsPlatform>
-        <OsPlatform Condition="$(OsPlatform) == '' AND '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'"> OSX</OsPlatform>
+        <OsPlatform Condition="$(OsPlatform) == '' AND '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">Windows</OsPlatform>
+        <OsPlatform Condition="$(OsPlatform) == '' AND '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">Linux</OsPlatform>
+        <OsPlatform Condition="$(OsPlatform) == '' AND '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'">OSX</OsPlatform>
         <LangVersion>latest</LangVersion>
         <IsPackable>true</IsPackable>
         <Authors>Lincoln Zocateli</Authors>
