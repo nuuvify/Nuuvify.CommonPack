@@ -31,6 +31,18 @@ public class MftClientFactoryTests
         Assert.Throws<InvalidOperationException>(() => factory.CreateTransferClient(MftProtocol.Sftp));
     }
 
+    [Fact]
+    public void DeveFalharQuandoExisteDuplicidadeDeProtocolo()
+    {
+        var first = new FakeProtocolClient(MftProtocol.Sftp);
+        var second = new FakeProtocolClient(MftProtocol.Sftp);
+
+        var exception = Assert.Throws<InvalidOperationException>(() =>
+            _ = new MftClientFactory(new[] { first, second }));
+
+        Assert.Contains("Multiple MFT clients registered", exception.Message, StringComparison.Ordinal);
+    }
+
     private sealed class FakeProtocolClient : IProtocolMftClient
     {
         public FakeProtocolClient(MftProtocol protocol)

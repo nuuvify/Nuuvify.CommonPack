@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Net.Sockets;
+using System.Runtime.ExceptionServices;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nuuvify.CommonPack.MftMailbox.Abstraction.Interfaces;
@@ -273,6 +274,7 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
             FileName = item.FileName,
             State = TransferState.Pending
         };
+        ExceptionDispatchInfo? capturedException = null;
 
         var idempotencyKey = IdempotencyKeyBuilder.Build(envelope, item);
         var statusKey = BuildStatusKey(envelope.IntegrationKey, item.ItemId);
@@ -337,6 +339,11 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
             await _idempotencyStore.MarkCompletedAsync(idempotencyKey, cancellationToken).ConfigureAwait(false);
             _resilienceGate.RegisterSuccess();
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            _resilienceGate.RegisterFailure();
+            throw;
+        }
         catch (Exception ex)
         {
             _resilienceGate.RegisterFailure();
@@ -348,6 +355,11 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
 
             await _idempotencyStore.MarkFailedAsync(idempotencyKey, ex.Message, cancellationToken).ConfigureAwait(false);
             _logger.LogError(ex, "MFT SFTP transfer failed for integration {IntegrationKey} item {ItemId}", envelope.IntegrationKey, item.ItemId);
+
+            if (!IsTransient(ex))
+            {
+                capturedException = ExceptionDispatchInfo.Capture(ex);
+            }
         }
 
         _status[statusKey] = BuildStatus(envelope, item, idempotencyKey, result);
@@ -362,6 +374,8 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
             State = result.State,
             Message = result.Message
         }, cancellationToken).ConfigureAwait(false);
+
+        capturedException?.Throw();
 
         return result;
     }
