@@ -47,7 +47,7 @@ public sealed class RedisAuditSerializer
     {
         try
         {
-            var nameValues = streamEntry.Values.ToDictionary(x => x.Name.ToString(), x => x.Value.ToString());
+            var nameValues = streamEntry.Values.ToDictionary(x => x.Name.ToString(), x => (string?)x.Value.ToString(), StringComparer.Ordinal);
 
             return new TransferAuditEntry
             {

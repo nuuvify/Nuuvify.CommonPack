@@ -33,16 +33,17 @@ namespace Nuuvify.CommonPack.MftMailbox.Redis;
 /// });
 ///
 /// // 3. Registrar Redis para MftMailbox (substitui in-memory)
+/// // 3. Registrar protocolos específicos
+/// services.AddMftMailboxSftp(/* ... */);
+/// services.AddMftMailboxHttp(/* ... */);
+///
+/// // 4. Registrar Redis para MftMailbox (substitui in-memory e aplica cache de status)
 /// services.AddMftMailboxRedis(opts =>
 /// {
 ///     opts.IdempotencyTtl = TimeSpan.FromHours(24);
 ///     opts.StatusCacheTtl = TimeSpan.FromMinutes(5);
 ///     opts.EnableAuditStream = true;
 /// });
-///
-/// // 4. Registrar protocolos específicos
-/// services.AddMftMailboxSftp(/* ... */);
-/// services.AddMftMailboxHttp(/* ... */);
 /// </code>
 /// </remarks>
 public static class RedisMftMailboxSetup
@@ -66,8 +67,9 @@ public static class RedisMftMailboxSetup
     /// <item><see cref="RedisAuditSerializer"/> → Serializador para auditoria (Singleton).</item>
     /// </list>
     ///
-    /// <c>AddMftMailboxRedis</c> deve ser chamado APÓS <c>AddMftMailboxCore</c>,
-    /// de modo que as substituições de Singleton funcionem corretamente.
+    /// <c>AddMftMailboxRedis</c> deve ser chamado APÓS <c>AddMftMailboxCore</c>.
+    /// Quando <c>EnableStatusCache=true</c>, também deve ser chamado após o registro
+    /// de ao menos um protocolo que implemente <see cref="IMftStatusClient"/>.
     /// </remarks>
     /// <exception cref="ArgumentNullException">
     /// Lançado quando <paramref name="services"/> é <see langword="null"/>.
@@ -115,24 +117,29 @@ public static class RedisMftMailboxSetup
             // Para preservar o cliente original, guardamos uma referência temporária
             var mftStatusClientDescriptor = services.LastOrDefault(sd => sd.ServiceType == typeof(IMftStatusClient));
 
-            if (mftStatusClientDescriptor is not null)
+            if (mftStatusClientDescriptor is null)
             {
-                // Remover o registro anterior (será re-adicionado via factory)
-                _ = services.Remove(mftStatusClientDescriptor);
-
-                // Registrar o cliente com decorador de cache
-                _ = services.AddSingleton<IMftStatusClient>(sp =>
-                {
-                    var innerClient = CreateInnerStatusClient(sp, mftStatusClientDescriptor);
-
-                    return new RedisCachedStatusClient(
-                        innerClient,
-                        sp.GetRequiredService<IConnectionMultiplexer>(),
-                        sp.GetRequiredService<IOptions<RedisMftMailboxOptions>>(),
-                        sp.GetRequiredService<RedisStatusSerializer>(),
-                        sp.GetRequiredService<ILogger<RedisCachedStatusClient>>());
-                });
+                throw new InvalidOperationException(
+                    "EnableStatusCache requer um IMftStatusClient previamente registrado. " +
+                    "Registre AddMftMailboxSftp/AddMftMailboxHttp antes de AddMftMailboxRedis, " +
+                    "ou desabilite EnableStatusCache.");
             }
+
+            // Remover o registro anterior (será re-adicionado via factory)
+            _ = services.Remove(mftStatusClientDescriptor);
+
+            // Registrar o cliente com decorador de cache
+            _ = services.AddSingleton<IMftStatusClient>(sp =>
+            {
+                var innerClient = CreateInnerStatusClient(sp, mftStatusClientDescriptor);
+
+                return new RedisCachedStatusClient(
+                    innerClient,
+                    sp.GetRequiredService<IConnectionMultiplexer>(),
+                    sp.GetRequiredService<IOptions<RedisMftMailboxOptions>>(),
+                    sp.GetRequiredService<RedisStatusSerializer>(),
+                    sp.GetRequiredService<ILogger<RedisCachedStatusClient>>());
+            });
         }
 
         // Substituir ITransferAuditSink com Redis Stream (se habilitado)
@@ -160,7 +167,13 @@ public static class RedisMftMailboxSetup
 
         if (serviceDescriptor.ImplementationType is not null)
         {
-            return (IMftStatusClient)ActivatorUtilities.CreateInstance(serviceProvider, serviceDescriptor.ImplementationType);
+            var implementation = ActivatorUtilities.CreateInstance(serviceProvider, serviceDescriptor.ImplementationType);
+            if (implementation is IMftStatusClient statusClient)
+            {
+                return statusClient;
+            }
+
+            throw new InvalidOperationException("ImplementationType registrado para IMftStatusClient não implementa o contrato esperado.");
         }
 
         throw new InvalidOperationException("Não foi possível resolver o registro original de IMftStatusClient para aplicar o decorador Redis.");

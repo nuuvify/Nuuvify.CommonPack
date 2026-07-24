@@ -1,6 +1,10 @@
+#nullable enable
+
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Sockets;
 using System.Runtime.ExceptionServices;
+using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nuuvify.CommonPack.MftMailbox.Abstraction.Interfaces;
@@ -76,6 +80,7 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
     public MftProtocol Protocol => MftProtocol.Sftp;
 
     /// <inheritdoc />
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Membro de contrato de interface e dependente do estado da instância via SendItemAsync.")]
     public async Task<TransferItemResult> SendSingleAsync(TransferEnvelope envelope, CancellationToken cancellationToken = default)
     {
         ValidateEnvelope(envelope);
@@ -138,6 +143,11 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
             ? envelope.Items.Select(x => ResolveInboundPath(x)).ToList()
             : await ListInboundFilesAsync(cancellationToken).ConfigureAwait(false);
 
+        if (envelope.Items.Count == 0)
+        {
+            paths = ApplyInboundOrdering(paths);
+        }
+
         if (paths.Count > _baseOptions.MaxBatchSize)
         {
             paths = paths.Take(_baseOptions.MaxBatchSize).ToList();
@@ -179,10 +189,12 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
     /// <remarks>
     /// O comportamento depende de <see cref="SftpMftMailboxOptions.AckNackMode"/>:
     /// <list type="bullet">
+    /// <item><see cref="SftpAckNackMode.None"/>: não envia confirmação ao servidor remoto.</item>
     /// <item><see cref="SftpAckNackMode.Metadata"/>: move o arquivo de <c>InboundDirectory</c>
     /// para <c>ArchiveSuccessDirectory</c> (ACK) ou <c>ArchiveErrorDirectory</c> (NACK).</item>
     /// <item><see cref="SftpAckNackMode.MarkerFile"/>: cria um arquivo <c>&lt;filename&gt;.ack</c>
     /// ou <c>&lt;filename&gt;.nack</c> em <c>AckMarkerDirectory</c>.</item>
+    /// <item><see cref="SftpAckNackMode.MetadataAndMarkerFile"/>: combina move e arquivo de marcador.</item>
     /// </list>
     /// A operação é protegida por retry. A auditoria é gravada ao final.
     /// </remarks>
@@ -195,40 +207,20 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
 
         var fileName = string.IsNullOrWhiteSpace(command.FileName) ? command.ItemId : command.FileName;
 
-        await RetryExecutor.ExecuteAsync(
+        if (_options.AckNackMode == SftpAckNackMode.None)
+        {
+            return await BuildAckNackResultAsync(
+                command,
+                fileName,
+                "ACKNACK_SKIPPED",
+                "ACK/NACK skipped by configuration.",
+                cancellationToken).ConfigureAwait(false);
+        }
+
+        _ = await RetryExecutor.ExecuteAsync(
             async () =>
             {
-                await Task.Run(() =>
-                {
-                    using var sftpScope = CreateClientScope();
-                    var sftp = sftpScope.Client;
-                    sftp.Connect();
-
-                    if (_options.AckNackMode == SftpAckNackMode.Metadata)
-                    {
-                        var source = CombinePath(_options.InboundDirectory, fileName);
-                        var target = command.Decision == AckNackType.Ack
-                            ? CombinePath(_options.ArchiveSuccessDirectory, fileName)
-                            : CombinePath(_options.ArchiveErrorDirectory, fileName);
-
-                        EnsureDirectory(sftp, Path.GetDirectoryName(target)?.Replace("\\", "/") ?? "/");
-                        if (sftp.Exists(source))
-                        {
-                            sftp.RenameFile(source, target);
-                        }
-                    }
-                    else
-                    {
-                        EnsureDirectory(sftp, _options.AckMarkerDirectory);
-                        var suffix = command.Decision == AckNackType.Ack ? "ack" : "nack";
-                        var markerPath = CombinePath(_options.AckMarkerDirectory, $"{fileName}.{suffix}");
-                        using var markerStream = sftp.Create(markerPath);
-                        var marker = System.Text.Encoding.UTF8.GetBytes(command.Reason ?? suffix);
-                        markerStream.Write(marker, 0, marker.Length);
-                    }
-
-                    sftp.Disconnect();
-                }, cancellationToken).ConfigureAwait(false);
+                await ExecuteAckNackOnSftpAsync(command, fileName, cancellationToken).ConfigureAwait(false);
 
                 return true;
             },
@@ -236,13 +228,28 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
             _baseOptions.Retry,
             cancellationToken).ConfigureAwait(false);
 
+        return await BuildAckNackResultAsync(
+            command,
+            fileName,
+            "ACKNACK_OK",
+            command.Decision.ToString(),
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task<TransferItemResult> BuildAckNackResultAsync(
+        AckNackCommand command,
+        string fileName,
+        string statusCode,
+        string message,
+        CancellationToken cancellationToken)
+    {
         var result = new TransferItemResult
         {
             ItemId = command.ItemId,
             FileName = fileName,
             State = TransferState.Succeeded,
-            StatusCode = "ACKNACK_OK",
-            Message = command.Decision.ToString()
+            StatusCode = statusCode,
+            Message = message
         };
 
         await _auditSink.WriteAsync(new TransferAuditEntry
@@ -253,12 +260,88 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
             ItemId = command.ItemId,
             Protocol = Protocol,
             State = TransferState.Succeeded,
-            Message = $"ACK/NACK processed as {command.Decision}."
+            Message = $"ACK/NACK processed as {command.Decision}.",
+            Metadata = new Dictionary<string, string>(command.Metadata, StringComparer.OrdinalIgnoreCase)
         }, cancellationToken).ConfigureAwait(false);
 
         return result;
     }
 
+    private async Task ExecuteAckNackOnSftpAsync(AckNackCommand command, string fileName, CancellationToken cancellationToken)
+    {
+        await Task.Run(() =>
+        {
+            using var sftpScope = CreateClientScope();
+            var sftp = sftpScope.Client;
+            sftp.Connect();
+
+            if (ShouldApplyMetadataAckNack())
+            {
+                ApplyMetadataAckNack(sftp, command, fileName);
+            }
+
+            if (ShouldApplyMarkerAckNack())
+            {
+                ApplyMarkerFileAckNack(sftp, command, fileName);
+            }
+
+            sftp.Disconnect();
+        }, cancellationToken).ConfigureAwait(false);
+    }
+
+    private void ApplyMetadataAckNack(SftpClient sftp, AckNackCommand command, string fileName)
+    {
+        var source = CombinePath(_options.InboundDirectory, fileName);
+        var target = command.Decision == AckNackType.Ack
+            ? CombinePath(_options.ArchiveSuccessDirectory, fileName)
+            : CombinePath(_options.ArchiveErrorDirectory, fileName);
+
+        EnsureDirectory(sftp, Path.GetDirectoryName(target)?.Replace("\\", "/") ?? "/");
+        if (sftp.Exists(source))
+        {
+            sftp.RenameFile(source, target);
+        }
+    }
+
+    private void ApplyMarkerFileAckNack(SftpClient sftp, AckNackCommand command, string fileName)
+    {
+        EnsureDirectory(sftp, _options.AckMarkerDirectory);
+        var suffix = command.Decision == AckNackType.Ack ? "ack" : "nack";
+        var markerPath = CombinePath(_options.AckMarkerDirectory, $"{fileName}.{suffix}");
+        using var markerStream = sftp.Create(markerPath);
+        var marker = ResolveAckMarkerEncoding().GetBytes(command.Reason ?? suffix);
+        markerStream.Write(marker, 0, marker.Length);
+    }
+
+    private bool ShouldApplyMetadataAckNack()
+    {
+        return _options.AckNackMode is SftpAckNackMode.Metadata or SftpAckNackMode.MetadataAndMarkerFile;
+    }
+
+    private bool ShouldApplyMarkerAckNack()
+    {
+        return _options.AckNackMode is SftpAckNackMode.MarkerFile or SftpAckNackMode.MetadataAndMarkerFile;
+    }
+
+    private Encoding ResolveAckMarkerEncoding()
+    {
+        if (string.IsNullOrWhiteSpace(_options.AckMarkerEncodingName))
+        {
+            return Encoding.UTF8;
+        }
+
+        try
+        {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            return Encoding.GetEncoding(_options.AckMarkerEncodingName);
+        }
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
+        {
+            throw new InvalidOperationException($"Encoding '{_options.AckMarkerEncodingName}' is not supported for ACK/NACK marker files.", ex);
+        }
+    }
+
+    [SuppressMessage("Maintainability", "CA1506:Avoid excessive class coupling", Justification = "Fluxo de orquestração SFTP integra contrato, idempotência, resiliência, auditoria e operações SSH por design do adapter.")]
     private async Task<TransferItemResult> SendItemAsync(TransferEnvelope envelope, TransferItem item, CancellationToken cancellationToken)
     {
         if (item.ContentFactory is null)
@@ -344,7 +427,7 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
             _resilienceGate.RegisterFailure();
             throw;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (IsHandledFailure(ex))
         {
             _resilienceGate.RegisterFailure();
 
@@ -372,7 +455,8 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
             ItemId = item.ItemId,
             Protocol = Protocol,
             State = result.State,
-            Message = result.Message
+            Message = result.Message,
+            Metadata = MergeMetadata(envelope.Metadata, item.Metadata)
         }, cancellationToken).ConfigureAwait(false);
 
         capturedException?.Throw();
@@ -425,8 +509,11 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
 
         if (!string.IsNullOrWhiteSpace(_options.Password))
         {
+            var passwordConnectionInfo = new PasswordConnectionInfo(_options.Host, _options.Port, _options.Username, _options.Password);
+
             return new ConnectionInfoContext(
-                new PasswordConnectionInfo(_options.Host, _options.Port, _options.Username, _options.Password));
+                passwordConnectionInfo,
+                passwordConnectionInfo);
         }
 
         throw new InvalidOperationException("SFTP credentials are not configured. Configure Password or PrivateKeyPath.");
@@ -472,7 +559,7 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
 
         public SftpClient Client { get; }
 
-        public void Dispose()
+        void IDisposable.Dispose()
         {
             Client.Dispose();
 
@@ -490,6 +577,13 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
             or SocketException
             or IOException
             or TimeoutException;
+    }
+
+    private static bool IsHandledFailure(Exception ex)
+    {
+        return ex is not OutOfMemoryException
+            and not StackOverflowException
+            and not AccessViolationException;
     }
 
     private string ResolveOutboundPath(TransferItem item)
@@ -591,12 +685,19 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
         return $"{integrationKey}|{itemId}".ToLowerInvariant();
     }
 
+    private List<string> ApplyInboundOrdering(List<string> paths)
+    {
+        return _baseOptions.InboundFileOrdering switch
+        {
+            InboundFileOrdering.FileNameAscending => paths.OrderBy(Path.GetFileName, StringComparer.OrdinalIgnoreCase).ToList(),
+            InboundFileOrdering.FileNameDescending => paths.OrderByDescending(Path.GetFileName, StringComparer.OrdinalIgnoreCase).ToList(),
+            _ => paths
+        };
+    }
+
     private static void ValidateEnvelope(TransferEnvelope envelope)
     {
-        if (envelope is null)
-        {
-            throw new ArgumentNullException(nameof(envelope));
-        }
+        ArgumentNullException.ThrowIfNull(envelope);
 
         if (string.IsNullOrWhiteSpace(envelope.IntegrationKey))
         {
@@ -636,5 +737,22 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
                 sftp.CreateDirectory(current);
             }
         }
+    }
+
+    private static Dictionary<string, string> MergeMetadata(IDictionary<string, string> envelopeMetadata, IDictionary<string, string> itemMetadata)
+    {
+        var merged = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var pair in envelopeMetadata)
+        {
+            merged[pair.Key] = pair.Value;
+        }
+
+        foreach (var pair in itemMetadata)
+        {
+            merged[pair.Key] = pair.Value;
+        }
+
+        return merged;
     }
 }

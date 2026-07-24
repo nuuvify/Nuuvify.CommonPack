@@ -46,6 +46,12 @@ public sealed class MftMailboxOptions
     /// </summary>
     public TimeSpan BatchTimeout { get; set; } = TimeSpan.FromMinutes(30);
 
+    /// <summary>
+    /// Estratégia de ordenação dos arquivos inbound antes do processamento.
+    /// Padrão: <see cref="InboundFileOrdering.None"/>.
+    /// </summary>
+    public InboundFileOrdering InboundFileOrdering { get; set; } = InboundFileOrdering.None;
+
     /// <summary>Parâmetros da política de retry com backoff exponencial.</summary>
     public RetryOptions Retry { get; set; } = new();
 

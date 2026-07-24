@@ -80,9 +80,11 @@ public sealed class RedisAuditStreamSink : ITransferAuditSink
             var nameValueEntries = _serializer.Serialize(entry);
 
             // Adicionar à stream Redis
-            var streamId = await _redis.StreamAddAsync(
-                _options.AuditStreamName,
-                nameValueEntries);
+            var streamId = await ExecuteRedisAsync(
+                _redis.StreamAddAsync(
+                    _options.AuditStreamName,
+                    nameValueEntries),
+                cancellationToken).ConfigureAwait(false);
 
             _logger.LogDebug(
                 "Entrada de auditoria adicionada à stream: {StreamId}, " +
@@ -94,9 +96,16 @@ public sealed class RedisAuditStreamSink : ITransferAuditSink
 
             // Trimagem assíncrona: manter apenas últimas N entradas
             // Executada em background, não bloqueia
-            _ = _redis.StreamTrimAsync(
+            ObserveTrimTask(_redis.StreamTrimAsync(
                 _options.AuditStreamName,
-                _options.AuditStreamMaxLength);
+                _options.AuditStreamMaxLength));
+        }
+        catch (TimeoutException ex)
+        {
+            _logger.LogWarning(
+                ex,
+                "Timeout Redis ao gravar auditoria para IntegrationKey={IntegrationKey}",
+                entry.IntegrationKey);
         }
         catch (RedisConnectionException ex)
         {
@@ -115,5 +124,25 @@ public sealed class RedisAuditStreamSink : ITransferAuditSink
                 entry.ItemId);
             throw;
         }
+    }
+
+    private async Task<T> ExecuteRedisAsync<T>(Task<T> operation, CancellationToken cancellationToken)
+    {
+        return await operation.WaitAsync(_options.OperationTimeout, cancellationToken).ConfigureAwait(false);
+    }
+
+    private void ObserveTrimTask(Task<long> trimTask)
+    {
+        _ = trimTask.ContinueWith(
+            t =>
+            {
+                if (t.Exception is null)
+                {
+                    return;
+                }
+
+                _logger.LogWarning(t.Exception, "Falha ao executar trim da stream de auditoria {StreamName}", _options.AuditStreamName);
+            },
+            TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously);
     }
 }
