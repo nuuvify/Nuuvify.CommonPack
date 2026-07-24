@@ -1,5 +1,5 @@
 ---
-name: library-maintenance
+name: nuuvify-maintenance
 description: 'Create, change, refactor, test, review, or document Nuuvify.CommonPack .NET libraries with minimal token usage. Use for package-focused implementation, API-safe refactoring, regression tests, PR reviews, and documentation updates guided by Clean Architecture, SOLID, SemVer, and repo conventions.'
 argument-hint: 'Pacote, tarefa, objetivo e restrições'
 user-invocable: true
@@ -29,8 +29,8 @@ Para esses pacotes, a especialização já cobre planejamento, implementação, 
 
 ## Agentes especializados
 
-- Use `library-reviewer` para revisão somente leitura com foco em achados e sem risco de edição acidental.
-- Use `library-refactorer` para refatoração incremental com edição e validação local, mas sem web ou subagentes.
+- Use `nuuvify-reviewer` para revisão somente leitura com foco em achados e sem risco de edição acidental.
+- Use `nuuvify-refactorer` para refatoração incremental com edição e validação local, mas sem web ou subagentes.
 
 ## Disciplina de tokens
 
@@ -50,9 +50,9 @@ Para esses pacotes, a especialização já cobre planejamento, implementação, 
 ## Arquivos de apoio
 
 - [Copilot Instructions](../../copilot-instructions.md)
-- [Library Source Instruction](../../instructions/library-source.instructions.md)
-- [Library Tests Instruction](../../instructions/library-tests.instructions.md)
+- [Library Source Instruction](../../instructions/nuuvify-source.instructions.md)
+- [Library Tests Instruction](../../instructions/nuuvify-tests.instructions.md)
 - [Package Docs Instruction](../../instructions/package-docs.instructions.md)
-- [Library Reviewer Agent](../../agents/library-reviewer.agent.md)
-- [Library Refactorer Agent](../../agents/library-refactorer.agent.md)
+- [Library Reviewer Agent](../../agents/nuuvify-reviewer.agent.md)
+- [Library Refactorer Agent](../../agents/nuuvify-refactorer.agent.md)
 - [Playbooks](./references/playbooks.md)

@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nuuvify-dev-scripts"
+version = "0.1.0"
+description = "Tooling CLI para automacoes internas do repositório"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+get-github-pr-comments = "github_pr_tools.get_github_pr_comments:main"
+update-github-pr-comments = "github_pr_tools.update_github_pr_comments:main"
+release-template = "release_tools.release_template:main"
+
+[tool.setuptools]
+package-dir = {"" = "."}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["*_tools*"]

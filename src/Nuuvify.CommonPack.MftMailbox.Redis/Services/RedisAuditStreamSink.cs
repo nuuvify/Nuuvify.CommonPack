@@ -15,7 +15,8 @@ namespace Nuuvify.CommonPack.MftMailbox.Redis.Services;
 /// Grava cada operação MFT (envio, recepção, ACK/NACK) em uma stream Redis que pode ser
 /// consumida por aplicações externas (logging, telemetria, banco de dados).
 ///
-/// Padrão: Fire-and-forget assíncrono (não bloqueia fluxo de transferência).
+/// Padrão: escrita assíncrona aguardada pelo chamador para garantir diagnóstico de falhas.
+/// Em caso de indisponibilidade Redis, a falha é registrada em log e o fluxo principal segue.
 /// Consumidores externos leem da stream com <c>XREAD</c> ou grupos de consumo.
 ///
 /// Registrado via <c>RedisMftMailboxSetup.AddMftMailboxRedis</c> quando
@@ -56,13 +57,14 @@ public sealed class RedisAuditStreamSink : ITransferAuditSink
     }
 
     /// <summary>
-    /// Grava uma entrada de auditoria na stream Redis de forma assíncrona e não-bloqueante.
+    /// Grava uma entrada de auditoria na stream Redis de forma assíncrona.
     /// </summary>
     /// <param name="entry">Dados da operação a ser auditada.</param>
     /// <param name="cancellationToken">Token de cancelamento.</param>
     /// <remarks>
-    /// Operação é fire-and-forget: não aguarda conclusão. Se falhar, apenas loga
-    /// warning e continua. Falhas não interrompem o fluxo de transferência MFT.
+    /// A operação é aguardada para permitir diagnóstico de falhas de infraestrutura.
+    /// Se Redis estiver indisponível, a implementação registra warning e continua,
+    /// pois auditoria é um recurso auxiliar.
     ///
     /// Stream é trimada automaticamente para <c>RedisMftMailboxOptions.AuditStreamMaxLength</c>
     /// (padrão 100k entradas) para evitar crescimento indefinido.
@@ -106,12 +108,12 @@ public sealed class RedisAuditStreamSink : ITransferAuditSink
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(
+            _logger.LogError(
                 ex,
-                "Erro ao gravar auditoria para IntegrationKey={IntegrationKey}, ItemId={ItemId}",
+                "Falha inesperada ao gravar auditoria para IntegrationKey={IntegrationKey}, ItemId={ItemId}",
                 entry.IntegrationKey,
                 entry.ItemId);
-            // Não relançar: auditoria é fire-and-forget
+            throw;
         }
     }
 }

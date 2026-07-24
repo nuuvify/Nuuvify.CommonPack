@@ -1,5 +1,5 @@
 ---
-name: "library-refactorer"
+name: "nuuvify-refactorer"
 description: "Use when refactoring, simplifying, renaming, or reducing complexity in Nuuvify.CommonPack libraries with controlled edits. Focus on behavior preservation, small slices, targeted validation, package boundaries, and API safety."
 tools: [read, search, edit, execute]
 model: "GPT-5 (copilot)"

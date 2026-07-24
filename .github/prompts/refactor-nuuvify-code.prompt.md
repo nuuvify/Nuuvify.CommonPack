@@ -2,7 +2,7 @@
 description: "Refatorar código de biblioteca Nuuvify.CommonPack preservando comportamento, reduzindo complexidade e mantendo validação estreita."
 name: "Refactor Library Code"
 argument-hint: "Pacote, símbolo ou arquivo, cheiro de código, restrições e teste alvo"
-agent: "library-refactorer"
+agent: "nuuvify-refactorer"
 model: "GPT-5 (copilot)"
 ---
 
@@ -19,5 +19,5 @@ Se a refatoração estiver concentrada em `UnitOfWork`, `BackgroundService` ou `
 Entregue uma refatoração incremental, sem ampliar escopo desnecessariamente.
 
 Use também:
-- [Nuuvify Library Refactoring](../instructions/library-refactoring.instructions.md)
-- [Nuuvify Library Source](../instructions/library-source.instructions.md)
+- [Nuuvify Library Refactoring](../instructions/nuuvify-refactoring.instructions.md)
+- [Nuuvify Library Source](../instructions/nuuvify-source.instructions.md)

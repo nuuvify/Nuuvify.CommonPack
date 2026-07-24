@@ -2,7 +2,7 @@
 description: "Refatorar Nuuvify.CommonPack.Security, Security.JwtCredentials ou Security.JwtStore.Ef com segurança para validação, claims, JWT, autenticação e segredos."
 name: "Security Refactor Code"
 argument-hint: "Símbolo, arquivo, cheiro de código e teste alvo"
-agent: "library-refactorer"
+agent: "nuuvify-refactorer"
 model: "GPT-5 (copilot)"
 ---
 
@@ -16,4 +16,4 @@ Cuidados obrigatórios:
 
 Use também:
 - [Security Source Instruction](../instructions/security-source.instructions.md)
-- [Library Refactoring Instruction](../instructions/library-refactoring.instructions.md)
+- [Library Refactoring Instruction](../instructions/nuuvify-refactoring.instructions.md)
