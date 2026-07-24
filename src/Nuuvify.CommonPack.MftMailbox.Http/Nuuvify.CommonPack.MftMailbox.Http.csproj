@@ -3,6 +3,7 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
     <PackageId>Nuuvify.CommonPack.MftMailbox.Http</PackageId>
     <Title>Nuuvify CommonPack MFT Mailbox HTTP Adapter</Title>
     <PackageTags>Nuuvify;MFT;Mailbox;HTTP;HTTPS;Streaming;.NET</PackageTags>
@@ -19,10 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference
-      Include="..\Nuuvify.CommonPack.MftMailbox\Nuuvify.CommonPack.MftMailbox.csproj" />
-    <ProjectReference
-      Include="..\Nuuvify.CommonPack.MftMailbox.Abstraction\Nuuvify.CommonPack.MftMailbox.Abstraction.csproj" />
+    <ProjectReference Include="..\Nuuvify.CommonPack.MftMailbox\Nuuvify.CommonPack.MftMailbox.csproj" />
+    <ProjectReference Include="..\Nuuvify.CommonPack.MftMailbox.Abstraction\Nuuvify.CommonPack.MftMailbox.Abstraction.csproj" />
   </ItemGroup>
 
 </Project>

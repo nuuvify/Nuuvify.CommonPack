@@ -30,6 +30,15 @@ public class NuuvifyLogFormatter : ConsoleFormatter, IDisposable
         IOptionsMonitor<NuuvifyLogColorConfiguration> nuuvifyLogColorConfiguration)
         : base(nameof(NuuvifyLogFormatter))
     {
+        if (nuuvifyLogOptions is null)
+        {
+            throw new ArgumentNullException(nameof(nuuvifyLogOptions));
+        }
+
+        if (nuuvifyLogColorConfiguration is null)
+        {
+            throw new ArgumentNullException(nameof(nuuvifyLogColorConfiguration));
+        }
 
         _formatterOptionsReloadToken = nuuvifyLogOptions.OnChange(ReloadLoggerOptions);
         _nuuvifyLogOptions = nuuvifyLogOptions.CurrentValue;
