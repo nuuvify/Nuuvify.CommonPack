@@ -20,11 +20,19 @@ public sealed class MftClientFactory : IMftClientFactory
     /// Inicializa a fábrica indexando os clientes fornecidos pelo protocolo.
     /// </summary>
     /// <param name="clients">Coleção de todos os <see cref="IProtocolMftClient"/> registrados no DI.</param>
+    /// <exception cref="InvalidOperationException">
+    /// Lançado quando há mais de um <see cref="IProtocolMftClient"/> registrado para o mesmo <see cref="MftProtocol"/>.
+    /// </exception>
     public MftClientFactory(IEnumerable<IProtocolMftClient> clients)
     {
         var dictionary = new Dictionary<MftProtocol, IProtocolMftClient>();
         foreach (var client in clients)
         {
+            if (dictionary.ContainsKey(client.Protocol))
+            {
+                throw new InvalidOperationException($"Multiple MFT clients registered for protocol '{client.Protocol}'. Keep only one implementation per protocol.");
+            }
+
             dictionary[client.Protocol] = client;
         }
 

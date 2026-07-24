@@ -17,4 +17,4 @@ Verifique principalmente:
 
 Use também:
 - [UnitOfWork Source Instruction](../instructions/unitofwork-source.instructions.md)
-- [Library Tests Instruction](../instructions/library-tests.instructions.md)
+- [Library Tests Instruction](../instructions/nuuvify-tests.instructions.md)

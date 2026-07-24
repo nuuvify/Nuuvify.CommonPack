@@ -13,17 +13,21 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 - Suporte opt-in a `IUnitOfWorkFactory<TContext>` no pacote `Nuuvify.CommonPack.UnitOfWork` para criação de `UnitOfWork` curto por operação com `IDbContextFactory<TContext>`.
 - Suporte opt-in a `IShortLivedDbContextFactory<TContext>` e `IWorkerDbContextFactory<TContext>` no pacote `Nuuvify.CommonPack.UnitOfWork` para criação de `DbContext` curto com auditoria em cenários de worker/background.
 - Novos pacotes para integração MFT Mailbox: `Nuuvify.CommonPack.MftMailbox.Abstraction`, `Nuuvify.CommonPack.MftMailbox`, `Nuuvify.CommonPack.MftMailbox.Sftp` e `Nuuvify.CommonPack.MftMailbox.Http`.
+- Novo pacote para integração MFT Mailbox com Redis distribuído: `Nuuvify.CommonPack.MftMailbox.Redis`.
 - Implementação de fluxos bidirecionais com envio/recebimento por streaming, consulta de status, ACK/NACK, idempotência e auditoria para SFTP e HTTPS Mailbox.
 
 ### Alterado
 - Geração de Id em `DomainEntity` no pacote `Nuuvify.CommonPack.Extensions` alterada para UUID orientado a banco de dados (UUID v7).
 - Fluxo de processamento de mensagens ajustado para evitar operações de settlement (`Complete`, `Abandon`, `DeadLetter`) quando `ReceiveMode` for `ReceiveAndDelete`.
 - Scripts e organização de execução de testes revisados para melhorar seleção por traits e execução local/CI.
+- Setup Redis do MFT Mailbox ajustado para orientar registro correto de `IConnectionMultiplexer` e aplicar decoração de `IMftStatusClient` com suporte a registros por tipo, factory e instância.
 
 ### Corrigido
 - Tratamento de exceções em `ReceiveAndDelete` ajustado para evitar falhas secundárias ao processar mensagens já removidas da fila.
 - Validação do CNPJ reforçada para rejeitar entradas inválidas (formato, tamanho e repetição total de caracteres).
 - `TokenService.GetToken` no pacote `Nuuvify.CommonPack.StandardHttpClient` agora resolve `ClientId`/`ClientSecret` também a partir de chaves planas com separador `--` (ex.: `AzureAdOpenID--cc--ClientId`), cobrindo cenários em que segredos do Key Vault são carregados via `AddKeyPerFile` sem tradução de `--` para `:`. Isso corrige falha de obtenção de token em workers/produção.
+- Lifecycle de objetos descartáveis no cliente SFTP do MFT Mailbox corrigido para evitar vazamento de recursos de autenticação.
+- Tratamento de exceções no cliente HTTP e nos serviços Redis do MFT Mailbox ajustado para não ocultar falhas críticas e melhorar diagnóstico.
 
 ### Removido
 
@@ -36,6 +40,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 - Padronização dos `CHANGELOG.md` dos pacotes e atualização dos changelogs de `Domain`, `AzureServiceBus`, `BackgroundService` e `Extensions` com alterações recentes.
 - Atualização de documentação de mantenedores e contribuição (onboarding, setup e processo de release).
 - Criação do guia central de consumo em projetos de terceiros em `docs/consumo-em-projetos-terceiros.md`, com onboarding, matriz de pacotes, configuração e exemplos de integração.
+- Atualização do README do pacote `Nuuvify.CommonPack.MftMailbox` com seção de troubleshooting e revisão dos changelogs de `Nuuvify.CommonPack.MftMailbox` e `Nuuvify.CommonPack.MftMailbox.Redis` para formato canônico.
 
 ## [3.0.0] - 2025-11-01
 

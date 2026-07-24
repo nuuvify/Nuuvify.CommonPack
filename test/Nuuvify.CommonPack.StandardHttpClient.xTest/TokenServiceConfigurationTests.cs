@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging;
 using Nuuvify.CommonPack.StandardHttpClient.Results;
 
 namespace Nuuvify.CommonPack.StandardHttpClient.xTest;
@@ -22,6 +23,14 @@ public class TokenServiceConfigurationTests
         Mock<IConfiguration> configuration,
         Mock<IStandardHttpClient> httpClient)
     {
+        return CreateTokenService(configuration, httpClient, NullLogger<TokenService>.Instance);
+    }
+
+    private static TokenService CreateTokenService(
+        Mock<IConfiguration> configuration,
+        Mock<IStandardHttpClient> httpClient,
+        ILogger<TokenService> logger)
+    {
         var options = new Mock<IOptions<CredentialToken>>();
         _ = options.Setup(o => o.Value).Returns(new CredentialToken());
 
@@ -31,7 +40,7 @@ public class TokenServiceConfigurationTests
             options.Object,
             httpClient.Object,
             configuration.Object,
-            NullLogger<TokenService>.Instance,
+            logger,
             accessor.Object);
     }
 
@@ -130,5 +139,43 @@ public class TokenServiceConfigurationTests
         var loginProperty = capturedBody.GetType().GetProperty("Login");
         Assert.NotNull(loginProperty);
         Assert.Equal("client-id-colon", loginProperty.GetValue(capturedBody));
+    }
+
+    [Fact]
+    public async Task GetNewToken_ComLogRequestAtivo_NaoDeveExporAuthorizationHeaderNosLogs()
+    {
+        var configuration = new Mock<IConfiguration>();
+        SetupSection(configuration, "AppConfig:LogRequest", "true");
+
+        var logger = new Mock<ILogger<TokenService>>();
+        var httpClient = new Mock<IStandardHttpClient>();
+
+        _ = httpClient.Setup(x => x.AuthorizationLog).Returns("Bearer top-secret-token");
+        _ = httpClient.Setup(x => x.WithHeader(It.IsAny<string>(), It.IsAny<object>()))
+            .Returns(httpClient.Object);
+        _ = httpClient.Setup(x => x.Post(
+                It.IsAny<string>(),
+                It.IsAny<object>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new HttpStandardReturn
+            {
+                Success = true,
+                ReturnMessage = "{\"token\":\"abc\",\"created\":\"2026-01-01T00:00:00Z\",\"expires\":\"2026-01-02T00:00:00Z\"}"
+            });
+
+        var service = CreateTokenService(configuration, httpClient, logger.Object);
+
+        _ = await service.GetNewToken("/token", "user", "pass", null, CancellationToken.None);
+
+        logger.Verify(
+            x => x.Log(
+                LogLevel.Information,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((state, _) =>
+                    state.ToString()!.Contains("Authorization header configured", StringComparison.Ordinal)
+                    && !state.ToString()!.Contains("top-secret-token", StringComparison.Ordinal)),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+            Times.AtLeast(2));
     }
 }

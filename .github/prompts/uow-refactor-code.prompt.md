@@ -2,7 +2,7 @@
 description: "Refatorar Nuuvify.CommonPack.UnitOfWork ou UnitOfWork.Abstraction com segurança para IQueryable, LINQ/EF, extensões públicas, paginação, filtros e ordenação."
 name: "UoW Refactor Code"
 argument-hint: "Símbolo, arquivo, cheiro de código e teste alvo"
-agent: "library-refactorer"
+agent: "nuuvify-refactorer"
 model: "GPT-5 (copilot)"
 ---
 
@@ -16,4 +16,4 @@ Cuidados obrigatórios:
 
 Use também:
 - [UnitOfWork Source Instruction](../instructions/unitofwork-source.instructions.md)
-- [Library Refactoring Instruction](../instructions/library-refactoring.instructions.md)
+- [Library Refactoring Instruction](../instructions/nuuvify-refactoring.instructions.md)
