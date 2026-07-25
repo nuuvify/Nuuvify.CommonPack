@@ -75,6 +75,11 @@ public sealed class RedisAuditStreamSink : ITransferAuditSink
 
         cancellationToken.ThrowIfCancellationRequested();
 
+        if (!_options.EnableAuditStream)
+        {
+            return;
+        }
+
         try
         {
             var nameValueEntries = _serializer.Serialize(entry);
