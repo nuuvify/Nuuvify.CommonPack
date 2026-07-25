@@ -63,6 +63,16 @@ public static class NuuvifyLogSetupExtensions
         Action<NuuvifyLogFormatterOptions> configureFormatter,
         Action<NuuvifyLogColorConfiguration> configureColor = default)
     {
+        if (builder is null)
+        {
+            throw new ArgumentNullException(nameof(builder));
+        }
+
+        if (configureFormatter is null)
+        {
+            throw new ArgumentNullException(nameof(configureFormatter));
+        }
+
         return builder.AddCustomFormatter(configureFormatter, configureConsole: null, configureColor);
     }
 
@@ -84,6 +94,16 @@ public static class NuuvifyLogSetupExtensions
         Action<ConsoleLoggerOptions> configureConsole,
         Action<NuuvifyLogColorConfiguration> configureColor = default)
     {
+        if (builder is null)
+        {
+            throw new ArgumentNullException(nameof(builder));
+        }
+
+        if (configureFormatter is null)
+        {
+            throw new ArgumentNullException(nameof(configureFormatter));
+        }
+
         if (configureColor != null)
             _ = builder.Services.Configure(configureColor);
 

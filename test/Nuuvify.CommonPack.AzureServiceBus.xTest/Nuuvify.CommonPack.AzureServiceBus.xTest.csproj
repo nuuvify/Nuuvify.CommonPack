@@ -14,7 +14,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Shouldly" />
         <PackageReference Include="Microsoft.Extensions.Options" />
     </ItemGroup>
 
