@@ -35,7 +35,7 @@ public static class RetryExecutor
         ArgumentNullException.ThrowIfNull(transientPredicate);
         ArgumentNullException.ThrowIfNull(options);
 
-        var random = options.UseJitter ? new Random() : null;
+        var random = options.UseJitter ? Random.Shared : null;
         var attempt = 0;
 
         while (true)

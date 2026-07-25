@@ -97,4 +97,36 @@ public static class NuuvifyLogSetupExtensions
         return builder;
     }
 
+    /// <summary>
+    /// Mantém compatibilidade com versões anteriores que registravam o formatter via AddNuuvifyConsoleFormatter.
+    /// </summary>
+    /// <param name="builder">Builder de logging que receberá o formatter.</param>
+    /// <param name="configureFormatter">Ação para customizar as opções do formatter.</param>
+    /// <param name="configureColor">Ação opcional para customizar o mapeamento de cores por nível de log.</param>
+    /// <returns>O mesmo <see cref="ILoggingBuilder"/> para encadeamento.</returns>
+    public static ILoggingBuilder AddNuuvifyConsoleFormatter(
+        this ILoggingBuilder builder,
+        Action<NuuvifyLogFormatterOptions> configureFormatter,
+        Action<NuuvifyLogColorConfiguration> configureColor = default)
+    {
+        return builder.AddCustomFormatter(configureFormatter, configureColor);
+    }
+
+    /// <summary>
+    /// Mantém compatibilidade com versões anteriores que registravam o formatter via AddNuuvifyConsoleFormatter.
+    /// </summary>
+    /// <param name="builder">Builder de logging que receberá o formatter.</param>
+    /// <param name="configureFormatter">Ação para customizar as opções do formatter.</param>
+    /// <param name="configureConsole">Ação opcional para customizar o provider de console padrão do .NET.</param>
+    /// <param name="configureColor">Ação opcional para customizar o mapeamento de cores por nível de log.</param>
+    /// <returns>O mesmo <see cref="ILoggingBuilder"/> para encadeamento.</returns>
+    public static ILoggingBuilder AddNuuvifyConsoleFormatter(
+        this ILoggingBuilder builder,
+        Action<NuuvifyLogFormatterOptions> configureFormatter,
+        Action<ConsoleLoggerOptions> configureConsole,
+        Action<NuuvifyLogColorConfiguration> configureColor = default)
+    {
+        return builder.AddCustomFormatter(configureFormatter, configureConsole, configureColor);
+    }
+
 }
