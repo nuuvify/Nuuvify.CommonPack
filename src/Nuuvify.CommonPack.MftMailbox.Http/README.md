@@ -24,6 +24,7 @@ Adapter HTTPS Mailbox para integração MFT com suporte a:
 - [Exemplo de ACK/NACK](#exemplo-de-acknack)
 - [Segurança](#segurança)
 - [Troubleshooting](#troubleshooting)
+- [Compatibilidade](#compatibilidade)
 
 ## Quando usar
 
@@ -157,3 +158,11 @@ await ackClient.AckOrNackAsync(new AckNackCommand
 - Timeout: revisar BaseUrl, proxy, timeout e políticas de retry.
 - Polling sem conclusão: ajustar StatusPollingMaxAttempts/base delay e validar endpoint de status.
 - Falha de desserialização: validar contrato de resposta do provedor MFT.
+
+## Compatibilidade
+
+- Framework alvo: .NET 8
+- Dependências principais:
+	- Nuuvify.CommonPack.MftMailbox
+	- Nuuvify.CommonPack.MftMailbox.Abstraction
+	- Microsoft.Extensions.Http
