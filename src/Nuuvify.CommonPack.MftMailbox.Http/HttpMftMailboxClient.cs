@@ -205,18 +205,16 @@ public sealed class HttpMftMailboxClient : IProtocolMftClient
     /// </remarks>
     public async Task<TransferItemResult> AckOrNackAsync(AckNackCommand command, CancellationToken cancellationToken = default)
     {
-        var response = await RetryExecutor.ExecuteAsync(
+        _ = await RetryExecutor.ExecuteAsync(
             async () =>
             {
-                var message = await _httpClient.PostAsJsonAsync(_options.AckNackPath, command, cancellationToken).ConfigureAwait(false);
+                using var message = await _httpClient.PostAsJsonAsync(_options.AckNackPath, command, cancellationToken).ConfigureAwait(false);
                 message.EnsureSuccessStatusCode();
-                return message;
+                return true;
             },
             IsTransient,
             _baseOptions.Retry,
             cancellationToken).ConfigureAwait(false);
-
-        response.Dispose();
 
         var result = new TransferItemResult
         {
