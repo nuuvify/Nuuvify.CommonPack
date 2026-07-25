@@ -1,3 +1,5 @@
+#nullable enable
+
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging.Console;
@@ -15,8 +17,8 @@ namespace Nuuvify.CommonPack.Logging;
 public class NuuvifyLogFormatter : ConsoleFormatter, IDisposable
 {
 
-    private readonly IDisposable _formatterOptionsReloadToken;
-    private readonly IDisposable _colorOptionsReloadToken;
+    private readonly IDisposable? _formatterOptionsReloadToken;
+    private readonly IDisposable? _colorOptionsReloadToken;
     private NuuvifyLogFormatterOptions _nuuvifyLogOptions;
     private NuuvifyLogColorConfiguration _nuuvifyLogColorConfiguration;
 
@@ -41,18 +43,18 @@ public class NuuvifyLogFormatter : ConsoleFormatter, IDisposable
         }
 
         _formatterOptionsReloadToken = nuuvifyLogOptions.OnChange(ReloadLoggerOptions);
-        _nuuvifyLogOptions = nuuvifyLogOptions.CurrentValue;
+        _nuuvifyLogOptions = nuuvifyLogOptions.CurrentValue ?? new NuuvifyLogFormatterOptions();
 
         _colorOptionsReloadToken = nuuvifyLogColorConfiguration.OnChange(ReloadLoggerColorConfiguration);
-        _nuuvifyLogColorConfiguration = nuuvifyLogColorConfiguration.CurrentValue;
+        _nuuvifyLogColorConfiguration = nuuvifyLogColorConfiguration.CurrentValue ?? new NuuvifyLogColorConfiguration();
 
     }
 
     private void ReloadLoggerOptions(NuuvifyLogFormatterOptions options) =>
-        _nuuvifyLogOptions = options;
+        _nuuvifyLogOptions = options ?? new NuuvifyLogFormatterOptions();
 
     private void ReloadLoggerColorConfiguration(NuuvifyLogColorConfiguration config) =>
-        _nuuvifyLogColorConfiguration = config;
+        _nuuvifyLogColorConfiguration = config ?? new NuuvifyLogColorConfiguration();
 
     /// <summary>
     /// Escreve uma entrada de log formatada com o prefixo e as cores configuradas.
@@ -61,18 +63,18 @@ public class NuuvifyLogFormatter : ConsoleFormatter, IDisposable
     /// <param name="logLevel">Nível do log.</param>
     /// <param name="eventId">Identificador do evento.</param>
     /// <param name="state">Estado associado à entrada de log.</param>
-    /// <param name="exception">Exceção opcional associada ao log.</param>
+    /// <param name="exception">Exceção opcional associada ao log. Pode ser <see langword="null"/>.</param>
     /// <param name="message">Mensagem já formatada a ser escrita.</param>
-    /// <param name="scopeProvider">Provider de escopo ativo.</param>
+    /// <param name="scopeProvider">Provider de escopo ativo. Pode ser <see langword="null"/>.</param>
     /// <param name="textWriter">Destino do texto formatado.</param>
     /// <param name="name">Categoria ou nome do logger.</param>
     public virtual void Write<TState>(
         LogLevel logLevel,
         EventId eventId,
         TState state,
-        Exception exception,
+        Exception? exception,
         string message,
-        IExternalScopeProvider scopeProvider,
+        IExternalScopeProvider? scopeProvider,
         TextWriter textWriter,
         string name)
     {
@@ -100,7 +102,7 @@ public class NuuvifyLogFormatter : ConsoleFormatter, IDisposable
     /// <inheritdoc />
     public override void Write<TState>(in
         LogEntry<TState> logEntry,
-        IExternalScopeProvider scopeProvider,
+        IExternalScopeProvider? scopeProvider,
         TextWriter textWriter)
     {
 
