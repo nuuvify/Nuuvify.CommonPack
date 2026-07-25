@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Nuuvify.CommonPack.MftMailbox.Abstraction\Nuuvify.CommonPack.MftMailbox.Abstraction.csproj" />
+    <ProjectReference Include="..\..\src\Nuuvify.CommonPack.MftMailbox\Nuuvify.CommonPack.MftMailbox.csproj" />
+    <ProjectReference Include="..\..\src\Nuuvify.CommonPack.MftMailbox.Http\Nuuvify.CommonPack.MftMailbox.Http.csproj" />
+    <ProjectReference Include="..\..\src\Nuuvify.CommonPack.MftMailbox.Sftp\Nuuvify.CommonPack.MftMailbox.Sftp.csproj" />
+  </ItemGroup>
+
+</Project>

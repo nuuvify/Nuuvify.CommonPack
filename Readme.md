@@ -94,6 +94,10 @@ Coleção de bibliotecas .NET para desenvolvimento de aplicações robustas, esc
 | **Nuuvify.CommonPack.StandardHttpClient** | Cliente HTTP otimizado com retry e resiliência | [![NuGet](https://img.shields.io/nuget/v/Nuuvify.CommonPack.StandardHttpClient.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.StandardHttpClient/) | [![Downloads](https://img.shields.io/nuget/dt/Nuuvify.CommonPack.StandardHttpClient.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.StandardHttpClient/) |
 | **Nuuvify.CommonPack.Email**              | Envio de e-mails via SMTP com MailKit          | [![NuGet](https://img.shields.io/nuget/v/Nuuvify.CommonPack.Email.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.Email/)                           | [![Downloads](https://img.shields.io/nuget/dt/Nuuvify.CommonPack.Email.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.Email/)                           |
 | **Nuuvify.CommonPack.Email.Abstraction**  | Abstrações para serviço de e-mail              | [![NuGet](https://img.shields.io/nuget/v/Nuuvify.CommonPack.Email.Abstraction.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.Email.Abstraction/)   | [![Downloads](https://img.shields.io/nuget/dt/Nuuvify.CommonPack.Email.Abstraction.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.Email.Abstraction/)   |
+| **Nuuvify.CommonPack.MftMailbox.Abstraction** | Contratos para integração MFT Mailbox | [![NuGet](https://img.shields.io/nuget/v/Nuuvify.CommonPack.MftMailbox.Abstraction.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.MftMailbox.Abstraction/) | [![Downloads](https://img.shields.io/nuget/dt/Nuuvify.CommonPack.MftMailbox.Abstraction.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.MftMailbox.Abstraction/) |
+| **Nuuvify.CommonPack.MftMailbox** | Núcleo de orquestração MFT Mailbox | [![NuGet](https://img.shields.io/nuget/v/Nuuvify.CommonPack.MftMailbox.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.MftMailbox/) | [![Downloads](https://img.shields.io/nuget/dt/Nuuvify.CommonPack.MftMailbox.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.MftMailbox/) |
+| **Nuuvify.CommonPack.MftMailbox.Sftp** | Adapter SFTP para MFT Mailbox | [![NuGet](https://img.shields.io/nuget/v/Nuuvify.CommonPack.MftMailbox.Sftp.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.MftMailbox.Sftp/) | [![Downloads](https://img.shields.io/nuget/dt/Nuuvify.CommonPack.MftMailbox.Sftp.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.MftMailbox.Sftp/) |
+| **Nuuvify.CommonPack.MftMailbox.Http** | Adapter HTTPS para MFT Mailbox | [![NuGet](https://img.shields.io/nuget/v/Nuuvify.CommonPack.MftMailbox.Http.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.MftMailbox.Http/) | [![Downloads](https://img.shields.io/nuget/dt/Nuuvify.CommonPack.MftMailbox.Http.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.MftMailbox.Http/) |
 
 ### Segurança
 
@@ -140,6 +144,8 @@ Coleção de bibliotecas .NET para desenvolvimento de aplicações robustas, esc
 
 Cada pacote possui documentação detalhada em seu respectivo diretório:
 
+- 📘 [Guia central para consumo em projetos de terceiros](docs/consumo-em-projetos-terceiros.md)
+
 ### Infraestrutura e Serviços
 - 📚 [BackgroundService](src/Nuuvify.CommonPack.BackgroundService/README.md) - **🆕 Com diagnóstico avançado**
 - 📚 [AzureServiceBus](src/Nuuvify.CommonPack.AzureServiceBus/README.md)
@@ -151,6 +157,10 @@ Cada pacote possui documentação detalhada em seu respectivo diretório:
 - 📚 [StandardHttpClient](src/Nuuvify.CommonPack.StandardHttpClient/README.md)
 - 📚 [Email](src/Nuuvify.CommonPack.Email/README.md) - **Envio de e-mails via SMTP**
 - 📚 [Email.Abstraction](src/Nuuvify.CommonPack.Email.Abstraction/README.md)
+- 📚 [MftMailbox.Abstraction](src/Nuuvify.CommonPack.MftMailbox.Abstraction/README.md)
+- 📚 [MftMailbox](src/Nuuvify.CommonPack.MftMailbox/README.md)
+- 📚 [MftMailbox.Sftp](src/Nuuvify.CommonPack.MftMailbox.Sftp/README.md)
+- 📚 [MftMailbox.Http](src/Nuuvify.CommonPack.MftMailbox.Http/README.md)
 
 ### Segurança
 - 📚 [Security](src/Nuuvify.CommonPack.Security/README.md)

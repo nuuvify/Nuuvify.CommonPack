@@ -1,0 +1,21 @@
+using Nuuvify.CommonPack.MftMailbox.Abstraction.Interfaces;
+using Nuuvify.CommonPack.MftMailbox.Abstraction.Models;
+
+namespace Nuuvify.CommonPack.MftMailbox.Protocols;
+
+/// <summary>
+/// Contrato público de infraestrutura que combina os contratos operacionais MFT em um único ponto de implementação.
+/// </summary>
+/// <remarks>
+/// Implementada pelos clientes concretos (<c>SftpMftMailboxClient</c> e <c>HttpMftMailboxClient</c>).
+/// Registrado no container DI como <c>IProtocolMftClient</c> transiente keyed por
+/// <see cref="Protocol"/> e resolvido pela <c>MftClientFactory</c>.
+/// Embora público para suportar registro/resolução entre pacotes, consumidores externos não devem depender diretamente desta interface; use os contratos
+/// individuais (<see cref="IMftTransferClient"/>, <see cref="IMftInboundClient"/>, etc.)
+/// obtidos via <see cref="IMftClientFactory"/>.
+/// </remarks>
+public interface IProtocolMftClient : IMftTransferClient, IMftInboundClient, IMftStatusClient, IAckNackClient
+{
+    /// <summary>Protocolo de rede suportado por esta implementação.</summary>
+    MftProtocol Protocol { get; }
+}

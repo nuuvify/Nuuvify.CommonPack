@@ -1259,12 +1259,14 @@ var obj = JsonSerializer.Deserialize<MyObject>(json, options);
 
 #### NuuvifyLogFormatter
 
-Formatador customizado de logs com cores.
+Formatador customizado de logs com cores e atualização dinâmica de opções.
 
 ```csharp
 public class NuuvifyLogFormatter : ConsoleFormatter
 {
-    public NuuvifyLogFormatter(IOptionsMonitor<NuuvifyLogFormatterOptions> options);
+    public NuuvifyLogFormatter(
+        IOptionsMonitor<NuuvifyLogFormatterOptions> options,
+        IOptionsMonitor<NuuvifyLogColorConfiguration> colorOptions);
 
     public override void Write<TState>(
         in LogEntry<TState> logEntry,
@@ -1281,9 +1283,16 @@ Extensões para configuração de logging customizado.
 public static class NuuvifyLogSetupExtensions
 {
     // Adiciona console formatter customizado
-    public static ILoggingBuilder AddNuuvifyConsoleFormatter(
+    public static ILoggingBuilder AddCustomFormatter(
         this ILoggingBuilder builder,
-        Action<NuuvifyLogFormatterOptions> configure = null);
+        Action<NuuvifyLogFormatterOptions> configureFormatter,
+        Action<NuuvifyLogColorConfiguration> configureColor = null);
+
+    public static ILoggingBuilder AddCustomFormatter(
+        this ILoggingBuilder builder,
+        Action<NuuvifyLogFormatterOptions> configureFormatter,
+        Action<ConsoleLoggerOptions> configureConsole,
+        Action<NuuvifyLogColorConfiguration> configureColor = null);
 }
 ```
 
@@ -1291,15 +1300,24 @@ public static class NuuvifyLogSetupExtensions
 ```csharp
 // Program.cs
 builder.Logging.ClearProviders();
-builder.Logging.AddConsole(options =>
-{
-    options.FormatterName = "nuuvify";
-});
-builder.Logging.AddNuuvifyConsoleFormatter(options =>
-{
-    options.IncludeScopes = true;
-    options.TimestampFormat = "yyyy-MM-dd HH:mm:ss ";
-});
+builder.Logging.AddCustomFormatter(
+    options =>
+    {
+        options.IncludeScopes = true;
+        options.TimestampFormat = "yyyy-MM-dd HH:mm:ss ";
+        options.CustomPrefix = "BOOT";
+    },
+    console =>
+    {
+        console.LogToStandardErrorThreshold = LogLevel.Error;
+    },
+    color =>
+    {
+        color.LogLevelToColorMap[LogLevel.Information] = ConsoleColor.Green;
+    });
+
+// Durante o bootstrap, mantenha a ownership do provider com a infraestrutura de logging.
+// O formatter observa mudanças de opções e libera corretamente ambos os tokens ao ser descartado.
 ```
 
 ---

@@ -2,7 +2,7 @@
 description: "Refatorar Nuuvify.CommonPack.BackgroundService com segurança para concorrência, cancelamento, lock renewal, telemetria e diagnósticos de falha."
 name: "BGS Refactor Code"
 argument-hint: "Símbolo, arquivo, cheiro de código e teste alvo"
-agent: "library-refactorer"
+agent: "nuuvify-refactorer"
 model: "GPT-5 (copilot)"
 ---
 
@@ -16,4 +16,4 @@ Cuidados obrigatórios:
 
 Use também:
 - [BackgroundService Source Instruction](../instructions/backgroundservice-source.instructions.md)
-- [Library Refactoring Instruction](../instructions/library-refactoring.instructions.md)
+- [Library Refactoring Instruction](../instructions/nuuvify-refactoring.instructions.md)
