@@ -64,14 +64,14 @@ public sealed class MftMailboxOptions
     /// Protocolos cujas instâncias de cliente serão cacheadas pela <c>MftClientFactory</c>.
     /// </summary>
     /// <remarks>
-    /// Por padrão, SFTP e HTTPS são cacheados para preservar estado em memória
-    /// (como circuit breaker e cache local de status). Em APIs/Workers que precisem
-    /// forçar nova criação do cliente HTTPS ao longo do tempo, remova
-    /// <see cref="MftProtocol.Https"/> deste conjunto.
+    /// Por padrão, apenas SFTP é cacheado para preservar estado de conexão/resiliência.
+    /// HTTPS fica sem cache por padrão para favorecer rotação de handlers e atualização
+    /// de DNS quando o cliente for resolvido repetidamente em APIs/Workers.
+    /// Para manter estado local do cliente HTTP entre chamadas, adicione
+    /// <see cref="MftProtocol.Https"/> explicitamente neste conjunto.
     /// </remarks>
     public HashSet<MftProtocol> CachedProtocols { get; set; } =
     [
-        MftProtocol.Sftp,
-        MftProtocol.Https
+        MftProtocol.Sftp
     ];
 }
