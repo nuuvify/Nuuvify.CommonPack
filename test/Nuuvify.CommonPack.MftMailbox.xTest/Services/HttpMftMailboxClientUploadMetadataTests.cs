@@ -1,6 +1,5 @@
 using System.Net;
 using System.Net.Http.Json;
-using System.Collections.Generic;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Nuuvify.CommonPack.MftMailbox.Abstraction.Models;
@@ -17,64 +16,62 @@ public sealed class HttpMftMailboxClientUploadMetadataTests
     [Fact]
     public async Task SendSingleAsync_DeveIncluirMetadadosComPrefixosConfiguradosNoMultipart()
     {
-        var responses = new List<HttpResponseMessage>();
+        using var responses = new DisposableHttpResponses();
         string? multipartBody = null;
         using var uploadContentStream = new MemoryStream(new byte[] { 1, 2, 3 });
 
-        try
+        using var handler = new StubHttpMessageHandler(async request =>
         {
-            using var handler = new StubHttpMessageHandler(async request =>
+            if (request.Method == HttpMethod.Post && request.RequestUri?.AbsolutePath == "/mailbox/upload")
             {
-                if (request.Method == HttpMethod.Post && request.RequestUri?.AbsolutePath == "/mailbox/upload")
-                {
-                    multipartBody = await request.Content!.ReadAsStringAsync();
-                    return RegisterResponse(responses, new HttpResponseMessage(HttpStatusCode.OK));
-                }
+                multipartBody = await request.Content!.ReadAsStringAsync();
+                return responses.Track(new HttpResponseMessage(HttpStatusCode.OK));
+            }
 
-                if (request.Method == HttpMethod.Get && request.RequestUri?.AbsolutePath == "/mailbox/status")
+            if (request.Method == HttpMethod.Get && request.RequestUri?.AbsolutePath == "/mailbox/status")
+            {
+                return responses.Track(new HttpResponseMessage(HttpStatusCode.OK)
                 {
-                    return RegisterResponse(responses, new HttpResponseMessage(HttpStatusCode.OK)
+                    Content = JsonContent.Create(new TransferStatus
                     {
-                        Content = JsonContent.Create(new TransferStatus
-                        {
-                            IntegrationKey = "erp-http",
-                            ItemId = "item-001",
-                            State = TransferState.Succeeded
-                        })
-                    });
-                }
+                        IntegrationKey = "erp-http",
+                        ItemId = "item-001",
+                        State = TransferState.Succeeded
+                    })
+                });
+            }
 
-                return RegisterResponse(responses, new HttpResponseMessage(HttpStatusCode.NotFound));
-            });
+            return responses.Track(new HttpResponseMessage(HttpStatusCode.NotFound));
+        });
 
-            using var httpClient = new HttpClient(handler, disposeHandler: false);
-            var client = new HttpMftMailboxClient(
-                httpClient,
-                Options.Create(new HttpMftMailboxOptions
-                {
-                    BaseUrl = "http://localhost",
-                    UploadPath = "/mailbox/upload",
-                    StatusPath = "/mailbox/status",
-                    IncludeMetadataInUploadForm = true,
-                    EnvelopeMetadataFieldPrefix = "env-",
-                    ItemMetadataFieldPrefix = "item-"
-                }),
-                Options.Create(new MftMailboxOptions()),
-                new InMemoryMftIdempotencyStore(),
-                new NullTransferAuditSink(),
-                NullLogger<HttpMftMailboxClient>.Instance);
-
-            var result = await client.SendSingleAsync(new TransferEnvelope
+        using var httpClient = new HttpClient(handler, disposeHandler: false);
+        var client = new HttpMftMailboxClient(
+            httpClient,
+            Options.Create(new HttpMftMailboxOptions
             {
-                IntegrationKey = "erp-http",
-                CorrelationId = Guid.NewGuid().ToString("N"),
-                Protocol = MftProtocol.Https,
-                Metadata = new Dictionary<string, string>
-                {
-                    ["source"] = "sap",
-                    ["batch"] = "42"
-                },
-                Items =
+                BaseUrl = "http://localhost",
+                UploadPath = "/mailbox/upload",
+                StatusPath = "/mailbox/status",
+                IncludeMetadataInUploadForm = true,
+                EnvelopeMetadataFieldPrefix = "env-",
+                ItemMetadataFieldPrefix = "item-"
+            }),
+            Options.Create(new MftMailboxOptions()),
+            new InMemoryMftIdempotencyStore(),
+            new NullTransferAuditSink(),
+            NullLogger<HttpMftMailboxClient>.Instance);
+
+        var result = await client.SendSingleAsync(new TransferEnvelope
+        {
+            IntegrationKey = "erp-http",
+            CorrelationId = Guid.NewGuid().ToString("N"),
+            Protocol = MftProtocol.Https,
+            Metadata = new Dictionary<string, string>
+            {
+                ["source"] = "sap",
+                ["batch"] = "42"
+            },
+            Items =
                 {
                     new TransferItem
                     {
@@ -91,31 +88,17 @@ public sealed class HttpMftMailboxClientUploadMetadataTests
                         }
                     }
                 }
-            });
+        });
 
-            Assert.Equal(TransferState.Succeeded, result.State);
-            Assert.NotNull(multipartBody);
-            Assert.Contains("orders.csv", multipartBody, StringComparison.Ordinal);
-            Assert.Contains("env-", multipartBody, StringComparison.Ordinal);
-            Assert.Contains("sap", multipartBody, StringComparison.Ordinal);
-            Assert.Contains("env-", multipartBody, StringComparison.Ordinal);
-            Assert.Contains("42", multipartBody, StringComparison.Ordinal);
-            Assert.Contains("item-", multipartBody, StringComparison.Ordinal);
-            Assert.Contains("high", multipartBody, StringComparison.Ordinal);
-        }
-        finally
-        {
-            foreach (var response in responses)
-            {
-                response.Dispose();
-            }
-        }
-    }
-
-    private static HttpResponseMessage RegisterResponse(ICollection<HttpResponseMessage> responses, HttpResponseMessage response)
-    {
-        responses.Add(response);
-        return response;
+        Assert.Equal(TransferState.Succeeded, result.State);
+        Assert.NotNull(multipartBody);
+        Assert.Contains("orders.csv", multipartBody, StringComparison.Ordinal);
+        Assert.Contains("env-", multipartBody, StringComparison.Ordinal);
+        Assert.Contains("sap", multipartBody, StringComparison.Ordinal);
+        Assert.Contains("env-", multipartBody, StringComparison.Ordinal);
+        Assert.Contains("42", multipartBody, StringComparison.Ordinal);
+        Assert.Contains("item-", multipartBody, StringComparison.Ordinal);
+        Assert.Contains("high", multipartBody, StringComparison.Ordinal);
     }
 
     private sealed class StubHttpMessageHandler : HttpMessageHandler
@@ -130,6 +113,25 @@ public sealed class HttpMftMailboxClientUploadMetadataTests
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             return _handle(request);
+        }
+    }
+
+    private sealed class DisposableHttpResponses : IDisposable
+    {
+        private readonly List<HttpResponseMessage> _responses = [];
+
+        public HttpResponseMessage Track(HttpResponseMessage response)
+        {
+            _responses.Add(response);
+            return response;
+        }
+
+        public void Dispose()
+        {
+            foreach (var response in _responses)
+            {
+                response.Dispose();
+            }
         }
     }
 }
