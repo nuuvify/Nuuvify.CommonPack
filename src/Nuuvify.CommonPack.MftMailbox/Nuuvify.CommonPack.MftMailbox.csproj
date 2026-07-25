@@ -3,7 +3,6 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
     <PackageId>Nuuvify.CommonPack.MftMailbox</PackageId>
     <Title>Nuuvify CommonPack MFT Mailbox</Title>
     <PackageTags>Nuuvify;MFT;Mailbox;Factory;Idempotency;Audit;.NET</PackageTags>
