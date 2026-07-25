@@ -193,8 +193,6 @@ public class RedisCachedStatusClientTests
     public async Task GetStatusAsync_WithDisabledCache_AlwaysCallsInnerClient()
     {
         // Arrange
-        // Note: Current implementation does not check EnableStatusCache flag in GetStatusAsync
-        // This test documents the actual behavior: cache is always checked, regardless of flag
         _options.EnableStatusCache = false;
 
         var client = new RedisCachedStatusClient(
@@ -228,9 +226,10 @@ public class RedisCachedStatusClientTests
         _mockInnerClient.Verify(
             x => x.GetStatusAsync("integration-4", "item-999", It.IsAny<CancellationToken>()),
             Times.Once);
-        // Cache is checked regardless of EnableStatusCache flag (implementation doesn't check flag)
+
+        // Com cache desabilitado, Redis não deve ser consultado.
         _mockDatabase.Verify(
             x => x.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()),
-            Times.Once);
+            Times.Never);
     }
 }
