@@ -157,6 +157,7 @@ publish/
 
 # NuGet Packages
 *.nupkg
+*.snupkg
 # The packages folder can be ignored because of Package Restore
 **/packages/*
 # exComicst build/, which is used as an MSBuild target.
@@ -249,3 +250,23 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+
+# Python / uv tooling
+__pycache__/
+*.py[cod]
+*.pyd
+*.egg-info/
+.python-version
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+
+# Local tooling envs and lockfiles
+.tools/scripts/.venv/
+.tools/scripts/*.egg-info/
+.tools/scripts/uv.lock
