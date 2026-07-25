@@ -45,6 +45,24 @@ public class RedisAuditStreamSinkTests
             _serializer,
             _mockLogger.Object);
 
+        _mockDatabase
+            .Setup(db => db.StreamAddAsync(
+                It.IsAny<RedisKey>(),
+                It.IsAny<NameValueEntry[]>(),
+                It.IsAny<RedisValue?>(),
+                It.IsAny<int?>(),
+                It.IsAny<bool>(),
+                It.IsAny<CommandFlags>()))
+            .ReturnsAsync("1-0");
+
+        _mockDatabase
+            .Setup(db => db.StreamTrimAsync(
+                It.IsAny<RedisKey>(),
+                It.IsAny<int>(),
+                It.IsAny<bool>(),
+                It.IsAny<CommandFlags>()))
+            .ReturnsAsync(1L);
+
         var entry = new TransferAuditEntry
         {
             IntegrationKey = "integration-1",
@@ -67,6 +85,16 @@ public class RedisAuditStreamSinkTests
             Options.Create(_options),
             _serializer,
             _mockLogger.Object);
+
+        _mockDatabase
+            .Setup(db => db.StreamAddAsync(
+                It.IsAny<RedisKey>(),
+                It.IsAny<NameValueEntry[]>(),
+                It.IsAny<RedisValue?>(),
+                It.IsAny<int?>(),
+                It.IsAny<bool>(),
+                It.IsAny<CommandFlags>()))
+            .ReturnsAsync("1-0");
 
         // Make mock throw on any method call (simulating Redis connection failure)
         _mockDatabase
@@ -100,6 +128,24 @@ public class RedisAuditStreamSinkTests
             _serializer,
             _mockLogger.Object);
 
+        _mockDatabase
+            .Setup(db => db.StreamAddAsync(
+                It.IsAny<RedisKey>(),
+                It.IsAny<NameValueEntry[]>(),
+                It.IsAny<RedisValue?>(),
+                It.IsAny<int?>(),
+                It.IsAny<bool>(),
+                It.IsAny<CommandFlags>()))
+            .ReturnsAsync("1-0");
+
+        _mockDatabase
+            .Setup(db => db.StreamTrimAsync(
+                It.IsAny<RedisKey>(),
+                It.IsAny<int>(),
+                It.IsAny<bool>(),
+                It.IsAny<CommandFlags>()))
+            .ReturnsAsync(1L);
+
         var entry = new TransferAuditEntry
         {
             IntegrationKey = "integration-3",
@@ -122,6 +168,16 @@ public class RedisAuditStreamSinkTests
             Options.Create(_options),
             _serializer,
             _mockLogger.Object);
+
+        _mockDatabase
+            .Setup(db => db.StreamAddAsync(
+                It.IsAny<RedisKey>(),
+                It.IsAny<NameValueEntry[]>(),
+                It.IsAny<RedisValue?>(),
+                It.IsAny<int?>(),
+                It.IsAny<bool>(),
+                It.IsAny<CommandFlags>()))
+            .ReturnsAsync("1-0");
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentNullException>(
