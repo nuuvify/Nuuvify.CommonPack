@@ -101,9 +101,11 @@ public sealed class RedisAuditStreamSink : ITransferAuditSink
 
             // Trimagem assíncrona: manter apenas últimas N entradas
             // Executada em background, não bloqueia
-            ObserveTrimTask(_redis.StreamTrimAsync(
-                _options.AuditStreamName,
-                _options.AuditStreamMaxLength));
+            ObserveTrimTask(ExecuteRedisAsync(
+                _redis.StreamTrimAsync(
+                    _options.AuditStreamName,
+                    _options.AuditStreamMaxLength),
+                cancellationToken));
         }
         catch (TimeoutException ex)
         {

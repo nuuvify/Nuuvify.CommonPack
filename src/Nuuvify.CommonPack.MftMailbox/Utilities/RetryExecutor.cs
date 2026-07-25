@@ -35,6 +35,26 @@ public static class RetryExecutor
         ArgumentNullException.ThrowIfNull(transientPredicate);
         ArgumentNullException.ThrowIfNull(options);
 
+        if (options.MaxRetries < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(options), "MaxRetries cannot be negative.");
+        }
+
+        if (options.BaseDelay < TimeSpan.Zero)
+        {
+            throw new ArgumentOutOfRangeException(nameof(options), "BaseDelay cannot be negative.");
+        }
+
+        if (options.MaxDelay < TimeSpan.Zero)
+        {
+            throw new ArgumentOutOfRangeException(nameof(options), "MaxDelay cannot be negative.");
+        }
+
+        if (options.MaxDelay < options.BaseDelay)
+        {
+            throw new ArgumentOutOfRangeException(nameof(options), "MaxDelay must be greater than or equal to BaseDelay.");
+        }
+
         var random = options.UseJitter ? Random.Shared : null;
         var attempt = 0;
 
@@ -54,6 +74,8 @@ public static class RetryExecutor
                 {
                     delayMs += random.Next(25, 250);
                 }
+
+                delayMs = Math.Min(delayMs, options.MaxDelay.TotalMilliseconds);
 
                 await Task.Delay(TimeSpan.FromMilliseconds(delayMs), cancellationToken).ConfigureAwait(false);
                 attempt++;

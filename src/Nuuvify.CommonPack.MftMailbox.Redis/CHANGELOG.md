@@ -8,23 +8,10 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 ## [Não Lançado]
 
 ### Adicionado
-
-### Alterado
-
-### Corrigido
-
-### Removido
-
-### Segurança
-
-## [1.0.0] - 2025-01-13
-
-### Adicionado
-- Release inicial do pacote de integração Redis para MFT Mailbox.
-- RedisMftIdempotencyStore para idempotência distribuída via SET NX EX.
-- RedisCachedStatusClient para cache de status com TTL configurável e fallback para cliente interno.
-- RedisAuditStreamSink para escrita de auditoria em Redis Streams.
-- RedisMftMailboxSetup para registro de serviços no container de DI com validação de pré-requisitos.
+- Store distribuída de idempotência com <c>SET NX EX</c> via Redis.
+- Cache de status compartilhado com TTL configurável e fallback para cliente interno.
+- Sink de auditoria em Redis Streams com trim assíncrono e observabilidade de falhas.
+- Setup de DI com validação de pré-requisitos e decoração opcional de status cache.
 
 ### Alterado
 
