@@ -90,6 +90,11 @@ public sealed class RedisCachedStatusClient : IMftStatusClient
 
         cancellationToken.ThrowIfCancellationRequested();
 
+        if (!_options.EnableStatusCache)
+        {
+            return await _innerClient.GetStatusAsync(integrationKey, itemId, cancellationToken).ConfigureAwait(false);
+        }
+
         var cacheKey = BuildCacheKey(integrationKey, itemId);
 
         try
