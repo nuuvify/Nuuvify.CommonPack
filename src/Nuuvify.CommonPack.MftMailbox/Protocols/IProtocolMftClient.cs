@@ -8,8 +8,8 @@ namespace Nuuvify.CommonPack.MftMailbox.Protocols;
 /// </summary>
 /// <remarks>
 /// Implementada pelos clientes concretos (<c>SftpMftMailboxClient</c> e <c>HttpMftMailboxClient</c>).
-/// Registrado no container DI como <c>IProtocolMftClient</c> (singleton) e resolvido pela
-/// <c>MftClientFactory</c> por meio de <see cref="Protocol"/>.
+/// Registrado no container DI como <c>IProtocolMftClient</c> transiente keyed por
+/// <see cref="Protocol"/> e resolvido pela <c>MftClientFactory</c>.
 /// Embora público para suportar registro/resolução entre pacotes, consumidores externos não devem depender diretamente desta interface; use os contratos
 /// individuais (<see cref="IMftTransferClient"/>, <see cref="IMftInboundClient"/>, etc.)
 /// obtidos via <see cref="IMftClientFactory"/>.

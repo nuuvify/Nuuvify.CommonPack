@@ -16,6 +16,8 @@ namespace Nuuvify.CommonPack.MftMailbox;
 /// {
 ///     opt.MaxBatchSize = 100;
 ///     opt.Retry.MaxRetries = 5;
+///     // Opcional: desabilitar cache da factory para HTTPS
+///     // opt.CachedProtocols.Remove(MftProtocol.Https);
 /// });
 /// services.AddMftMailboxSftp(sftp =&gt;
 /// {
@@ -41,7 +43,7 @@ public static class MftMailboxSetup
     /// <list type="bullet">
     /// <item><see cref="IMftIdempotencyStore"/> → <see cref="InMemoryMftIdempotencyStore"/> (substitua por implementação persistente em produção).</item>
     /// <item><see cref="ITransferAuditSink"/> → <see cref="NullTransferAuditSink"/> (substitua por implementação de auditoria real).</item>
-    /// <item><see cref="IMftClientFactory"/> → <see cref="MftClientFactory"/>.</item>
+    /// <item><see cref="IMftClientFactory"/> → <see cref="MftClientFactory"/> (com cache explícito por protocolo definido em <see cref="MftMailboxOptions.CachedProtocols"/>).</item>
     /// </list>
     /// </remarks>
     /// <exception cref="ArgumentNullException">

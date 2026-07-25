@@ -1,5 +1,7 @@
 namespace Nuuvify.CommonPack.MftMailbox.Configuration;
 
+using Nuuvify.CommonPack.MftMailbox.Abstraction.Models;
+
 /// <summary>
 /// Opções globais do pacote MftMailbox, compartilhadas por todos os protocolos.
 /// </summary>
@@ -57,4 +59,19 @@ public sealed class MftMailboxOptions
 
     /// <summary>Parâmetros do circuit breaker que protege o servidor MFT de sobrecarga.</summary>
     public CircuitBreakerOptions CircuitBreaker { get; set; } = new();
+
+    /// <summary>
+    /// Protocolos cujas instâncias de cliente serão cacheadas pela <c>MftClientFactory</c>.
+    /// </summary>
+    /// <remarks>
+    /// Por padrão, SFTP e HTTPS são cacheados para preservar estado em memória
+    /// (como circuit breaker e cache local de status). Em APIs/Workers que precisem
+    /// forçar nova criação do cliente HTTPS ao longo do tempo, remova
+    /// <see cref="MftProtocol.Https"/> deste conjunto.
+    /// </remarks>
+    public HashSet<MftProtocol> CachedProtocols { get; set; } =
+    [
+        MftProtocol.Sftp,
+        MftProtocol.Https
+    ];
 }
