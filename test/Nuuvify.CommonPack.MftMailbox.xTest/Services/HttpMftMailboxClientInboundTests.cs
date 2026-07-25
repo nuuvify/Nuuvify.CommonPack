@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Linq;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Nuuvify.CommonPack.MftMailbox.Abstraction.Models;
@@ -19,39 +20,43 @@ public sealed class HttpMftMailboxClientInboundTests
     [Fact]
     public async Task ReceiveBatchAsync_ComEnvelopeItens_NaoDeveChamarListagemRemota()
     {
-        using var handler = new StubHttpMessageHandler(request =>
-        {
-            if (request.RequestUri?.AbsolutePath == "/mailbox/list")
-            {
-                throw new InvalidOperationException("List endpoint should not be called when envelope has explicit items.");
-            }
+        var responses = new List<HttpResponseMessage>();
 
-            if (request.RequestUri?.AbsolutePath == "/mailbox/download")
+        try
+        {
+            using var handler = new StubHttpMessageHandler(request =>
             {
-                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+                if (request.RequestUri?.AbsolutePath == "/mailbox/list")
                 {
-                    Content = new ByteArrayContent(new byte[] { 1, 2, 3 })
-                });
-            }
+                    throw new InvalidOperationException("List endpoint should not be called when envelope has explicit items.");
+                }
 
-            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound));
-        });
+                if (request.RequestUri?.AbsolutePath == "/mailbox/download")
+                {
+                    return Task.FromResult(RegisterResponse(responses, new HttpResponseMessage(HttpStatusCode.OK)
+                    {
+                        Content = new ByteArrayContent(new byte[] { 1, 2, 3 })
+                    }));
+                }
 
-        using var httpClient = new HttpClient(handler, disposeHandler: false);
+                return Task.FromResult(RegisterResponse(responses, new HttpResponseMessage(HttpStatusCode.NotFound)));
+            });
 
-        var client = CreateClient(httpClient, new HttpMftMailboxOptions
-        {
-            BaseUrl = "http://localhost",
-            DownloadPath = "/mailbox/download",
-            ListPath = "/mailbox/list"
-        });
+            using var httpClient = new HttpClient(handler, disposeHandler: false);
 
-        var envelope = new TransferEnvelope
-        {
-            IntegrationKey = "mainframe-x",
-            CorrelationId = Guid.NewGuid().ToString("N"),
-            Protocol = MftProtocol.Https,
-            Items =
+            var client = CreateClient(httpClient, new HttpMftMailboxOptions
+            {
+                BaseUrl = "http://localhost",
+                DownloadPath = "/mailbox/download",
+                ListPath = "/mailbox/list"
+            });
+
+            var envelope = new TransferEnvelope
+            {
+                IntegrationKey = "mainframe-x",
+                CorrelationId = Guid.NewGuid().ToString("N"),
+                Protocol = MftProtocol.Https,
+                Items =
             {
                 new TransferItem
                 {
@@ -60,23 +65,33 @@ public sealed class HttpMftMailboxClientInboundTests
                     RemotePath = "/inbound/arquivo-c.dat"
                 }
             }
-        };
+            };
 
-        var result = await client.ReceiveBatchAsync(envelope);
+            var result = await client.ReceiveBatchAsync(envelope);
 
-        Assert.Single(result);
-        Assert.Equal("item-001", result.First().ItemId);
-        Assert.Equal("arquivo-c.dat", result.First().FileName);
+            Assert.Single(result);
+            Assert.Equal("item-001", result.First().ItemId);
+            Assert.Equal("arquivo-c.dat", result.First().FileName);
 
-        foreach (var item in result)
+            foreach (var item in result)
+            {
+                await item.DisposeAsync();
+            }
+        }
+        finally
         {
-            await item.DisposeAsync();
+            foreach (var response in responses)
+            {
+                response.Dispose();
+            }
         }
     }
 
     [Fact]
     public async Task ReceiveBatchAsync_ListaRemota_DeveRespeitarOrdenacaoPorNome()
     {
+        var responses = new List<HttpResponseMessage>();
+
         var payload = new
         {
             items = new[]
@@ -86,53 +101,69 @@ public sealed class HttpMftMailboxClientInboundTests
             }
         };
 
-        using var handler = new StubHttpMessageHandler(request =>
+        try
         {
-            if (request.RequestUri?.AbsolutePath == "/mailbox/list")
+            using var handler = new StubHttpMessageHandler(request =>
             {
-                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+                if (request.RequestUri?.AbsolutePath == "/mailbox/list")
                 {
-                    Content = JsonContent.Create(payload)
-                });
-            }
+                    return Task.FromResult(RegisterResponse(responses, new HttpResponseMessage(HttpStatusCode.OK)
+                    {
+                        Content = JsonContent.Create(payload)
+                    }));
+                }
 
-            if (request.RequestUri?.AbsolutePath == "/mailbox/download")
+                if (request.RequestUri?.AbsolutePath == "/mailbox/download")
+                {
+                    return Task.FromResult(RegisterResponse(responses, new HttpResponseMessage(HttpStatusCode.OK)
+                    {
+                        Content = new ByteArrayContent(DownloadPayload)
+                    }));
+                }
+
+                return Task.FromResult(RegisterResponse(responses, new HttpResponseMessage(HttpStatusCode.NotFound)));
+            });
+
+            using var httpClient = new HttpClient(handler, disposeHandler: false);
+
+            var client = CreateClient(httpClient, new HttpMftMailboxOptions
             {
-                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = new ByteArrayContent(DownloadPayload)
-                });
+                BaseUrl = "http://localhost",
+                DownloadPath = "/mailbox/download",
+                ListPath = "/mailbox/list",
+                InboundFileOrdering = InboundFileOrdering.FileNameAscending
+            });
+
+            var envelope = new TransferEnvelope
+            {
+                IntegrationKey = "mainframe-x",
+                CorrelationId = Guid.NewGuid().ToString("N"),
+                Protocol = MftProtocol.Https
+            };
+
+            var result = await client.ReceiveBatchAsync(envelope);
+            var orderedNames = result.Select(x => x.FileName).ToArray();
+
+            Assert.Equal(new[] { "A-file.txt", "B-file.txt" }, orderedNames);
+
+            foreach (var item in result)
+            {
+                await item.DisposeAsync();
             }
-
-            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound));
-        });
-
-        using var httpClient = new HttpClient(handler, disposeHandler: false);
-
-        var client = CreateClient(httpClient, new HttpMftMailboxOptions
-        {
-            BaseUrl = "http://localhost",
-            DownloadPath = "/mailbox/download",
-            ListPath = "/mailbox/list",
-            InboundFileOrdering = InboundFileOrdering.FileNameAscending
-        });
-
-        var envelope = new TransferEnvelope
-        {
-            IntegrationKey = "mainframe-x",
-            CorrelationId = Guid.NewGuid().ToString("N"),
-            Protocol = MftProtocol.Https
-        };
-
-        var result = await client.ReceiveBatchAsync(envelope);
-        var orderedNames = result.Select(x => x.FileName).ToArray();
-
-        Assert.Equal(new[] { "A-file.txt", "B-file.txt" }, orderedNames);
-
-        foreach (var item in result)
-        {
-            await item.DisposeAsync();
         }
+        finally
+        {
+            foreach (var response in responses)
+            {
+                response.Dispose();
+            }
+        }
+    }
+
+    private static HttpResponseMessage RegisterResponse(ICollection<HttpResponseMessage> responses, HttpResponseMessage response)
+    {
+        responses.Add(response);
+        return response;
     }
 
     private static HttpMftMailboxClient CreateClient(HttpClient httpClient, HttpMftMailboxOptions httpOptions)

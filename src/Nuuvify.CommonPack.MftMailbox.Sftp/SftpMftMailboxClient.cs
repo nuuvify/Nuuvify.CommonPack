@@ -483,11 +483,23 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
     private SftpClientScope CreateClientScope()
     {
         var connectionInfo = BuildConnectionInfo();
-        var client = new SftpClient(connectionInfo.ConnectionInfo);
+        try
+        {
+            var client = new SftpClient(connectionInfo.ConnectionInfo);
 
-        ConfigureHostKeyValidation(client);
+            ConfigureHostKeyValidation(client);
 
-        return new SftpClientScope(client, connectionInfo.OwnedDisposables);
+            return new SftpClientScope(client, connectionInfo.OwnedDisposables);
+        }
+        catch
+        {
+            foreach (var disposable in connectionInfo.OwnedDisposables)
+            {
+                disposable.Dispose();
+            }
+
+            throw;
+        }
     }
 
     private ConnectionInfoContext BuildConnectionInfo()
@@ -498,22 +510,47 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
                 ? new PrivateKeyFile(_options.PrivateKeyPath)
                 : new PrivateKeyFile(_options.PrivateKeyPath, _options.PrivateKeyPassphrase);
 
-            var authenticationMethod = new PrivateKeyAuthenticationMethod(_options.Username, keyFile);
-            var connectionInfo = new ConnectionInfo(_options.Host, _options.Port, _options.Username, authenticationMethod);
+            try
+            {
+                var authenticationMethod = new PrivateKeyAuthenticationMethod(_options.Username, keyFile);
 
-            return new ConnectionInfoContext(
-                connectionInfo,
-                keyFile,
-                authenticationMethod);
+                try
+                {
+                    var connectionInfo = new ConnectionInfo(_options.Host, _options.Port, _options.Username, authenticationMethod);
+
+                    return new ConnectionInfoContext(
+                        connectionInfo,
+                        keyFile,
+                        authenticationMethod);
+                }
+                catch
+                {
+                    authenticationMethod.Dispose();
+                    throw;
+                }
+            }
+            catch
+            {
+                keyFile.Dispose();
+                throw;
+            }
         }
 
         if (!string.IsNullOrWhiteSpace(_options.Password))
         {
             var passwordConnectionInfo = new PasswordConnectionInfo(_options.Host, _options.Port, _options.Username, _options.Password);
 
-            return new ConnectionInfoContext(
-                passwordConnectionInfo,
-                passwordConnectionInfo);
+            try
+            {
+                return new ConnectionInfoContext(
+                    passwordConnectionInfo,
+                    passwordConnectionInfo);
+            }
+            catch
+            {
+                passwordConnectionInfo.Dispose();
+                throw;
+            }
         }
 
         throw new InvalidOperationException("SFTP credentials are not configured. Configure Password or PrivateKeyPath.");
