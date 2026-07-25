@@ -3,7 +3,6 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <Nullable>enable</Nullable>
         <NoWarn>$(NoWarn);NU1603</NoWarn>
         <PackageId>Nuuvify.CommonPack.MftMailbox.Redis</PackageId>
         <Title>Nuuvify CommonPack MFT Mailbox — Redis Integration</Title>
