@@ -1,5 +1,6 @@
 using Azure.Messaging.ServiceBus;
 using Microsoft.Extensions.Logging;
+using Nuuvify.CommonPack.BackgroundService.Models;
 using Nuuvify.CommonPack.BackgroundService.Services;
 using Nuuvify.CommonPack.Middleware.Abstraction;
 using System.Diagnostics;
@@ -150,4 +151,7 @@ public class TestServiceBusBackgroundService : ServiceBusBackgroundService<TestS
 
     public Task TestHandleGenericExceptionAsync(ProcessMessageEventArgs args, Exception ex, CancellationToken cancellationToken)
         => HandleGenericExceptionAsync(args, ex, cancellationToken);
+
+    public Task<DeadLetterMessageAction> TestDecideDeadLetterMessageActionAsync(ServiceBusReceivedMessage message, CancellationToken cancellationToken)
+        => DecideDeadLetterMessageActionAsync(message, cancellationToken);
 }
