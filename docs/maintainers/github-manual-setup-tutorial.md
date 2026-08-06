@@ -117,28 +117,18 @@ Habilite:
 
 Caminho: `Settings > Branches > Edit rule`
 
-Depois que os workflows rodarem ao menos uma vez, marque como obrigatórios:
+Depois que os workflows rodarem ao menos uma vez, marque como obrigatórios.
 
-Para `main`:
+Os nomes devem ser digitados exatamente como aparecem na interface (campo *Search for status checks in the last week*).
 
-- `PR Validation / Build and unit tests`
-- `PR Validation / Integration tests`
-- `Community Validation / Validate community assets`
-- `Workflow Validation / Lint workflows`
+Para `main`, `qas` e `nugettest/qas` (checks que sempre executam em PRs):
 
-Para `qas`:
+- `Version policy check`
+- `Verify package CHANGELOG updated`
 
-- `PR Validation / Build and unit tests`
-- `PR Validation / Integration tests`
-- `Community Validation / Validate community assets`
-- `Workflow Validation / Lint workflows`
+> **Não adicione** `Lint workflows` e `Validate community assets` como required — esses checks são path-filtered e não executam em todos os PRs. Quando ausentes, o GitHub trata o check como faltante e bloqueia o merge indevidamente.
 
-Para `nugettest/qas`:
-
-- `PR Validation / Build and unit tests`
-- `PR Validation / Integration tests`
-- `Community Validation / Validate community assets`
-- `Workflow Validation / Lint workflows`
+> `Build and unit tests` e `Integration tests` executam apenas no workflow `Publish and Release`, disparado por push após o merge — não estão disponíveis como status checks de PR.
 
 ## 8. Criar os environments
 
