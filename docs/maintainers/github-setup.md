@@ -4,10 +4,6 @@ Este guia descreve o passo a passo recomendado para deixar o repositório pronto
 
 Para um tutorial operacional detalhado com caminhos da interface do GitHub, use também [github-manual-setup-tutorial.md](./github-manual-setup-tutorial.md).
 
-Para a sequência completa de ativação, validação e desligamento do Azure DevOps, use [github-cutover-checklist.md](./github-cutover-checklist.md).
-
-Para o dia do cutover, use [github-go-live-checklist.md](./github-go-live-checklist.md).
-
 ## 1. Configurações gerais do repositório
 
 No GitHub, abra `Settings` do repositório e revise:
@@ -93,14 +89,19 @@ Recomendado:
 
 O GitHub Actions deve ser a fonte oficial dos checks obrigatórios.
 
-Quando os checks estiverem aparecendo nos PRs, marque como obrigatórios ao menos:
+Quando os checks estiverem aparecendo nos PRs, marque como obrigatórios:
 
-- `PR Validation / Build and unit tests`
-- `PR Validation / Integration tests` para `main` e `qas`
-- `Community Validation / Validate community assets`
-- `Workflow Validation / Lint workflows`
+**Sempre executam em PRs para `main`, `qas` e `nugettest/qas`:**
 
-Para `nugettest/qas`, você pode dispensar integração obrigatória se quiser reduzir custo e tempo de feedback.
+- `Version policy check`
+- `Verify package CHANGELOG updated`
+
+**Path-filtered — executam apenas quando os paths relevantes são alterados (não adicionar como required):**
+
+- `Lint workflows` — somente quando `.github/workflows/**` muda
+- `Validate community assets` — somente quando `.github/**`, `docs/**`, `Readme.md` ou `CHANGELOG.md` mudam
+
+> `Build and unit tests` e `Integration tests` rodam apenas no `publish-release.yml` após o merge, não em PRs.
 
 ## 6.1 Environments e segredos
 
@@ -116,6 +117,8 @@ Configure os secrets:
 - `NUGETTEST_API_KEY` para `https://int.nugettest.org/`
 
 Se quiser endurecer a produção, adicione regra de approval no environment `production`.
+
+O workflow `Publish and Release` é disparado por `push` em `main`, `qas` e `nugettest/qas`. As branch protections devem impedir push direto para que somente commits aprovados em PR sejam publicados.
 
 ## 6.2 Variável de runner do GitHub Actions
 

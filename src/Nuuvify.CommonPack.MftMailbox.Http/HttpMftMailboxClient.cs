@@ -1,7 +1,9 @@
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Runtime.ExceptionServices;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nuuvify.CommonPack.MftMailbox.Abstraction.Interfaces;
@@ -91,6 +93,7 @@ public sealed class HttpMftMailboxClient : IProtocolMftClient
     public MftProtocol Protocol => MftProtocol.Https;
 
     /// <inheritdoc />
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Membro de contrato de interface e dependente do estado da instância via SendItemAsync.")]
     public async Task<TransferItemResult> SendSingleAsync(TransferEnvelope envelope, CancellationToken cancellationToken = default)
     {
         ValidateEnvelope(envelope);
@@ -146,18 +149,14 @@ public sealed class HttpMftMailboxClient : IProtocolMftClient
         ValidateEnvelope(envelope);
         _resilienceGate.EnsureCanExecute();
 
-        var list = await RetryExecutor.ExecuteAsync(
-            async () =>
-            {
-                using var response = await _httpClient.GetAsync(_options.ListPath, cancellationToken).ConfigureAwait(false);
-                response.EnsureSuccessStatusCode();
+        var list = envelope.Items.Count > 0
+            ? BuildInboundListFromEnvelope(envelope)
+            : await ListInboundFromRemoteAsync(cancellationToken).ConfigureAwait(false);
 
-                var payload = await response.Content.ReadFromJsonAsync<MailboxListResponse>(cancellationToken: cancellationToken).ConfigureAwait(false);
-                return payload?.Items ?? new List<MailboxListItem>();
-            },
-            IsTransient,
-            _baseOptions.Retry,
-            cancellationToken).ConfigureAwait(false);
+        if (envelope.Items.Count == 0)
+        {
+            list = ApplyInboundOrdering(list);
+        }
 
         var inbound = new List<InboundTransferItem>();
         foreach (var candidate in list.Take(_baseOptions.MaxBatchSize))
@@ -206,18 +205,16 @@ public sealed class HttpMftMailboxClient : IProtocolMftClient
     /// </remarks>
     public async Task<TransferItemResult> AckOrNackAsync(AckNackCommand command, CancellationToken cancellationToken = default)
     {
-        var response = await RetryExecutor.ExecuteAsync(
+        _ = await RetryExecutor.ExecuteAsync(
             async () =>
             {
-                var message = await _httpClient.PostAsJsonAsync(_options.AckNackPath, command, cancellationToken).ConfigureAwait(false);
+                using var message = await _httpClient.PostAsJsonAsync(_options.AckNackPath, command, cancellationToken).ConfigureAwait(false);
                 message.EnsureSuccessStatusCode();
-                return message;
+                return true;
             },
             IsTransient,
             _baseOptions.Retry,
             cancellationToken).ConfigureAwait(false);
-
-        response.Dispose();
 
         var result = new TransferItemResult
         {
@@ -236,12 +233,14 @@ public sealed class HttpMftMailboxClient : IProtocolMftClient
             ItemId = command.ItemId,
             Protocol = Protocol,
             State = TransferState.Succeeded,
-            Message = result.Message
+            Message = result.Message,
+            Metadata = new Dictionary<string, string>(command.Metadata, StringComparer.OrdinalIgnoreCase)
         }, cancellationToken).ConfigureAwait(false);
 
         return result;
     }
 
+    [SuppressMessage("Maintainability", "CA1506:Avoid excessive class coupling", Justification = "Fluxo de orquestração HTTP integra contratos de transferência, resiliência, auditoria e serialização por design do adapter.")]
     private async Task<TransferItemResult> SendItemAsync(TransferEnvelope envelope, TransferItem item, CancellationToken cancellationToken)
     {
         if (item.ContentFactory is null)
@@ -260,6 +259,7 @@ public sealed class HttpMftMailboxClient : IProtocolMftClient
             FileName = item.FileName,
             State = TransferState.Pending
         };
+        ExceptionDispatchInfo? capturedException = null;
 
         if (!await _idempotencyStore.TryStartAsync(idempotencyKey, cancellationToken).ConfigureAwait(false))
         {
@@ -290,6 +290,8 @@ public sealed class HttpMftMailboxClient : IProtocolMftClient
                     content.Add(new StringContent(item.ItemId), "itemId");
                     content.Add(new StringContent(envelope.IntegrationKey), "integrationKey");
                     content.Add(new StringContent(envelope.CorrelationId), "correlationId");
+                    AddMetadataFields(content, envelope.Metadata, _options.EnvelopeMetadataFieldPrefix);
+                    AddMetadataFields(content, item.Metadata, _options.ItemMetadataFieldPrefix);
 
                     using var response = await _httpClient.PostAsync(_options.UploadPath, content, timeoutCts.Token).ConfigureAwait(false);
                     response.EnsureSuccessStatusCode();
@@ -312,7 +314,12 @@ public sealed class HttpMftMailboxClient : IProtocolMftClient
             await _idempotencyStore.MarkCompletedAsync(idempotencyKey, cancellationToken).ConfigureAwait(false);
             _resilienceGate.RegisterSuccess();
         }
-        catch (Exception ex)
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            _resilienceGate.RegisterFailure();
+            throw;
+        }
+        catch (Exception ex) when (IsHandledFailure(ex))
         {
             _resilienceGate.RegisterFailure();
 
@@ -323,6 +330,11 @@ public sealed class HttpMftMailboxClient : IProtocolMftClient
 
             await _idempotencyStore.MarkFailedAsync(idempotencyKey, ex.Message, cancellationToken).ConfigureAwait(false);
             _logger.LogError(ex, "MFT HTTP transfer failed for integration {IntegrationKey} item {ItemId}", envelope.IntegrationKey, item.ItemId);
+
+            if (!IsTransient(ex))
+            {
+                capturedException = ExceptionDispatchInfo.Capture(ex);
+            }
         }
 
         _status[statusKey] = BuildStatus(envelope, item, idempotencyKey, result);
@@ -335,8 +347,11 @@ public sealed class HttpMftMailboxClient : IProtocolMftClient
             ItemId = item.ItemId,
             Protocol = Protocol,
             State = result.State,
-            Message = result.Message
+            Message = result.Message,
+            Metadata = MergeMetadata(envelope.Metadata, item.Metadata)
         }, cancellationToken).ConfigureAwait(false);
+
+        capturedException?.Throw();
 
         return result;
     }
@@ -373,9 +388,103 @@ public sealed class HttpMftMailboxClient : IProtocolMftClient
             Content = readStream,
             Metadata = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
-                ["remotePath"] = item.RemotePath
+                ["remotePath"] = item.RemotePath,
+                ["itemId"] = item.ItemId,
+                ["fileName"] = item.FileName
             }
         };
+    }
+
+    private async Task<List<MailboxListItem>> ListInboundFromRemoteAsync(CancellationToken cancellationToken)
+    {
+        return await RetryExecutor.ExecuteAsync(
+            async () =>
+            {
+                using var response = await _httpClient.GetAsync(_options.ListPath, cancellationToken).ConfigureAwait(false);
+                response.EnsureSuccessStatusCode();
+
+                var payload = await response.Content.ReadFromJsonAsync<MailboxListResponse>(cancellationToken: cancellationToken).ConfigureAwait(false);
+                return payload?.Items ?? new List<MailboxListItem>();
+            },
+            IsTransient,
+            _baseOptions.Retry,
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    private static List<MailboxListItem> BuildInboundListFromEnvelope(TransferEnvelope envelope)
+    {
+        var list = new List<MailboxListItem>(envelope.Items.Count);
+        foreach (var transferItem in envelope.Items)
+        {
+            var remotePath = !string.IsNullOrWhiteSpace(transferItem.RemotePath)
+                ? transferItem.RemotePath
+                : transferItem.FileName;
+
+            if (string.IsNullOrWhiteSpace(remotePath))
+            {
+                throw new ArgumentException("Inbound item must define RemotePath or FileName.", nameof(envelope));
+            }
+
+            var fileName = !string.IsNullOrWhiteSpace(transferItem.FileName)
+                ? transferItem.FileName
+                : Path.GetFileName(remotePath);
+
+            list.Add(new MailboxListItem
+            {
+                ItemId = transferItem.ItemId,
+                FileName = fileName,
+                RemotePath = remotePath,
+                SizeBytes = transferItem.SizeBytes
+            });
+        }
+
+        return list;
+    }
+
+    private List<MailboxListItem> ApplyInboundOrdering(List<MailboxListItem> items)
+    {
+        return _options.InboundFileOrdering switch
+        {
+            InboundFileOrdering.FileNameAscending => items.OrderBy(x => x.FileName, StringComparer.OrdinalIgnoreCase).ToList(),
+            InboundFileOrdering.FileNameDescending => items.OrderByDescending(x => x.FileName, StringComparer.OrdinalIgnoreCase).ToList(),
+            _ => items
+        };
+    }
+
+    [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "MultipartFormDataContent assume ownership e descarta os StringContent adicionados ao final do uso.")]
+    private void AddMetadataFields(MultipartFormDataContent content, IDictionary<string, string> metadata, string prefix)
+    {
+        if (!_options.IncludeMetadataInUploadForm || metadata.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var pair in metadata)
+        {
+            if (string.IsNullOrWhiteSpace(pair.Key))
+            {
+                continue;
+            }
+
+            content.Add(new StringContent(pair.Value ?? string.Empty), $"{prefix}{pair.Key}");
+        }
+    }
+
+    private static Dictionary<string, string> MergeMetadata(IDictionary<string, string> envelopeMetadata, IDictionary<string, string> itemMetadata)
+    {
+        var merged = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var pair in envelopeMetadata)
+        {
+            merged[pair.Key] = pair.Value;
+        }
+
+        foreach (var pair in itemMetadata)
+        {
+            merged[pair.Key] = pair.Value;
+        }
+
+        return merged;
     }
 
     private async Task PollStatusUntilFinalAsync(string integrationKey, string itemId, CancellationToken cancellationToken)
@@ -417,6 +526,13 @@ public sealed class HttpMftMailboxClient : IProtocolMftClient
         return ex is HttpRequestException or TaskCanceledException or TimeoutException;
     }
 
+    private static bool IsHandledFailure(Exception ex)
+    {
+        return ex is not OutOfMemoryException
+            and not StackOverflowException
+            and not AccessViolationException;
+    }
+
     private TransferStatus BuildStatus(TransferEnvelope envelope, TransferItem item, string idempotencyKey, TransferItemResult result)
     {
         return new TransferStatus
@@ -440,10 +556,7 @@ public sealed class HttpMftMailboxClient : IProtocolMftClient
 
     private static void ValidateEnvelope(TransferEnvelope envelope)
     {
-        if (envelope is null)
-        {
-            throw new ArgumentNullException(nameof(envelope));
-        }
+        ArgumentNullException.ThrowIfNull(envelope);
 
         if (string.IsNullOrWhiteSpace(envelope.IntegrationKey))
         {

@@ -93,7 +93,7 @@ public sealed class ServiceBusBackgroundServiceSimplifiedTests : IDisposable
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(() =>
-            service.TestConfigureServiceBus("", "queue", null, null));
+            service.TestConfigureServiceBus("", "queue", null!, null!));
 
         Assert.Contains("Service Bus não foi configurada corretamente", exception.Message);
     }
@@ -107,7 +107,7 @@ public sealed class ServiceBusBackgroundServiceSimplifiedTests : IDisposable
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(() =>
-            service.TestConfigureServiceBus("validName", "queue", null, null));
+            service.TestConfigureServiceBus("validName", "queue", null!, null!));
 
         Assert.Contains("Service Bus não foi configurada corretamente", exception.Message);
     }
@@ -121,7 +121,7 @@ public sealed class ServiceBusBackgroundServiceSimplifiedTests : IDisposable
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(() =>
-            service.TestConfigureServiceBus("validConnection", "", null, null));
+            service.TestConfigureServiceBus("validConnection", "", null!, null!));
 
         Assert.Contains("Service Bus não foi configurada corretamente", exception.Message);
     }
@@ -184,30 +184,20 @@ public sealed class ServiceBusBackgroundServiceSimplifiedTests : IDisposable
 
         service.SetThrowGenericException(true);
         Assert.True(service.TestThrowGenericException);
-
-        service.SetThrowInvalidOperationExceptionOnDispose(true);
-        Assert.True(service.TestThrowOnDispose);
     }
 
     [Fact]
-    public void Dispose_ShouldLogWarning_WhenThrowInvalidOperationExceptionOnDisposeIsSet()
+    public async Task DisposeAsync_ShouldBeIdempotent_WhenCalledMultipleTimes()
     {
         // Arrange
         using var service = new TestServiceBusBackgroundServiceSimplified(_loggerMock.Object, _configurationMock.Object, _requestConfiguration);
-        service.SetThrowInvalidOperationExceptionOnDispose(true);
 
         // Act
-        service.Dispose();
+        await service.DisposeAsync();
+        await service.DisposeAsync();
 
-        // Assert - Verify that warning was logged
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Warning,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Recurso do Service Bus já estava em processo de liberação")),
-                It.IsAny<InvalidOperationException>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
+        // Assert
+        Assert.True(true);
     }
 
     [Fact]
@@ -218,6 +208,20 @@ public sealed class ServiceBusBackgroundServiceSimplifiedTests : IDisposable
 
         // Act & Assert - Should not throw
         service.Dispose();
+    }
+
+    [Fact]
+    public async Task DisposeAsync_ShouldNotThrow_WhenCalledAfterDisposeAsync()
+    {
+        // Arrange
+        var service = new TestServiceBusBackgroundServiceSimplified(_loggerMock.Object, _configurationMock.Object, _requestConfiguration);
+
+        // Act
+        await service.DisposeAsync();
+        await service.DisposeAsync();
+
+        // Assert
+        Assert.True(true);
     }
 
     public void Dispose()

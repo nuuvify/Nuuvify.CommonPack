@@ -20,8 +20,12 @@ public sealed class NullTransferAuditSink : ITransferAuditSink
     /// </summary>
     /// <param name="entry">Entrada a ser descartada.</param>
     /// <param name="cancellationToken">Token de cancelamento.</param>
+    /// <exception cref="ArgumentNullException">
+    /// Lançado quando <paramref name="entry"/> é <see langword="null"/>.
+    /// </exception>
     public Task WriteAsync(TransferAuditEntry entry, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(entry);
         cancellationToken.ThrowIfCancellationRequested();
         return Task.CompletedTask;
     }

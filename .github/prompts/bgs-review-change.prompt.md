@@ -2,7 +2,7 @@
 description: "Revisar mudanças em Nuuvify.CommonPack.BackgroundService com foco em perda de mensagem, retry indevido, lock renewal, telemetria, diagnósticos e semântica de falha."
 name: "BGS Review Change"
 argument-hint: "PR, diff, arquivo ou símbolo para revisar"
-agent: "library-reviewer"
+agent: "nuuvify-reviewer"
 model: ["Claude Sonnet 4.5 (copilot)", "GPT-5 (copilot)"]
 ---
 
@@ -17,4 +17,4 @@ Priorize:
 
 Use também:
 - [BackgroundService Source Instruction](../instructions/backgroundservice-source.instructions.md)
-- [Library Review Instruction](../instructions/library-review.instructions.md)
+- [Library Review Instruction](../instructions/nuuvify-review.instructions.md)

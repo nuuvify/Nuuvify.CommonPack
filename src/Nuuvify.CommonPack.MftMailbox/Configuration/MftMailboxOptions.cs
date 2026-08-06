@@ -1,5 +1,7 @@
 namespace Nuuvify.CommonPack.MftMailbox.Configuration;
 
+using Nuuvify.CommonPack.MftMailbox.Abstraction.Models;
+
 /// <summary>
 /// Opções globais do pacote MftMailbox, compartilhadas por todos os protocolos.
 /// </summary>
@@ -46,9 +48,30 @@ public sealed class MftMailboxOptions
     /// </summary>
     public TimeSpan BatchTimeout { get; set; } = TimeSpan.FromMinutes(30);
 
+    /// <summary>
+    /// Estratégia de ordenação dos arquivos inbound antes do processamento.
+    /// Padrão: <see cref="InboundFileOrdering.None"/>.
+    /// </summary>
+    public InboundFileOrdering InboundFileOrdering { get; set; } = InboundFileOrdering.None;
+
     /// <summary>Parâmetros da política de retry com backoff exponencial.</summary>
     public RetryOptions Retry { get; set; } = new();
 
     /// <summary>Parâmetros do circuit breaker que protege o servidor MFT de sobrecarga.</summary>
     public CircuitBreakerOptions CircuitBreaker { get; set; } = new();
+
+    /// <summary>
+    /// Protocolos cujas instâncias de cliente serão cacheadas pela <c>MftClientFactory</c>.
+    /// </summary>
+    /// <remarks>
+    /// Por padrão, apenas SFTP é cacheado para preservar estado de conexão/resiliência.
+    /// HTTPS fica sem cache por padrão para favorecer rotação de handlers e atualização
+    /// de DNS quando o cliente for resolvido repetidamente em APIs/Workers.
+    /// Para manter estado local do cliente HTTP entre chamadas, adicione
+    /// <see cref="MftProtocol.Https"/> explicitamente neste conjunto.
+    /// </remarks>
+    public HashSet<MftProtocol> CachedProtocols { get; set; } =
+    [
+        MftProtocol.Sftp
+    ];
 }

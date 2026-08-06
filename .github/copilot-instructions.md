@@ -41,10 +41,11 @@
 ## Uso eficiente de contexto
 
 - Não replique documentação longa aqui; carregue instruções sob demanda em `.github/instructions/`.
+- Para qualquer criação/movimentação/atualização de planos em `docs/plan/`, aplicar `.github/instructions/plan-status-policy.instructions.md`.
 - Para criação/atualização de `src/**/README.md`, aplicar a regra dedicada em `.github/instructions/package-readme-nuget.instructions.md`.
 - Use prompts de `.github/prompts/` para tarefas repetíveis.
 - Use agentes em `.github/agents/` quando a tarefa pedir revisão somente leitura ou refatoração com ferramentas restritas.
-- Use a skill `library-maintenance` para fluxos maiores de criar, alterar, refatorar, testar, revisar e documentar.
+- Use a skill `nuuvify-maintenance` para fluxos maiores de criar, alterar, refatorar, testar, revisar e documentar.
 
 ## Referências do projeto
 

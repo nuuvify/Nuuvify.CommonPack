@@ -16,6 +16,8 @@ namespace Nuuvify.CommonPack.MftMailbox;
 /// {
 ///     opt.MaxBatchSize = 100;
 ///     opt.Retry.MaxRetries = 5;
+///     // Opcional: habilitar cache da factory para HTTPS
+///     // opt.CachedProtocols.Add(MftProtocol.Https);
 /// });
 /// services.AddMftMailboxSftp(sftp =&gt;
 /// {
@@ -41,19 +43,18 @@ public static class MftMailboxSetup
     /// <list type="bullet">
     /// <item><see cref="IMftIdempotencyStore"/> → <see cref="InMemoryMftIdempotencyStore"/> (substitua por implementação persistente em produção).</item>
     /// <item><see cref="ITransferAuditSink"/> → <see cref="NullTransferAuditSink"/> (substitua por implementação de auditoria real).</item>
-    /// <item><see cref="IMftClientFactory"/> → <see cref="MftClientFactory"/>.</item>
+    /// <item><see cref="IMftClientFactory"/> → <see cref="MftClientFactory"/> (com cache explícito por protocolo definido em <see cref="MftMailboxOptions.CachedProtocols"/>).</item>
     /// </list>
     /// </remarks>
+    /// <exception cref="ArgumentNullException">
+    /// Lançado quando <paramref name="services"/> é <see langword="null"/>.
+    /// </exception>
     public static IServiceCollection AddMftMailboxCore(this IServiceCollection services, Action<MftMailboxOptions>? configureOptions = null)
     {
-        if (configureOptions is null)
-        {
-            _ = services.Configure<MftMailboxOptions>(_ => { });
-        }
-        else
-        {
-            _ = services.Configure(configureOptions);
-        }
+        ArgumentNullException.ThrowIfNull(services);
+
+        configureOptions ??= _ => { };
+        _ = services.Configure(configureOptions);
 
         _ = services.AddSingleton<IMftIdempotencyStore, InMemoryMftIdempotencyStore>();
         _ = services.AddSingleton<ITransferAuditSink, NullTransferAuditSink>();

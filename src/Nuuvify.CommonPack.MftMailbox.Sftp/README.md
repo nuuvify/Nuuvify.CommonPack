@@ -22,6 +22,7 @@ Adapter SFTP para MFT Mailbox com suporte a:
 - [Exemplo de envio](#exemplo-de-envio)
 - [Exemplo de recebimento](#exemplo-de-recebimento)
 - [ACK/NACK](#acknack)
+- [Mainframe (UTF-8 e EBCDIC)](#mainframe-utf-8-e-ebcdic)
 - [Segurança](#segurança)
 - [Troubleshooting](#troubleshooting)
 
@@ -57,12 +58,15 @@ Adapter SFTP para MFT Mailbox com suporte a:
 - ArchiveSuccessDirectory
 - ArchiveErrorDirectory
 - AckMarkerDirectory
-- AckNackMode (Metadata ou MarkerFile)
+- AckNackMode (`None`, `Metadata`, `MarkerFile`, `MetadataAndMarkerFile`)
+- AckMarkerEncodingName (valores aceitos por `Encoding.GetEncoding`; exemplos: `utf-8`, `ibm037`)
+- InboundFileOrdering (`None`, `FileNameAscending`, `FileNameDescending`)
 
 ## Registro no DI
 
 ```csharp
 using Nuuvify.CommonPack.MftMailbox;
+using Nuuvify.CommonPack.MftMailbox.Configuration;
 using Nuuvify.CommonPack.MftMailbox.Sftp;
 using Nuuvify.CommonPack.MftMailbox.Sftp.Configuration;
 
@@ -80,7 +84,9 @@ builder.Services.AddMftMailboxSftp(options =>
 	options.ArchiveSuccessDirectory = "/archive/success";
 	options.ArchiveErrorDirectory = "/archive/error";
 	options.AckMarkerDirectory = "/ack";
-	options.AckNackMode = SftpAckNackMode.Metadata;
+	options.AckNackMode = SftpAckNackMode.MetadataAndMarkerFile;
+	options.AckMarkerEncodingName = "utf-8";
+	options.InboundFileOrdering = InboundFileOrdering.FileNameAscending;
 });
 ```
 
@@ -157,10 +163,12 @@ public sealed class SftpInboundService
 
 ## ACK/NACK
 
-O adapter suporta dois modos:
+O adapter suporta quatro modos:
 
+- None: não executa confirmação remota.
 - Metadata: move arquivo para pasta de sucesso/erro.
-- MarkerFile: cria arquivo marcador na pasta de ACK.
+- MarkerFile: cria arquivo marcador na pasta de ACK/NACK.
+- MetadataAndMarkerFile: combina movimentação + marcador.
 
 Exemplo:
 
@@ -176,6 +184,35 @@ await client.AckOrNackAsync(new AckNackCommand
 	Protocol = MftProtocol.Sftp,
 	Decision = AckNackType.Ack
 }, ct);
+```
+
+## Mainframe (UTF-8 e EBCDIC)
+
+Para integrações com parceiros/mainframe que exigem codificação específica no arquivo marcador:
+
+```csharp
+builder.Services.AddMftMailboxSftp(options =>
+{
+	options.AckNackMode = SftpAckNackMode.MarkerFile;
+	options.AckMarkerEncodingName = "utf-8"; // marcador em UTF-8
+});
+```
+
+```csharp
+builder.Services.AddMftMailboxSftp(options =>
+{
+	options.AckNackMode = SftpAckNackMode.MarkerFile;
+	options.AckMarkerEncodingName = "ibm037"; // EBCDIC (CP037)
+});
+```
+
+Se você precisa somente processar arquivo sem retorno de ACK/NACK remoto:
+
+```csharp
+builder.Services.AddMftMailboxSftp(options =>
+{
+	options.AckNackMode = SftpAckNackMode.None;
+});
 ```
 
 ## Segurança

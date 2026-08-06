@@ -3,6 +3,7 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
+        <NoWarn>$(NoWarn);NU1603</NoWarn>
         <PackageId>Nuuvify.CommonPack.MftMailbox.Redis</PackageId>
         <Title>Nuuvify CommonPack MFT Mailbox — Redis Integration</Title>
         <PackageTags>Nuuvify;MFT;Mailbox;Redis;Idempotency;Distributed;Cache;Stream;.NET</PackageTags>
@@ -20,10 +21,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference
-            Include="..\Nuuvify.CommonPack.MftMailbox.Abstraction\Nuuvify.CommonPack.MftMailbox.Abstraction.csproj" />
-        <ProjectReference
-            Include="..\Nuuvify.CommonPack.MftMailbox\Nuuvify.CommonPack.MftMailbox.csproj" />
+        <ProjectReference Include="..\Nuuvify.CommonPack.MftMailbox.Abstraction\Nuuvify.CommonPack.MftMailbox.Abstraction.csproj" />
+        <ProjectReference Include="..\Nuuvify.CommonPack.MftMailbox\Nuuvify.CommonPack.MftMailbox.csproj" />
     </ItemGroup>
 
 </Project>

@@ -15,7 +15,8 @@ namespace Nuuvify.CommonPack.MftMailbox.Redis.Services;
 /// Grava cada operação MFT (envio, recepção, ACK/NACK) em uma stream Redis que pode ser
 /// consumida por aplicações externas (logging, telemetria, banco de dados).
 ///
-/// Padrão: Fire-and-forget assíncrono (não bloqueia fluxo de transferência).
+/// Padrão: escrita assíncrona aguardada pelo chamador para garantir diagnóstico de falhas.
+/// Em caso de indisponibilidade Redis, a falha é registrada em log e o fluxo principal segue.
 /// Consumidores externos leem da stream com <c>XREAD</c> ou grupos de consumo.
 ///
 /// Registrado via <c>RedisMftMailboxSetup.AddMftMailboxRedis</c> quando
@@ -56,13 +57,14 @@ public sealed class RedisAuditStreamSink : ITransferAuditSink
     }
 
     /// <summary>
-    /// Grava uma entrada de auditoria na stream Redis de forma assíncrona e não-bloqueante.
+    /// Grava uma entrada de auditoria na stream Redis de forma assíncrona.
     /// </summary>
     /// <param name="entry">Dados da operação a ser auditada.</param>
     /// <param name="cancellationToken">Token de cancelamento.</param>
     /// <remarks>
-    /// Operação é fire-and-forget: não aguarda conclusão. Se falhar, apenas loga
-    /// warning e continua. Falhas não interrompem o fluxo de transferência MFT.
+    /// A operação é aguardada para permitir diagnóstico de falhas de infraestrutura.
+    /// Se Redis estiver indisponível, a implementação registra warning e continua,
+    /// pois auditoria é um recurso auxiliar.
     ///
     /// Stream é trimada automaticamente para <c>RedisMftMailboxOptions.AuditStreamMaxLength</c>
     /// (padrão 100k entradas) para evitar crescimento indefinido.
@@ -73,14 +75,21 @@ public sealed class RedisAuditStreamSink : ITransferAuditSink
 
         cancellationToken.ThrowIfCancellationRequested();
 
+        if (!_options.EnableAuditStream)
+        {
+            return;
+        }
+
         try
         {
             var nameValueEntries = _serializer.Serialize(entry);
 
             // Adicionar à stream Redis
-            var streamId = await _redis.StreamAddAsync(
-                _options.AuditStreamName,
-                nameValueEntries);
+            var streamId = await ExecuteRedisAsync(
+                _redis.StreamAddAsync(
+                    _options.AuditStreamName,
+                    nameValueEntries),
+                cancellationToken).ConfigureAwait(false);
 
             _logger.LogDebug(
                 "Entrada de auditoria adicionada à stream: {StreamId}, " +
@@ -92,9 +101,18 @@ public sealed class RedisAuditStreamSink : ITransferAuditSink
 
             // Trimagem assíncrona: manter apenas últimas N entradas
             // Executada em background, não bloqueia
-            _ = _redis.StreamTrimAsync(
-                _options.AuditStreamName,
-                _options.AuditStreamMaxLength);
+            ObserveTrimTask(ExecuteRedisAsync(
+                _redis.StreamTrimAsync(
+                    _options.AuditStreamName,
+                    _options.AuditStreamMaxLength),
+                cancellationToken));
+        }
+        catch (TimeoutException ex)
+        {
+            _logger.LogWarning(
+                ex,
+                "Timeout Redis ao gravar auditoria para IntegrationKey={IntegrationKey}",
+                entry.IntegrationKey);
         }
         catch (RedisConnectionException ex)
         {
@@ -106,12 +124,32 @@ public sealed class RedisAuditStreamSink : ITransferAuditSink
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(
+            _logger.LogError(
                 ex,
-                "Erro ao gravar auditoria para IntegrationKey={IntegrationKey}, ItemId={ItemId}",
+                "Falha inesperada ao gravar auditoria para IntegrationKey={IntegrationKey}, ItemId={ItemId}",
                 entry.IntegrationKey,
                 entry.ItemId);
-            // Não relançar: auditoria é fire-and-forget
+            throw;
         }
+    }
+
+    private async Task<T> ExecuteRedisAsync<T>(Task<T> operation, CancellationToken cancellationToken)
+    {
+        return await operation.WaitAsync(_options.OperationTimeout, cancellationToken).ConfigureAwait(false);
+    }
+
+    private void ObserveTrimTask(Task<long> trimTask)
+    {
+        _ = trimTask.ContinueWith(
+            t =>
+            {
+                if (t.Exception is null)
+                {
+                    return;
+                }
+
+                _logger.LogWarning(t.Exception, "Falha ao executar trim da stream de auditoria {StreamName}", _options.AuditStreamName);
+            },
+            TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously);
     }
 }

@@ -37,4 +37,42 @@ public class RetryExecutorTests
         Assert.Equal(42, result);
         Assert.Equal(3, count);
     }
+
+    [Fact]
+    public async Task ExecuteAsync_ComMaxRetriesNegativo_DeveFalharComArgumentOutOfRangeException()
+    {
+        var options = new RetryOptions
+        {
+            MaxRetries = -1,
+            BaseDelay = TimeSpan.FromMilliseconds(1),
+            MaxDelay = TimeSpan.FromMilliseconds(10),
+            UseJitter = false
+        };
+
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
+            RetryExecutor.ExecuteAsync(
+                () => Task.FromResult(1),
+                _ => true,
+                options,
+                CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ComBaseDelayMaiorQueMaxDelay_DeveFalharComArgumentOutOfRangeException()
+    {
+        var options = new RetryOptions
+        {
+            MaxRetries = 1,
+            BaseDelay = TimeSpan.FromSeconds(5),
+            MaxDelay = TimeSpan.FromSeconds(1),
+            UseJitter = true
+        };
+
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
+            RetryExecutor.ExecuteAsync(
+                () => Task.FromResult(1),
+                _ => true,
+                options,
+                CancellationToken.None));
+    }
 }
