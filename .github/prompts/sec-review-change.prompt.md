@@ -2,7 +2,7 @@
 description: "Revisar mudanças em Nuuvify.CommonPack.Security, Security.JwtCredentials ou Security.JwtStore.Ef com foco em defaults inseguros, validação, segredos, claims e contratos de autenticação."
 name: "Security Review Change"
 argument-hint: "PR, diff, arquivo ou símbolo para revisar"
-agent: "library-reviewer"
+agent: "nuuvify-reviewer"
 model: ["Claude Sonnet 4.5 (copilot)", "GPT-5 (copilot)"]
 ---
 
@@ -17,4 +17,4 @@ Priorize:
 
 Use também:
 - [Security Source Instruction](../instructions/security-source.instructions.md)
-- [Library Review Instruction](../instructions/library-review.instructions.md)
+- [Library Review Instruction](../instructions/nuuvify-review.instructions.md)

@@ -21,4 +21,4 @@ Checklist de saída:
 
 Use também:
 - [Security Source Instruction](../instructions/security-source.instructions.md)
-- [Library Tests Instruction](../instructions/library-tests.instructions.md)
+- [Library Tests Instruction](../instructions/nuuvify-tests.instructions.md)

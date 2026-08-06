@@ -25,9 +25,15 @@ public sealed class InMemoryMftIdempotencyStore : IMftIdempotencyStore
     /// <see langword="true"/> se a chave foi inserida pela primeira vez (processamento pode prosseguir);
     /// <see langword="false"/> se já existia (item já processado ou em andamento).
     /// </returns>
+    /// <exception cref="ArgumentException">Lançado quando <paramref name="idempotencyKey"/> é nula, vazia ou whitespace.</exception>
     public Task<bool> TryStartAsync(string idempotencyKey, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
+
+        if (string.IsNullOrWhiteSpace(idempotencyKey))
+        {
+            throw new ArgumentException("Chave de idempotência não pode ser nula ou vazia.", nameof(idempotencyKey));
+        }
 
         var started = _state.TryAdd(idempotencyKey, "started");
         return Task.FromResult(started);
@@ -38,9 +44,15 @@ public sealed class InMemoryMftIdempotencyStore : IMftIdempotencyStore
     /// </summary>
     /// <param name="idempotencyKey">Chave composta da transferência.</param>
     /// <param name="cancellationToken">Token de cancelamento.</param>
+    /// <exception cref="ArgumentException">Lançado quando <paramref name="idempotencyKey"/> é nula, vazia ou whitespace.</exception>
     public Task MarkCompletedAsync(string idempotencyKey, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
+
+        if (string.IsNullOrWhiteSpace(idempotencyKey))
+        {
+            throw new ArgumentException("Chave de idempotência não pode ser nula ou vazia.", nameof(idempotencyKey));
+        }
 
         _state[idempotencyKey] = "completed";
         return Task.CompletedTask;
@@ -52,9 +64,22 @@ public sealed class InMemoryMftIdempotencyStore : IMftIdempotencyStore
     /// <param name="idempotencyKey">Chave composta da transferência.</param>
     /// <param name="reason">Descrição do motivo da falha.</param>
     /// <param name="cancellationToken">Token de cancelamento.</param>
+    /// <exception cref="ArgumentException">
+    /// Lançado quando <paramref name="idempotencyKey"/> ou <paramref name="reason"/> são nulos, vazios ou whitespace.
+    /// </exception>
     public Task MarkFailedAsync(string idempotencyKey, string reason, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
+
+        if (string.IsNullOrWhiteSpace(idempotencyKey))
+        {
+            throw new ArgumentException("Chave de idempotência não pode ser nula ou vazia.", nameof(idempotencyKey));
+        }
+
+        if (string.IsNullOrWhiteSpace(reason))
+        {
+            throw new ArgumentException("Motivo da falha não pode ser nulo ou vazio.", nameof(reason));
+        }
 
         _state[idempotencyKey] = $"failed:{reason}";
         return Task.CompletedTask;

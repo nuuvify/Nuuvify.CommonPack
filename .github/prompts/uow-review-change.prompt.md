@@ -2,7 +2,7 @@
 description: "Revisar mudanças em Nuuvify.CommonPack.UnitOfWork ou UnitOfWork.Abstraction com foco em LINQ/EF translation, paginação, filtros, ordenação, performance e API pública."
 name: "UoW Review Change"
 argument-hint: "PR, diff, arquivo ou símbolo para revisar"
-agent: "library-reviewer"
+agent: "nuuvify-reviewer"
 model: ["Claude Sonnet 4.5 (copilot)", "GPT-5 (copilot)"]
 ---
 
@@ -17,4 +17,4 @@ Priorize:
 
 Use também:
 - [UnitOfWork Source Instruction](../instructions/unitofwork-source.instructions.md)
-- [Library Review Instruction](../instructions/library-review.instructions.md)
+- [Library Review Instruction](../instructions/nuuvify-review.instructions.md)

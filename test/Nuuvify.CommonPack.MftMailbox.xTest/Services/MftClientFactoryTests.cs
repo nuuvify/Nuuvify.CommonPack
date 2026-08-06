@@ -1,5 +1,8 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Nuuvify.CommonPack.MftMailbox.Abstraction.Interfaces;
 using Nuuvify.CommonPack.MftMailbox.Abstraction.Models;
+using Nuuvify.CommonPack.MftMailbox.Configuration;
 using Nuuvify.CommonPack.MftMailbox.Protocols;
 using Nuuvify.CommonPack.MftMailbox.Services;
 
@@ -11,24 +14,80 @@ public class MftClientFactoryTests
     [Fact]
     public void DeveResolverClientesPorProtocolo()
     {
-        var sftp = new FakeProtocolClient(MftProtocol.Sftp);
-        var https = new FakeProtocolClient(MftProtocol.Https);
+        var services = new ServiceCollection();
+        _ = services.AddKeyedTransient<IProtocolMftClient>(MftProtocol.Sftp, (_, _) => new FakeProtocolClient(MftProtocol.Sftp));
+        _ = services.AddKeyedTransient<IProtocolMftClient>(MftProtocol.Https, (_, _) => new FakeProtocolClient(MftProtocol.Https));
 
-        IMftClientFactory factory = new MftClientFactory(new[] { sftp, https });
+        var provider = services.BuildServiceProvider();
+        IMftClientFactory factory = new MftClientFactory(provider, Options.Create(new MftMailboxOptions()));
 
         var transfer = factory.CreateTransferClient(MftProtocol.Sftp);
         var inbound = factory.CreateInboundClient(MftProtocol.Https);
 
-        Assert.Same(sftp, transfer);
-        Assert.Same(https, inbound);
+        Assert.Equal(MftProtocol.Sftp, ((IProtocolMftClient)transfer).Protocol);
+        Assert.Equal(MftProtocol.Https, ((IProtocolMftClient)inbound).Protocol);
     }
 
     [Fact]
     public void DeveFalharQuandoNaoExisteProtocoloRegistrado()
     {
-        IMftClientFactory factory = new MftClientFactory(Array.Empty<IProtocolMftClient>());
+        var services = new ServiceCollection();
+        var provider = services.BuildServiceProvider();
+        IMftClientFactory factory = new MftClientFactory(provider, Options.Create(new MftMailboxOptions()));
 
         Assert.Throws<InvalidOperationException>(() => factory.CreateTransferClient(MftProtocol.Sftp));
+    }
+
+    [Fact]
+    public void DeveFalharQuandoExisteDuplicidadeDeProtocolo()
+    {
+        var services = new ServiceCollection();
+        _ = services.AddKeyedTransient<IProtocolMftClient>(MftProtocol.Sftp, (_, _) => new FakeProtocolClient(MftProtocol.Sftp));
+        _ = services.AddKeyedTransient<IProtocolMftClient>(MftProtocol.Sftp, (_, _) => new FakeProtocolClient(MftProtocol.Sftp));
+        var provider = services.BuildServiceProvider();
+
+        var exception = Assert.Throws<InvalidOperationException>(() =>
+        {
+            IMftClientFactory factory = new MftClientFactory(provider, Options.Create(new MftMailboxOptions()));
+            _ = factory.CreateTransferClient(MftProtocol.Sftp);
+        });
+
+        Assert.Contains("Multiple MFT clients registered", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void DeveCachearInstanciaPorProtocoloMesmoComRegistroTransiente()
+    {
+        var services = new ServiceCollection();
+        _ = services.AddKeyedTransient<IProtocolMftClient>(MftProtocol.Sftp, (_, _) => new FakeProtocolClient(MftProtocol.Sftp));
+
+        var provider = services.BuildServiceProvider();
+        IMftClientFactory factory = new MftClientFactory(provider, Options.Create(new MftMailboxOptions()));
+
+        var first = factory.CreateTransferClient(MftProtocol.Sftp);
+        var second = factory.CreateInboundClient(MftProtocol.Sftp);
+
+        Assert.Same(first, second);
+    }
+
+    [Fact]
+    public void NaoDeveCachearQuandoProtocoloNaoEstaConfiguradoParaCache()
+    {
+        var services = new ServiceCollection();
+        _ = services.AddKeyedTransient<IProtocolMftClient>(MftProtocol.Https, (_, _) => new FakeProtocolClient(MftProtocol.Https));
+
+        var provider = services.BuildServiceProvider();
+        var options = new MftMailboxOptions
+        {
+            CachedProtocols = [MftProtocol.Sftp]
+        };
+
+        IMftClientFactory factory = new MftClientFactory(provider, Options.Create(options));
+
+        var first = factory.CreateTransferClient(MftProtocol.Https);
+        var second = factory.CreateInboundClient(MftProtocol.Https);
+
+        Assert.NotSame(first, second);
     }
 
     private sealed class FakeProtocolClient : IProtocolMftClient

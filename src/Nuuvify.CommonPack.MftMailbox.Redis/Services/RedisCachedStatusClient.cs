@@ -90,6 +90,11 @@ public sealed class RedisCachedStatusClient : IMftStatusClient
 
         cancellationToken.ThrowIfCancellationRequested();
 
+        if (!_options.EnableStatusCache)
+        {
+            return await _innerClient.GetStatusAsync(integrationKey, itemId, cancellationToken).ConfigureAwait(false);
+        }
+
         var cacheKey = BuildCacheKey(integrationKey, itemId);
 
         try
@@ -138,15 +143,6 @@ public sealed class RedisCachedStatusClient : IMftStatusClient
             // Fallback para cliente original se Redis falhar
             return await _innerClient.GetStatusAsync(integrationKey, itemId, cancellationToken);
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(
-                ex,
-                "Erro ao consultar status para {IntegrationKey}:{ItemId}",
-                integrationKey,
-                itemId);
-            throw;
-        }
     }
 
     /// <summary>
@@ -158,7 +154,7 @@ public sealed class RedisCachedStatusClient : IMftStatusClient
     {
         try
         {
-            var cached = await _redis.StringGetAsync(cacheKey);
+            var cached = await ExecuteRedisAsync(_redis.StringGetAsync(cacheKey), cancellationToken).ConfigureAwait(false);
             if (!cached.HasValue)
                 return null;
 
@@ -168,9 +164,9 @@ public sealed class RedisCachedStatusClient : IMftStatusClient
 
             return _serializer.Deserialize(cached);
         }
-        catch (Exception ex)
+        catch (RedisException ex)
         {
-            _logger.LogWarning(ex, "Erro ao desserializar cache de status para {CacheKey}", cacheKey);
+            _logger.LogWarning(ex, "Erro Redis ao consultar cache de status para {CacheKey}", cacheKey);
             return null;
         }
     }
@@ -187,9 +183,9 @@ public sealed class RedisCachedStatusClient : IMftStatusClient
         try
         {
             var serialized = _serializer.Serialize(status);
-            _ = await _redis.StringSetAsync(cacheKey, serialized, ttl);
+            _ = await ExecuteRedisAsync(_redis.StringSetAsync(cacheKey, serialized, ttl), cancellationToken).ConfigureAwait(false);
         }
-        catch (Exception ex)
+        catch (RedisException ex)
         {
             _logger.LogWarning(ex, "Erro ao cachear status para {CacheKey}", cacheKey);
             // Não relançar: cache é otimização, falha não deve quebrar fluxo
@@ -206,9 +202,9 @@ public sealed class RedisCachedStatusClient : IMftStatusClient
     {
         try
         {
-            _ = await _redis.StringSetAsync(cacheKey, "null", ttl);
+            _ = await ExecuteRedisAsync(_redis.StringSetAsync(cacheKey, "null", ttl), cancellationToken).ConfigureAwait(false);
         }
-        catch (Exception ex)
+        catch (RedisException ex)
         {
             _logger.LogWarning(ex, "Erro ao cachear resultado negativo para {CacheKey}", cacheKey);
         }
@@ -219,4 +215,9 @@ public sealed class RedisCachedStatusClient : IMftStatusClient
     /// </summary>
     private string BuildCacheKey(string integrationKey, string itemId) =>
         $"{_options.StatusCacheKeyPrefix}{integrationKey}:{itemId}";
+
+    private async Task<T> ExecuteRedisAsync<T>(Task<T> operation, CancellationToken cancellationToken)
+    {
+        return await operation.WaitAsync(_options.OperationTimeout, cancellationToken).ConfigureAwait(false);
+    }
 }

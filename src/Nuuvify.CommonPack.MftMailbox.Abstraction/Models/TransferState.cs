@@ -5,6 +5,9 @@ namespace Nuuvify.CommonPack.MftMailbox.Abstraction.Models;
 /// </summary>
 public enum TransferState
 {
+    /// <summary>A transferência ainda não teve estado definido.</summary>
+    None = 0,
+
     /// <summary>A transferência foi criada, mas ainda não foi iniciada.</summary>
     Pending = 1,
 

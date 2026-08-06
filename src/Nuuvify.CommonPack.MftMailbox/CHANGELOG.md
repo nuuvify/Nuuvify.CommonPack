@@ -1,19 +1,20 @@
 # Changelog - Nuuvify.CommonPack.MftMailbox
 
-Todas as mudancas notaveis deste pacote serao documentadas neste arquivo.
+Todas as mudanças notáveis deste pacote serão documentadas neste arquivo.
 
-O formato e baseado em [Keep a Changelog](https://keepachangelog.com/pt-br/1.0.0/),
+O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-br/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec/v2.0.0.html).
 
-## [Nao Lancado]
+## [Não Lançado]
 
 ### Adicionado
-- Nucleo de MFT Mailbox com factory, idempotencia e auditoria.
+- Núcleo de MFT Mailbox com factory, idempotência e auditoria.
 
 ### Alterado
+- Adicionada opção de ordenação de arquivos inbound para permitir escolha entre ordem original, nome crescente e nome decrescente.
 
 ### Corrigido
 
 ### Removido
 
-### Seguranca
+### Segurança

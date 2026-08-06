@@ -6,7 +6,7 @@ Este documento registra o plano completo para padronizar os arquivos `CHANGELOG.
 
 1. CHANGELOGs quebrados (contendo apenas uma URL) devem ser **apagados e reconstruídos do zero** com apenas `## [Não Lançado]` vazio.
 2. PR validation deve **falhar** ao detectar alteração de código em qualquer pacote sem atualização do `CHANGELOG.md` correspondente — sem exceção por pacote.
-3. A automação do CHANGELOG raiz usa **Commitizen como mecanismo principal** no CI; fallback por leitura de labels de PRs via `gh` quando Commitizen não detectar commits válidos.
+3. A automação do CHANGELOG raiz usa **release PR manual** como mecanismo principal; a seção `## [Não Lançado]` é fechada pelo workflow `prepare-release.yml` no momento do bump de versão.
 
 ---
 
@@ -30,7 +30,7 @@ Este documento registra o plano completo para padronizar os arquivos `CHANGELOG.
 
 ### Gaps de automação identificados
 
-- Commitizen está configurado em `.cz.toml` com `changelog_incremental = true` mas **não é executado no CI**.
+- O CHANGELOG raiz é atualizado manualmente (seção `## [Não Lançado]`) e fechado pelo workflow `prepare-release.yml` a cada release.
 - `build-release-notes.ps1` aceita apenas a variante `Não Lançado` via regex — qualquer CHANGELOG com `Unreleased` falha silenciosamente.
 - `community-validation.yml` **não valida** o formato do `CHANGELOG.md` raiz.
 - `pr-validation.yml` **não verifica** se o CHANGELOG do pacote alterado foi atualizado.
@@ -128,11 +128,9 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 ```
 Fase 1 ──────────────────────────────────┐
    │                                     │
-   ├──► Fase 2 (corrigir arquivos)        ├──► Fase 4 (Commitizen + fallback)
-   │                                     │         │
-   └──► Fase 3 (CI validação)  ──────────┘         ├──► Fase 5 (pacotes via IA)
-             │                                     │
-             └─────────────────────────────────────┴──► Fase 6 (unificar release notes)
+   ├──► Fase 2 (corrigir arquivos)        ├──► Fase 5 (pacotes via IA)
+   │                                     │
+   └──► Fase 3 (CI validação)  ──────────┴──► Fase 6 (unificar release notes)
 
 Fase 3c pode ser executada imediatamente, independente de qualquer outra.
 ```
@@ -241,86 +239,11 @@ Após a Fase 2 estar concluída e todos os arquivos estarem em pt-BR: reverter p
 
 ---
 
-### Fase 4 — Automação do CHANGELOG raiz via Commitizen e fallback por labels
+### Fase 4 — Encerrada: Commitizen removido
 
-**Objetivo:** gerar entradas do CHANGELOG raiz automaticamente a partir dos commits convencionais, sem edição manual no momento do release.
+O mecanismo de bump automático via Commitizen foi removido. O CHANGELOG raiz é atualizado manualmente durante o desenvolvimento (seção `## [Não Lançado]`) e fechado automaticamente pelo workflow `prepare-release.yml` no momento do release.
 
-**Pré-requisito humano:** todos os commits que tocam código de pacote devem usar Conventional Commits com scope de pacote obrigatório. Exemplos:
-
-```
-feat(email): adiciona suporte a múltiplos destinatários Bcc
-fix(unitofwork): corrige paginação para provider DB2
-refactor(backgroundservice): reduz complexidade cognitiva do HandleMessageAsync
-docs(security): atualiza guia de migração JWT
-```
-
-#### 4a — Configurar `change_type_map` pt-BR no `.cz.toml`
-
-```toml
-[tool.commitizen]
-# ... configurações existentes ...
-changelog_file = "CHANGELOG.md"
-
-[tool.commitizen.change_type_map]
-feat = "Adicionado"
-fix = "Corrigido"
-refactor = "Alterado"
-docs = "Documentação"
-perf = "Performance"
-"breaking change" = "Removido"
-```
-
-#### 4b — Step Commitizen em `publish-release.yml`
-
-Adicionar antes do step `Build release notes`:
-
-```yaml
-- name: Generate changelog via Commitizen
-  id: cz_changelog
-  continue-on-error: true
-  shell: bash
-  run: |
-      pip install commitizen
-      cz changelog --incremental --file-name CHANGELOG.md
-      if [ $? -ne 0 ] || [ -z "$(git diff --name-only CHANGELOG.md)" ]; then
-        echo "cz_changed=false" >> $GITHUB_OUTPUT
-      else
-        echo "cz_changed=true" >> $GITHUB_OUTPUT
-      fi
-
-- name: Fallback changelog via PR labels
-  if: ${{ steps.cz_changelog.outputs.cz_changed == 'false' }}
-  shell: pwsh
-  env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  run: |
-      # Obtém data da última tag para filtrar PRs
-      $lastTag = git tag --list 'v[0-9]*' | Sort-Object { [version]($_ -replace '^v','') } | Select-Object -Last 1
-      $lastTagDate = git log -1 --format="%aI" $lastTag
-      # Chama build-release-notes.ps1 no modo fallback de labels
-      ./.github/scripts/build-release-notes.ps1 `
-        -Mode 'labels-fallback' `
-        -Version '${{ steps.version.outputs.version }}' `
-        -LastTagDate $lastTagDate
-
-- name: Commit changelog update
-  if: ${{ steps.cz_changelog.outputs.cz_changed == 'true' }}
-  shell: bash
-  run: |
-      git config user.name "github-actions[bot]"
-      git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-      git add CHANGELOG.md
-      git commit -m "docs(changelog): atualiza para v${{ steps.version.outputs.version }} [skip ci]"
-      git push origin HEAD
-```
-
-#### 4c — Expandir `build-release-notes.ps1` com modo fallback por labels
-
-O script recebe um parâmetro `-Mode` opcional:
-- `default` (existente): extrai seção `[Não Lançado]` do arquivo
-- `labels-fallback` (novo): consulta `gh pr list`, mapeia labels para categorias do `.github/release.yml`, insere bloco gerado na seção `[Não Lançado]` do CHANGELOG raiz
-
-**Verificação:** merge em `main` com commits convencionais válidos gera e commita o CHANGELOG atualizado automaticamente. Merge com commits sem scope ativa o fallback por labels e produz notas coerentes.
+Ver [release-process.md](./release-process.md) para o fluxo atual.
 
 ---
 
@@ -384,8 +307,7 @@ Isso cria duas seções nas notas de release, potencialmente com conteúdo sobre
 | `.github/workflows/community-validation.yml`                      | Adicionar validação de formato do CHANGELOG raiz                        | 3a     |
 | `.github/workflows/pr-validation.yml`                             | Adicionar bloqueio de PR sem CHANGELOG de pacote                        | 3b     |
 | `.github/scripts/build-release-notes.ps1`                         | Aceitar `Unreleased` no regex (transição)                               | 3c     |
-| `.cz.toml`                                                        | Adicionar `change_type_map` com traduções pt-BR                         | 4a     |
-| `.github/workflows/publish-release.yml`                           | Adicionar steps Commitizen, fallback e commit do changelog              | 4b     |
+| `.cz.toml`                                                        | Removido — Commitizen eliminado                                         | 4      |
 | `.github/scripts/build-release-notes.ps1`                         | Adicionar modo `labels-fallback` e geração completa                     | 4c + 6 |
 | `.github/workflows/publish-release.yml`                           | Remover `--generate-notes`                                              | 6      |
 
@@ -401,7 +323,7 @@ Isso cria duas seções nas notas de release, potencialmente com conteúdo sobre
 | 3a        | PR que remove `## [Não Lançado]` do CHANGELOG raiz falha em `community-validation.yml`                                                     |
 | 3b        | PR alterando `src/Email/**` sem atualizar `Email/CHANGELOG.md` falha em `pr-validation.yml` com nome do pacote na mensagem                 |
 | 3c        | `build-release-notes.ps1` processa arquivos com `Unreleased` sem erro                                                                      |
-| 4         | Merge em `main` com commits convencionais gera commit automático do CHANGELOG; merge sem commits convencionais ativa o fallback por labels |
+| 4         | `.cz.toml` removido; fluxo de bump migrado para `prepare-release.yml` com workflow dispatch                                               |
 | 5         | IA produz CHANGELOG de pacote com conteúdo conciso, sem roadmap e no template canônico                                                     |
 | 6         | GitHub Release exibe um único bloco de notas sem duplicação                                                                                |
 
@@ -414,4 +336,4 @@ Isso cria duas seções nas notas de release, potencialmente com conteúdo sobre
 - [`.github/instructions/package-docs.instructions.md`](../../.github/instructions/package-docs.instructions.md)
 - [`.github/scripts/build-release-notes.ps1`](../../.github/scripts/build-release-notes.ps1)
 - [`.github/workflows/publish-release.yml`](../../.github/workflows/publish-release.yml)
-- [`.cz.toml`](../../.cz.toml)
+- `prepare-release.yml` — workflow de bump de versão (substitui Commitizen)

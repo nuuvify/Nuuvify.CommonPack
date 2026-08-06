@@ -80,7 +80,7 @@ public sealed class ServiceBusBackgroundServiceReceiveModeTests : IDisposable
         };
 
         // Act
-        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null, processorOptions);
+        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null!, processorOptions);
 
         // Assert
         service.GetReceiveMode().ShouldBe(ServiceBusReceiveMode.PeekLock);
@@ -98,7 +98,7 @@ public sealed class ServiceBusBackgroundServiceReceiveModeTests : IDisposable
         };
 
         // Act
-        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null, processorOptions);
+        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null!, processorOptions);
 
         // Assert
         service.GetReceiveMode().ShouldBe(ServiceBusReceiveMode.ReceiveAndDelete);
@@ -112,7 +112,7 @@ public sealed class ServiceBusBackgroundServiceReceiveModeTests : IDisposable
         using var service = new TestServiceBusBackgroundService(_loggerMock.Object, _configurationMock.Object, _requestConfiguration);
 
         // Act
-        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null, null);
+        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null!, null!);
 
         // Assert
         service.GetReceiveMode().ShouldBe(ServiceBusReceiveMode.PeekLock);
@@ -134,7 +134,7 @@ public sealed class ServiceBusBackgroundServiceReceiveModeTests : IDisposable
         };
 
         // Act
-        service.TestConfigureServiceBusWithTopicConnectionString("ServiceBus:CnnName", "test-topic", "test-subscription", null, processorOptions);
+        service.TestConfigureServiceBusWithTopicConnectionString("ServiceBus:CnnName", "test-topic", "test-subscription", null!, processorOptions);
 
         // Assert
         service.GetReceiveMode().ShouldBe(ServiceBusReceiveMode.ReceiveAndDelete);
@@ -152,7 +152,7 @@ public sealed class ServiceBusBackgroundServiceReceiveModeTests : IDisposable
         };
 
         // Act
-        service.TestConfigureServiceBusWithTopicConnectionString("ServiceBus:CnnName", "test-topic", "test-subscription", null, processorOptions);
+        service.TestConfigureServiceBusWithTopicConnectionString("ServiceBus:CnnName", "test-topic", "test-subscription", null!, processorOptions);
 
         // Assert
         service.GetReceiveMode().ShouldBe(ServiceBusReceiveMode.PeekLock);
@@ -170,7 +170,7 @@ public sealed class ServiceBusBackgroundServiceReceiveModeTests : IDisposable
         using var service = new TestServiceBusBackgroundService(_loggerMock.Object, _configurationMock.Object, _requestConfiguration);
         service.SetActivitySource(_activitySource);
         service.SetExecuteRuleResult(true);
-        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null, new ServiceBusProcessorOptions
+        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null!, new ServiceBusProcessorOptions
         {
             ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete
         });
@@ -193,7 +193,7 @@ public sealed class ServiceBusBackgroundServiceReceiveModeTests : IDisposable
         using var service = new TestServiceBusBackgroundService(_loggerMock.Object, _configurationMock.Object, _requestConfiguration);
         service.SetActivitySource(_activitySource);
         service.SetExecuteRuleResult(false);
-        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null, new ServiceBusProcessorOptions
+        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null!, new ServiceBusProcessorOptions
         {
             ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete
         });
@@ -217,7 +217,7 @@ public sealed class ServiceBusBackgroundServiceReceiveModeTests : IDisposable
         service.SetActivitySource(_activitySource);
         service.SetExecuteRuleResult(false);
         service.SetAbandonMessageIfFailed(true);
-        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null, new ServiceBusProcessorOptions
+        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null!, new ServiceBusProcessorOptions
         {
             ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete
         });
@@ -243,7 +243,7 @@ public sealed class ServiceBusBackgroundServiceReceiveModeTests : IDisposable
         // Arrange
         using var service = new TestServiceBusBackgroundService(_loggerMock.Object, _configurationMock.Object, _requestConfiguration);
         service.SetActivitySource(_activitySource);
-        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null, new ServiceBusProcessorOptions
+        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null!, new ServiceBusProcessorOptions
         {
             ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete
         });
@@ -265,7 +265,7 @@ public sealed class ServiceBusBackgroundServiceReceiveModeTests : IDisposable
         // Arrange
         using var service = new TestServiceBusBackgroundService(_loggerMock.Object, _configurationMock.Object, _requestConfiguration);
         service.SetActivitySource(_activitySource);
-        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null, new ServiceBusProcessorOptions
+        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null!, new ServiceBusProcessorOptions
         {
             ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete
         });
@@ -288,7 +288,7 @@ public sealed class ServiceBusBackgroundServiceReceiveModeTests : IDisposable
         // Arrange
         using var service = new TestServiceBusBackgroundService(_loggerMock.Object, _configurationMock.Object, _requestConfiguration);
         service.SetActivitySource(_activitySource);
-        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null, new ServiceBusProcessorOptions
+        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null!, new ServiceBusProcessorOptions
         {
             ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete
         });
@@ -312,7 +312,7 @@ public sealed class ServiceBusBackgroundServiceReceiveModeTests : IDisposable
         // Arrange
         using var service = new TestServiceBusBackgroundService(_loggerMock.Object, _configurationMock.Object, _requestConfiguration);
         service.SetActivitySource(_activitySource);
-        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null, new ServiceBusProcessorOptions
+        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null!, new ServiceBusProcessorOptions
         {
             ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete
         });
@@ -336,7 +336,7 @@ public sealed class ServiceBusBackgroundServiceReceiveModeTests : IDisposable
         using var service = new TestServiceBusBackgroundService(_loggerMock.Object, _configurationMock.Object, _requestConfiguration);
         service.SetActivitySource(_activitySource);
         service.SetAbandonMessageIfFailed(true);
-        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null, new ServiceBusProcessorOptions
+        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null!, new ServiceBusProcessorOptions
         {
             ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete
         });
@@ -359,7 +359,7 @@ public sealed class ServiceBusBackgroundServiceReceiveModeTests : IDisposable
         // Arrange
         using var service = new TestServiceBusBackgroundService(_loggerMock.Object, _configurationMock.Object, _requestConfiguration);
         service.SetActivitySource(_activitySource);
-        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null, new ServiceBusProcessorOptions
+        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null!, new ServiceBusProcessorOptions
         {
             ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete
         });
@@ -382,13 +382,13 @@ public sealed class ServiceBusBackgroundServiceReceiveModeTests : IDisposable
     #region HandleMessageAsync - Exception in ReceiveAndDelete Tests
 
     [Fact]
-    public async Task HandleMessageAsync_ReceiveAndDelete_WhenExecuteThrows_ShouldNotThrowWithoutDeadLetter()
+    public async Task HandleMessageAsync_ReceiveAndDelete_WhenExecuteThrows_ShouldPropagateException()
     {
         // Arrange
         using var service = new TestServiceBusBackgroundService(_loggerMock.Object, _configurationMock.Object, _requestConfiguration);
         service.SetActivitySource(_activitySource);
         service.SetThrowGenericException(true);
-        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null, new ServiceBusProcessorOptions
+        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null!, new ServiceBusProcessorOptions
         {
             ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete
         });
@@ -400,8 +400,8 @@ public sealed class ServiceBusBackgroundServiceReceiveModeTests : IDisposable
 
         var args = CreateProcessMessageEventArgs(message);
 
-        // Act & Assert - Não deve lançar exceção no modo ReceiveAndDelete
-        await Should.NotThrowAsync(
+        // Act & Assert - Exceções não mapeadas devem ser propagadas
+        await Should.ThrowAsync<InvalidOperationException>(
             () => service.TestHandleMessageAsync(args, CancellationToken.None));
     }
 
@@ -412,7 +412,7 @@ public sealed class ServiceBusBackgroundServiceReceiveModeTests : IDisposable
         using var service = new TestServiceBusBackgroundService(_loggerMock.Object, _configurationMock.Object, _requestConfiguration);
         service.SetActivitySource(_activitySource);
         service.SetThrowOperationCanceledException(true);
-        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null, new ServiceBusProcessorOptions
+        service.TestConfigureServiceBus("ServiceBus:CnnName", "test-queue", null!, new ServiceBusProcessorOptions
         {
             ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete
         });
@@ -436,7 +436,7 @@ public sealed class ServiceBusBackgroundServiceReceiveModeTests : IDisposable
     {
         return new ProcessMessageEventArgs(
             message: message,
-            receiver: null,
+            receiver: null!,
             cancellationToken: CancellationToken.None);
     }
 
@@ -447,3 +447,4 @@ public sealed class ServiceBusBackgroundServiceReceiveModeTests : IDisposable
         _activitySource?.Dispose();
     }
 }
+

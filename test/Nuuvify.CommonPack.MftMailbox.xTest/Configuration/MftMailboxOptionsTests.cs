@@ -12,5 +12,6 @@ public class MftMailboxOptionsTests
 
         Assert.Equal(500, options.MaxBatchSize);
         Assert.Equal(1_073_741_824, options.MaxFileSizeBytes);
+        Assert.Equal(InboundFileOrdering.None, options.InboundFileOrdering);
     }
 }

@@ -18,8 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference
-      Include="..\Nuuvify.CommonPack.MftMailbox.Abstraction\Nuuvify.CommonPack.MftMailbox.Abstraction.csproj" />
+    <ProjectReference Include="..\Nuuvify.CommonPack.MftMailbox.Abstraction\Nuuvify.CommonPack.MftMailbox.Abstraction.csproj" />
   </ItemGroup>
 
 </Project>
