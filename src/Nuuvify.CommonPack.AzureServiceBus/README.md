@@ -83,6 +83,46 @@ public class NotificationController : ControllerBase
 }
 ```
 
+## 📥 ReceiveMode no ServiceBusMessageReceiver
+
+O `ServiceBusMessageReceiver<T>` suporta `ReceiveMode` via `ServiceBusProcessorOptions` e expõe o modo configurado para customizações em classes derivadas.
+
+### PeekLock (padrão recomendado)
+
+Use quando você precisa de controle explícito de settlement (`Complete`, `Abandon`, `DeadLetter`) após validar a execução.
+
+```csharp
+ConfigureServiceBus(
+    cnnName: "ServiceBus:Pedidos:ConnectionString",
+    topicName: "pedidos-topic",
+    subscription: "processador",
+    serviceBusProcessorOptions: new ServiceBusProcessorOptions
+    {
+        AutoCompleteMessages = false,
+        MaxConcurrentCalls = 10,
+        ReceiveMode = ServiceBusReceiveMode.PeekLock
+    });
+```
+
+### ReceiveAndDelete
+
+Use apenas quando a perda de mensagem em falha for aceitável e o cenário priorizar baixa latência.
+
+```csharp
+ConfigureServiceBus(
+    cnnName: "ServiceBus:Eventos:ConnectionString",
+    queueName: "eventos-fire-and-forget",
+    serviceBusProcessorOptions: new ServiceBusProcessorOptions
+    {
+        AutoCompleteMessages = true,
+        ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete
+    });
+```
+
+Em `ReceiveAndDelete`, a mensagem já sai da fila no recebimento. Por isso, o receiver evita chamadas de settlement não permitidas nesse modo (como `Complete`, `Abandon` e `DeadLetter`) quando ocorrem falhas.
+
+Para um cenário completo de fire-and-forget, consulte `EventosFireAndForgetProcessor` em [Examples/ServiceBusMessageReceiverExamples.cs](Examples/ServiceBusMessageReceiverExamples.cs) e o guia em [Examples/README.md](Examples/README.md).
+
 ## 🎯 Casos de Uso Comuns
 
 ### Envio para Múltiplas Filas (E-commerce)

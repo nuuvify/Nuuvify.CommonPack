@@ -1,0 +1,138 @@
+name: Prepare Release PR
+
+on:
+    workflow_dispatch:
+        inputs:
+            version:
+                description: "Versão alvo (X.Y.Z)"
+                required: true
+            target_branch:
+                description: "Branch destino do PR"
+                required: true
+                default: "main"
+                type: choice
+                options:
+                    - main
+                    - qas
+                    - nugettest/qas
+            changelog_mode:
+                description: "Tratamento do CHANGELOG"
+                required: true
+                default: "close-unreleased"
+                type: choice
+                options:
+                    - close-unreleased
+                    - keep-unreleased
+
+concurrency:
+    group: prepare-release-${{ github.event.inputs.target_branch }}
+    cancel-in-progress: false
+
+permissions:
+    contents: write
+    pull-requests: write
+
+jobs:
+    prepare:
+        name: Prepare release branch and PR
+        runs-on: ${{ vars.GH_ACTIONS_UBUNTU_RUNNER != '' && vars.GH_ACTIONS_UBUNTU_RUNNER || 'ubuntu-24.04' }}
+
+        steps:
+            - name: Validate version format
+              shell: pwsh
+              run: |
+                  $v = '${{ github.event.inputs.version }}'
+                  if ($v -notmatch '^\d+\.\d+\.\d+$') {
+                    throw "Versao '$v' nao e SemVer estrita (X.Y.Z)."
+                  }
+
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Validate version monotonicity
+              shell: pwsh
+              run: |
+                  $v = '${{ github.event.inputs.version }}'
+                  $ErrorActionPreference = 'Continue'
+                  $tags = (git tag --list 'v[0-9]*.[0-9]*.[0-9]*' 2>$null) -split "`n" |
+                      Where-Object { $_ -match '^v\d+\.\d+\.\d+$' }
+                  $ErrorActionPreference = 'Stop'
+
+                  if ($tags) {
+                    $latest = $tags |
+                        ForEach-Object { [System.Version]($_ -replace '^v', '') } |
+                        Sort-Object -Descending |
+                        Select-Object -First 1
+                    $proposed = [System.Version]$v
+                    if ($proposed -le $latest) {
+                      throw "Versao $v nao e maior que a ultima tag estavel v$latest."
+                    }
+                  }
+
+                  Write-Host "Versao $v e valida."
+
+            - name: Configure git
+              shell: bash
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+            - name: Create release branch
+              shell: bash
+              run: |
+                  BRANCH="release/v${{ github.event.inputs.version }}"
+                  git checkout -b "$BRANCH" "origin/${{ github.event.inputs.target_branch }}"
+
+            - name: Update VersionPrefix in Directory.Build.props
+              shell: pwsh
+              run: |
+                  $file = 'src/Directory.Build.props'
+                  $content = Get-Content -Path $file -Raw
+                  $updated = $content -replace '<VersionPrefix>\d+\.\d+\.\d+</VersionPrefix>', '<VersionPrefix>${{ github.event.inputs.version }}</VersionPrefix>'
+                  $updated | Set-Content -Path $file -Encoding utf8 -NoNewline
+
+            - name: Close Unreleased section in CHANGELOG (stable mode)
+              if: ${{ github.event.inputs.changelog_mode == 'close-unreleased' }}
+              shell: pwsh
+              run: |
+                  $file = 'CHANGELOG.md'
+                  $date = (Get-Date -Format 'yyyy-MM-dd')
+                  $v    = '${{ github.event.inputs.version }}'
+
+                  $content = Get-Content -Path $file -Raw
+                  if ($content -notmatch '## \[Não Lançado\]') {
+                    throw "CHANGELOG.md nao contem a secao '## [Nao Lancado]'."
+                  }
+
+                  $updated = $content -replace '## \[Não Lançado\]', "## [Não Lançado]`n`n## [$v] - $date"
+                  $updated | Set-Content -Path $file -Encoding utf8 -NoNewline
+
+            - name: Commit version bump
+              shell: bash
+              run: |
+                  git add src/Directory.Build.props CHANGELOG.md
+                  git commit -m "chore(release): bump VersionPrefix to ${{ github.event.inputs.version }}"
+
+            - name: Push release branch
+              shell: bash
+              run: |
+                  git push origin "release/v${{ github.event.inputs.version }}"
+
+            - name: Open Pull Request
+              shell: bash
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  gh pr create \
+                    --title "chore(release): bump version to ${{ github.event.inputs.version }}" \
+                    --body "Release automático gerado por prepare-release.yml.
+
+                  **Versão:** \`${{ github.event.inputs.version }}\`
+                  **Canal:** ${{ github.event.inputs.target_branch }}
+                  **Changelog:** ${{ github.event.inputs.changelog_mode }}
+
+                  Revise o CHANGELOG e aprove para iniciar o deploy." \
+                    --base "${{ github.event.inputs.target_branch }}" \
+                    --head "release/v${{ github.event.inputs.version }}"

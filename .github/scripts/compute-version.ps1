@@ -11,101 +11,97 @@ param(
     [string]$RunNumber = '0'
 )
 
-function ConvertTo-VersionObject {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$VersionText
-    )
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
-    return [System.Version]::Parse($VersionText)
-}
-
-function Get-StableVersionFromFile {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$FilePath
-    )
+function Get-VersionPrefixFromFile {
+    param([string]$FilePath)
 
     $content = Get-Content -Path $FilePath -Raw
-    $match = [regex]::Match($content, '<Version>(?<version>\d+\.\d+\.\d+)</Version>')
-
+    $match = [regex]::Match($content, '<VersionPrefix>(?<version>\d+\.\d+\.\d+)</VersionPrefix>')
     if (-not $match.Success) {
-        throw "Nao foi possivel localizar <Version> no arquivo $FilePath"
+        throw "Nao foi possivel localizar <VersionPrefix> no arquivo $FilePath"
     }
-
     return $match.Groups['version'].Value
 }
 
+function Assert-StrictSemVer {
+    param([string]$Version)
+    if ($Version -notmatch '^\d+\.\d+\.\d+$') {
+        throw "Versao '$Version' nao e SemVer estrita (X.Y.Z)."
+    }
+}
+
+function ConvertTo-VersionObject {
+    param([string]$VersionText)
+    return [System.Version]::Parse($VersionText)
+}
+
 function Get-LatestStableTag {
-    $tags = git tag --list 'v*' 2>$null
+    $ErrorActionPreference = 'Continue'
+    $tags = (git tag --list 'v[0-9]*.[0-9]*.[0-9]*' 2>$null) -split "`n" |
+    Where-Object { $_ -match '^v\d+\.\d+\.\d+$' }
+    $ErrorActionPreference = 'Stop'
 
-    if ([string]::IsNullOrWhiteSpace(($tags | Out-String))) {
-        return $null
-    }
+    if (-not $tags) { return $null }
 
-    $stableTags = foreach ($tag in $tags) {
-        if ($tag -match '^v(?<version>\d+\.\d+\.\d+)$') {
-            [PSCustomObject]@{
-                Tag     = $tag
-                Version = ConvertTo-VersionObject -VersionText $Matches.version
-            }
-        }
-    }
-
-    return $stableTags |
+    return $tags |
+    ForEach-Object { [PSCustomObject]@{ Tag = $_; Version = ConvertTo-VersionObject ($_ -replace '^v', '') } } |
     Sort-Object -Property Version -Descending |
     Select-Object -First 1
 }
 
-function Get-StableTagForHead {
-    $tags = git tag --points-at HEAD --list 'v*' 2>$null
-
-    if ([string]::IsNullOrWhiteSpace(($tags | Out-String))) {
-        return $null
-    }
-
-    foreach ($tag in $tags) {
-        if ($tag -match '^v(?<version>\d+\.\d+\.\d+)$') {
-            return $Matches.version
-        }
-    }
-
-    return $null
+function Get-StableTagForCommit {
+    param([string]$CommitSha)
+    $ErrorActionPreference = 'Continue'
+    $tags = (git tag --points-at $CommitSha --list 'v[0-9]*.[0-9]*.[0-9]*' 2>$null) -split "`n" |
+    Where-Object { $_ -match '^v\d+\.\d+\.\d+$' }
+    $ErrorActionPreference = 'Stop'
+    return $tags | Select-Object -First 1
 }
 
-function Get-NextPatchVersion {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$VersionText
-    )
-
-    $version = ConvertTo-VersionObject -VersionText $VersionText
-    return '{0}.{1}.{2}' -f $version.Major, $version.Minor, ($version.Build + 1)
+function Get-CurrentSha {
+    $ErrorActionPreference = 'Continue'
+    $sha = (git rev-parse HEAD 2>$null | Out-String).Trim()
+    $ErrorActionPreference = 'Stop'
+    return $sha
 }
 
-$fileVersion = Get-StableVersionFromFile -FilePath $VersionFile
-$latestStableTag = Get-LatestStableTag
+# ── Leitura e validação do VersionPrefix ────────────────────────────────────
+$versionPrefix = Get-VersionPrefixFromFile -FilePath $VersionFile
+Assert-StrictSemVer -Version $versionPrefix
 
-if ($null -eq $latestStableTag) {
-    $nextStableVersion = $fileVersion
+$prefixObj = ConvertTo-VersionObject -VersionText $versionPrefix
+$latestTag = Get-LatestStableTag
+$currentSha = Get-CurrentSha
+$major = $prefixObj.Major
+
+# ── Validação de monotonicidade para stable ──────────────────────────────────
+if ($Channel -eq 'stable' -and $null -ne $latestTag) {
+    # Permite reusar se a tag já aponta para o commit atual (reexecução idempotente)
+    $existingTagOnHead = Get-StableTagForCommit -CommitSha $currentSha
+    $isRerun = $null -ne $existingTagOnHead -and $existingTagOnHead -eq "v$versionPrefix"
+
+    if (-not $isRerun -and $prefixObj -le $latestTag.Version) {
+        throw ("VersionPrefix $versionPrefix nao e maior que a ultima tag estavel " +
+            "$($latestTag.Tag). Atualize o VersionPrefix via prepare-release.yml.")
+    }
 }
-else {
-    $fileVersionObject = ConvertTo-VersionObject -VersionText $fileVersion
-    if ($latestStableTag.Version -gt $fileVersionObject) {
-        $nextStableVersion = Get-NextPatchVersion -VersionText $latestStableTag.Version.ToString()
-    }
-    elseif ($latestStableTag.Version -eq $fileVersionObject) {
-        $nextStableVersion = Get-NextPatchVersion -VersionText $fileVersion
-    }
-    else {
-        $nextStableVersion = $fileVersion
-    }
-}
+
+# ── Derivação dos outputs ────────────────────────────────────────────────────
+$assemblyVersion = "$major.0.0.0"
+$versionSuffix = ''
+$fileVersionRevision = '0'
 
 switch ($Channel) {
     'stable' {
-        $existingHeadTag = Get-StableTagForHead
-        $version = if ($null -ne $existingHeadTag) { $existingHeadTag } else { $nextStableVersion }
+        $existingTagOnHead = Get-StableTagForCommit -CommitSha $currentSha
+        if ($null -ne $existingTagOnHead) {
+            $versionPrefix = $existingTagOnHead -replace '^v', ''
+        }
+        $version = $versionPrefix
+        $versionSuffix = ''
+        $fileVersionRevision = '0'
         $tag = "v$version"
         $isPrerelease = 'false'
         $createRelease = 'true'
@@ -113,7 +109,9 @@ switch ($Channel) {
         $environmentName = 'production'
     }
     'preview' {
-        $version = "$nextStableVersion-preview.$RunNumber"
+        $versionSuffix = "preview.$RunNumber"
+        $version = "$versionPrefix-$versionSuffix"
+        $fileVersionRevision = $RunNumber
         $tag = "v$version"
         $isPrerelease = 'true'
         $createRelease = 'true'
@@ -121,7 +119,9 @@ switch ($Channel) {
         $environmentName = 'preview'
     }
     'dev' {
-        $version = "$nextStableVersion-dev.$RunNumber"
+        $versionSuffix = "dev.$RunNumber"
+        $version = "$versionPrefix-$versionSuffix"
+        $fileVersionRevision = $RunNumber
         $tag = "v$version"
         $isPrerelease = 'true'
         $createRelease = 'false'
@@ -130,9 +130,21 @@ switch ($Channel) {
     }
 }
 
-"version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-"tag=$tag" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-"is_prerelease=$isPrerelease" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-"create_release=$createRelease" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-"nuget_source=$nugetSource" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-"environment_name=$environmentName" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+$fileVersion = "$versionPrefix.$fileVersionRevision"
+$informationalVersion = if ($currentSha) { "$version+$($currentSha.Substring(0, [Math]::Min(12, $currentSha.Length)))" } else { $version }
+
+# ── Emissão dos outputs ──────────────────────────────────────────────────────
+@(
+    "version=$version"
+    "version_prefix=$versionPrefix"
+    "version_suffix=$versionSuffix"
+    "assembly_version=$assemblyVersion"
+    "file_version=$fileVersion"
+    "file_version_revision=$fileVersionRevision"
+    "informational_version=$informationalVersion"
+    "tag=$tag"
+    "is_prerelease=$isPrerelease"
+    "create_release=$createRelease"
+    "nuget_source=$nugetSource"
+    "environment_name=$environmentName"
+) | ForEach-Object { $_ | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8 }

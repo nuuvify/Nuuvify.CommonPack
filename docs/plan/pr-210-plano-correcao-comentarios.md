@@ -1,5 +1,21 @@
 # Plano de Correcao dos Comentarios do PR #210
 
+## Gestao de Status
+
+| Campo | Valor |
+|---|---|
+| Status | Em andamento |
+| Criado em | 2026-08-06 |
+| Atualizado em | 2026-08-06 |
+| Responsavel | Time mantenedor |
+| Ultima revisao | 2026-08-06 |
+
+### Historico de Status
+
+| Data | De -> Para | Motivo |
+|---|---|---|
+| 2026-08-06 | N/A -> Em andamento | Plano consolidado para execucao do PR |
+
 ## Contexto
 
 - PR: https://github.com/nuuvify/Nuuvify.CommonPack/pull/210
@@ -11,7 +27,7 @@
 - Branch de trabalho sincronizada com o PR.
 - Ferramentas locais:
   - `dotnet` (build/test)
-  - `uv` (scripts em `.tools/scripts`)
+  - `uv` (scripts em `tools/scripts`)
 - Token GitHub em uma destas variaveis:
   - `GITHUB_LZOCATELI_TOKEN` (preferencial)
   - `GH_TOKEN`
@@ -22,7 +38,7 @@
 ### Modo autenticado (recomendado)
 
 ```powershell
-uv run --project .tools/scripts get-github-pr-comments --pr-url https://github.com/nuuvify/Nuuvify.CommonPack/pull/210 --open-threads-only
+uv run --project tools/scripts get-github-pr-comments --pr-url https://github.com/nuuvify/Nuuvify.CommonPack/pull/210 --open-threads-only
 ```
 
 ### Fallback sem token (somente leitura publica)
@@ -147,13 +163,13 @@ Criterio de aceite:
 1. Recoletar comentarios abertos:
 
 ```powershell
-uv run --project .tools/scripts get-github-pr-comments --pr-url https://github.com/nuuvify/Nuuvify.CommonPack/pull/210 --open-threads-only
+uv run --project tools/scripts get-github-pr-comments --pr-url https://github.com/nuuvify/Nuuvify.CommonPack/pull/210 --open-threads-only
 ```
 
 2. Responder/fechar thread por thread:
 
 ```powershell
-uv run --project .tools/scripts update-github-pr-comments --pr-url https://github.com/nuuvify/Nuuvify.CommonPack/pull/210 --thread-id <THREAD_ID_GRAPHQL> --comment "Corrigido em <commit>." --close-thread
+uv run --project tools/scripts update-github-pr-comments --pr-url https://github.com/nuuvify/Nuuvify.CommonPack/pull/210 --thread-id <THREAD_ID_GRAPHQL> --comment "Corrigido em <commit>." --close-thread
 ```
 
 ## Checklist operacional

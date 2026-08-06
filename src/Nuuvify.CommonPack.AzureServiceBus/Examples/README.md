@@ -129,6 +129,25 @@ public async Task Main(string[] args)
 }
 ```
 
+### 4. **ReceiveMode: quando usar PeekLock vs ReceiveAndDelete**
+
+```csharp
+ConfigureServiceBus(
+  cnnName: "ServiceBus:Notificacoes:ConnectionString",
+  queueName: "notificacoes",
+  serviceBusProcessorOptions: new ServiceBusProcessorOptions
+  {
+    MaxConcurrentCalls = 5,
+    AutoCompleteMessages = false,
+    ReceiveMode = ServiceBusReceiveMode.PeekLock
+  });
+```
+
+- `PeekLock` (recomendado): permite controle explícito de sucesso/falha e uso de `Abandon`/`DeadLetter`.
+- `ReceiveAndDelete`: remove a mensagem no recebimento e não permite settlement posterior; use apenas em cenários tolerantes a perda.
+
+> Observação: em `ReceiveAndDelete`, o receiver não tenta executar operações de settlement não suportadas.
+
 ## 📋 Exemplos Disponíveis
 
 ## 🔥 **NOVIDADE: Recebimento de Mensagens**
@@ -137,6 +156,7 @@ public async Task Main(string[] args)
 - `PedidosMessageProcessor` - Processamento de pedidos com Topic
 - `NotificacoesQueueProcessor` - Processamento de notificações com Queue
 - `EventosAzureCredentialsProcessor` - Usando Azure Credentials
+- `EventosFireAndForgetProcessor` - Processamento com `ReceiveAndDelete` para baixa latência
 - `ConsoleServiceBusReceiver` - Uso em Console Application
 
 ### � **Envio de Mensagens (ServiceBusMessageSender)**
@@ -180,6 +200,7 @@ public async Task Main(string[] args)
 | `PedidosMessageProcessor`          | Processamento de negócio | Worker Services, processamento batch     |
 | `NotificacoesQueueProcessor`       | Notificações assíncronas | Envio de emails, SMS, push notifications |
 | `EventosAzureCredentialsProcessor` | Eventos do sistema       | Arquiteturas orientadas a eventos        |
+| `EventosFireAndForgetProcessor`    | Fire-and-forget          | Telemetria/eventos tolerantes a perda    |
 | `ConsoleServiceBusReceiver`        | Aplicações console       | Scripts, ferramentas administrativas     |
 
 ## 🔧 **Personalização**
