@@ -101,22 +101,63 @@ Quando os checks estiverem aparecendo nos PRs, marque como obrigatórios:
 - `Lint workflows` — somente quando `.github/workflows/**` muda
 - `Validate community assets` — somente quando `.github/**`, `docs/**`, `Readme.md` ou `CHANGELOG.md` mudam
 
-> `Build and unit tests` e `Integration tests` rodam apenas no `publish-release.yml` após o merge, não em PRs.
+Configuração recomendada em `Require status checks to pass before merging`:
+
+- Required: `Version policy check`
+- Required: `Verify package CHANGELOG updated`
+- Não required: `Lint workflows`
+- Não required: `Validate community assets`
+
+Motivo: checks path-filtered podem não executar em todos os PRs; se forem marcados como required, o merge pode ficar bloqueado sem necessidade.
+
+> `Build and unit tests` e `Integration tests` também rodam em PRs (workflow `PR Validation`) e podem rodar novamente no fluxo de publicação.
 
 ## 6.1 Environments e segredos
 
-Crie os environments:
+Onde configurar no GitHub:
+
+- `Settings > Environments`
+
+Crie os environments (botao `New environment`):
 
 - `production`
 - `preview`
 - `nugettest`
 
-Configure os secrets:
+Mapeamento usado pelo workflow `publish-release.yml`:
 
-- `NUGET_API_KEY` para NuGet.org
-- `NUGETTEST_API_KEY` para `https://int.nugettest.org/`
+- branch `main` -> environment `production`
+- branch `qas` -> environment `preview`
+- branch `nugettest/qas` -> environment `nugettest`
 
-Se quiser endurecer a produção, adicione regra de approval no environment `production`.
+Configure os secrets em cada environment:
+
+- Em `production`:
+   - `NUGET_API_KEY` (token do NuGet.org)
+- Em `preview`:
+   - `NUGET_API_KEY` (token do NuGet.org)
+- Em `nugettest`:
+   - `NUGETTEST_API_KEY` (token do `https://int.nugettest.org/`)
+
+Como adicionar secret (por environment):
+
+1. `Settings > Environments > <environment>`
+2. Seção `Environment secrets`
+3. `Add secret`
+4. `Name`: use exatamente o nome esperado pelo workflow
+5. `Value`: cole o token
+6. `Add secret` para salvar
+
+Opcional de governanca:
+
+- Em `production`, configure `Required reviewers` para exigir aprovação antes do job de publish.
+- Se quiser, aplique a mesma proteção em `preview`.
+
+Validacao rapida apos configurar:
+
+1. Rode manualmente `publish-release.yml` via `Actions > Publish and Release > Run workflow` apontando para cada branch.
+2. Confirme no job `Publish packages and release` que o campo `Environment` corresponde ao branch.
+3. Se secret faltar, o job falha com mensagem explicita indicando o nome do secret ausente.
 
 O workflow `Publish and Release` é disparado por `push` em `main`, `qas` e `nugettest/qas`. As branch protections devem impedir push direto para que somente commits aprovados em PR sejam publicados.
 
@@ -130,6 +171,18 @@ Onde configurar:
 
 - `Settings > Secrets and variables > Actions > Variables`
 
+Opcao recomendada para padronizacao entre repositorios:
+
+- Criar em nivel de organizacao: `Organization settings > Secrets and variables > Actions > Variables`
+- Nome: `GH_ACTIONS_UBUNTU_RUNNER`
+- Valor: `ubuntu-24.04`
+- Repositorios com acesso: incluir `Nuuvify.CommonPack` (ou `All repositories`, se fizer sentido para a organizacao)
+
+Precedencia importante:
+
+- Se existir a mesma variavel no repositorio e na organizacao, a variavel do repositorio prevalece.
+- Para evitar ambiguidade, mantenha apenas uma fonte de verdade (organizacao ou repositorio).
+
 Observação operacional:
 
 - Os workflows possuem fallback para `ubuntu-24.04`, mas manter a variável definida facilita upgrades futuros (por exemplo, `ubuntu-26.04`) com uma única alteração.
@@ -142,6 +195,16 @@ Confirme o reconhecimento automático de:
 - `.github/ISSUE_TEMPLATE/feature_request.yml`
 - `.github/ISSUE_TEMPLATE/config.yml`
 - `.github/PULL_REQUEST_TEMPLATE.md`
+
+Para Discussions, confirme também:
+
+- `.github/DISCUSSION_TEMPLATE/q-a.yml`
+- `.github/DISCUSSION_TEMPLATE/ideas.yml`
+- `.github/DISCUSSION_TEMPLATE/show-and-tell.yml`
+
+Para o post inicial fixado, use como base:
+
+- `docs/maintainers/github-discussions-initial-post.md`
 
 ## 8. Merge policy recomendada
 
