@@ -15,18 +15,18 @@
     sao removidas.
 
 .EXAMPLE
-    PS C:\Users\user\projetos\Inventory360Api\.tools\scripts> .\cleanup.ps1
+    PS C:\Users\user\projetos\Inventory360Api\tools\scripts> .\cleanup.ps1
 
     Executa a limpeza e exibe relatorio detalhado de pastas encontradas e removidas.
 
 .EXAMPLE
-    & "C:\Users\user\projetos\Inventory360Api\.tools\scripts\cleanup.ps1"
+    & "C:\Users\user\projetos\Inventory360Api\tools\scripts\cleanup.ps1"
 
     Alternativa com o operador de chamada (&) para executar o script.
 
 .EXAMPLE
     # Executar a partir da raiz do workspace
-    Invoke-Expression "& '.\\.tools\\scripts\\cleanup.ps1'"
+    Invoke-Expression "& '.\\tools\\scripts\\cleanup.ps1'"
 
     Executa o script usando Invoke-Expression (util em scripts automation).
 

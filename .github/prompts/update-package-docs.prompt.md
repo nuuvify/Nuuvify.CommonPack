@@ -104,3 +104,41 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 - **NUNCA** escrever em inglês — todo o conteúdo deve estar em pt-BR.
 - **NUNCA** incluir blocos de código extensos, exemplos de uso ou explicações técnicas internas (pertencem ao README).
 - Cada item deve responder: "o que o consumidor NuGet precisa saber para atualizar com segurança?"
+
+---
+
+## Fluxo de atualização de changelog
+
+Siga estas regras sempre que atualizar qualquer `CHANGELOG.md` neste repositório.
+
+### Responsabilidade por seção
+
+| Seção | Criada por | Quando |
+|---|---|---|
+| `## [Não Lançado]` | Humano / IA (você) | A cada mudança de comportamento ou API |
+| `## [X.Y.Z] - yyyy-mm-dd` | 🤖 `prepare-release.yml` | Ao disparar o release PR via `workflow_dispatch` |
+
+**Nunca crie uma seção `[X.Y.Z]` manualmente.** O workflow `prepare-release.yml` fecha `[Não Lançado]` para `[X.Y.Z]` automaticamente ao abrir o PR de release.
+
+### Quais arquivos atualizar
+
+Sempre que houver mudança de comportamento ou API pública em um pacote, atualize **os dois arquivos no mesmo commit**:
+
+1. `CHANGELOG.md` (raiz do repositório) — entry visível no GitHub Release e nos release notes.
+2. `src/<Pacote>/CHANGELOG.md` — entry embarcada no `.nupkg` publicado no NuGet.
+
+Se a mudança afetar mais de um pacote, atualize o `CHANGELOG.md` de **cada** pacote afetado.
+
+### Bloqueios de CI que você precisa evitar
+
+- `PR Validation / changelog-check` — falha se o CHANGELOG do pacote alterado não foi atualizado. Corrija antes de mergear.
+- `publish-release.yml` — aborta se `[Não Lançado]` estiver vazio no momento do publish. Garanta pelo menos um item antes de mergear em canal de release.
+
+### Resumo da ação esperada
+
+```
+Você alterou src/Nuuvify.CommonPack.<Pacote>/
+  → adicione um item em ## [Não Lançado] de src/<Pacote>/CHANGELOG.md
+  → adicione um item em ## [Não Lançado] de CHANGELOG.md (raiz)
+  → NÃO crie seção [X.Y.Z] — isso é feito por prepare-release.yml
+```

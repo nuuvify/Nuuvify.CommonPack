@@ -1,5 +1,21 @@
 # Plano de Implementação - DLL .NET Abstraída para MFT Mailbox
 
+## Gestao de Status
+
+| Campo | Valor |
+|---|---|
+| Status | Em andamento |
+| Criado em | 2026-08-06 |
+| Atualizado em | 2026-08-06 |
+| Responsavel | Time MFT |
+| Ultima revisao | 2026-08-06 |
+
+### Historico de Status
+
+| Data | De -> Para | Motivo |
+|---|---|---|
+| 2026-08-06 | N/A -> Em andamento | Plano base definido para execucao por fases |
+
 ## 1. Objetivo
 
 Implementar uma DLL reutilizável no ecossistema Nuuvify para integração com MFT Mailbox, com foco em:
