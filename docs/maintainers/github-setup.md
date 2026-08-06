@@ -89,13 +89,19 @@ Recomendado:
 
 O GitHub Actions deve ser a fonte oficial dos checks obrigatórios.
 
-Quando os checks estiverem aparecendo nos PRs, marque como obrigatórios ao menos:
+Quando os checks estiverem aparecendo nos PRs, marque como obrigatórios:
 
-- `PR Validation / Version policy check`
-- `PR Validation / Build and unit tests`
-- `PR Validation / Integration tests`
-- `Community Validation / Validate community assets`
-- `Workflow Validation / Lint workflows`
+**Sempre executam em PRs para `main`, `qas` e `nugettest/qas`:**
+
+- `Version policy check`
+- `Verify package CHANGELOG updated`
+
+**Path-filtered — executam apenas quando os paths relevantes são alterados (não adicionar como required):**
+
+- `Lint workflows` — somente quando `.github/workflows/**` muda
+- `Validate community assets` — somente quando `.github/**`, `docs/**`, `Readme.md` ou `CHANGELOG.md` mudam
+
+> `Build and unit tests` e `Integration tests` rodam apenas no `publish-release.yml` após o merge, não em PRs.
 
 ## 6.1 Environments e segredos
 
