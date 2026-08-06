@@ -235,7 +235,13 @@ Os labels oficiais e suas descrições estão versionados em `.github/labels.yml
 
 Para a operação diária de triagem, consulte também [triage-guide.md](./triage-guide.md).
 
-## 10. Checklist final
+## 10. Governança de acesso
+
+A organização deve manter exatamente `lzocateli` e `eusener` como owners e administradores do repositório. Colaboradores devem receber `Write` pelo time `collaborators`, sem grants humanos diretos.
+
+Para auditar e reconciliar esse estado, siga [github-access-governance.md](./github-access-governance.md).
+
+## 11. Checklist final
 
 - Discussions habilitado
 - Private vulnerability reporting habilitado
@@ -247,8 +253,9 @@ Para a operação diária de triagem, consulte também [triage-guide.md](./triag
 - Checks obrigatórios definidos
 - Environments e secrets configurados
 - Labels iniciais criadas
+- Governança de acesso auditada sem `DRIFT` ou `BLOCKED`
 
-## 11. Automação de labels e triagem
+## 12. Automação de labels e triagem
 
 Depois de subir os arquivos de automação:
 
