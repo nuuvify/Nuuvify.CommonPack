@@ -1,6 +1,7 @@
 using Azure.Core;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Extensions.Logging;
+using Nuuvify.CommonPack.BackgroundService.Models;
 using Nuuvify.CommonPack.Middleware.Abstraction;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -21,6 +22,15 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
     private ServiceBusClient _serviceBusClient;
     [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed")]
     private ServiceBusProcessor _serviceBusProcessor;
+    [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed")]
+    private ServiceBusProcessor _deadLetterProcessor;
+    [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed")]
+    private ServiceBusSender _originEntitySender;
+
+    private string _configuredQueueName = string.Empty;
+    private string _configuredTopicName = string.Empty;
+    private string _configuredSubscriptionName = string.Empty;
+    private bool _isTopicConfigured;
 
     private ServiceBusReceiveMode _receiveMode = ServiceBusReceiveMode.PeekLock;
 
@@ -121,6 +131,13 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
             topicName: topicName,
             subscriptionName: subscription,
             options: serviceBusProcessorOptions);
+
+        _configuredQueueName = string.Empty;
+        _configuredTopicName = topicName;
+        _configuredSubscriptionName = subscription;
+        _isTopicConfigured = true;
+
+        ConfigureDeadLetterProcessing(serviceBusProcessorOptions);
     }
 
     /// <summary>
@@ -169,6 +186,13 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
             topicName: topicName,
             subscriptionName: subscription,
             options: serviceBusProcessorOptions);
+
+        _configuredQueueName = string.Empty;
+        _configuredTopicName = topicName;
+        _configuredSubscriptionName = subscription;
+        _isTopicConfigured = true;
+
+        ConfigureDeadLetterProcessing(serviceBusProcessorOptions);
     }
 
     /// <summary>
@@ -208,6 +232,13 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
         _serviceBusProcessor = _serviceBusClient.CreateProcessor(
             queueName: queueName,
             options: serviceBusProcessorOptions);
+
+        _configuredQueueName = queueName;
+        _configuredTopicName = string.Empty;
+        _configuredSubscriptionName = string.Empty;
+        _isTopicConfigured = false;
+
+        ConfigureDeadLetterProcessing(serviceBusProcessorOptions);
     }
 
     /// <summary>
@@ -249,6 +280,13 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
         _serviceBusProcessor = _serviceBusClient.CreateProcessor(
             queueName: queueName,
             options: serviceBusProcessorOptions);
+
+        _configuredQueueName = queueName;
+        _configuredTopicName = string.Empty;
+        _configuredSubscriptionName = string.Empty;
+        _isTopicConfigured = false;
+
+        ConfigureDeadLetterProcessing(serviceBusProcessorOptions);
     }
 
     /// <summary>
@@ -263,6 +301,18 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
         ServiceBusReceivedMessage message,
         ActivitySource activitySource,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Decide qual ação aplicar para mensagens recebidas da Dead Letter Queue.
+    /// Por padrão, toda mensagem da DLQ é descartada.
+    /// </summary>
+    /// <param name="message">Mensagem recebida da DLQ</param>
+    /// <param name="cancellationToken">Token de cancelamento</param>
+    /// <returns>Ação de tratamento para a mensagem da DLQ</returns>
+    protected virtual Task<DeadLetterMessageAction> DecideDeadLetterMessageActionAsync(
+        ServiceBusReceivedMessage message,
+        CancellationToken cancellationToken)
+        => Task.FromResult(DeadLetterMessageAction.Discard);
 
     /// <summary>
     /// Cria propriedades de diagnóstico para mensagens que vão para Dead Letter Queue
@@ -361,7 +411,11 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
             _serviceBusProcessor.ProcessMessageAsync += (args) => HandleMessageAsync(args, stoppingToken);
             _serviceBusProcessor.ProcessErrorAsync += HandleErrorAsync;
 
+            _deadLetterProcessor.ProcessMessageAsync += (args) => HandleDeadLetterMessageAsync(args, stoppingToken);
+            _deadLetterProcessor.ProcessErrorAsync += HandleErrorAsync;
+
             await _serviceBusProcessor.StartProcessingAsync(stoppingToken);
+            await _deadLetterProcessor.StartProcessingAsync(stoppingToken);
 
             // Aguarda até que o token de cancelamento seja acionado
             await Task.Delay(Timeout.Infinite, stoppingToken);
@@ -470,6 +524,17 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
                 await _serviceBusProcessor.DisposeAsync();
             }
 
+            if (_deadLetterProcessor != null)
+            {
+                await _deadLetterProcessor.StopProcessingAsync(cancellationToken);
+                await _deadLetterProcessor.DisposeAsync();
+            }
+
+            if (_originEntitySender != null)
+            {
+                await _originEntitySender.DisposeAsync();
+            }
+
             if (_serviceBusClient != null)
             {
                 await _serviceBusClient.DisposeAsync();
@@ -508,6 +573,8 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
             {
                 // Dispose dos recursos IDisposable para satisfazer CA1001
                 _serviceBusProcessor?.DisposeAsync().AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
+                _deadLetterProcessor?.DisposeAsync().AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
+                _originEntitySender?.DisposeAsync().AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
                 _serviceBusClient?.DisposeAsync().AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
 
                 ActivitySourceCustom?.Dispose();

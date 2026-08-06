@@ -1,5 +1,6 @@
 using Azure.Messaging.ServiceBus;
 using Microsoft.Extensions.Logging;
+using Nuuvify.CommonPack.BackgroundService.Models;
 using Moq;
 using Nuuvify.CommonPack.BackgroundService.xTest.Fakers;
 using Nuuvify.CommonPack.Middleware.Abstraction;
@@ -252,9 +253,66 @@ public sealed class ServiceBusBackgroundServiceBaseTests : IDisposable
         Assert.True(true);
     }
 
+    [Fact]
+    public async Task DecideDeadLetterMessageActionAsync_DefaultImplementation_ShouldDiscard()
+    {
+        // Arrange
+        using var service = new TestServiceBusBackgroundService(_loggerMock.Object, _configurationMock.Object, _requestConfiguration);
+        var message = ServiceBusModelFactory.ServiceBusReceivedMessage(body: new BinaryData("default-action"), messageId: "msg-default");
+
+        // Act
+        var action = await service.TestDecideDeadLetterMessageActionAsync(message, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(DeadLetterMessageAction.Discard, action);
+    }
+
+    [Fact]
+    public async Task DecideDeadLetterMessageActionAsync_CustomImplementation_ShouldRequeueWhenHeaderMatches()
+    {
+        // Arrange
+        using var service = new HeaderBasedDeadLetterDecisionService(_loggerMock.Object, _configurationMock.Object, _requestConfiguration);
+        var message = ServiceBusModelFactory.ServiceBusReceivedMessage(
+            body: new BinaryData("test"),
+            messageId: "msg-custom",
+            properties: new Dictionary<string, object>
+            {
+                ["RetryMode"] = "Requeue"
+            });
+
+        // Act
+        var action = await service.TestDecideDeadLetterMessageActionAsync(message, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(DeadLetterMessageAction.RequeueToOrigin, action);
+    }
+
     public void Dispose()
     {
         _activitySource?.Dispose();
+    }
+}
+
+internal sealed class HeaderBasedDeadLetterDecisionService : TestServiceBusBackgroundService
+{
+    public HeaderBasedDeadLetterDecisionService(
+        ILogger<TestServiceBusBackgroundService> logger,
+        IConfigurationCustom configurationCustom,
+        RequestConfiguration requestConfiguration)
+        : base(logger, configurationCustom, requestConfiguration)
+    {
+    }
+
+    protected override Task<DeadLetterMessageAction> DecideDeadLetterMessageActionAsync(ServiceBusReceivedMessage message, CancellationToken cancellationToken)
+    {
+        if (message.ApplicationProperties.TryGetValue("RetryMode", out var value)
+            && value is string stringValue
+            && string.Equals(stringValue, "Requeue", StringComparison.OrdinalIgnoreCase))
+        {
+            return Task.FromResult(DeadLetterMessageAction.RequeueToOrigin);
+        }
+
+        return Task.FromResult(DeadLetterMessageAction.Discard);
     }
 }
 
