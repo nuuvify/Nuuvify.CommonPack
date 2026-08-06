@@ -1,5 +1,21 @@
 # Plano de Correcao dos Comentarios do PR #210
 
+## Gestao de Status
+
+| Campo | Valor |
+|---|---|
+| Status | Em andamento |
+| Criado em | 2026-08-06 |
+| Atualizado em | 2026-08-06 |
+| Responsavel | Time mantenedor |
+| Ultima revisao | 2026-08-06 |
+
+### Historico de Status
+
+| Data | De -> Para | Motivo |
+|---|---|---|
+| 2026-08-06 | N/A -> Em andamento | Plano consolidado para execucao do PR |
+
 ## Contexto
 
 - PR: https://github.com/nuuvify/Nuuvify.CommonPack/pull/210

@@ -395,6 +395,91 @@ public class EventosAzureCredentialsProcessor : ServiceBusMessageReceiver<Evento
 }
 
 /// <summary>
+/// Exemplo de processamento fire-and-forget com ReceiveAndDelete.
+/// </summary>
+public class EventosFireAndForgetProcessor : ServiceBusMessageReceiver<EventoContext>
+{
+    private readonly ILogger<EventosFireAndForgetProcessor> _logger;
+
+    public EventosFireAndForgetProcessor(
+        ILogger<EventosFireAndForgetProcessor> logger,
+        IConfigurationCustom configurationCustom,
+        RequestConfiguration requestConfiguration)
+        : base(logger, configurationCustom, requestConfiguration)
+    {
+        _logger = logger;
+        ActivitySourceCustom = new ActivitySource("EventosFireAndForgetService");
+        AbandonMessageIfFailed = false;
+    }
+
+    /// <summary>
+    /// Configura Queue em modo ReceiveAndDelete para cenários de baixa latência.
+    /// </summary>
+    public async Task ConfigurarEIniciarReceiveAndDeleteAsync(CancellationToken cancellationToken = default)
+    {
+        ConfigureServiceBus(
+            cnnName: "ServiceBus:Eventos:ConnectionString",
+            queueName: ConfigurationCustom.GetSectionValue("ServiceBus:Eventos:QueueName"),
+            serviceBusProcessorOptions: new ServiceBusProcessorOptions
+            {
+                AutoCompleteMessages = true,
+                MaxConcurrentCalls = 20,
+                ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete
+            });
+
+        await StartProcessingAsync(cancellationToken);
+    }
+
+    public override async Task<bool> ExecuteReceivedMessageAsync(
+        ServiceBusReceivedMessage message,
+        ActivitySource activitySource,
+        CancellationToken cancellationToken)
+    {
+        using var activity = activitySource?.StartActivity("ProcessarEventoFireAndForget");
+
+        try
+        {
+            var evento = JsonSerializer.Deserialize<EventoSistema>(message.Body.ToString());
+
+            if (evento == null)
+            {
+                _logger.LogWarning("Evento inválido em ReceiveAndDelete. MessageId: {MessageId}", message.MessageId);
+                return false;
+            }
+
+            _logger.LogInformation(
+                "Evento {TipoEvento} recebido em ReceiveAndDelete. MessageId: {MessageId}",
+                evento.TipoEvento,
+                message.MessageId);
+
+            await PublicarMetricaAssincrona(evento, cancellationToken);
+
+            return true;
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex,
+                "Falha de deserialização em ReceiveAndDelete para MessageId: {MessageId}",
+                message.MessageId);
+            return false;
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex,
+                "Falha de processamento em ReceiveAndDelete para MessageId: {MessageId}",
+                message.MessageId);
+            return false;
+        }
+    }
+
+    private async Task PublicarMetricaAssincrona(EventoSistema evento, CancellationToken cancellationToken)
+    {
+        _logger.LogDebug("Publicando métrica do evento {TipoEvento}", evento.TipoEvento);
+        await Task.Delay(50, cancellationToken);
+    }
+}
+
+/// <summary>
 /// Exemplo para uso em Console Application
 /// </summary>
 public class ConsoleServiceBusReceiver

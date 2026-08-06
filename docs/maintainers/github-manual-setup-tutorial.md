@@ -4,10 +4,6 @@ Este documento mostra exatamente onde e como executar as configurações manuais
 
 Use este tutorial depois que os workflows já estiverem versionados no repositório.
 
-Para a ordem completa de execução até o desligamento do Azure DevOps, use também [github-cutover-checklist.md](./github-cutover-checklist.md).
-
-No dia da virada operacional, use [github-go-live-checklist.md](./github-go-live-checklist.md).
-
 ## Pré-requisitos
 
 - Ser administrador do repositório no GitHub
@@ -140,10 +136,9 @@ Para `qas`:
 Para `nugettest/qas`:
 
 - `PR Validation / Build and unit tests`
+- `PR Validation / Integration tests`
 - `Community Validation / Validate community assets`
 - `Workflow Validation / Lint workflows`
-
-Se quiser, também pode exigir `Integration tests` em `nugettest/qas`, mas o fluxo atual foi desenhado para tornar isso opcional.
 
 ## 8. Criar os environments
 
@@ -245,29 +240,7 @@ Depois repita:
 1. Um PR para `qas` e confirme publish preview.
 2. Um PR para `nugettest/qas` e confirme publish `dev` em `https://int.nugettest.org/`.
 
-## 13. Desativar o Azure DevOps
-
-Só faça isso depois de validar os três fluxos:
-
-- `main` estável
-- `qas` preview
-- `nugettest/qas` dev
-
-Checklist:
-
-1. Remover badges antigos do Azure DevOps dos READMEs.
-2. Atualizar documentação interna para GitHub Actions como fonte oficial.
-3. Desabilitar triggers e pipelines ativos no Azure DevOps.
-4. Garantir que não exista publicação duplicada para os mesmos pacotes.
-
-Sugestão prática:
-
-1. Primeiro valide `nugettest/qas`.
-2. Depois valide `qas`.
-3. Por último valide `main`.
-4. Só então desligue o Azure DevOps.
-
-## 14. Solução de problemas rápida
+## 13. Solução de problemas rápida
 
 ### O PR para `main` não exige sua aprovação
 
@@ -324,4 +297,3 @@ Verifique:
 - cadastrar secrets
 - executar `Label Sync`
 - validar PRs reais em `main`, `qas` e `nugettest/qas`
-- desligar os pipelines e triggers do Azure DevOps
