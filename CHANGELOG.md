@@ -17,6 +17,9 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 - Implementação de fluxos bidirecionais com envio/recebimento por streaming, consulta de status, ACK/NACK, idempotência e auditoria para SFTP e HTTPS Mailbox.
 
 ### Alterado
+- Política de versionamento centralizada: `VersionPrefix` em `src/Directory.Build.props` como única fonte de versão base; `AssemblyVersion` estabilizada por major (`X.0.0.0`); `FileVersion` e `InformationalVersion` derivados deterministicamente pelo CI.
+- Commitizen removido: `.cz.toml` excluído; bump de versão agora é explícito via workflow `prepare-release.yml` (workflow_dispatch).
+- CI/CD migrado integralmente para GitHub Actions, com validação de PR, empacotamento, artefatos, publicação por canal e GitHub Releases.
 - Geração de Id em `DomainEntity` no pacote `Nuuvify.CommonPack.Extensions` alterada para UUID orientado a banco de dados (UUID v7).
 - Fluxo de processamento de mensagens ajustado para evitar operações de settlement (`Complete`, `Abandon`, `DeadLetter`) quando `ReceiveMode` for `ReceiveAndDelete`.
 - Scripts e organização de execução de testes revisados para melhorar seleção por traits e execução local/CI.
@@ -42,7 +45,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 - Criação do guia central de consumo em projetos de terceiros em `docs/consumo-em-projetos-terceiros.md`, com onboarding, matriz de pacotes, configuração e exemplos de integração.
 - Atualização do README do pacote `Nuuvify.CommonPack.MftMailbox` com seção de troubleshooting e revisão dos changelogs de `Nuuvify.CommonPack.MftMailbox` e `Nuuvify.CommonPack.MftMailbox.Redis` para formato canônico.
 
-## [3.0.0] - 2025-11-01
+## [2.6.0] - 2025-11-01
 
 ### 🆕 Adicionado
 - **Suporte completo a filtros com tipos complexos** usando QueryOperatorAttribute

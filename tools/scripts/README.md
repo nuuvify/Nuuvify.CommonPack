@@ -1,4 +1,4 @@
-# .tools/scripts
+# tools/scripts
 
 Projeto Python dedicado aos scripts executados com `uv`.
 
@@ -13,14 +13,14 @@ Projeto Python dedicado aos scripts executados com `uv`.
 A partir da raiz do repositório, use:
 
 ```bash
-uv run --project .tools/scripts get-github-pr-comments --help
-uv run --project .tools/scripts update-github-pr-comments --help
-uv run --project .tools/scripts release-template --help
+uv run --project tools/scripts get-github-pr-comments --help
+uv run --project tools/scripts update-github-pr-comments --help
+uv run --project tools/scripts release-template --help
 ```
 
 ## Como adicionar novos scripts
 
-1. Crie um novo pacote dentro de `.tools/scripts` (ex.: `release_tools/`).
+1. Crie um novo pacote dentro de `tools/scripts` (ex.: `release_tools/`).
 2. Adicione o entrypoint em `[project.scripts]` no `pyproject.toml`.
 3. Mantenha nomes de comando em kebab-case e funções `main()` por script.
 4. Prefira reaproveitar utilitários comuns em modulo `_common.py` do pacote.

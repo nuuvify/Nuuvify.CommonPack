@@ -49,7 +49,7 @@ Essas tasks ajudam principalmente em contribuições feitas via VS Code.
 
 ## Observações importantes
 
-- O CI principal do projeto roda em Azure DevOps.
+- O CI/CD oficial do projeto roda em GitHub Actions.
 - O arquivo `src/Directory.Build.props` centraliza metadados de pacote, versão, documentação XML e empacotamento.
 - O arquivo `test/Directory.Build.props` centraliza dependências e comportamento dos projetos de teste.
 

@@ -14,94 +14,60 @@ param(
     [string]$OutputPath,
 
     [Parameter(Mandatory = $false)]
-    [string]$ChangelogPath = 'CHANGELOG.md',
-
-    [Parameter(Mandatory = $false)]
-    [ValidateSet('default', 'labels-fallback')]
-    [string]$Mode = 'default',
-
-    [Parameter(Mandatory = $false)]
-    [string]$LastTagDate = ''
+    [string]$ChangelogPath = 'CHANGELOG.md'
 )
 
-function Get-ChangelogExcerpt {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$FilePath
-    )
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
+function Get-StableSection {
+    param([string]$FilePath, [string]$Ver)
+
+    if (-not (Test-Path -Path $FilePath -PathType Leaf)) {
+        throw "Changelog nao encontrado em $FilePath."
+    }
     $content = Get-Content -Path $FilePath -Raw
-    $match = [regex]::Match($content, '## \[(Não Lançado|Unreleased)\](?<section>[\s\S]*?)(\r?\n## \[|$)')
-
-    if ($match.Success) {
-        return $match.Groups['section'].Value.Trim()
+    if ([string]::IsNullOrWhiteSpace($content)) {
+        throw "O changelog $FilePath esta vazio."
     }
 
-    return "Sem secao '[Nao Lancado]' ou '[Unreleased]' no changelog."
+    # Lê a seção fechada [X.Y.Z] correspondente à versão
+    $escaped = [regex]::Escape($Ver)
+    $match = [regex]::Match($content, "## \[$escaped\][^\r\n]*\r?\n(?<section>[\s\S]*?)(\r?\n## \[|$)")
+    if (-not $match.Success) {
+        throw "Changelog nao contem a secao fechada '## [$Ver]'. Execute prepare-release.yml antes de publicar."
+    }
+    $excerpt = $match.Groups['section'].Value.Trim()
+    if ([string]::IsNullOrWhiteSpace($excerpt) -or $excerpt -notmatch '(?m)^[-#]') {
+        throw "A secao '## [$Ver]' esta vazia ou sem itens."
+    }
+    return $excerpt
 }
 
-function Get-ChangelogFromLabels {
-    param(
-        [string]$Version,
-        [string]$LastTagDate
-    )
+function Get-UnreleasedSection {
+    param([string]$FilePath)
 
-    $labelMap = @{
-        'breaking-change' = 'Removido'
-        'enhancement'     = 'Adicionado'
-        'bug'             = 'Corrigido'
-        'documentation'   = 'Documentação'
-        'performance'     = 'Performance'
-        'refactor'        = 'Alterado'
+    if (-not (Test-Path -Path $FilePath -PathType Leaf)) {
+        throw "Changelog nao encontrado em $FilePath."
+    }
+    $content = Get-Content -Path $FilePath -Raw
+    if ([string]::IsNullOrWhiteSpace($content)) {
+        throw "O changelog $FilePath esta vazio."
     }
 
-    $ghArgs = @('pr', 'list', '--state', 'merged', '--json', 'title,labels,mergedAt,number', '--limit', '100')
-    if ($LastTagDate -ne '') {
-        $ghArgs += @('--search', "merged:>=$LastTagDate")
+    $match = [regex]::Match($content, '## \[Não Lançado\](?<section>[\s\S]*?)(\r?\n## \[|$)')
+    if (-not $match.Success) {
+        # Aceita também a variante em inglês durante transição
+        $match = [regex]::Match($content, '## \[Unreleased\](?<section>[\s\S]*?)(\r?\n## \[|$)')
     }
-
-    try {
-        $prJson = & gh @ghArgs 2>&1
-        $prs = $prJson | ConvertFrom-Json
+    if (-not $match.Success) {
+        throw "O changelog deve conter a secao '## [Nao Lancado]'."
     }
-    catch {
-        return "Nao foi possivel obter PRs mergeados via gh: $_"
+    $excerpt = $match.Groups['section'].Value.Trim()
+    if ([string]::IsNullOrWhiteSpace($excerpt) -or $excerpt -notmatch '(?m)^[-#]') {
+        throw "A secao '## [Nao Lancado]' nao possui itens de release."
     }
-
-    $grouped = @{}
-    foreach ($pr in $prs) {
-        $prLabels = $pr.labels | ForEach-Object { $_.name }
-        $matched = $false
-        foreach ($label in $labelMap.Keys) {
-            if ($prLabels -contains $label) {
-                $category = $labelMap[$label]
-                if (-not $grouped.ContainsKey($category)) { $grouped[$category] = @() }
-                $grouped[$category] += "- $($pr.title) (#$($pr.number))"
-                $matched = $true
-                break
-            }
-        }
-        if (-not $matched) {
-            if (-not $grouped.ContainsKey('Alterado')) { $grouped['Alterado'] = @() }
-            $grouped['Alterado'] += "- $($pr.title) (#$($pr.number))"
-        }
-    }
-
-    $sections = @()
-    $order = @('Adicionado', 'Alterado', 'Corrigido', 'Removido', 'Documentação', 'Performance')
-    foreach ($cat in $order) {
-        if ($grouped.ContainsKey($cat) -and $grouped[$cat].Count -gt 0) {
-            $sections += "### $cat"
-            $sections += $grouped[$cat]
-            $sections += ''
-        }
-    }
-
-    if ($sections.Count -eq 0) {
-        return "Nenhum PR mergeado encontrado com labels mapeadas."
-    }
-
-    return $sections -join [Environment]::NewLine
+    return $excerpt
 }
 
 $channelLabel = switch ($Channel) {
@@ -110,21 +76,25 @@ $channelLabel = switch ($Channel) {
     'dev' { 'Dev' }
 }
 
-$notes = @()
-$notes += "# Release $Version"
-$notes += ""
-$notes += "- Canal: $channelLabel"
-$notes += "- Branch base: $BaseBranch"
-$notes += "- Gerado por GitHub Actions"
-$notes += ""
-$notes += "## Resumo do changelog"
-$notes += ""
-
-if ($Mode -eq 'labels-fallback') {
-    $notes += (Get-ChangelogFromLabels -Version $Version -LastTagDate $LastTagDate)
+$excerpt = if ($Channel -eq 'stable') {
+    # Para stable: lê a seção fechada que foi criada pelo prepare-release.yml
+    Get-StableSection -FilePath $ChangelogPath -Ver ($Version -split '-')[0]
 }
 else {
-    $notes += (Get-ChangelogExcerpt -FilePath $ChangelogPath)
+    # Para preview/dev: lê a seção Não Lançado ainda aberta
+    Get-UnreleasedSection -FilePath $ChangelogPath
 }
+
+$notes = @(
+    "# Release $Version"
+    ""
+    "- Canal: $channelLabel"
+    "- Branch base: $BaseBranch"
+    "- Gerado por GitHub Actions"
+    ""
+    "## Resumo do changelog"
+    ""
+    $excerpt
+)
 
 $notes -join [Environment]::NewLine | Set-Content -Path $OutputPath -Encoding utf8
