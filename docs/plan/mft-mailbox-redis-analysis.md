@@ -1,5 +1,21 @@
 # MFT Mailbox — Análise de Uso de Redis
 
+## Gestao de Status
+
+| Campo | Valor |
+|---|---|
+| Status | Concluido |
+| Criado em | 2026-08-06 |
+| Atualizado em | 2026-08-06 |
+| Responsavel | Time MFT |
+| Ultima revisao | 2026-08-06 |
+
+### Historico de Status
+
+| Data | De -> Para | Motivo |
+|---|---|---|
+| 2026-08-06 | Em andamento -> Concluido | Analise finalizada com recomendacoes |
+
 ## Visão Geral Atual
 
 A implementação MftMailbox possui 3 abstrações-chave com implementações em memória:

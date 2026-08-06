@@ -10,8 +10,8 @@ tools: [read, edit, search, execute, todo, vscode_askQuestions]
 Busque os comentarios do Pull Request no GitHub usando a API e as variaveis de ambiente `GITHUB_LZOCATELI_TOKEN` (preferencial), `GH_TOKEN` ou `GITHUB_TOKEN`.
 
 Use os comandos via projeto dedicado de scripts:
-- `uv run --project .tools/scripts get-github-pr-comments`
-- `uv run --project .tools/scripts update-github-pr-comments`
+- `uv run --project tools/scripts get-github-pr-comments`
+- `uv run --project tools/scripts update-github-pr-comments`
 
 Se o usuario informar a URL completa do PR no formato `https://github.com/<owner>/<repo>/pull/<prNumber>`, extraia automaticamente `owner`, `repo` e `prNumber`.
 
