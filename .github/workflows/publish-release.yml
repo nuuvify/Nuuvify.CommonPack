@@ -1,171 +1,188 @@
 name: Publish and Release
 
 on:
-    pull_request_target:
-        types:
-            - closed
-        branches:
-            - main
-            - qas
-            - nugettest/qas
+  push:
+    branches:
+      - main
+      - qas
+      - nugettest/qas
+  workflow_dispatch:
+
+concurrency:
+  group: publish-release-${{ github.ref_name }}
+  cancel-in-progress: false
 
 permissions:
-    contents: write
+  contents: write
 
 jobs:
-    publish:
-        name: Publish packages and release
-        if: ${{ github.event.pull_request.merged == true }}
-        runs-on: ${{ vars.GH_ACTIONS_UBUNTU_RUNNER != '' && vars.GH_ACTIONS_UBUNTU_RUNNER || 'ubuntu-24.04' }}
-        environment: ${{ github.event.pull_request.base.ref == 'main' && 'production' || github.event.pull_request.base.ref == 'qas' && 'preview' || 'nugettest' }}
+  publish:
+    name: Publish packages and release
+    runs-on: ${{ vars.GH_ACTIONS_UBUNTU_RUNNER != '' && vars.GH_ACTIONS_UBUNTU_RUNNER || 'ubuntu-24.04' }}
+    environment:
+      name: ${{ github.ref_name == 'main' && 'production' || github.ref_name == 'qas' && 'preview' || 'nugettest' }}
 
-        steps:
-            - name: Checkout merged commit
-              uses: actions/checkout@v4
-              with:
-                  ref: ${{ github.event.pull_request.merge_commit_sha }}
-                  fetch-depth: 0
+    steps:
+      - name: Checkout release commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-            - name: Setup .NET SDK
-              uses: actions/setup-dotnet@v4
-              with:
-                  global-json-file: global.json
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
 
-            - name: Resolve release channel
-              id: channel
-              shell: pwsh
-              run: |
-                  switch ('${{ github.event.pull_request.base.ref }}') {
-                    'main' { $channel = 'stable' }
-                    'qas' { $channel = 'preview' }
-                    'nugettest/qas' { $channel = 'dev' }
-                    default { throw 'Branch de release nao suportada.' }
-                  }
+      - name: Resolve release channel
+        id: channel
+        shell: pwsh
+        run: |
+          switch ('${{ github.ref_name }}') {
+            'main' { $channel = 'stable' }
+            'qas' { $channel = 'preview' }
+            'nugettest/qas' { $channel = 'dev' }
+            default { throw 'Branch de release nao suportada.' }
+          }
 
-                  "value=$channel" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "value=$channel" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
-            - name: Compute version
-              id: version
-              shell: pwsh
-              run: ./.github/scripts/compute-version.ps1 -Channel '${{ steps.channel.outputs.value }}' -VersionFile 'src/Directory.Build.props' -RunNumber '${{ github.run_number }}'
+      - name: Compute version
+        id: version
+        shell: pwsh
+        run: ./.github/scripts/compute-version.ps1 -Channel '${{ steps.channel.outputs.value }}' -VersionFile 'src/Directory.Build.props' -RunNumber '${{ github.run_number }}'
 
-            - name: Restore solution
-              run: dotnet restore Nuuvify.CommonPack.sln
+      - name: Restore solution
+        run: dotnet restore Nuuvify.CommonPack.sln
 
-            - name: Build solution
-              run: dotnet build Nuuvify.CommonPack.sln --configuration Release --no-restore /p:Version=${{ steps.version.outputs.version }}
+      - name: Build solution
+        run: >
+          dotnet build Nuuvify.CommonPack.sln --configuration Release --no-restore
+          /p:VersionPrefix=${{ steps.version.outputs.version_prefix }}
+          /p:VersionSuffix=${{ steps.version.outputs.version_suffix }}
+          /p:AssemblyVersion=${{ steps.version.outputs.assembly_version }}
+          /p:FileVersionRevision=${{ steps.version.outputs.file_version_revision }}
+          /p:ContinuousIntegrationBuild=true
+          /p:RepositoryCommit=${{ github.sha }}
 
-            - name: Run unit tests
-              run: dotnet test Nuuvify.CommonPack.sln --configuration Release --no-build --filter "Category=Unit"
+      - name: Run unit tests
+        run: dotnet test Nuuvify.CommonPack.sln --configuration Release --no-build --filter "Category=Unit"
 
-            - name: Run integration tests
-              if: ${{ steps.channel.outputs.value != 'dev' }}
-              run: dotnet test Nuuvify.CommonPack.sln --configuration Release --no-build --filter "Category=Integration"
+      - name: Run integration tests
+        run: dotnet test Nuuvify.CommonPack.sln --configuration Release --no-build --filter "Category=Integration"
 
-            - name: Pack solution
-              run: dotnet pack Nuuvify.CommonPack.sln --configuration Release --no-build -o ./artifacts /p:Version=${{ steps.version.outputs.version }} /p:PackageVersion=${{ steps.version.outputs.version }}
+      - name: Pack solution
+        run: >
+          dotnet pack Nuuvify.CommonPack.sln --configuration Release --no-build -o ./artifacts
+          /p:VersionPrefix=${{ steps.version.outputs.version_prefix }}
+          /p:VersionSuffix=${{ steps.version.outputs.version_suffix }}
+          /p:AssemblyVersion=${{ steps.version.outputs.assembly_version }}
+          /p:FileVersionRevision=${{ steps.version.outputs.file_version_revision }}
+          /p:ContinuousIntegrationBuild=true
+          /p:RepositoryCommit=${{ github.sha }}
 
-            - name: Generate changelog via Commitizen
-              id: cz_changelog
-              if: ${{ steps.version.outputs.create_release == 'true' }}
-              continue-on-error: true
-              shell: bash
-              run: |
-                  pip install commitizen --quiet
-                  cz changelog --incremental --file-name CHANGELOG.md
-                  if [ $? -ne 0 ] || [ -z "$(git diff --name-only CHANGELOG.md)" ]; then
-                    echo "cz_changed=false" >> $GITHUB_OUTPUT
-                  else
-                    echo "cz_changed=true" >> $GITHUB_OUTPUT
-                  fi
+      - name: Assert artifact versions
+        shell: pwsh
+        run: >
+          ./.github/scripts/assert-artifact-version.ps1
+          -ArtifactsPath './artifacts'
+          -VersionFile 'src/Directory.Build.props'
+          -ExpectedVersion '${{ steps.version.outputs.version }}'
+          -ExpectedAssemblyVersion '${{ steps.version.outputs.assembly_version }}'
+          -ExpectedFileVersion '${{ steps.version.outputs.file_version }}'
 
-            - name: Fallback changelog via PR labels
-              if: ${{ steps.version.outputs.create_release == 'true' && steps.cz_changelog.outputs.cz_changed == 'false' }}
-              shell: pwsh
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: |
-                  $lastTag = git tag --list 'v[0-9]*' | Sort-Object { [version]($_ -replace '^v','') } | Select-Object -Last 1
-                  $lastTagDate = git log -1 --format="%aI" $lastTag
-                  ./.github/scripts/build-release-notes.ps1 `
-                    -Mode 'labels-fallback' `
-                    -Version '${{ steps.version.outputs.version }}' `
-                    -Channel '${{ steps.channel.outputs.value }}' `
-                    -BaseBranch '${{ github.event.pull_request.base.ref }}' `
-                    -OutputPath './artifacts/release-notes.md' `
-                    -LastTagDate $lastTagDate
+      - name: Build release notes
+        if: ${{ steps.version.outputs.create_release == 'true' }}
+        shell: pwsh
+        run: ./.github/scripts/build-release-notes.ps1 -Version '${{ steps.version.outputs.version }}' -Channel '${{ steps.channel.outputs.value }}' -BaseBranch '${{ github.ref_name }}' -OutputPath './artifacts/release-notes.md'
 
-            - name: Commit changelog update
-              if: ${{ steps.version.outputs.create_release == 'true' && steps.cz_changelog.outputs.cz_changed == 'true' }}
-              shell: bash
-              run: |
-                  git config user.name "github-actions[bot]"
-                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-                  git add CHANGELOG.md
-                  git commit -m "docs(changelog): atualiza para v${{ steps.version.outputs.version }} [skip ci]"
-                  git push origin HEAD
+      - name: Upload package artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-${{ steps.version.outputs.version }}
+          path: |
+            artifacts/*.nupkg
+            artifacts/*.snupkg
+          if-no-files-found: error
+          retention-days: 14
 
-            - name: Build release notes
-              if: ${{ steps.version.outputs.create_release == 'true' && steps.cz_changelog.outputs.cz_changed != 'false' }}
-              shell: pwsh
-              run: ./.github/scripts/build-release-notes.ps1 -Version '${{ steps.version.outputs.version }}' -Channel '${{ steps.channel.outputs.value }}' -BaseBranch '${{ github.event.pull_request.base.ref }}' -OutputPath './artifacts/release-notes.md'
+      - name: Create git tag
+        if: ${{ steps.version.outputs.create_release == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git rev-parse "${{ steps.version.outputs.tag }}" >/dev/null 2>&1; then
+            echo "Tag ${{ steps.version.outputs.tag }} ja existe."
+          else
+            git tag "${{ steps.version.outputs.tag }}"
+            git push origin "${{ steps.version.outputs.tag }}"
+          fi
 
-            - name: Publish to NuGet.org
-              if: ${{ steps.channel.outputs.value != 'dev' }}
-              shell: pwsh
-              env:
-                  NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-              run: |
-                  Get-ChildItem -Path ./artifacts -Filter *.nupkg |
-                    Where-Object { $_.Name -notlike '*.snupkg' } |
-                    ForEach-Object {
-                      dotnet nuget push $_.FullName --api-key $env:NUGET_API_KEY --source '${{ steps.version.outputs.nuget_source }}' --skip-duplicate
-                    }
+      - name: Publish to NuGet.org
+        if: ${{ steps.channel.outputs.value != 'dev' }}
+        shell: pwsh
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:NUGET_API_KEY)) {
+            throw 'O secret NUGET_API_KEY nao foi configurado no environment atual.'
+          }
 
-            - name: Publish to nugettest
-              if: ${{ steps.channel.outputs.value == 'dev' }}
-              shell: pwsh
-              env:
-                  NUGETTEST_API_KEY: ${{ secrets.NUGETTEST_API_KEY }}
-              run: |
-                  Get-ChildItem -Path ./artifacts -Filter *.nupkg |
-                    Where-Object { $_.Name -notlike '*.snupkg' } |
-                    ForEach-Object {
-                      dotnet nuget push $_.FullName --api-key $env:NUGETTEST_API_KEY --source '${{ steps.version.outputs.nuget_source }}' --skip-duplicate
-                    }
+          $packages = @(Get-ChildItem -Path ./artifacts -Filter *.nupkg)
+          if ($packages.Count -eq 0) {
+            throw 'Nenhum pacote NuGet foi gerado.'
+          }
 
-            - name: Create git tag
-              if: ${{ steps.version.outputs.create_release == 'true' }}
-              shell: bash
-              run: |
-                  git config user.name "github-actions[bot]"
-                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-                  if git rev-parse "${{ steps.version.outputs.tag }}" >/dev/null 2>&1; then
-                    echo "Tag ${{ steps.version.outputs.tag }} ja existe."
-                  else
-                    git tag "${{ steps.version.outputs.tag }}"
-                    git push origin "${{ steps.version.outputs.tag }}"
-                  fi
+          foreach ($package in $packages) {
+            dotnet nuget push $package.FullName --api-key $env:NUGET_API_KEY --source '${{ steps.version.outputs.nuget_source }}' --skip-duplicate
+            if ($LASTEXITCODE -ne 0) {
+              throw "Falha ao publicar $($package.Name)."
+            }
+          }
 
-            - name: Create GitHub release
-              if: ${{ steps.version.outputs.create_release == 'true' }}
-              shell: bash
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: |
-                  if gh release view "${{ steps.version.outputs.tag }}" >/dev/null 2>&1; then
-                    echo "Release ${{ steps.version.outputs.tag }} ja existe."
-                  else
-                    prerelease_flag=""
-                    if [ "${{ steps.version.outputs.is_prerelease }}" = "true" ]; then
-                      prerelease_flag="--prerelease"
-                    fi
+      - name: Publish to nugettest
+        if: ${{ steps.channel.outputs.value == 'dev' }}
+        shell: pwsh
+        env:
+          NUGETTEST_API_KEY: ${{ secrets.NUGETTEST_API_KEY }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:NUGETTEST_API_KEY)) {
+            throw 'O secret NUGETTEST_API_KEY nao foi configurado no environment atual.'
+          }
 
-                    gh release create "${{ steps.version.outputs.tag }}" \
-                      artifacts/*.nupkg \
-                      artifacts/*.snupkg \
-                      --target "${{ github.event.pull_request.merge_commit_sha }}" \
-                      --title "${{ steps.version.outputs.tag }}" \
-                      --notes-file ./artifacts/release-notes.md \
-                      $prerelease_flag
-                  fi
+          $packages = @(Get-ChildItem -Path ./artifacts -Filter *.nupkg)
+          if ($packages.Count -eq 0) {
+            throw 'Nenhum pacote NuGet foi gerado.'
+          }
+
+          foreach ($package in $packages) {
+            dotnet nuget push $package.FullName --api-key $env:NUGETTEST_API_KEY --source '${{ steps.version.outputs.nuget_source }}' --skip-duplicate
+            if ($LASTEXITCODE -ne 0) {
+              throw "Falha ao publicar $($package.Name)."
+            }
+          }
+
+      - name: Create GitHub release
+        if: ${{ steps.version.outputs.create_release == 'true' }}
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if gh release view "${{ steps.version.outputs.tag }}" >/dev/null 2>&1; then
+            echo "Release ${{ steps.version.outputs.tag }} ja existe."
+          else
+            prerelease_flag=""
+            if [ "${{ steps.version.outputs.is_prerelease }}" = "true" ]; then
+              prerelease_flag="--prerelease"
+            fi
+
+            gh release create "${{ steps.version.outputs.tag }}" \
+              artifacts/*.nupkg \
+              artifacts/*.snupkg \
+              --target "${{ github.sha }}" \
+              --title "${{ steps.version.outputs.tag }}" \
+              --notes-file ./artifacts/release-notes.md \
+              $prerelease_flag
+          fi

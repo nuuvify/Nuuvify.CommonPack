@@ -109,3 +109,25 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 ### Regra de idioma
 
 Todos os CHANGELOGs (raiz e de pacote) devem estar inteiramente em **pt-BR**. Seções, categorias e conteúdo — sem exceção.
+
+---
+
+## Alinhamento com o processo de release
+
+O CHANGELOG está diretamente integrado ao `prepare-release.yml` e ao `build-release-notes.ps1`. Respeite as responsabilidades abaixo — violar qualquer uma pode abortar a publicação.
+
+| Momento | Ator | Arquivo | Ação |
+|---|---|---|---|
+| Durante desenvolvimento | Humano / IA | `CHANGELOG.md` (raiz) e `src/pkg/CHANGELOG.md` | Adicionar itens em `## [Não Lançado]` |
+| Abertura do release PR | 🤖 `prepare-release.yml` | `CHANGELOG.md` (raiz) | Fecha `[Não Lançado]` → `## [X.Y.Z] - yyyy-mm-dd` |
+| Publicação stable | 🤖 `build-release-notes.ps1` | `CHANGELOG.md` (raiz) | Lê a seção fechada `[X.Y.Z]` para as release notes |
+| Publicação preview/dev | 🤖 `build-release-notes.ps1` | `CHANGELOG.md` (raiz) | Lê `[Não Lançado]` para as release notes |
+
+### Regras derivadas
+
+- **Sempre adicione a `[Não Lançado]`** — nunca crie manualmente uma seção `[X.Y.Z]`; isso é responsabilidade exclusiva do `prepare-release.yml`.
+- Atualize **ambos** os changelogs na mesma alteração de código: o raiz **e** o do pacote afetado.
+- O CHANGELOG raiz é a **fonte das GitHub Release Notes**; omita detalhes internos sem impacto para o consumidor externo.
+- O CHANGELOG de pacote é **embarcado no `.nupkg`** via `Directory.Build.props`; mantenha-o conciso e orientado ao consumidor NuGet.
+- Se `[Não Lançado]` estiver vazio ou sem itens válidos no momento do publish, o `build-release-notes.ps1` aborta a publicação — garanta pelo menos um item antes de mergear em qualquer canal de release.
+- O `PR Validation / changelog-check` bloqueia o PR se o CHANGELOG do pacote alterado não for atualizado — não tente mergear sem corrigir.

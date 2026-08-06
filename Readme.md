@@ -500,8 +500,7 @@ Resumo rápido:
 - [Processo de release](docs/maintainers/release-process.md)
 - [Política de depreciação](docs/maintainers/deprecation-policy.md)
 - [Configuração do GitHub](docs/maintainers/github-setup.md)
-- [Checklist de cutover GitHub](docs/maintainers/github-cutover-checklist.md)
-- [Checklist de go live GitHub](docs/maintainers/github-go-live-checklist.md)
+- [Tutorial de configuração manual do GitHub](docs/maintainers/github-manual-setup-tutorial.md)
 
 ### Expectativas para pull requests
 
