@@ -4,12 +4,11 @@ using Microsoft.Extensions.Logging;
 using Nuuvify.CommonPack.BackgroundService.Models;
 using Nuuvify.CommonPack.Middleware.Abstraction;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace Nuuvify.CommonPack.BackgroundService.Services;
 
-public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensions.Hosting.BackgroundService
+public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensions.Hosting.BackgroundService, IAsyncDisposable
 {
     private const string UnknownValue = "Unknown";
 
@@ -17,20 +16,18 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
     private readonly IConfigurationCustom _configurationCustom;
     private readonly RequestConfiguration _requestConfiguration;
 
-    // Recursos IDisposable adequadamente liberados via DisposeAsync no método DisposeCustom
-    [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed")]
-    private ServiceBusClient _serviceBusClient;
-    [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed")]
-    private ServiceBusProcessor _serviceBusProcessor;
-    [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed")]
-    private ServiceBusProcessor _deadLetterProcessor;
-    [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed")]
-    private ServiceBusSender _originEntitySender;
+    private readonly object _resourceDisposalSync = new();
+
+    private ServiceBusClient _serviceBusClient = null!;
+    private ServiceBusProcessor _serviceBusProcessor = null!;
+    private ServiceBusProcessor _deadLetterProcessor = null!;
+    private ServiceBusSender _originEntitySender = null!;
 
     private string _configuredQueueName = string.Empty;
     private string _configuredTopicName = string.Empty;
     private string _configuredSubscriptionName = string.Empty;
     private bool _isTopicConfigured;
+    private bool _resourcesDisposed;
 
     private ServiceBusReceiveMode _receiveMode = ServiceBusReceiveMode.PeekLock;
 
@@ -448,6 +445,7 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
             throw new ArgumentException($"{nameof(ActivitySourceCustom)} não está configurado. Certifique-se de que o ActivitySource foi inicializado corretamente.");
         }
 
+        var activitySource = ActivitySourceCustom;
         using var activity = ActivitySourceCustom.StartActivity(nameof(HandleMessageAsync));
         try
         {
@@ -455,7 +453,7 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
 
             _logger.LogInformation("Iniciando {ClassName} Worker: {Data}", nameof(HandleMessageAsync), DateTimeOffset.Now);
 
-            var result = await ExecuteReceivedMessageAsync(args.Message, ActivitySourceCustom, cancellationToken);
+            var result = await ExecuteReceivedMessageAsync(args.Message, activitySource, cancellationToken);
 
             _logger.LogInformation("Finalizando {ClassName} Worker: {Data}", nameof(HandleMessageAsync), DateTimeOffset.Now);
 
@@ -488,10 +486,6 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
         {
             await HandleOperationCanceledExceptionAsync(args, ex, cancellationToken);
         }
-        catch (Exception ex)
-        {
-            await HandleGenericExceptionAsync(args, ex, cancellationToken);
-        }
     }
 
     /// <summary>
@@ -505,89 +499,6 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
             args.ErrorSource, args.EntityPath, args.FullyQualifiedNamespace);
 
         return Task.CompletedTask;
-    }
-
-    /// <summary>
-    /// Para o processamento das mensagens e libera os recursos
-    /// </summary>
-    /// <param name="cancellationToken">Token de cancelamento</param>
-    /// <returns>Task representando a operação assíncrona</returns>
-    public override async Task StopAsync(CancellationToken cancellationToken)
-    {
-        _logger.LogInformation("Parando o processamento das mensagens do bus");
-
-        try
-        {
-            if (_serviceBusProcessor != null)
-            {
-                await _serviceBusProcessor.StopProcessingAsync(cancellationToken);
-                await _serviceBusProcessor.DisposeAsync();
-            }
-
-            if (_deadLetterProcessor != null)
-            {
-                await _deadLetterProcessor.StopProcessingAsync(cancellationToken);
-                await _deadLetterProcessor.DisposeAsync();
-            }
-
-            if (_originEntitySender != null)
-            {
-                await _originEntitySender.DisposeAsync();
-            }
-
-            if (_serviceBusClient != null)
-            {
-                await _serviceBusClient.DisposeAsync();
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Erro ao parar o processamento das mensagens do bus");
-            throw new InvalidOperationException($"Erro ao parar o processamento do Service Bus: {ex.Message}", ex);
-        }
-        finally
-        {
-            await base.StopAsync(cancellationToken);
-        }
-    }
-
-    /// <summary>
-    /// Libera os recursos utilizados pela classe
-    /// </summary>
-    public sealed override void Dispose()
-    {
-        DisposeCustom(true);
-        base.Dispose();
-        GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
-    /// Método protegido para liberação de recursos
-    /// </summary>
-    /// <param name="disposing">Indica se o método está sendo chamado pelo Dispose ou pelo finalizador</param>
-    protected virtual void DisposeCustom(bool disposing)
-    {
-        if (disposing)
-        {
-            try
-            {
-                // Dispose dos recursos IDisposable para satisfazer CA1001
-                _serviceBusProcessor?.DisposeAsync().AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
-                _deadLetterProcessor?.DisposeAsync().AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
-                _originEntitySender?.DisposeAsync().AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
-                _serviceBusClient?.DisposeAsync().AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
-
-                ActivitySourceCustom?.Dispose();
-            }
-            catch (ObjectDisposedException)
-            {
-                // Ignorar se já foi liberado
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logger?.LogWarning(ex, "Recurso do Service Bus já estava em processo de liberação");
-            }
-        }
     }
 
 }
