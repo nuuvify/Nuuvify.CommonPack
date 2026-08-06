@@ -1,0 +1,41 @@
+title: "[Q&A] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Pergunta tecnica
+
+        Use esta categoria para duvidas objetivas sobre uso dos pacotes, comportamento esperado
+        e troubleshooting.
+
+  - type: textarea
+    id: pergunta
+    attributes:
+      label: Qual e a sua pergunta?
+      description: Descreva de forma objetiva o que voce quer saber.
+      placeholder: Ex.: Como registrar X no DI sem quebrar Y?
+    validations:
+      required: true
+
+  - type: textarea
+    id: contexto
+    attributes:
+      label: Contexto
+      description: Versao do pacote, cenario, stack e restricoes relevantes.
+      placeholder: Ex.: Nuuvify.CommonPack.Security 1.2.3, .NET 8, API ASP.NET Core.
+    validations:
+      required: true
+
+  - type: textarea
+    id: tentativas
+    attributes:
+      label: O que voce ja tentou?
+      description: Liste passos, testes e hipoteses que ja validou.
+      placeholder: Ex.: Tentei A, B e C. Resultado: erro Z.
+
+  - type: textarea
+    id: evidencias
+    attributes:
+      label: Evidencias
+      description: Inclua logs, stack trace, trecho de codigo ou links relevantes.
+      placeholder: Ex.: Cole aqui as mensagens de erro e referencias.
