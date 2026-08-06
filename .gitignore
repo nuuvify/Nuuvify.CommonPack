@@ -267,6 +267,6 @@ __pycache__/
 htmlcov/
 
 # Local tooling envs and lockfiles
-.tools/scripts/.venv/
-.tools/scripts/*.egg-info/
-.tools/scripts/uv.lock
+tools/scripts/.venv/
+tools/scripts/*.egg-info/
+tools/scripts/uv.lock

@@ -126,15 +126,35 @@ public abstract partial class ServiceBusBackgroundService<T>
                 args.Message.MessageId,
                 requeueMessage.MessageId);
         }
-        catch (Exception ex)
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
-            _logger.LogError(
-                ex,
-                "Falha ao reenfileirar mensagem {MessageId} da DLQ. A mensagem sera descartada para evitar acumulacao.",
-                args.Message.MessageId);
-
-            await DiscardDeadLetterMessageAsync(args, cancellationToken);
+            throw;
         }
+        catch (ServiceBusException ex)
+        {
+            await HandleRequeueFailureAsync(args, ex, cancellationToken);
+        }
+        catch (ObjectDisposedException ex)
+        {
+            await HandleRequeueFailureAsync(args, ex, cancellationToken);
+        }
+        catch (InvalidOperationException ex)
+        {
+            await HandleRequeueFailureAsync(args, ex, cancellationToken);
+        }
+    }
+
+    private async Task HandleRequeueFailureAsync(
+        ProcessMessageEventArgs args,
+        Exception ex,
+        CancellationToken cancellationToken)
+    {
+        _logger.LogError(
+            ex,
+            "Falha ao reenfileirar mensagem {MessageId} da DLQ. A mensagem sera descartada para evitar acumulacao.",
+            args.Message.MessageId);
+
+        await DiscardDeadLetterMessageAsync(args, cancellationToken);
     }
 
     private async Task DiscardDeadLetterMessageAsync(

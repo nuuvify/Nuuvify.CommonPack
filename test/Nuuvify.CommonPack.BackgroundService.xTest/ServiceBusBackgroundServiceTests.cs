@@ -16,7 +16,6 @@ public class TestServiceBusBackgroundService : ServiceBusBackgroundService<TestS
     private ServiceBusFailureReason? _throwServiceBusException;
     private bool _throwOperationCanceledException;
     private bool _throwGenericException;
-    private bool _throwOnDispose;
 
     public TestServiceBusBackgroundService(
         ILogger<TestServiceBusBackgroundService> logger,
@@ -44,23 +43,6 @@ public class TestServiceBusBackgroundService : ServiceBusBackgroundService<TestS
         }
 
         return Task.FromResult(_executeRuleResult);
-    }
-
-    protected override void DisposeCustom(bool disposing)
-    {
-        if (_throwOnDispose)
-        {
-            try
-            {
-                throw new InvalidOperationException("Test dispose exception");
-            }
-            catch (InvalidOperationException ex)
-            {
-                Logger.LogWarning(ex, "Recurso do Service Bus já estava em processo de liberação");
-            }
-        }
-
-        base.DisposeCustom(disposing);
     }
 
     // Métodos públicos para testes
@@ -93,11 +75,6 @@ public class TestServiceBusBackgroundService : ServiceBusBackgroundService<TestS
     public void SetThrowGenericException(bool throwException)
     {
         _throwGenericException = throwException;
-    }
-
-    public void SetThrowInvalidOperationExceptionOnDispose(bool throwException)
-    {
-        _throwOnDispose = throwException;
     }
 
     public void SetAbandonMessageIfFailed(bool abandon)

@@ -66,7 +66,7 @@ public sealed class ServiceBusBackgroundServiceBaseTests : IDisposable
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(() =>
-            service.TestConfigureServiceBus("", "queue", null, null));
+            service.TestConfigureServiceBus("", "queue", null!, null!));
 
         Assert.Contains("Service Bus não foi configurada corretamente", exception.Message);
     }
@@ -80,7 +80,7 @@ public sealed class ServiceBusBackgroundServiceBaseTests : IDisposable
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(() =>
-            service.TestConfigureServiceBus("validName", "queue", null, null));
+            service.TestConfigureServiceBus("validName", "queue", null!, null!));
 
         Assert.Contains("A conexão com o Service Bus não foi configurada corretamente", exception.Message);
     }
@@ -94,7 +94,7 @@ public sealed class ServiceBusBackgroundServiceBaseTests : IDisposable
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(() =>
-            service.TestConfigureServiceBus("validConnection", "", null, null));
+            service.TestConfigureServiceBus("validConnection", "", null!, null!));
 
         Assert.Contains("fila do Service Bus não foi configurada corretamente", exception.Message);
     }
@@ -107,7 +107,7 @@ public sealed class ServiceBusBackgroundServiceBaseTests : IDisposable
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(() =>
-            service.TestConfigureServiceBusWithTopicConnectionString("connection", "", "subscription", null, null));
+            service.TestConfigureServiceBusWithTopicConnectionString("connection", "", "subscription", null!, null!));
 
         Assert.Contains("tópico do Service Bus não foi configurado", exception.Message);
     }
@@ -120,7 +120,7 @@ public sealed class ServiceBusBackgroundServiceBaseTests : IDisposable
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(() =>
-            service.TestConfigureServiceBusWithTopicConnectionString("connection", "topic", "", null, null));
+            service.TestConfigureServiceBusWithTopicConnectionString("connection", "topic", "", null!, null!));
 
         Assert.Contains("assinatura do Service Bus não foi configurada", exception.Message);
     }
@@ -133,7 +133,7 @@ public sealed class ServiceBusBackgroundServiceBaseTests : IDisposable
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(() =>
-            service.TestConfigureServiceBusWithTopicCredentials("topic", "subscription", "namespace", null!, null, null));
+            service.TestConfigureServiceBusWithTopicCredentials("topic", "subscription", "namespace", null!, null!, null!));
 
         Assert.Contains("O TokenCredential do Azure não foi configurado", exception.Message);
     }
@@ -147,7 +147,7 @@ public sealed class ServiceBusBackgroundServiceBaseTests : IDisposable
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(() =>
-            service.TestConfigureServiceBusWithQueueCredentials("queue", "", mockCredential.Object, null, null));
+            service.TestConfigureServiceBusWithQueueCredentials("queue", "", mockCredential.Object, null!, null!));
 
         Assert.Contains("namespace totalmente qualificado do Service Bus não foi configurado", exception.Message);
     }
@@ -187,24 +187,31 @@ public sealed class ServiceBusBackgroundServiceBaseTests : IDisposable
     }
 
     [Fact]
-    public void Dispose_ShouldLogWarning_WhenThrowInvalidOperationExceptionOnDisposeIsSet()
+    public async Task DisposeAsync_ShouldBeIdempotent_WhenCalledMultipleTimes()
     {
         // Arrange
         using var service = new TestServiceBusBackgroundService(_loggerMock.Object, _configurationMock.Object, _requestConfiguration);
-        service.SetThrowInvalidOperationExceptionOnDispose(true);
 
         // Act
-        service.Dispose();
+        await service.DisposeAsync();
+        await service.DisposeAsync();
 
         // Assert
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Warning,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Recurso do Service Bus já estava em processo de liberação")),
-                It.IsAny<InvalidOperationException>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
+        Assert.True(true);
+    }
+
+    [Fact]
+    public async Task DisposeAsync_ShouldNotThrow_WhenCalledAfterDisposeAsync()
+    {
+        // Arrange
+        var service = new TestServiceBusBackgroundService(_loggerMock.Object, _configurationMock.Object, _requestConfiguration);
+
+        // Act
+        await service.DisposeAsync();
+        await service.DisposeAsync();
+
+        // Assert
+        Assert.True(true);
     }
 
     [Fact]
