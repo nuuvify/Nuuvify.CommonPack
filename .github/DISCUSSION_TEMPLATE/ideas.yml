@@ -12,7 +12,7 @@ body:
     attributes:
       label: Qual problema queremos resolver?
       description: Explique a dor atual e quem e impactado.
-      placeholder: Ex.: Integracao X exige muito codigo repetido em varios servicos.
+      placeholder: "Ex.: Integracao X exige muito codigo repetido em varios servicos."
     validations:
       required: true
 
@@ -21,7 +21,7 @@ body:
     attributes:
       label: Proposta de solucao
       description: Descreva a ideia principal e suas alternativas.
-      placeholder: Ex.: Criar extensao Y com contrato Z.
+      placeholder: "Ex.: Criar extensao Y com contrato Z."
     validations:
       required: true
 
@@ -30,18 +30,18 @@ body:
     attributes:
       label: Impacto e compatibilidade
       description: Avalie risco de breaking change, migracao e SemVer.
-      placeholder: Ex.: Sem quebra de API publica; apenas adicao backward-compatible.
+      placeholder: "Ex.: Sem quebra de API publica; apenas adicao backward-compatible."
 
   - type: textarea
     id: criterios
     attributes:
       label: Criterios de sucesso
       description: Como medir que a ideia foi bem-sucedida?
-      placeholder: Ex.: Menos boilerplate, menos incidentes, onboarding mais rapido.
+      placeholder: "Ex.: Menos boilerplate, menos incidentes, onboarding mais rapido."
 
   - type: textarea
     id: referencias
     attributes:
       label: Referencias
       description: Links para PRs, issues, docs, benchmarks ou RFCs.
-      placeholder: Ex.: https://github.com/org/repo/issues/123
+      placeholder: "Ex.: https://github.com/org/repo/issues/123"

@@ -12,7 +12,7 @@ body:
     attributes:
       label: Resumo
       description: Titulo curto do que voce quer compartilhar.
-      placeholder: Ex.: Implementacao de pipeline de autenticacao com Nuuvify.CommonPack.Security
+      placeholder: "Ex.: Implementacao de pipeline de autenticacao com Nuuvify.CommonPack.Security"
     validations:
       required: true
 
@@ -21,7 +21,7 @@ body:
     attributes:
       label: Cenario
       description: Contexto do projeto e objetivo.
-      placeholder: Ex.: API B2B com multi-tenant e rotacao de credenciais.
+      placeholder: "Ex.: API B2B com multi-tenant e rotacao de credenciais."
     validations:
       required: true
 
@@ -30,7 +30,7 @@ body:
     attributes:
       label: Como foi implementado
       description: Arquitetura, decisoes e trechos relevantes.
-      placeholder: Ex.: Estrutura, DI, estrategias e trade-offs.
+      placeholder: "Ex.: Estrutura, DI, estrategias e trade-offs."
     validations:
       required: true
 
@@ -39,11 +39,11 @@ body:
     attributes:
       label: Resultados e aprendizados
       description: O que funcionou, o que nao funcionou e recomendacoes.
-      placeholder: Ex.: Reducao de erros, ganhos de desempenho, alertas importantes.
+      placeholder: "Ex.: Reducao de erros, ganhos de desempenho, alertas importantes."
 
   - type: textarea
     id: links
     attributes:
       label: Links e anexos
       description: PRs, issues, dashboards, prints ou documentacao.
-      placeholder: Ex.: Links para evidencias e materiais de apoio.
+      placeholder: "Ex.: Links para evidencias e materiais de apoio."
