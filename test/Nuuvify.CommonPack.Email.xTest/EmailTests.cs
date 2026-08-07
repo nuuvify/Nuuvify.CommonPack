@@ -38,6 +38,29 @@ public class EmailTests
 
     }
 
+    private Email CreateIntegrationEmailSender()
+    {
+        var integrationConfiguration = new EmailServerConfiguration();
+
+        new ConfigureFromConfigurationOptions<EmailServerConfiguration>(
+            config.GetSection("EmailConfig:EmailServerConfiguration"))
+            .Configure(integrationConfiguration);
+
+        var (envEmailUsername, envEmailPassword) = _emailConfigFixture.GetEmailCredential(config);
+
+        if (!string.IsNullOrWhiteSpace(envEmailUsername))
+        {
+            integrationConfiguration.AccountUserName = envEmailUsername;
+        }
+
+        if (!string.IsNullOrWhiteSpace(envEmailPassword))
+        {
+            integrationConfiguration.AccountPassword = envEmailPassword;
+        }
+
+        return new Email(integrationConfiguration);
+    }
+
     [Fact]
     [Trait("Category", "Unit")]
     [Trait("Nuuvify.CommonPack.Email", nameof(Email))]
@@ -126,7 +149,7 @@ public class EmailTests
         const string assunto = "Teste da classe de envio de email";
         const string mensagem = "Esse é o corpo do email";
 
-        var testarEnvio = new Email(emailServerConfiguration);
+        var testarEnvio = CreateIntegrationEmailSender();
 
         var emailEnviado = await testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
 
@@ -169,7 +192,7 @@ public class EmailTests
         const string assunto = "Teste da classe de envio de email";
         const string mensagem = "Esse é o corpo do email";
 
-        var testarEnvio = new Email(emailServerConfiguration);
+        var testarEnvio = CreateIntegrationEmailSender();
 
         var emailEnviado = await testarEnvio.EnviarAsync(destinatarios, Remetentes, assunto, mensagem);
 
@@ -312,7 +335,4 @@ public class EmailTests
         Assert.Equal(teste, emailResult);
         Assert.False(testarEnvio.IsValid());
     }
-
 }
-
-
