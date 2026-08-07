@@ -1,0 +1,31 @@
+{
+    "organization": "nuuvify",
+    "repository": "Nuuvify.CommonPack",
+    "protectedAdministrators": [
+        "lzocateli",
+        "eusener"
+    ],
+    "organizationSettings": {
+        "defaultRepositoryPermission": "none",
+        "membersCanCreateRepositories": false,
+        "membersCanCreatePublicRepositories": false,
+        "membersCanCreatePrivateRepositories": false,
+        "membersCanCreateInternalRepositories": false,
+        "membersCanCreateTeams": false
+    },
+    "collaboratorTeam": {
+        "name": "collaborators",
+        "description": "Colaboradores autorizados dos repositorios Nuuvify.",
+        "privacy": "secret",
+        "notificationSetting": "notifications_enabled",
+        "repositoryPermission": "push",
+        "maintainers": [
+            "lzocateli",
+            "eusener"
+        ],
+        "members": []
+    },
+    "allowedRepositoryTeams": [
+        "collaborators"
+    ]
+}
