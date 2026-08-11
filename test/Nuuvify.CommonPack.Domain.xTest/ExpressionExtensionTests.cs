@@ -79,10 +79,22 @@ public class ExpressionExtensionTests
     {
         // Arrange
         var now = DateTimeOffset.Now;
-        var pastTime = now.AddHours(-1); // Uma hora atrás
-        var timeString = pastTime.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
+        var pastTime = now.AddHours(-1).TimeOfDay;
 
-        var expectedTargetTime = DateTimeOffset.Parse($"{now.AddDays(1):yyyy-MM-dd} {timeString}", CultureInfo.InvariantCulture);
+        // Perto da meia-noite, now - 1h pode cair no dia anterior (ex.: 23:30).
+        // Ajusta para garantir um horário que realmente já passou no dia atual.
+        if (pastTime > now.TimeOfDay)
+        {
+            pastTime = now.TimeOfDay.Subtract(TimeSpan.FromMinutes(1));
+        }
+
+        var timeString = pastTime.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture);
+
+        var expectedTargetTime = DateTimeOffset.Parse($"{now:yyyy-MM-dd} {timeString}", CultureInfo.InvariantCulture);
+        if (expectedTargetTime <= now)
+        {
+            expectedTargetTime = expectedTargetTime.AddDays(1);
+        }
 
         // Act
         var result = CacheTimeServiceExtension.ExpireAt(timeString);
