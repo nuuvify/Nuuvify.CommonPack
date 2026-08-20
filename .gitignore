@@ -270,3 +270,6 @@ htmlcov/
 tools/scripts/.venv/
 tools/scripts/*.egg-info/
 tools/scripts/uv.lock
+
+_netrc
+pip.ini
