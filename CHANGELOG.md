@@ -8,14 +8,17 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 ## [Não Lançado]
 
 ### Adicionado
+- Nova extensão `AddContainerSecrets` no pacote `Nuuvify.CommonPack.Middleware` para secrets montados via `KeyPerFile`.
 
 ### Alterado
 
 ### Corrigido
+- Carregamento silenciosamente vazio de variáveis de ambiente no método legado do pacote `Nuuvify.CommonPack.Middleware`.
 
 ### Removido
 
 ### Segurança
+- Eliminada a persistência temporária de secrets em arquivos locais pelo pacote `Nuuvify.CommonPack.Middleware`.
 
 ### Performance
 
