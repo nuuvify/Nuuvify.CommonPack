@@ -6,6 +6,40 @@ namespace Nuuvify.CommonPack.OpenApi;
 
 public static class SwaggerGenSecurity
 {
+    /// <summary>
+    /// Registra no Swagger o esquema de autenticação por API key.
+    /// </summary>
+    /// <param name="services">Coleção de serviços da aplicação.</param>
+    /// <param name="headerName">Nome do header que transporta a credencial.</param>
+    public static void ConfigurationApiKey(this IServiceCollection services, string headerName = "X-API-Key")
+    {
+        _ = services.AddSwaggerGen(options =>
+        {
+            options.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
+            {
+                Description = "API key usada para autenticar a requisição.",
+                Name = headerName,
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
+            });
+
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "ApiKey"
+                        }
+                    },
+                    new List<string>()
+                }
+            });
+        });
+    }
+
     public static void Configuration(this IServiceCollection services)
     {
         _ = services.AddSwaggerGen(options =>

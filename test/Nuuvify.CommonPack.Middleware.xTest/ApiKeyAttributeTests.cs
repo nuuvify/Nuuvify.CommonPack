@@ -222,7 +222,7 @@ public class ApiKeyAttributeTests
         Assert.Null(contentResult);
         Assert.True(_actionExecutingContext.HttpContext.User.HasClaim(x =>
             x.Type == ApiKeyFilterConstants.ApiKeyInfo &&
-            x.Value == $"{keyNameTest[1]}={keyValueTest1}"));
+            x.Value == keyNameTest[1]));
 
     }
 

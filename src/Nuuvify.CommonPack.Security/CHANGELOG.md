@@ -8,6 +8,8 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 ## [Não Lançado]
 
 ### Adicionado
+- esquema de autenticação por API key com comparação em tempo constante
+- registro de API key via `AddApiKeyAuthentication`
 
 ### Alterado
 
@@ -16,6 +18,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 ### Removido
 
 ### Segurança
+- impedir que a credencial validada seja materializada em claims
 
 ## [Sem versão registrada] - 2026-05-29
 

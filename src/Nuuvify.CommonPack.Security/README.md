@@ -11,6 +11,7 @@ O pacote principal reúne utilitários para cenários com JWT e OpenID, além de
 - handlers de autorização para políticas e validação por claims
 - helper `IUserAuthenticated` para leitura do usuário autenticado, claims e papéis
 - opções de token centralizadas em `JwtTokenOptions`
+- autenticação por API key via esquema `ApiKey`
 
 ## Quando usar
 
@@ -37,11 +38,11 @@ Por padrão, o método lê a seção `JwtTokenOptions`, registra `IUserAuthentic
 
 ```json
 {
-	"JwtTokenOptions": {
-		"Issuer": "nuuvify-auth",
-		"Audience": "nuuvify-api",
-		"SecretKey": "uma-chave-com-pelo-menos-32-caracteres-seguros"
-	}
+ "JwtTokenOptions": {
+  "Issuer": "nuuvify-auth",
+  "Audience": "nuuvify-api",
+  "SecretKey": "uma-chave-com-pelo-menos-32-caracteres-seguros"
+ }
 }
 ```
 
@@ -56,6 +57,26 @@ builder.Services.AddOpenIdSecuritySetup(builder.Configuration);
 ```
 
 Esse setup complementa a infraestrutura de autenticação já existente na aplicação e adiciona os serviços auxiliares usados pelos handlers do pacote.
+
+## Configuração de API key
+
+O esquema `ApiKey` pode ser registrado quando a aplicação precisa validar uma
+credencial em um header HTTP dedicado:
+
+```csharp
+using Nuuvify.CommonPack.Security;
+
+builder.Services.AddAuthentication(ApiKeyAuthenticationDefaults.AuthenticationScheme)
+ .AddApiKeyAuthentication(options =>
+ {
+  options.HeaderName = "X-API-Key";
+  options.ValidKeys = new[] { "valor-carregado-de-um-secret-manager" };
+ });
+```
+
+O handler retorna `NoResult` quando o header não está presente e falha com uma
+mensagem genérica quando a credencial é inválida. A claim emitida identifica o
+header utilizado; o valor secreto nunca é copiado para claims, logs ou respostas.
 
 ## Acesso ao usuário autenticado
 
@@ -99,3 +120,4 @@ O pacote exige chave simétrica válida e trata tempo de expiração com `ClockS
 - expiração e audiência incorreta
 - claims esperadas e autorização negada
 - ausência de vazamento de segredo ou detalhe sensível
+

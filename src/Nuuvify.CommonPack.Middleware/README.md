@@ -6,6 +6,9 @@ Middlewares, filtros e extensões de configuração para aplicações ASP.NET Co
 
 - [Instalação](#instalação)
 - [Configuração](#configuração)
+- [Dotenv canônico](#dotenv-canônico)
+- [Tratamento de exceções](#tratamento-de-exceções)
+- [Contexto de operação](#contexto-de-operação)
 - [Segurança](#segurança)
 - [Compatibilidade](#compatibilidade)
 - [Troubleshooting](#troubleshooting)
@@ -39,6 +42,50 @@ Um arquivo chamado `Database__Password` fica disponível como `Database:Password
 O método legado `AddEnvironmentVariablesToKeyPerFile` continua disponível para compatibilidade. Ele agora captura os valores em memória e pode remover as variáveis somente do processo atual quando `removeVariavel` for verdadeiro. Para novos mounts de secrets, prefira `AddContainerSecrets`.
 
 Os providers são aplicados na ordem em que são registrados; fontes posteriores podem substituir chaves anteriores.
+
+## Dotenv canônico
+
+Para carregar um arquivo `.env` sem materializar seus valores no ambiente do
+processo, use:
+
+```csharp
+builder.AddDotEnvConfiguration();
+```
+
+O parser separa chave e valor no primeiro `=`, preserva valores vazios,
+converte `__` em `:` e insere a fonte abaixo das fontes já registradas. Assim,
+variáveis de ambiente reais, secrets montados e argumentos de linha de comando
+podem manter precedência conforme a composição do host.
+
+## Tratamento de exceções
+
+Para aplicações novas, registre o handler baseado em `IExceptionHandler` e
+`ProblemDetailsService` no composition root:
+
+```csharp
+builder.Services.AddProblemDetailsExceptionHandler();
+```
+
+O registro é opt-in e deve ser combinado com `app.UseExceptionHandler()`. O
+handler retorna `application/problem+json` com mensagem genérica e registra a
+exceção somente no logger. O middleware legado
+`UseGlobalExceptionHandlerMiddleware` continua disponível para consumidores
+existentes e mantém o envelope anterior.
+
+## Contexto de operação
+
+Para integrar requisições HTTP ao contexto neutro de observabilidade, registre
+o accessor e adicione o adapter ao pipeline:
+
+```csharp
+builder.Services.AddOperationContextHeaders();
+app.UseOperationContextHeaders();
+```
+
+O adapter preserva o `CorrelationId` recebido, cria um identificador quando o
+header não existe e restaura o contexto anterior ao finalizar a requisição. O
+middleware legado `UseHandlingHeadersMiddleware` continua disponível para
+consumidores existentes.
 
 ## Segurança
 
