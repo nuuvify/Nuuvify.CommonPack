@@ -9,6 +9,7 @@ Middlewares, filtros e extensões de configuração para aplicações ASP.NET Co
 - [Dotenv canônico](#dotenv-canônico)
 - [Tratamento de exceções](#tratamento-de-exceções)
 - [Contexto de operação](#contexto-de-operação)
+- [Validação](#validação)
 - [Segurança](#segurança)
 - [Compatibilidade](#compatibilidade)
 - [Troubleshooting](#troubleshooting)
@@ -31,6 +32,14 @@ Para secrets montados por Docker, Podman ou Kubernetes, registre o diretório du
 builder.Configuration.AddContainerSecrets("/run/secrets");
 ```
 
+Quando o caminho precisa seguir o padrão do sistema operacional, use o
+resolvedor sem estado:
+
+```csharp
+var secretsPath = builder.GetContainerSecretsPath();
+builder.Configuration.AddContainerSecrets(secretsPath, optional: true);
+```
+
 O padrão é fail-closed (`optional: false`) e sem recarga automática (`reloadOnChange: false`). Para um diretório opcional:
 
 ```csharp
@@ -39,7 +48,11 @@ builder.Configuration.AddContainerSecrets("/run/secrets", optional: true);
 
 Um arquivo chamado `Database__Password` fica disponível como `Database:Password`. O provider `KeyPerFile` não altera, copia ou remove os arquivos montados. Permissões, montagem e rotação pertencem ao runtime ou ao orquestrador.
 
-O método legado `AddEnvironmentVariablesToKeyPerFile` continua disponível para compatibilidade. Ele agora captura os valores em memória e pode remover as variáveis somente do processo atual quando `removeVariavel` for verdadeiro. Para novos mounts de secrets, prefira `AddContainerSecrets`.
+O método legado `AddEnvironmentVariablesToKeyPerFile` continua disponível para compatibilidade, mas está obsoleto. Ele agora captura os valores em memória e pode remover as variáveis somente do processo atual quando `removeVariavel` for verdadeiro. Para novos mounts de secrets, prefira `AddContainerSecrets`; para arquivos `.env`, use `AddDotEnvConfiguration`.
+
+`PathSecrets`, `SetPathSecretsToOSPlatform` e `GetPathSecretsToOSPlatform`
+também estão obsoletos. Eles permanecem para compatibilidade, mas mantêm estado
+estático e devem ser substituídos por `GetContainerSecretsPath`.
 
 Os providers são aplicados na ordem em que são registrados; fontes posteriores podem substituir chaves anteriores.
 
@@ -86,6 +99,25 @@ O adapter preserva o `CorrelationId` recebido, cria um identificador quando o
 header não existe e restaura o contexto anterior ao finalizar a requisição. O
 middleware legado `UseHandlingHeadersMiddleware` continua disponível para
 consumidores existentes.
+
+## Validação
+
+Para APIs novas, registre a resposta canônica de validação do ASP.NET Core:
+
+```csharp
+builder.Services.AddCanonicalValidation();
+```
+
+Quando o MVC já foi registrado, aplique a extensão diretamente ao builder
+existente para evitar um segundo registro de controllers:
+
+```csharp
+builder.Services.AddControllers().AddCanonicalValidation();
+```
+
+O setup responde com HTTP 400 e `ValidationProblemDetails`. O filtro legado
+`ValidateModelStateCustomAttribute` permanece disponível para endpoints que
+dependem do contrato anterior com HTTP 417.
 
 ## Segurança
 

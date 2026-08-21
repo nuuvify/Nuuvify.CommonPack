@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Nuuvify.CommonPack.Security;
 using Xunit;
 
@@ -64,5 +65,20 @@ public class ApiKeyAuthenticationTests
         Assert.False(result.Succeeded);
         Assert.NotNull(result.Failure);
         Assert.Contains("Invalid API key", result.Failure.Message);
+    }
+
+    [Fact]
+    public void AddApiKeyAuthentication_WhenNoKeysAreConfigured_FailsValidation()
+    {
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddAuthentication(ApiKeyAuthenticationDefaults.AuthenticationScheme)
+            .AddApiKeyAuthentication(_ => { });
+
+        using var provider = services.BuildServiceProvider();
+
+        Assert.Throws<OptionsValidationException>(() =>
+            provider.GetRequiredService<IOptionsMonitor<ApiKeyAuthenticationOptions>>()
+                .Get(ApiKeyAuthenticationDefaults.AuthenticationScheme));
     }
 }

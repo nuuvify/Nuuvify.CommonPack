@@ -29,6 +29,8 @@ public static class ConfigurationBuilderExtensions
     /// <param name="removeVariavel">Remove as variáveis somente do processo atual após capturá-las.</param>
     /// <param name="logger">Logger opcional. Nenhum valor ou nome de secret é registrado.</param>
     /// <returns>O mesmo builder recebido.</returns>
+    /// <remarks>Use <see cref="AddContainerSecrets(IConfigurationBuilder, string, bool, bool)"/> para diretórios montados ou <c>AddDotEnvConfiguration</c> para arquivos dotenv.</remarks>
+    [Obsolete("Use AddContainerSecrets para diretórios montados ou AddDotEnvConfiguration para arquivos dotenv. Consulte README.md#dotenv-canônico.", error: false)]
     public static IConfigurationBuilder AddEnvironmentVariablesToKeyPerFile(
         this IConfigurationBuilder builder,
         string prefix,

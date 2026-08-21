@@ -6,7 +6,7 @@
 | --- | --- |
 | Status | Em andamento |
 | Criado em | 2026-08-20 |
-| Atualizado em | 2026-08-20 |
+| Atualizado em | 2026-08-21 |
 | Responsável | Lincoln Zocateli |
 | Última revisão | 2026-08-20 |
 
@@ -19,6 +19,8 @@
 | 2026-08-20 | Rascunho -> Rascunho | Definição da implementação canônica no Nuuvify, proxies CommonPack e hardening de `Environment` |
 | 2026-08-20 | Rascunho -> Em andamento | Implementação do hardening compatível concluída no pacote `Nuuvify.CommonPack.Middleware`; restante segue na modernização de maior porte |
 | 2026-08-20 | Em andamento -> Em andamento | Implementação do contexto neutro e do esquema canônico de API key em `Nuuvify.CommonPack.Security` |
+| 2026-08-21 | Em andamento -> Em andamento | Atualização dos Templates sobre `origin/master`, alinhamento Nuuvify 2.8.0 e desbloqueio do contrato de `CwsRepository` |
+| 2026-08-21 | Em andamento -> Em andamento | Validação das soluções completas dos Templates após a publicação local dos pacotes Nuuvify 2.8.0 |
 
 > A execução depende de revisão humana. Este documento não registra aprovação, conclusão ou autorização para publicação.
 
@@ -28,15 +30,15 @@
 | --- | --- | --- |
 | 0. Baseline e contratos | Concluída | Snapshot do pacote e testes do Middleware com regressões de configuração |
 | 1. Observabilidade neutra | Concluída | `OperationContext`, accessor `AsyncLocal`, escopo restaurável e testes de isolamento concorrente |
-| 2. Configuração, `.env` e secrets | Em andamento | `AddContainerSecrets`, loader `AddDotEnvConfiguration`, captura em memória e remoção responsável de `Environment`; proxies CommonPack delegando para 2.8.0 e testes legados em migração |
-| 3. API key em Security | Em andamento | Esquema `ApiKey`, handler com comparação em tempo constante, adapter legado corrigido, integração OpenAPI opt-in e 14 + 31 testes focados aprovados |
-| 4. Modernização ASP.NET Core | Em andamento | `ProblemDetailsExceptionHandler`, adapter HTTP de `OperationContext`, registros opt-in e 32 testes do Middleware aprovados |
-| 5. Migração CommonPack | Em andamento | Proxies de API e Worker delegando para `AddContainerSecrets` e `AddDotEnvConfiguration`; projetos de produção API/Worker compilados sem warnings/erros; documentação XML e asserts de loaders ajustados; validação final dos consumidores pendente |
-| 6. Migração TemplateDotnetApi | Em andamento | Middleware e Nuuvify 2.8.0 registrados; startup usando `AddProblemDetailsExceptionHandler`, `AddOperationContextHeaders`, `UseExceptionHandler` e `UseOperationContextHeaders`; atualização de `CwsRepository` removeu o bloqueio de contrato; permanecem warnings NU1603 das dependências CBL.CommonPack 7.3.0 |
-| 7. Migração TemplateDotnetWorker | Em andamento | CommonPack 8.6.2 e Nuuvify 2.8.0 já registrados; build avançou com warning de dependência transitiva `StackExchange.Redis`, sem erro observado no recorte executado |
-| 8. Ativação de APIs obsoletas | Não iniciada | N/A |
+| 2. Configuração, `.env` e secrets | Em andamento | `AddContainerSecrets`, loader `AddDotEnvConfiguration`, captura em memória e remoção responsável de `Environment`; proxies CommonPack delegando para 2.8.0; testes de parser alinhados ao primeiro separador e valores vazios; resolvedor de path canônico sem duplicação e com regressão de caminho customizado |
+| 3. API key em Security | Em andamento | Esquema `ApiKey`, validação de startup, comparação em tempo constante, adapter legado corrigido, integração OpenAPI opt-in e 15 testes Security aprovados |
+| 4. Modernização ASP.NET Core | Em andamento | `ProblemDetailsExceptionHandler`, adapter HTTP de `OperationContext`, `AddCanonicalValidation` com HTTP 400 e suporte a `IMvcBuilder`; Template API passou a remover o filtro 417 legado do pipeline moderno |
+| 5. Migração CommonPack | Em andamento | Proxies de API e Worker delegando para `AddContainerSecrets` e `AddDotEnvConfiguration`; `AzureServiceBuilderExtensions` deixou de copiar/remover variáveis `AzureKeyVault`; testes de API/Worker recompilados e iniciados; validação final dos consumidores pendente |
+| 6. Migração TemplateDotnetApi | Em andamento | Middleware, observabilidade e Nuuvify 2.8.0 registrados; startup moderno de exceção, contexto e validação 400 ativo; `HomeController.Info` migrou de `RequestConfiguration` para `IHostEnvironment` e metadata do assembly; `MqClientRepository` e `SynchroRepository` usam `IOperationContextAccessor` com fallback compatível; `CwsRepository` atualizado; permanecem warnings transitivos NU1603 do CBL CommonPack 7.3.0 |
+| 7. Migração TemplateDotnetWorker | Em andamento | CommonPack 8.6.2 e Nuuvify 2.8.0 registrados; accessor neutro registrado no DI, `OperationContext` criado por mensagem e repositórios HTTP usando correlation neutro com fallback; `GlobalUsings` corrigido; permanece warning transitivo NU1603 de `StackExchange.Redis` |
+| 8. Ativação de APIs obsoletas | Em andamento | APIs de dotenv e paths marcadas com `Obsolete(error: false)` após migração dos consumidores internos; métodos legados de path agora delegam ao resolvedor canônico; APIs de `RequestConfiguration` e headers ainda aguardam migração |
 | 9. Documentação e release | Concluída parcialmente | README, changelog e documentação pública do pacote atualizados |
-| 10. Validação cruzada | Em andamento | Nuuvify completo empacotado em 2.8.0 no feed local; Template Worker validado; Template API recompilado após atualização do `CwsRepository`, sem o erro CS0535 anterior; warnings transitivos NU1603 permanecem |
+| 10. Validação cruzada | Em andamento | API key Security validada com 15 testes aprovados e 0 falhas; primeira API obsoleta ativada; resolvedor de path com teste de regressão; repositórios HTTP dos dois Templates sem diagnósticos; builds executados com warnings transitivos NU1603 |
 
 ## Objetivo
 
@@ -174,11 +176,11 @@ será documentada como hardening de segurança, sem modo legado inseguro.
 | API atual | Destino canônico | Compatibilidade na 2.x |
 | --- | --- | --- |
 | `AddEnvironmentVariablesToMemoryCollection` | Provider nativo para env real; loader `.env` direto para arquivo | Manter e depreciar após migração |
-| `AddEnvironmentVariablesToKeyPerFile` | Loader `.env` direto ou `AddContainerSecrets`, conforme a origem | Manter assinatura e documentar que hoje usa memória |
+| `AddEnvironmentVariablesToKeyPerFile` | Loader `.env` direto ou `AddContainerSecrets`, conforme a origem | Manter assinatura; `[Obsolete(error: false)]` ativado após migração dos consumidores internos |
 | `AddLoadDotEnvBuilder` | `AddDotEnvConfiguration` sobre `IHostApplicationBuilder` no Nuuvify | Manter como proxy; retirar mutação de `Environment` |
 | `AddCustomKeyPerFile` | Options explícitas e `AddContainerSecrets` | Manter como proxy; não enumerar arquivos em log |
 | `AddContainerSecrets` | Mesmo método, delegando a `AddKeyPerFile` | Manter e testar |
-| `Set/GetPathSecretsToOSPlatform` e `PathSecrets` | Caminho explícito por options do host | Manter e depreciar após migração |
+| `Set/GetPathSecretsToOSPlatform` e `PathSecrets` | `GetContainerSecretsPath` e `AddContainerSecrets` | Manter assinatura; `[Obsolete(error: false)]` ativado após migração dos consumidores internos |
 | `IConfigurationCustom` e `ConfigurationCustom` | Options tipadas e valores explícitos | Manter adapter e depreciar após migração |
 | `RequestConfiguration` | `IOperationContextAccessor` e `OperationContext` | Manter adapter e depreciar após migração |
 | `HandlingHeadersMiddleware` | Adapter HTTP sobre `Activity` e contexto de operação | Manter fachada legada |
