@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <PackageId>Nuuvify.CommonPack.Observability.Abstraction</PackageId>
+        <Title>Nuuvify CommonPack Observability Abstraction</Title>
+        <PackageTags>nuuvify;observability;operation-context;correlation;trace;netstandard</PackageTags>
+        <Description>Abstração neutra para contexto de operação, correlação e rastreio sem acoplamento a ASP.NET Core ou Hosting.</Description>
+        <Product>Nuuvify CommonPack Observability Abstraction</Product>
+        <RootNamespace>Nuuvify.CommonPack.Observability.Abstraction</RootNamespace>
+    </PropertyGroup>
+
+</Project>

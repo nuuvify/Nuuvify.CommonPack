@@ -1,5 +1,7 @@
 using System.Diagnostics;
+using System.Security.Cryptography;
 using System.Security.Claims;
+using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -61,15 +63,14 @@ public class ApiKeyFilter : IResourceFilter, IActionFilter, IExceptionFilter
 
     }
 
-    private void AddNewClaim(ClaimsPrincipal principal, string keyName, string keyValue)
+    private static ClaimsPrincipal AddNewClaim(ClaimsPrincipal principal, string keyName)
     {
-
         var clone = principal.Clone();
         var newIdentity = (ClaimsIdentity)clone.Identity;
 
-        var claim = new Claim(ApiKeyFilterConstants.ApiKeyInfo, $"{keyName}={keyValue}");
+        var claim = new Claim(ApiKeyFilterConstants.ApiKeyInfo, keyName);
         newIdentity.AddClaim(claim);
-
+        return clone;
     }
 
     private bool HasClaimApiKey(ClaimsPrincipal principal)
@@ -105,7 +106,10 @@ public class ApiKeyFilter : IResourceFilter, IActionFilter, IExceptionFilter
         if (context.HttpContext.Request.Headers.TryGetValue(itemKeyName, out var headerApiKey))
         {
             var apiKeyVaultValue = _configuration.GetSection(itemKeyName)?.Value;
-            return (hasHeader: apiKeyVaultValue == headerApiKey, apiKeyValue: apiKeyVaultValue);
+            var matches = apiKeyVaultValue is not null && CryptographicOperations.FixedTimeEquals(
+                Encoding.UTF8.GetBytes(apiKeyVaultValue),
+                Encoding.UTF8.GetBytes(headerApiKey.ToString()));
+            return (hasHeader: matches, apiKeyValue: apiKeyVaultValue);
         }
 
         return (false, string.Empty);
@@ -134,7 +138,7 @@ public class ApiKeyFilter : IResourceFilter, IActionFilter, IExceptionFilter
                 (bool hasHeader, string apiKeyValue) hasKeyHeader = HasKeyHeader(context, item);
                 if (hasKeyHeader.hasHeader)
                 {
-                    AddNewClaim(context.HttpContext.User, item, hasKeyHeader.apiKeyValue);
+                    context.HttpContext.User = AddNewClaim(context.HttpContext.User, item);
                     return;
                 }
 

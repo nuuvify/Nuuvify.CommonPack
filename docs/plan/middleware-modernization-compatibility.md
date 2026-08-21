@@ -4,11 +4,11 @@
 
 | Campo | Valor |
 | --- | --- |
-| Status | Rascunho |
+| Status | Em andamento |
 | Criado em | 2026-08-20 |
 | Atualizado em | 2026-08-20 |
 | Responsável | Lincoln Zocateli |
-| Última revisão | N/A |
+| Última revisão | 2026-08-20 |
 
 ### Histórico de Status
 
@@ -17,6 +17,8 @@
 | 2026-08-20 | N/A -> Rascunho | Criação após análise do Nuuvify.CommonPack, CommonPack e templates |
 | 2026-08-20 | Rascunho -> Rascunho | Revisão do contrato de `.env`, prefixos e KeyPerFile a partir de `LoadDotEnvBuilderExtensions` |
 | 2026-08-20 | Rascunho -> Rascunho | Definição da implementação canônica no Nuuvify, proxies CommonPack e hardening de `Environment` |
+| 2026-08-20 | Rascunho -> Em andamento | Implementação do hardening compatível concluída no pacote `Nuuvify.CommonPack.Middleware`; restante segue na modernização de maior porte |
+| 2026-08-20 | Em andamento -> Em andamento | Implementação do contexto neutro e do esquema canônico de API key em `Nuuvify.CommonPack.Security` |
 
 > A execução depende de revisão humana. Este documento não registra aprovação, conclusão ou autorização para publicação.
 
@@ -24,17 +26,17 @@
 
 | Etapa | Status | Evidência |
 | --- | --- | --- |
-| 0. Baseline e contratos | Não iniciada | N/A |
-| 1. Observabilidade neutra | Não iniciada | N/A |
-| 2. Configuração, `.env` e secrets | Não iniciada | N/A |
-| 3. API key em Security | Não iniciada | N/A |
-| 4. Modernização ASP.NET Core | Não iniciada | N/A |
-| 5. Migração CommonPack | Não iniciada | N/A |
-| 6. Migração TemplateDotnetApi | Não iniciada | N/A |
-| 7. Migração TemplateDotnetWorker | Não iniciada | N/A |
+| 0. Baseline e contratos | Concluída | Snapshot do pacote e testes do Middleware com regressões de configuração |
+| 1. Observabilidade neutra | Concluída | `OperationContext`, accessor `AsyncLocal`, escopo restaurável e testes de isolamento concorrente |
+| 2. Configuração, `.env` e secrets | Em andamento | `AddContainerSecrets`, loader `AddDotEnvConfiguration`, captura em memória e remoção responsável de `Environment`; proxies CommonPack delegando para 2.8.0 e testes legados em migração |
+| 3. API key em Security | Em andamento | Esquema `ApiKey`, handler com comparação em tempo constante, adapter legado corrigido, integração OpenAPI opt-in e 14 + 31 testes focados aprovados |
+| 4. Modernização ASP.NET Core | Em andamento | `ProblemDetailsExceptionHandler`, adapter HTTP de `OperationContext`, registros opt-in e 32 testes do Middleware aprovados |
+| 5. Migração CommonPack | Em andamento | Proxies de API e Worker delegando para `AddContainerSecrets` e `AddDotEnvConfiguration`; projetos de produção API/Worker compilados sem warnings/erros; documentação XML e asserts de loaders ajustados; validação final dos consumidores pendente |
+| 6. Migração TemplateDotnetApi | Em andamento | Middleware e Nuuvify 2.8.0 registrados; startup usando `AddProblemDetailsExceptionHandler`, `AddOperationContextHeaders`, `UseExceptionHandler` e `UseOperationContextHeaders`; atualização de `CwsRepository` removeu o bloqueio de contrato; permanecem warnings NU1603 das dependências CBL.CommonPack 7.3.0 |
+| 7. Migração TemplateDotnetWorker | Em andamento | CommonPack 8.6.2 e Nuuvify 2.8.0 já registrados; build avançou com warning de dependência transitiva `StackExchange.Redis`, sem erro observado no recorte executado |
 | 8. Ativação de APIs obsoletas | Não iniciada | N/A |
-| 9. Documentação e release | Não iniciada | N/A |
-| 10. Validação cruzada | Não iniciada | N/A |
+| 9. Documentação e release | Concluída parcialmente | README, changelog e documentação pública do pacote atualizados |
+| 10. Validação cruzada | Em andamento | Nuuvify completo empacotado em 2.8.0 no feed local; Template Worker validado; Template API recompilado após atualização do `CwsRepository`, sem o erro CS0535 anterior; warnings transitivos NU1603 permanecem |
 
 ## Objetivo
 

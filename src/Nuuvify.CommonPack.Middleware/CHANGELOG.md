@@ -9,6 +9,9 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ### Adicionado
 - Nova extensão `AddContainerSecrets` para carregar secrets montados usando o provider `KeyPerFile`.
+- Handler opt-in baseado em `IExceptionHandler` e `ProblemDetailsService`.
+- Adapter HTTP opt-in para preencher `OperationContext` por requisição.
+- Loader canônico `AddDotEnvConfiguration` sem mutação do ambiente do processo.
 
 ### Alterado
 
@@ -19,6 +22,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ### Segurança
 - Eliminada a persistência temporária de secrets em arquivos locais pelo método legado.
+- Respostas modernas de exceção não expõem mensagens internas.
 
 ## [Sem versão registrada] - 2026-05-29
 
