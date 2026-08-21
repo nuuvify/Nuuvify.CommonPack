@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Nuuvify.CommonPack.Security;
 
@@ -19,6 +20,10 @@ public static class ApiKeyAuthenticationExtensions
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(configureOptions);
+
+        _ = builder.Services.AddOptions<ApiKeyAuthenticationOptions>(ApiKeyAuthenticationDefaults.AuthenticationScheme)
+            .Validate(options => options.IsValid(out _), "A configuração de API key é inválida.")
+            .ValidateOnStart();
 
         return builder.AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(
             ApiKeyAuthenticationDefaults.AuthenticationScheme,

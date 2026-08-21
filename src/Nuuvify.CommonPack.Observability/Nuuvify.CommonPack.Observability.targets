@@ -1,1 +1,8 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" />
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <ItemGroup>
+        <SourceCustomFilesObservabilityXml Include="$(MSBuildThisFileDirectory)..\content\*.xml" />
+    </ItemGroup>
+    <Target Name="ObservabilityCopyFilesToProject" BeforeTargets="Build">
+        <Copy SourceFiles="@(SourceCustomFilesObservabilityXml)" DestinationFolder="$(ProjectDir)\Docs" />
+    </Target>
+</Project>
