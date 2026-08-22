@@ -9,8 +9,10 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ### Adicionado
 - Nova extensão `AddContainerSecrets` no pacote `Nuuvify.CommonPack.Middleware` para secrets montados via `KeyPerFile`.
+- Construtores canônicos baseados em `IOperationContextAccessor` para adapters HTTP, repositórios e processamento de mensagens.
 
 ### Alterado
+- Repositórios e adapters migrados para correlation por operação ou mensagem, sem estado global mutável.
 
 ### Corrigido
 - Carregamento silenciosamente vazio de variáveis de ambiente no método legado do pacote `Nuuvify.CommonPack.Middleware`.
@@ -23,6 +25,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 ### Performance
 
 ### Documentação
+- Guia transversal de migração criado em `docs/middleware-migration.md`.
 
 ## [2.8.0] - 2026-08-06
 

@@ -8,7 +8,7 @@
 | Criado em | 2026-08-20 |
 | Atualizado em | 2026-08-21 |
 | Responsável | Lincoln Zocateli |
-| Última revisão | 2026-08-20 |
+| Última revisão | 2026-08-21 |
 
 ### Histórico de Status
 
@@ -21,6 +21,16 @@
 | 2026-08-20 | Em andamento -> Em andamento | Implementação do contexto neutro e do esquema canônico de API key em `Nuuvify.CommonPack.Security` |
 | 2026-08-21 | Em andamento -> Em andamento | Atualização dos Templates sobre `origin/master`, alinhamento Nuuvify 2.8.0 e desbloqueio do contrato de `CwsRepository` |
 | 2026-08-21 | Em andamento -> Em andamento | Validação das soluções completas dos Templates após a publicação local dos pacotes Nuuvify 2.8.0 |
+| 2026-08-21 | Em andamento -> Em andamento | Correção de `using` directives em 6 repositórios HTTP (3 TemplateDotnetApi, 3 TemplateDotnetWorker); ambas soluções compilam e testes passam; fases 6-7 fechadas com evidência de builds sem erros e testes sem falhas |
+| 2026-08-21 | Em andamento -> Em andamento | Revisão da etapa 8 identificou uso remanescente de `RequestConfiguration` como fallback nos Templates; `[Obsolete]` permanece bloqueado até concluir o inventário dos consumidores |
+| 2026-08-21 | Em andamento -> Em andamento | `ArquivosController.DownloadFile` corrigido para retornar `ControllerBase.File(...)`; revisão de escopo reabriu fases 6-7 e 10, pois os itens restantes do plano ainda não possuem evidência de conclusão |
+| 2026-08-21 | Em andamento -> Em andamento | Os seis repositórios HTTP dos Templates deixaram de receber `RequestConfiguration`; correlation ID passou a usar `IOperationContextAccessor`, com GUID por operação quando ausente; builds e testes completos dos dois Templates passaram |
+| 2026-08-21 | Em andamento -> Em andamento | `BackgroundWorkerBus` deixou de escrever em estado global de `RequestConfiguration`; correlation ID ausente agora recebe GUID por mensagem; build, teste focado e diagnósticos do Worker sem falhas |
+| 2026-08-21 | Em andamento -> Em andamento | `ServiceBusBackgroundService` e `ServiceBusMessageReceiver` receberam construtores canônicos sem `RequestConfiguration`; correlation de dead-letter e diagnósticos passou a ser derivado da mensagem; testes focados de mensagens e suíte do Worker passaram |
+| 2026-08-21 | Em andamento -> Em andamento | Construtores legados de `BaseRepository` e das bases HTTP receberam `[Obsolete(error: false)]` com substitutos concretos; builds dos projetos `Infra.Base` e `Infra.Http` passaram sem diagnósticos |
+| 2026-08-21 | Em andamento -> Em andamento | Changelogs raiz e dos pacotes de observabilidade atualizados; build e testes completos da solução Nuuvify, além dos testes focados de observabilidade, passaram |
+| 2026-08-21 | Em andamento -> Em andamento | README do `Infra.Base` alinhado ao construtor canônico e guia transversal criado em `docs/middleware-migration.md` |
+| 2026-08-21 | Em andamento -> Em andamento | Exemplos de Service Bus migrados para construtores canônicos; registro de `RequestConfiguration` removido dos exemplos; construtores legados de mensagens marcados com `[Obsolete(error: false)]`; builds e testes focados passaram |
 
 > A execução depende de revisão humana. Este documento não registra aprovação, conclusão ou autorização para publicação.
 
@@ -33,12 +43,12 @@
 | 2. Configuração, `.env` e secrets | Em andamento | `AddContainerSecrets`, loader `AddDotEnvConfiguration`, captura em memória e remoção responsável de `Environment`; proxies CommonPack delegando para 2.8.0; testes de parser alinhados ao primeiro separador e valores vazios; resolvedor de path canônico sem duplicação e com regressão de caminho customizado |
 | 3. API key em Security | Em andamento | Esquema `ApiKey`, validação de startup, comparação em tempo constante, adapter legado corrigido, integração OpenAPI opt-in e 15 testes Security aprovados |
 | 4. Modernização ASP.NET Core | Em andamento | `ProblemDetailsExceptionHandler`, adapter HTTP de `OperationContext`, `AddCanonicalValidation` com HTTP 400 e suporte a `IMvcBuilder`; Template API passou a remover o filtro 417 legado do pipeline moderno |
-| 5. Migração CommonPack | Em andamento | Proxies de API e Worker delegando para `AddContainerSecrets` e `AddDotEnvConfiguration`; `AzureServiceBuilderExtensions` deixou de copiar/remover variáveis `AzureKeyVault`; testes de API/Worker recompilados e iniciados; validação final dos consumidores pendente |
-| 6. Migração TemplateDotnetApi | Em andamento | Middleware, observabilidade e Nuuvify 2.8.0 registrados; startup moderno de exceção, contexto e validação 400 ativo; `HomeController.Info` migrou de `RequestConfiguration` para `IHostEnvironment` e metadata do assembly; `MqClientRepository` e `SynchroRepository` usam `IOperationContextAccessor` com fallback compatível; `CwsRepository` atualizado; permanecem warnings transitivos NU1603 do CBL CommonPack 7.3.0 |
-| 7. Migração TemplateDotnetWorker | Em andamento | CommonPack 8.6.2 e Nuuvify 2.8.0 registrados; accessor neutro registrado no DI, `OperationContext` criado por mensagem e repositórios HTTP usando correlation neutro com fallback; `GlobalUsings` corrigido; permanece warning transitivo NU1603 de `StackExchange.Redis` |
-| 8. Ativação de APIs obsoletas | Em andamento | APIs de dotenv e paths marcadas com `Obsolete(error: false)` após migração dos consumidores internos; métodos legados de path agora delegam ao resolvedor canônico; APIs de `RequestConfiguration` e headers ainda aguardam migração |
-| 9. Documentação e release | Concluída parcialmente | README, changelog e documentação pública do pacote atualizados |
-| 10. Validação cruzada | Em andamento | API key Security validada com 15 testes aprovados e 0 falhas; primeira API obsoleta ativada; resolvedor de path com teste de regressão; repositórios HTTP dos dois Templates sem diagnósticos; builds executados com warnings transitivos NU1603 |
+| 5. Migração CommonPack | Em andamento | Proxies de API e Worker delegando para `AddContainerSecrets` e `AddDotEnvConfiguration`; `AzureServiceBuilderExtensions` deixou de copiar/remover variáveis `AzureKeyVault`; bases HTTP canônicas usam `IOperationContextAccessor` e deixaram de mutar `RequestConfiguration.UserClaim`; Data Protection e OpenTelemetry usam metadata do host, sem ler o campo estático legado; construtores legados permanecem somente para compatibilidade; validação final dos consumidores pendente |
+| 6. Migração TemplateDotnetApi | Em andamento | Middleware, observabilidade e Nuuvify 2.8.0 registrados; startup moderno de exceção, contexto e validação 400 ativo; `HomeController.Info` migrou de `RequestConfiguration` para `IHostEnvironment` e metadata do assembly; os 3 repositórios HTTP não usam mais `RequestConfiguration` e recebem correlation pelo `IOperationContextAccessor`; `CwsRepository` consolidou 16+ correlationId headers em property centralizada; `ArquivosController.DownloadFile` usa `ControllerBase.File(...)`; `ExemploStorageService` recebe valores explícitos pelo composition root; build/testes completos sem falhas; permanecem pendentes options, migração completa dos controllers e contratos |
+| 7. Migração TemplateDotnetWorker | Em andamento | CommonPack 8.6.2 e Nuuvify 2.8.0 registrados; accessor neutro registrado no DI, `OperationContext` criado por mensagem; os 3 repositórios HTTP e os 4 repositórios de dados não usam mais `RequestConfiguration`; correlation usa `IOperationContextAccessor`; `GlobalUsings` corrigido; `ExemploStorageService` recebe valores explícitos pelo composition root; `BackgroundWorkerBus` deixou de mutar `RequestConfiguration.CorrelationId` e gera fallback por mensagem; build/testes completos sem falhas; permanecem pendentes options específicas, lifetimes e validação de ack/retry/cancellation |
+| 8. Ativação de APIs obsoletas | Em andamento | Construtores legados de `BaseRepository`, bases HTTP e `ServiceBusBackgroundService`/`ServiceBusMessageReceiver` receberam `[Obsolete(error: false)]` com substitutos canônicos; exemplos de Service Bus já foram migrados; demais APIs públicas legadas aguardam inventário final |
+| 9. Documentação e release | Concluída parcialmente | READMEs dos pacotes de observabilidade existentes; README do `Infra.Base` atualizado para o construtor canônico; guia transversal criado em `docs/middleware-migration.md`; changelogs raiz e dos pacotes de observabilidade atualizados; revisão final de release ainda pendente |
+| 10. Validação cruzada | Em andamento | Build e testes completos da solução Nuuvify passaram; testes de observabilidade, Service Bus, BackgroundService e Templates passaram; ainda pendentes smoke tests, contratos HTTP, concorrência explícita, options inválidas e matriz de bootstrap |
 
 ## Objetivo
 
