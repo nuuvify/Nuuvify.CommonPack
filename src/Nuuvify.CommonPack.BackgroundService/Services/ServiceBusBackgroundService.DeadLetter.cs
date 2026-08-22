@@ -83,7 +83,7 @@ public abstract partial class ServiceBusBackgroundService<T>
         {
             MessageId = Guid.NewGuid().ToString("N"),
             CorrelationId = string.IsNullOrWhiteSpace(deadLetterMessage.CorrelationId)
-                ? RequestConfiguration.CorrelationId
+                ? Guid.NewGuid().ToString()
                 : deadLetterMessage.CorrelationId,
             ContentType = deadLetterMessage.ContentType,
             Subject = deadLetterMessage.Subject,

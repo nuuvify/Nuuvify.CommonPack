@@ -1,5 +1,9 @@
 # Changelog
 
+## [Não Lançado]
+
+- Documentado o contrato neutro de `IOperationContextAccessor` para migração de `RequestConfiguration`.
+
 ## 2.8.0
 
 - Adicionado o contrato neutro de contexto de operação para correlação, trace e metadata.

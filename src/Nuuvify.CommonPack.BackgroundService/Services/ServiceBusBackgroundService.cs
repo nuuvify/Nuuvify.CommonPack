@@ -52,6 +52,7 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
     /// </summary>
     protected bool AbandonMessageIfFailed { get; set; } = false;
 
+    [Obsolete("Use o construtor sem RequestConfiguration. Consulte a documentação de operação e correlação.", error: false)]
     protected ServiceBusBackgroundService(
         ILogger<ServiceBusBackgroundService<T>> logger,
         IConfigurationCustom configurationCustom,
@@ -66,6 +67,17 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
             _requestConfiguration.CorrelationId = Guid.NewGuid().ToString();
         }
 
+    }
+
+    /// <summary>
+    /// Inicializa o serviço usando configuração sem estado de requisição compartilhado.
+    /// </summary>
+    protected ServiceBusBackgroundService(
+        ILogger<ServiceBusBackgroundService<T>> logger,
+        IConfigurationCustom configurationCustom)
+    {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _configurationCustom = configurationCustom ?? throw new ArgumentNullException(nameof(configurationCustom));
     }
 
     /// <summary>

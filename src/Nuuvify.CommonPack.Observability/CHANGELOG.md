@@ -1,5 +1,9 @@
 # Changelog
 
+## [Não Lançado]
+
+- Documentada a adoção de `OperationContextScope` para requests, mensagens e jobs.
+
 ## 2.8.0
 
 - Adicionada a implementação de contexto de operação isolada por `AsyncLocal`.
