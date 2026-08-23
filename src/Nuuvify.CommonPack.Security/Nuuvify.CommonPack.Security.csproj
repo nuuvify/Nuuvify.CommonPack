@@ -31,6 +31,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Compile Remove="ApiKeyOpenApiExtensions.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
         <Compile Update="Resources\MsgSecurityJwt.Designer.cs">
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>

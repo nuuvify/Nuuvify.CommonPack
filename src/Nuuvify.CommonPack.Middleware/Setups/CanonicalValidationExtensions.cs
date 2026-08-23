@@ -18,7 +18,7 @@ public static class CanonicalValidationExtensions
     {
         ArgumentNullException.ThrowIfNull(services);
 
-        _ = services.AddControllers().ConfigureCanonicalValidation();
+        _ = services.AddControllers().AddCanonicalValidation();
         return services;
     }
 
