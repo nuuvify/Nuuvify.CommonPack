@@ -9,6 +9,8 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ### Adicionado
 
+- Integração opt-in do esquema de autenticação por API key na documentação OpenAPI.
+
 ### Alterado
 
 ### Corrigido

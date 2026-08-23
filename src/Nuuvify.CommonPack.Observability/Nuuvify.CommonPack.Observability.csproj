@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <PackageId>Nuuvify.CommonPack.Observability</PackageId>
+        <Title>Nuuvify CommonPack Observability</Title>
+        <PackageTags>nuuvify;observability;operation-context;correlation;trace;activity;dotnet</PackageTags>
+        <Description>Implementação neutra para isolamento de contexto de operação usando AsyncLocal e integração com Activity.Current.</Description>
+        <Product>Nuuvify CommonPack Observability</Product>
+        <RootNamespace>Nuuvify.CommonPack.Observability</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Nuuvify.CommonPack.Observability.Abstraction\Nuuvify.CommonPack.Observability.Abstraction.csproj" />
+    </ItemGroup>
+
+</Project>
