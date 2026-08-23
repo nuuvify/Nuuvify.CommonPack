@@ -9,7 +9,14 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ### Adicionado
 
+- Validação de startup para header e credenciais do esquema de API key.
+- Esquema de autenticação por API key com comparação em tempo constante.
+- Registro de API key via `AddApiKeyAuthentication`.
+- Claim canônica `urn:nuuvify:security:api-key` para autorização por esquema.
+
 ### Alterado
+
+- A integração OpenAPI permanece responsabilidade da aplicação consumidora, sem dependência de Swashbuckle no pacote Security.
 
 ### Corrigido
 
@@ -17,7 +24,10 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ### Segurança
 
+- impedir que a credencial validada seja materializada em claims
+
 ## [Sem versão registrada] - 2026-05-29
 
-### Adicionado
+### Histórico
+
 - Estrutura inicial do changelog padronizada para este pacote.

@@ -9,7 +9,7 @@ public abstract partial class ServiceBusMessageReceiver<T>
 
     /// <summary>
     /// Cria propriedades de diagnóstico para mensagens que vão para Dead Letter Queue
-    /// Utiliza o RequestConfiguration.CorrelationId como uma das propriedades
+    /// Utiliza a correlação da mensagem como uma das propriedades
     /// </summary>
     /// <param name="message">Mensagem original</param>
     /// <param name="errorDetails">Detalhes do erro</param>
@@ -39,7 +39,7 @@ public abstract partial class ServiceBusMessageReceiver<T>
             ["ErrorDetails"] = errorDetails,
             ["FailureTime"] = DateTimeOffset.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", System.Globalization.CultureInfo.InvariantCulture),
             ["ProcessorVersion"] = Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? UnknownValue,
-            ["CorrelationId"] = RequestConfiguration.CorrelationId,
+            ["CorrelationId"] = string.IsNullOrWhiteSpace(message.CorrelationId) ? Guid.NewGuid().ToString() : message.CorrelationId,
             ["DeliveryAttempt"] = message.DeliveryCount,
             ["MessageId"] = message.MessageId,
             ["ExceptionType"] = exceptionType ?? "ProcessingFailure",
@@ -50,7 +50,7 @@ public abstract partial class ServiceBusMessageReceiver<T>
 
     /// <summary>
     /// Cria propriedades de diagnóstico para mensagens abandonadas
-    /// Utiliza o RequestConfiguration.CorrelationId como uma das propriedades
+    /// Utiliza a correlação da mensagem como uma das propriedades
     /// </summary>
     /// <param name="message">Mensagem original</param>
     /// <param name="abandonReason">Motivo do abandono</param>
@@ -77,7 +77,7 @@ public abstract partial class ServiceBusMessageReceiver<T>
             ["AbandonReason"] = abandonReason,
             ["AbandonTime"] = DateTimeOffset.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", System.Globalization.CultureInfo.InvariantCulture),
             ["RetryCount"] = message.DeliveryCount,
-            ["CorrelationId"] = RequestConfiguration.CorrelationId,
+            ["CorrelationId"] = string.IsNullOrWhiteSpace(message.CorrelationId) ? Guid.NewGuid().ToString() : message.CorrelationId,
             ["MessageId"] = message.MessageId,
             ["ProcessorInstance"] = Environment.MachineName,
             ["NextRetryHint"] = DateTimeOffset.UtcNow.AddMinutes(1).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", System.Globalization.CultureInfo.InvariantCulture),
