@@ -20,6 +20,8 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 - `PathSecrets`, `SetPathSecretsToOSPlatform` e `GetPathSecretsToOSPlatform` agora emitem aviso de obsolescência não bloqueante; use `GetContainerSecretsPath`.
 - `AddEnvironmentVariablesToKeyPerFile` agora emite aviso de obsolescência não bloqueante; use `AddContainerSecrets` ou `AddDotEnvConfiguration`.
+- `AddEnvironmentVariablesToMemoryCollection` agora emite aviso de obsolescência não bloqueante; use o provider nativo de variáveis ou `AddDotEnvConfiguration`.
+- `ValidateModelStateCustomAttribute`, `FileStreamResultCustom` e `GetFilesBase64` agora emitem avisos de obsolescência não bloqueantes; use os APIs nativos do ASP.NET Core.
 
 ### Alterado
 

@@ -10,9 +10,11 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 ### Adicionado
 - Nova extensão `AddContainerSecrets` no pacote `Nuuvify.CommonPack.Middleware` para secrets montados via `KeyPerFile`.
 - Construtores canônicos baseados em `IOperationContextAccessor` para adapters HTTP, repositórios e processamento de mensagens.
+- Esquema de autenticação `ApiKey` com claim canônica e integração opt-in ao pipeline ASP.NET Core.
 
 ### Alterado
 - Repositórios e adapters migrados para correlation por operação ou mensagem, sem estado global mutável.
+- APIs legadas de configuração, validação e arquivos passaram a emitir avisos de obsolescência não bloqueantes, mantendo compatibilidade na linha 2.x.
 
 ### Corrigido
 - Carregamento silenciosamente vazio de variáveis de ambiente no método legado do pacote `Nuuvify.CommonPack.Middleware`.
@@ -21,6 +23,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ### Segurança
 - Eliminada a persistência temporária de secrets em arquivos locais pelo pacote `Nuuvify.CommonPack.Middleware`.
+- O filtro legado de API key emite simultaneamente as claims legada e canônica durante a transição.
 
 ### Performance
 
