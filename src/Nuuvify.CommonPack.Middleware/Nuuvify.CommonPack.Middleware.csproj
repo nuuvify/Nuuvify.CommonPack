@@ -28,6 +28,7 @@
         <ProjectReference Include="..\Nuuvify.CommonPack.Extensions\Nuuvify.CommonPack.Extensions.csproj" />
         <ProjectReference Include="..\Nuuvify.CommonPack.Observability.Abstraction\Nuuvify.CommonPack.Observability.Abstraction.csproj" />
         <ProjectReference Include="..\Nuuvify.CommonPack.Observability\Nuuvify.CommonPack.Observability.csproj" />
+        <ProjectReference Include="..\Nuuvify.CommonPack.Security\Nuuvify.CommonPack.Security.csproj" />
     </ItemGroup>
 
 </Project>

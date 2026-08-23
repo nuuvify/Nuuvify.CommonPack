@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Nuuvify.CommonPack.Middleware.Filters;
+using Nuuvify.CommonPack.Security;
 using Xunit;
 
 namespace Nuuvify.CommonPack.Middleware.xTest;
@@ -224,6 +225,58 @@ public class ApiKeyAttributeTests
             x.Type == ApiKeyFilterConstants.ApiKeyInfo &&
             x.Value == keyNameTest[1]));
 
+    }
+
+    [Fact]
+    public void OnActionExecuting_RegistersBothLegacyAndCanonicalClaims()
+    {
+        // Regression test: validates that ApiKeyFilter registers both claim types
+        // to maintain backward compatibility during migration from legacy to canonical
+        // authentication scheme.
+
+        string[] keyNameTest = new[] { "ApiKeyTest" };
+        string keyValueTest = "test-secret-key";
+        var loggerMock = new Mock<ILogger<ApiKeyFilter>>();
+
+        var mockIConfiguration = new Mock<IConfiguration>();
+        _ = mockIConfiguration.Setup(s => s.GetSection(keyNameTest[0]).Value)
+            .Returns(keyValueTest);
+
+        var httpContext = new DefaultHttpContext();
+        httpContext.Request.Headers.Append(keyNameTest[0], keyValueTest);
+
+        ArrangeActionExecutingContextTests(httpContext);
+
+        var apiKeyFilter = new ApiKeyFilter(
+            loggerMock.Object,
+            mockIConfiguration.Object,
+            keyNameTest);
+
+        apiKeyFilter.OnActionExecuting(_actionExecutingContext);
+
+        // Authentication should succeed (no 401 error)
+        var contentResult = (ContentResult)_actionExecutingContext.Result;
+        Assert.Null(contentResult);
+
+        var user = _actionExecutingContext.HttpContext.User;
+
+        // Verify legacy claim is present (for backward compatibility)
+        Assert.True(
+            user.HasClaim(ApiKeyFilterConstants.ApiKeyInfo, keyNameTest[0]),
+            $"Legacy claim not found. Expected type='{ApiKeyFilterConstants.ApiKeyInfo}', value='{keyNameTest[0]}'");
+
+        // Verify canonical claim is present (for new canonical authentication)
+        Assert.True(
+            user.HasClaim(ApiKeyAuthenticationDefaults.ClaimType, keyNameTest[0]),
+            $"Canonical claim not found. Expected type='{ApiKeyAuthenticationDefaults.ClaimType}', value='{keyNameTest[0]}'");
+
+        // Verify both claims have the same value (key name)
+        var legacyClaim = user.FindFirst(ApiKeyFilterConstants.ApiKeyInfo);
+        var canonicalClaim = user.FindFirst(ApiKeyAuthenticationDefaults.ClaimType);
+
+        Assert.NotNull(legacyClaim);
+        Assert.NotNull(canonicalClaim);
+        Assert.Equal(legacyClaim.Value, canonicalClaim.Value);
     }
 
 }

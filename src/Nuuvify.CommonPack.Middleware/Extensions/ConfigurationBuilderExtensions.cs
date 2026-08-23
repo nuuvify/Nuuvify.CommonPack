@@ -14,6 +14,7 @@ public static class ConfigurationBuilderExtensions
     /// <param name="removePrefix">Indica se o prefixo deve ser removido das chaves.</param>
     /// <param name="logger">Logger opcional. Nenhum valor ou nome de secret é registrado.</param>
     /// <returns>O mesmo builder recebido.</returns>
+    [Obsolete("Use AddEnvironmentVariables e AddDotEnvConfiguration para configuração. Consulte README.md#dotenv-canônico.", error: false)]
     public static IConfigurationBuilder AddEnvironmentVariablesToMemoryCollection(
         this IConfigurationBuilder builder,
         string prefix,

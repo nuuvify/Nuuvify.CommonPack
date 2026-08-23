@@ -78,6 +78,91 @@ O handler retorna `NoResult` quando o header não está presente e falha com uma
 mensagem genérica quando a credencial é inválida. A claim emitida identifica o
 header utilizado; o valor secreto nunca é copiado para claims, logs ou respostas.
 
+## Migração da API Legada
+
+### De Attribute (`[ApiKey]`) para Scheme (`AddApiKeyAuthentication`)
+
+A implementação legada de atributo é mantida para compatibilidade, mas será removida
+em uma versão futura. As aplicações devem migrar para o novo esquema de autenticação
+baseado em ASP.NET Core `AuthenticationScheme`.
+
+#### Código legado (deprecado)
+
+```csharp
+[ApiKey(KeyName = new[] { "MyApiKey" })]
+public class MyController : ControllerBase
+{
+    [HttpGet]
+    public IActionResult Get() => Ok();
+}
+
+app.UseHttpRequestKeyVerifyMiddleware("x-api-key", StatusCodes.Status401Unauthorized);
+```
+
+#### Novo código (canônico)
+
+```csharp
+builder.Services.AddAuthentication(ApiKeyAuthenticationDefaults.AuthenticationScheme)
+    .AddApiKeyAuthentication(options =>
+    {
+        options.HeaderName = "X-API-Key";
+        options.ValidKeys = new[] { "secret-key-from-vault" };
+    });
+
+builder.Services.AddAuthorization();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+[Authorize(AuthenticationSchemes = ApiKeyAuthenticationDefaults.AuthenticationScheme)]
+public class MyController : ControllerBase
+{
+    [HttpGet]
+    public IActionResult Get() => Ok();
+}
+```
+
+#### Período de transição
+
+Durante a transição, o `ApiKeyFilter` (legado) registra dois claims ao mesmo tempo:
+
+- `ApiKeyInfo` (legado)
+- `urn:nuuvify:security:api-key` (canônico)
+
+Isso permite que consumidores migrem gradualmente sem perder funcionalidade. A estratégia
+será removida em uma versão futura.
+
+### Integração com OpenAPI / Swagger
+
+Para documentar endpoints protegidos por API key no Swagger/OpenAPI, registre o esquema
+na configuração de `SwaggerGen` da sua aplicação:
+
+```csharp
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
+
+builder.Services.AddSwaggerGen(options =>
+{
+    var securityScheme = new OpenApiSecurityScheme
+    {
+        Name = "X-API-Key",
+        Type = SecuritySchemeType.ApiKey,
+        In = ParameterLocation.Header,
+        Description = "Autenticação por chave de API"
+    };
+
+    options.AddSecurityDefinition("ApiKey", securityScheme);
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        { securityScheme, new[] { ApiKeyAuthenticationDefaults.AuthenticationScheme } }
+    });
+});
+```
+
+A biblioteca Security não adiciona dependência de Swashbuckle para preservar a separação
+de responsabilidades: a biblioteca fornece o padrão de autenticação, enquanto a aplicação
+consumidora é responsável pela integração OpenAPI quando necessário.
+
 ## Acesso ao usuário autenticado
 
 O contrato `IUserAuthenticated` permite consultar o usuário atual, autenticação, claims e papéis sem espalhar leitura direta de `HttpContext`.

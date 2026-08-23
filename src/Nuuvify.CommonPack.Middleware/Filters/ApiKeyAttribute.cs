@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.Extensions.Notificator;
 using Nuuvify.CommonPack.Middleware.Abstraction.Results;
+using Nuuvify.CommonPack.Security;
 
 namespace Nuuvify.CommonPack.Middleware.Filters;
 
@@ -20,6 +21,10 @@ namespace Nuuvify.CommonPack.Middleware.Filters;
 /// [ApiKey(KeyName = new string[] {"MyKeyName")] ou <br/>
 /// [ApiKey(KeyName = new string[] {"MyKeyName", "OtherKeyName")] <br/>
 /// </summary>
+[Obsolete(
+    "Use ApiKeyAuthenticationHandler from Nuuvify.CommonPack.Security with AddApiKeyAuthentication() extension. " +
+    "See README.md in Nuuvify.CommonPack.Security for migration guide.",
+    error: false)]
 [AttributeUsage(validOn: AttributeTargets.Class |
     AttributeTargets.Method, AllowMultiple = true)]
 public class ApiKeyAttribute : Attribute, IFilterFactory
@@ -46,6 +51,15 @@ public static class ApiKeyFilterConstants
 
 }
 
+/// <summary>
+/// Legacy filter implementation for API key validation. Use ApiKeyAuthenticationHandler instead.
+/// This filter is maintained for backward compatibility during migration to the canonical authentication scheme.
+/// </summary>
+[Obsolete(
+    "Use ApiKeyAuthenticationHandler from Nuuvify.CommonPack.Security with AddApiKeyAuthentication() extension. " +
+    "This filter will be removed in a future major version. " +
+    "See README.md in Nuuvify.CommonPack.Security for migration guide.",
+    error: false)]
 public class ApiKeyFilter : IResourceFilter, IActionFilter, IExceptionFilter
 {
     private readonly string[] _keyName;
@@ -68,8 +82,11 @@ public class ApiKeyFilter : IResourceFilter, IActionFilter, IExceptionFilter
         var clone = principal.Clone();
         var newIdentity = (ClaimsIdentity)clone.Identity;
 
-        var claim = new Claim(ApiKeyFilterConstants.ApiKeyInfo, keyName);
-        newIdentity.AddClaim(claim);
+        // Adiciona ambas as claims: legada (compatibilidade) e nova (schema canonico)
+        var legacyClaim = new Claim(ApiKeyFilterConstants.ApiKeyInfo, keyName);
+        var canonicalClaim = new Claim(ApiKeyAuthenticationDefaults.ClaimType, keyName);
+        newIdentity.AddClaim(legacyClaim);
+        newIdentity.AddClaim(canonicalClaim);
         return clone;
     }
 
