@@ -223,9 +223,9 @@ public abstract partial class ServiceBusMessageReceiver<T> : IServiceBusMessageR
         using var activity = ActivitySourceCustom?.StartActivity(nameof(HandleMessageAsync));
         try
         {
-            _ = activity?.SetTag("ServiceBus.CorrelationId", string.IsNullOrWhiteSpace(message.CorrelationId)
+            _ = activity?.SetTag("ServiceBus.CorrelationId", string.IsNullOrWhiteSpace(args.Message.CorrelationId)
                 ? Guid.NewGuid().ToString()
-                : message.CorrelationId);
+                : args.Message.CorrelationId);
             _ = activity?.SetTag("ServiceBus.MessageId", args.Message.MessageId);
 
             _logger.LogInformation("Iniciando processamento da mensagem {MessageId}: {Data}",
