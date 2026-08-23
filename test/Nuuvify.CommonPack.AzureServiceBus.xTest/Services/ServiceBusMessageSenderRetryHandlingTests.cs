@@ -13,6 +13,8 @@ public class ServiceBusMessageSenderRetryHandlingTests : IAsyncDisposable
     {
         _fixture = new ServiceBusTestFixture();
         var config = _fixture.CreateValidServiceBusConfiguration();
+        config.Value.MaxRetryAttempts = 3;
+        config.Value.RetryDelaySeconds = 1;
         _mockLogger = _fixture.CreateMockLogger<ServiceBusMessageSender>();
         _sender = new ServiceBusMessageSender(config, _mockLogger.Object);
     }
