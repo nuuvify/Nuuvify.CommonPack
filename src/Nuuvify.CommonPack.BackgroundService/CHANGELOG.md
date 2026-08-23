@@ -11,6 +11,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 - Suporte a `ReceiveMode` no `ServiceBusBackgroundService`, com identificação explícita do modo `ReceiveAndDelete` para classes derivadas.
 - Processamento dedicado da Dead Letter Queue com ação configurável para descartar a mensagem ou reenfileirá-la na entidade de origem.
+- Diagnósticos de processamento e correlação alinhados ao contexto de operação da mensagem.
 
 ### Alterado
 
