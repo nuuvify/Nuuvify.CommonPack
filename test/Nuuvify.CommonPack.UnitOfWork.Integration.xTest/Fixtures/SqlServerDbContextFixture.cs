@@ -24,6 +24,7 @@ namespace Nuuvify.CommonPack.UnitOfWork.Integration.xTest.Fixtures;
 /// </remarks>
 public sealed class SqlServerDbContextFixture : IAsyncLifetime
 {
+    private const string TestcontainersModeVariable = "NUUVIFY_TESTCONTAINERS_MODE";
     private MsSqlContainer? _msSqlContainer;
     private string? _connectionString;
     private DbContextOptions<ExampleDbContext>? _inMemoryOptions;
@@ -31,6 +32,11 @@ public sealed class SqlServerDbContextFixture : IAsyncLifetime
 
     public SqlServerDbContextFixture()
     {
+        if (IsTestcontainersDisabled())
+        {
+            return;
+        }
+
         try
         {
             _msSqlContainer = new MsSqlBuilder()
@@ -41,6 +47,11 @@ public sealed class SqlServerDbContextFixture : IAsyncLifetime
         }
         catch (ArgumentException)
         {
+            if (IsTestcontainersRequired())
+            {
+                throw;
+            }
+
             // Docker is not available; will fall back to InMemory in InitializeAsync
             _msSqlContainer = null;
         }
@@ -62,7 +73,7 @@ public sealed class SqlServerDbContextFixture : IAsyncLifetime
                 _ = await context.Database.EnsureCreatedAsync().ConfigureAwait(false);
                 return;
             }
-            catch
+            catch when (!IsTestcontainersRequired())
             {
                 // Docker start failed; fall back to InMemory
                 _msSqlContainer = null;
@@ -142,5 +153,21 @@ public sealed class SqlServerDbContextFixture : IAsyncLifetime
         }
 
         return _connectionString;
+    }
+
+    private static bool IsTestcontainersDisabled()
+    {
+        return string.Equals(
+            Environment.GetEnvironmentVariable(TestcontainersModeVariable),
+            "Disabled",
+            StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsTestcontainersRequired()
+    {
+        return string.Equals(
+            Environment.GetEnvironmentVariable(TestcontainersModeVariable),
+            "Required",
+            StringComparison.OrdinalIgnoreCase);
     }
 }
