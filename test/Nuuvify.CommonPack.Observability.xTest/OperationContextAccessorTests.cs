@@ -19,7 +19,7 @@ public class OperationContextAccessorTests
     }
 
     [Fact]
-    public void ConcurrentScopes_KeepTheirOwnOperationContext()
+    public async Task ConcurrentScopes_KeepTheirOwnOperationContext()
     {
         var accessor = new OperationContextAccessor();
         var first = new OperationContext("corr-1", "trace-1", "op-1");
@@ -29,7 +29,7 @@ public class OperationContextAccessorTests
         {
             using var scope = new OperationContextScope(accessor, first);
             Assert.Equal("corr-1", accessor.Current.CorrelationId);
-            Task.Delay(50).Wait();
+            await Task.Delay(50);
             Assert.Equal("trace-1", accessor.Current.TraceId);
         });
 
@@ -37,10 +37,10 @@ public class OperationContextAccessorTests
         {
             using var scope = new OperationContextScope(accessor, second);
             Assert.Equal("corr-2", accessor.Current.CorrelationId);
-            Task.Delay(50).Wait();
+            await Task.Delay(50);
             Assert.Equal("trace-2", accessor.Current.TraceId);
         });
 
-        Task.WaitAll(task1, task2);
+        await Task.WhenAll(task1, task2);
     }
 }

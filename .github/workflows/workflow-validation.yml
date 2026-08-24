@@ -1,30 +1,30 @@
 name: Workflow Validation
 
 on:
-    pull_request:
-        paths:
-            - ".github/workflows/**"
-            - ".github/scripts/**"
-            - ".config/dotnet-tools.json"
-    push:
-        branches:
-            - main
-        paths:
-            - ".github/workflows/**"
-            - ".github/scripts/**"
-            - ".config/dotnet-tools.json"
+  pull_request:
+    paths:
+      - ".github/workflows/**"
+      - ".github/scripts/**"
+      - ".config/dotnet-tools.json"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/**"
+      - ".github/scripts/**"
+      - ".config/dotnet-tools.json"
 
 permissions:
-    contents: read
+  contents: read
 
 jobs:
-    actionlint:
-        name: Lint workflows
-        runs-on: ${{ vars.GH_ACTIONS_UBUNTU_RUNNER != '' && vars.GH_ACTIONS_UBUNTU_RUNNER || 'ubuntu-24.04' }}
+  actionlint:
+    name: Lint workflows
+    runs-on: ${{ vars.GH_ACTIONS_UBUNTU_RUNNER != '' && vars.GH_ACTIONS_UBUNTU_RUNNER || 'ubuntu-24.04' }}
 
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-            - name: Lint GitHub Actions workflows
-              uses: rhysd/actionlint@v1.7.12
+      - name: Lint GitHub Actions workflows
+        uses: rhysd/actionlint@914e7df21a07ef503a81201c76d2b11c789d3fca

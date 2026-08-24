@@ -13,6 +13,8 @@ namespace Nuuvify.CommonPack.Security.xTest;
 [Trait("Category", "Unit")]
 public class ApiKeyAuthenticationTests
 {
+    private static readonly string[] s_validKeys = ["abc123"];
+
     [Fact]
     public async Task AuthenticateAsync_WhenHeaderMatchesConfiguredKey_ReturnsSuccess()
     {
@@ -22,7 +24,7 @@ public class ApiKeyAuthenticationTests
             .AddApiKeyAuthentication(options =>
             {
                 options.HeaderName = "X-API-Key";
-                options.ValidKeys = new[] { "abc123" };
+                options.ValidKeys = s_validKeys;
             });
 
         var provider = services.BuildServiceProvider();
@@ -49,7 +51,7 @@ public class ApiKeyAuthenticationTests
             .AddApiKeyAuthentication(options =>
             {
                 options.HeaderName = "X-API-Key";
-                options.ValidKeys = new[] { "abc123" };
+                options.ValidKeys = s_validKeys;
             });
 
         var provider = services.BuildServiceProvider();
@@ -64,7 +66,7 @@ public class ApiKeyAuthenticationTests
 
         Assert.False(result.Succeeded);
         Assert.NotNull(result.Failure);
-        Assert.Contains("Invalid API key", result.Failure.Message);
+        Assert.Contains("Invalid API key", result.Failure.Message, StringComparison.Ordinal);
     }
 
     [Fact]
