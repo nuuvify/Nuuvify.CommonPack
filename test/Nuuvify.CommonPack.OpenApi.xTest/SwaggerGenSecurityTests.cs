@@ -27,7 +27,7 @@ public class SwaggerGenSecurityTests
     {
         var services = new ServiceCollection();
 
-        services.Configuration();
+        SwaggerGenSecurity.Configuration(services);
 
         using var provider = services.BuildServiceProvider();
         var options = provider.GetRequiredService<IOptions<SwaggerGenOptions>>().Value;
