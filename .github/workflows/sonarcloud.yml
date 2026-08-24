@@ -24,7 +24,6 @@ jobs:
     name: SonarCloud analysis
     runs-on: ${{ vars.GH_ACTIONS_UBUNTU_RUNNER != '' && vars.GH_ACTIONS_UBUNTU_RUNNER || 'ubuntu-24.04' }}
     env:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       SONAR_PROJECT_KEY: nuuvify_Nuuvify.CommonPack
       SONAR_ORGANIZATION: nuuvify
       SONAR_HOST_URL: https://sonarcloud.io
@@ -43,6 +42,8 @@ jobs:
 
       - name: Validate SonarCloud token
         shell: pwsh
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           if ([string]::IsNullOrWhiteSpace($env:SONAR_TOKEN)) {
             throw 'O secret SONAR_TOKEN não foi configurado.'
@@ -56,6 +57,8 @@ jobs:
 
       - name: Begin SonarCloud analysis
         shell: pwsh
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           $arguments = @(
             'begin',
@@ -85,4 +88,6 @@ jobs:
 
       - name: End SonarCloud analysis
         shell: pwsh
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: dotnet sonarscanner end "/d:sonar.token=$env:SONAR_TOKEN"
