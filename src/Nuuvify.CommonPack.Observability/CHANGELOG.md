@@ -2,6 +2,12 @@
 
 ## [Não Lançado]
 
+### Corrigido
+
+- Teste de isolamento concorrente convertido para fluxo assíncrono sem operações bloqueantes.
+
+### Adicionado
+
 - Documentada a adoção de `OperationContextScope` para requests, mensagens e jobs.
 
 ## 2.8.0

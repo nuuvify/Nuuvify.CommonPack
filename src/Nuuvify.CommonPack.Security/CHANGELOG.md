@@ -20,6 +20,8 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ### Corrigido
 
+- Testes de autenticação passaram a usar comparação explícita e configuração determinística.
+
 ### Removido
 
 ### Segurança

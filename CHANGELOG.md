@@ -17,6 +17,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 - Repositórios e adapters migrados para correlation por operação ou mensagem, sem estado global mutável.
 - APIs legadas de configuração, validação e arquivos passaram a emitir avisos de obsolescência não bloqueantes, mantendo compatibilidade na linha 2.x.
+- Análise SonarCloud integrada aos workflows de pull request e branches de release.
 
 ### Corrigido
 
@@ -28,6 +29,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 - Eliminada a persistência temporária de secrets em arquivos locais pelo pacote `Nuuvify.CommonPack.Middleware`.
 - O filtro legado de API key emite simultaneamente as claims legada e canônica durante a transição.
+- Actions de validação fixadas por SHA completo para reduzir risco de alteração transitiva.
 
 ### Performance
 

@@ -25,9 +25,13 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ### Alterado
 
+- Guards e logging estruturado modernizados sem alterar o comportamento dos adapters.
+- Parser dotenv passou a explicitar comparação ordinal e o tipo concreto do dicionário interno.
+
 ### Corrigido
 
 - Carregamento silenciosamente vazio de `AddEnvironmentVariablesToKeyPerFile` após a remoção do diretório temporário.
+- Validação de argumentos de `AddContainerSecrets` agora usa guard clause nativa.
 
 ### Removido
 
