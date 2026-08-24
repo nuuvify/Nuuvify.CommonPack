@@ -1,0 +1,88 @@
+name: SonarCloud Analysis
+
+on:
+  push:
+    branches:
+      - main
+      - qas
+  pull_request:
+    branches:
+      - main
+      - qas
+      - nugettest/qas
+
+concurrency:
+  group: sonarcloud-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  analysis:
+    name: SonarCloud analysis
+    runs-on: ${{ vars.GH_ACTIONS_UBUNTU_RUNNER != '' && vars.GH_ACTIONS_UBUNTU_RUNNER || 'ubuntu-24.04' }}
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_PROJECT_KEY: nuuvify_Nuuvify.CommonPack
+      SONAR_ORGANIZATION: nuuvify
+      SONAR_HOST_URL: https://sonarcloud.io
+      SONAR_PULL_REQUEST_KEY: ${{ github.event.pull_request.number }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Validate SonarCloud token
+        shell: pwsh
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:SONAR_TOKEN)) {
+            throw 'O secret SONAR_TOKEN não foi configurado.'
+          }
+
+      - name: Restore .NET tools
+        run: dotnet tool restore
+
+      - name: Restore solution
+        run: dotnet restore Nuuvify.CommonPack.sln
+
+      - name: Begin SonarCloud analysis
+        shell: pwsh
+        run: |
+          $arguments = @(
+            'begin',
+            "/k:$env:SONAR_PROJECT_KEY",
+            "/o:$env:SONAR_ORGANIZATION",
+            "/d:sonar.host.url=$env:SONAR_HOST_URL",
+            "/d:sonar.token=$env:SONAR_TOKEN",
+            '/d:sonar.qualitygate.wait=true',
+            '/d:sonar.cs.opencover.reportsPaths=**/coverage.opencover.xml',
+            '/d:sonar.coverage.exclusions=**/*Tests.cs,**/*Test.cs,**/Migrations/**'
+          )
+
+          if ($env:GITHUB_EVENT_NAME -eq 'pull_request') {
+            $arguments += "/d:sonar.pullrequest.key=$env:SONAR_PULL_REQUEST_KEY"
+            $arguments += "/d:sonar.pullrequest.branch=$env:GITHUB_HEAD_REF"
+            $arguments += "/d:sonar.pullrequest.base=$env:GITHUB_BASE_REF"
+          }
+
+          dotnet sonarscanner @arguments
+
+      - name: Build solution
+        run: dotnet build Nuuvify.CommonPack.sln --configuration Release --no-restore
+
+      - name: Run unit tests with coverage
+        run: >-
+          dotnet test Nuuvify.CommonPack.sln --configuration Release --no-build --filter "Category=Unit" --collect:"XPlat Code Coverage" --results-directory ./artifacts/sonar-test-results -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+
+      - name: End SonarCloud analysis
+        shell: pwsh
+        run: dotnet sonarscanner end "/d:sonar.token=$env:SONAR_TOKEN"

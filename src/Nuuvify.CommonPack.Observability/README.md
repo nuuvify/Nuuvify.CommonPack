@@ -1,5 +1,7 @@
 # Nuuvify.CommonPack.Observability
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nuuvify_Nuuvify.CommonPack&metric=alert_status)](https://sonarcloud.io/project/overview?id=nuuvify_Nuuvify.CommonPack)
+
 [![NuGet](https://img.shields.io/nuget/v/Nuuvify.CommonPack.Observability.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.Observability)
 [![Downloads](https://img.shields.io/nuget/dt/Nuuvify.CommonPack.Observability.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.Observability)
 
