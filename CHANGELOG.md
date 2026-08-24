@@ -12,6 +12,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 - Nova extensão `AddContainerSecrets` no pacote `Nuuvify.CommonPack.Middleware` para secrets montados via `KeyPerFile`.
 - Construtores canônicos baseados em `IOperationContextAccessor` para adapters HTTP, repositórios e processamento de mensagens.
 - Esquema de autenticação `ApiKey` com claim canônica e integração opt-in ao pipeline ASP.NET Core.
+- Testes de cobertura para configuração OpenAPI e isolamento assíncrono do contexto de operação.
 
 ### Alterado
 
