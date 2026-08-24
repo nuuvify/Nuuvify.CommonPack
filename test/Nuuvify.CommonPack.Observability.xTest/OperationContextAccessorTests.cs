@@ -25,7 +25,7 @@ public class OperationContextAccessorTests
         var first = new OperationContext("corr-1", "trace-1", "op-1");
         var second = new OperationContext("corr-2", "trace-2", "op-2");
 
-        var task1 = Task.Run(() =>
+        var task1 = Task.Run(async () =>
         {
             using var scope = new OperationContextScope(accessor, first);
             Assert.Equal("corr-1", accessor.Current.CorrelationId);
@@ -33,7 +33,7 @@ public class OperationContextAccessorTests
             Assert.Equal("trace-1", accessor.Current.TraceId);
         });
 
-        var task2 = Task.Run(() =>
+        var task2 = Task.Run(async () =>
         {
             using var scope = new OperationContextScope(accessor, second);
             Assert.Equal("corr-2", accessor.Current.CorrelationId);
