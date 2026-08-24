@@ -62,7 +62,7 @@ jobs:
             "/d:sonar.token=$env:SONAR_TOKEN",
             '/d:sonar.qualitygate.wait=true',
             '/d:sonar.cs.opencover.reportsPaths=**/coverage.opencover.xml',
-            '/d:sonar.coverage.exclusions=**/*Tests.cs,**/*Test.cs,**/Migrations/**'
+            '/d:sonar.coverage.exclusions=**/*Tests.cs,**/*Test.cs,**/Migrations/**,**/Examples/**'
           )
 
           dotnet sonarscanner @arguments

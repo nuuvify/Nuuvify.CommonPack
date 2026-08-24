@@ -43,4 +43,32 @@ public class OperationContextAccessorTests
 
         await Task.WhenAll(task1, task2);
     }
+
+    [Fact]
+    public void OperationContextScope_NullContext_UsesEmptyContextAndRestoresPrevious()
+    {
+        var accessor = new OperationContextAccessor
+        {
+            Current = new OperationContext("previous")
+        };
+
+        using (new OperationContextScope(accessor, null))
+        {
+            Assert.Same(OperationContext.Empty, accessor.Current);
+        }
+
+        Assert.Equal("previous", accessor.Current.CorrelationId);
+    }
+
+    [Fact]
+    public void OperationContextScope_DoubleDispose_IsIdempotent()
+    {
+        var accessor = new OperationContextAccessor();
+        var scope = new OperationContextScope(accessor, new OperationContext("current"));
+
+        scope.Dispose();
+        scope.Dispose();
+
+        Assert.Equal(string.Empty, accessor.Current.CorrelationId);
+    }
 }

@@ -5,6 +5,7 @@
 ### Corrigido
 
 - Teste de isolamento concorrente convertido para fluxo assíncrono sem operações bloqueantes.
+- Cobertura ampliada para restauração de contexto e descarte idempotente de escopos.
 
 ### Adicionado
 
