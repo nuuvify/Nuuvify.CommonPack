@@ -4,11 +4,15 @@ on:
     pull_request:
         paths:
             - ".github/workflows/**"
+            - ".github/scripts/**"
+            - ".config/dotnet-tools.json"
     push:
         branches:
             - main
         paths:
             - ".github/workflows/**"
+            - ".github/scripts/**"
+            - ".config/dotnet-tools.json"
 
 permissions:
     contents: read

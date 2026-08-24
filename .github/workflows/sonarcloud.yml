@@ -5,11 +5,6 @@ on:
     branches:
       - main
       - qas
-  pull_request:
-    branches:
-      - main
-      - qas
-      - nugettest/qas
 
 concurrency:
   group: sonarcloud-${{ github.event.pull_request.number || github.ref }}
@@ -27,7 +22,6 @@ jobs:
       SONAR_PROJECT_KEY: nuuvify_Nuuvify.CommonPack
       SONAR_ORGANIZATION: nuuvify
       SONAR_HOST_URL: https://sonarcloud.io
-      SONAR_PULL_REQUEST_KEY: ${{ github.event.pull_request.number }}
 
     steps:
       - name: Checkout
@@ -70,12 +64,6 @@ jobs:
             '/d:sonar.cs.opencover.reportsPaths=**/coverage.opencover.xml',
             '/d:sonar.coverage.exclusions=**/*Tests.cs,**/*Test.cs,**/Migrations/**'
           )
-
-          if ($env:GITHUB_EVENT_NAME -eq 'pull_request') {
-            $arguments += "/d:sonar.pullrequest.key=$env:SONAR_PULL_REQUEST_KEY"
-            $arguments += "/d:sonar.pullrequest.branch=$env:GITHUB_HEAD_REF"
-            $arguments += "/d:sonar.pullrequest.base=$env:GITHUB_BASE_REF"
-          }
 
           dotnet sonarscanner @arguments
 
