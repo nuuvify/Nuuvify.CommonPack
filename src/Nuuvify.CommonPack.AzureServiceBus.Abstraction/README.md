@@ -1,4 +1,5 @@
-# Nuuvify.CommonPack.AzureServiceBus.Abstraction
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nuuvify_Nuuvify.CommonPack&metric=alert_status)](https://sonarcloud.io/project/overview?id=nuuvify_Nuuvify.CommonPack)
 
 [![.NET Standard 2.1](https://img.shields.io/badge/.NET%20Standard-2.1-blue.svg)](https://dotnet.microsoft.com/)
 [![Abstractions](https://img.shields.io/badge/Package-Abstractions-yellow.svg)]()
