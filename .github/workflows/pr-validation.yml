@@ -188,6 +188,7 @@ jobs:
             '/d:sonar.qualitygate.wait=true',
             '/d:sonar.cs.opencover.reportsPaths=**/coverage.opencover.xml',
                     '/d:sonar.coverage.exclusions=**/*Tests.cs,**/*Test.cs,**/Migrations/**,**/Examples/**',
+                    '/d:sonar.exclusions=**/Examples/**,**/.github/**,**/*.ps1',
             "/d:sonar.pullrequest.key=$env:SONAR_PULL_REQUEST_KEY",
             "/d:sonar.pullrequest.branch=$env:GITHUB_HEAD_REF",
             "/d:sonar.pullrequest.base=$env:GITHUB_BASE_REF"
