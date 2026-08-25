@@ -12,15 +12,15 @@ public class SwaggerGenOptionsConfigure : IConfigureOptions<SwaggerGenOptions>
     private readonly IConfiguration _config;
     private readonly SwaggerInfoModel _swaggerInfoModel;
 
-    public SwaggerGenOptionsConfigure(IServiceProvider serviceProvider, IConfiguration config)
-        : this(serviceProvider.GetService<IApiVersionDescriptionProvider>(), config)
+    public SwaggerGenOptionsConfigure(IServiceProvider serviceProvider)
+        : this(serviceProvider.GetService<IApiVersionDescriptionProvider>(), serviceProvider.GetService<IConfiguration>())
     {
     }
 
-    public SwaggerGenOptionsConfigure(IApiVersionDescriptionProvider? provider, IConfiguration config)
+    public SwaggerGenOptionsConfigure(IApiVersionDescriptionProvider? provider, IConfiguration? config)
     {
         _provider = provider;
-        _config = config;
+        _config = config ?? new ConfigurationBuilder().Build();
 
         _swaggerInfoModel = new SwaggerInfoModel(
             developerName: _config.GetSection("SwaggerInfo:DesenvolvedorNome").Value,
