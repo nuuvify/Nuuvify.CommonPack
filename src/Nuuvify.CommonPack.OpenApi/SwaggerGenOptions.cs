@@ -8,12 +8,16 @@ namespace Nuuvify.CommonPack.OpenApi;
 
 public class SwaggerGenOptionsConfigure : IConfigureOptions<SwaggerGenOptions>
 {
-    private readonly IApiVersionDescriptionProvider _provider;
+    private readonly IApiVersionDescriptionProvider? _provider;
     private readonly IConfiguration _config;
     private readonly SwaggerInfoModel _swaggerInfoModel;
 
-    public SwaggerGenOptionsConfigure(IApiVersionDescriptionProvider provider,
-        IConfiguration config)
+    public SwaggerGenOptionsConfigure(IServiceProvider serviceProvider, IConfiguration config)
+        : this(serviceProvider.GetService<IApiVersionDescriptionProvider>(), config)
+    {
+    }
+
+    public SwaggerGenOptionsConfigure(IApiVersionDescriptionProvider? provider, IConfiguration config)
     {
         _provider = provider;
         _config = config;
@@ -26,11 +30,14 @@ public class SwaggerGenOptionsConfigure : IConfigureOptions<SwaggerGenOptions>
             urlTermService: _config.GetSection("SwaggerInfo:TermoDeServico").Value,
             urlLicense: _config.GetSection("SwaggerInfo:LicencaUrl").Value
         );
-
     }
 
     public void Configure(SwaggerGenOptions options)
     {
+        if (_provider is null)
+        {
+            return;
+        }
 
         foreach (var description in _provider.ApiVersionDescriptions)
         {
@@ -39,7 +46,5 @@ public class SwaggerGenOptionsConfigure : IConfigureOptions<SwaggerGenOptions>
             options.SwaggerDoc(name: _swaggerInfoModel.VersionName,
                 info: _swaggerInfoModel.CreateInfoForApiVersion());
         }
-
     }
-
 }

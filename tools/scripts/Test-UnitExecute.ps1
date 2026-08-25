@@ -486,8 +486,30 @@ if ($runsIntegrationTests) {
 }
 
 # Remover e recriar a pasta TestResults raiz do script se -RecreateTestResults for especificado
+$testResultsRoot = Join-Path $testRoot "TestResults"
+$runLockPath = Join-Path $testRoot ".coverage-run.lock"
+$runLockStream = $null
+try {
+    $runLockStream = [System.IO.File]::Open($runLockPath, [System.IO.FileMode]::OpenOrCreate, [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::None)
+}
+catch {
+    Write-ColorOutput "ERRO: Já existe uma execução de cobertura em andamento. Aguarde a conclusão antes de iniciar outra." "Red"
+    exit 3
+}
+
+function Release-RunLock {
+    if ($script:runLockStream) {
+        $script:runLockStream.Dispose()
+        $script:runLockStream = $null
+    }
+
+    if (Test-Path -LiteralPath $runLockPath) {
+        Remove-Item -LiteralPath $runLockPath -Force -ErrorAction SilentlyContinue
+    }
+}
+
+try {
 if ($RecreateTestResults) {
-    $testResultsRoot = Join-Path $testRoot "TestResults"
     Write-ColorOutput "════════════════════════════════════════════════════════════════" "Cyan"
     Write-ColorOutput "Removendo e recriando pasta TestResults..." "Cyan"
     if (Test-Path $testResultsRoot) {
@@ -508,6 +530,7 @@ if ($RecreateTestResults) {
 
 # Limpar diretório de output se Clean estiver habilitado
 $fullOutputPath = Resolve-RelativePathFromBase -BasePath $testRoot -Path $OutputPath
+
 if ($Clean -and (Test-Path $fullOutputPath)) {
     Write-ColorOutput "Limpando diretório de output anterior..." "Cyan"
     try {
@@ -545,12 +568,17 @@ if (Test-Path $tempLogFile) {
 
 # Construir comando de teste
 $testTarget ??= $solutionFile
-$testCommand = "dotnet test `"$testTarget`""
-$testCommand += " --configuration $Configuration"
-$testCommand += " --verbosity $Verbosity"
+$testArguments = @(
+    "test",
+    $testTarget,
+    "--configuration",
+    $Configuration,
+    "--verbosity",
+    $Verbosity
+)
 
 if ($NoBuild) {
-    $testCommand += " --no-build"
+    $testArguments += "--no-build"
 }
 
 $effectiveFilter = $Filter
@@ -572,14 +600,18 @@ if (-not [string]::IsNullOrWhiteSpace($categoryFilter)) {
 }
 
 if (-not [string]::IsNullOrWhiteSpace($effectiveFilter)) {
-    $testCommand += " --filter `"$effectiveFilter`""
+    $testArguments += @("--filter", $effectiveFilter)
 }
 
 # Adicionar coleta de cobertura
 $coverageFile = Join-Path $fullOutputPath "coverage.cobertura.xml"
-$testCommand += " --collect:`"XPlat Code Coverage`""
-$testCommand += " --results-directory `"$fullOutputPath`""
-$testCommand += " --settings `"$(Join-Path $projectRoot 'test.runsettings.xml')`""
+$testArguments += @(
+    "--collect:XPlat Code Coverage",
+    "--results-directory",
+    $fullOutputPath,
+    "--settings",
+    (Join-Path $projectRoot "test.runsettings.xml")
+)
 
 Write-ColorOutput "════════════════════════════════════════════════════════════════" "Cyan"
 Write-ColorOutput "Executando Testes..." "Cyan"
@@ -595,7 +627,7 @@ $tempLogFile = Join-Path $fullOutputPath "test-output.log"
 # sejam capturados no log, não apenas exibidos no console.
 $PSNativeCommandUseErrorActionPreference = $false
 try {
-    Invoke-Expression "$testCommand 2>&1" | Tee-Object -FilePath $tempLogFile
+    & dotnet @testArguments 2>&1 | Tee-Object -FilePath $tempLogFile
     $testExitCode = $LASTEXITCODE
 }
 finally {
@@ -975,8 +1007,12 @@ Write-ColorOutput "Para visualizar o relatório posteriormente, abra:" "Cyan"
 Write-ColorOutput $indexFile "Yellow"
 Write-Host ""
 
-if ($testExitCode -ne 0) {
-    exit $testExitCode
-}
+    if ($testExitCode -ne 0) {
+        exit $testExitCode
+    }
 
-exit $coverageExitCode
+    exit $coverageExitCode
+}
+finally {
+    Release-RunLock
+}
