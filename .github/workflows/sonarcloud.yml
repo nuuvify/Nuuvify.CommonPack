@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - qas
+  workflow_dispatch: {}
 
 concurrency:
   group: sonarcloud-${{ github.event.pull_request.number || github.ref }}
@@ -24,6 +25,21 @@ jobs:
       SONAR_HOST_URL: https://sonarcloud.io
 
     steps:
+      # workflow_dispatch já exige permissão de escrita no repositório; aqui restringimos ainda mais, a admins
+      - name: Restrict manual trigger to admins
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data } = await github.rest.repos.getCollaboratorPermissionLevel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              username: context.actor,
+            });
+            if (data.permission !== 'admin') {
+              core.setFailed(`Disparo manual restrito a administradores. Usuário '${context.actor}' possui permissão '${data.permission}'.`);
+            }
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
