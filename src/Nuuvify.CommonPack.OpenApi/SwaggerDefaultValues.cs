@@ -8,15 +8,12 @@ namespace Nuuvify.CommonPack.OpenApi;
 
 public class SwaggerDefaultValues : IOperationFilter
 {
-
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        if (operation.Deprecated)
+        if (operation.Deprecated || context.MethodInfo.GetCustomAttributes<ObsoleteAttribute>().Any())
         {
             var obsoleteActions = context.MethodInfo.GetCustomAttributes<ObsoleteAttribute>();
-
             operation.Description = obsoleteActions.FirstOrDefault()?.Message;
         }
     }
-
 }

@@ -11,8 +11,15 @@
     Caminho para salvar o relatório de cobertura (padrão: .\TestResults\Coverage)
 .PARAMETER Filter
     Filtro para executar apenas testes específicos (opcional)
+.PARAMETER TestProject
+    Caminho opcional, absoluto ou relativo à raiz, de um projeto de testes específico.
+    Quando informado, substitui a solution e limita a cobertura ao pacote exercitado.
 .PARAMETER TestCategory
     Categoria de testes a executar (All, Unit ou Integration)
+.PARAMETER IntegrationContainers
+    Controla os containers auxiliares dos testes de integração:
+    Auto usa Testcontainers quando Docker está disponível e preserva o fallback dos fixtures;
+    Required exige Docker e impede fallback silencioso; Disabled desabilita Testcontainers.
 .PARAMETER NoBuild
     Se especificado, não executa o build antes dos testes
 .PARAMETER Verbosity
@@ -35,9 +42,8 @@
     Requisitos:
     - .NET 8 SDK instalado
     - Pacote coverlet.collector nos projetos de teste
-    - ReportGenerator tool instalado (dotnet tool install -g dotnet-reportgenerator-globaltool)
-
-    O script verifica automaticamente se o ReportGenerator está instalado e oferece instalá-lo.
+    - Docker em execução quando -IntegrationContainers Required for usado
+    - Ferramentas locais restauráveis pelo manifesto .config/dotnet-tools.json
 
     IMPORTANTE: Este arquivo deve ser salvo com encoding UTF-8 with BOM para garantir
     a correta exibição de caracteres especiais no console do PowerShell.
@@ -56,7 +62,10 @@
     Executa apenas testes com Trait Category=Unit
 .EXAMPLE
     .\Test-UnitExecute.ps1 -TestCategory Integration
-    Executa apenas testes com Trait Category=Integration
+    Executa apenas testes com Trait Category=Integration e usa Testcontainers quando Docker está disponível
+.EXAMPLE
+    .\Test-UnitExecute.ps1 -TestCategory Integration -IntegrationContainers Required
+    Exige Docker e executa os testes de integração com os containers auxiliares
 .EXAMPLE
     .\Test-UnitExecute.ps1 -NoBuild
     Executa testes sem fazer rebuild do projeto
@@ -80,7 +89,9 @@ param (
                 $PSDefaultParameterValues.Remove("*:Configuration")
                 $PSDefaultParameterValues.Remove("*:OutputPath")
                 $PSDefaultParameterValues.Remove("*:Filter")
+                $PSDefaultParameterValues.Remove("*:TestProject")
                 $PSDefaultParameterValues.Remove("*:TestCategory")
+                $PSDefaultParameterValues.Remove("*:IntegrationContainers")
                 $PSDefaultParameterValues.Remove("*:Verbosity")
                 $PSDefaultParameterValues.Remove("*:MinimumCoverage")
                 $PSDefaultParameterValues.Remove("*:Clean")
@@ -89,7 +100,9 @@ param (
                 $PSDefaultParameterValues.Add("*:Configuration", "Debug")
                 $PSDefaultParameterValues.Add("*:OutputPath", ".\TestResults\Coverage")
                 $PSDefaultParameterValues.Add("*:Filter", "")
+                $PSDefaultParameterValues.Add("*:TestProject", "")
                 $PSDefaultParameterValues.Add("*:TestCategory", "All")
+                $PSDefaultParameterValues.Add("*:IntegrationContainers", "Auto")
                 $PSDefaultParameterValues.Add("*:Verbosity", "normal")
                 $PSDefaultParameterValues.Add("*:MinimumCoverage", 95)
                 $PSDefaultParameterValues.Add("*:Clean", $true)
@@ -110,31 +123,38 @@ param (
     [string]$Filter = "",
 
     [Parameter(Position = 4)]
+    [string]$TestProject = "",
+
+    [Parameter(Position = 5)]
     [ValidateSet("All", "Unit", "Integration")]
     [string]$TestCategory = "Unit",
 
-    [Parameter(Position = 5)]
+    [Parameter(Position = 6)]
     [switch]$NoBuild,
 
-    [Parameter(Position = 6)]
+    [Parameter(Position = 7)]
     [ValidateSet("quiet", "minimal", "normal", "detailed", "diagnostic")]
     [string]$Verbosity = "normal",
 
-    [Parameter(Position = 7)]
+    [Parameter(Position = 8)]
     [ValidateRange(0, 100)]
     [int]$MinimumCoverage = 95,
 
-    [Parameter(Position = 8)]
+    [Parameter(Position = 9)]
     [bool]$Clean = $true,
 
-    [Parameter(Position = 9)]
+    [Parameter(Position = 10)]
     [switch]$RecreateTestResults,
 
-    [Parameter(Position = 10)]
+    [Parameter(Position = 11)]
     [bool]$OpenReport = $true,
 
-    [Parameter(Position = 11)]
-    [bool]$LogOnlyFailedTests = $true
+    [Parameter(Position = 12)]
+    [bool]$LogOnlyFailedTests = $true,
+
+    [Parameter(Position = 13)]
+    [ValidateSet("Auto", "Required", "Disabled")]
+    [string]$IntegrationContainers = "Auto"
 )
 
 # Verificar se --help foi passado como argumento
@@ -377,41 +397,37 @@ if (-not (Test-CommandExists "dotnet")) {
     exit 1
 }
 
-# Verificar se ReportGenerator está instalado
-Write-ColorOutput "Verificando ReportGenerator..." "Cyan"
-if (-not (Test-CommandExists "reportgenerator")) {
-    Write-ColorOutput "ReportGenerator não encontrado." "Yellow"
-    $install = Read-Host "Deseja instalar o ReportGenerator agora? (S/N)"
-
-    if ($install -eq "S" -or $install -eq "s") {
-        Write-ColorOutput "Instalando ReportGenerator..." "Cyan"
-        dotnet tool install -g dotnet-reportgenerator-globaltool
-
-        if ($LASTEXITCODE -ne 0) {
-            Write-ColorOutput "ERRO: Falha ao instalar ReportGenerator." "Red"
-            exit 1
-        }
-
-        Write-ColorOutput "ReportGenerator instalado com sucesso!" "Green"
-    }
-    else {
-        Write-ColorOutput "ERRO: ReportGenerator é necessário para gerar o relatório de cobertura." "Red"
-        Write-ColorOutput "Execute: dotnet tool install -g dotnet-reportgenerator-globaltool" "Yellow"
-        exit 1
-    }
-}
-
 # Verificar diretório raiz do projeto
 $projectRoot = Get-ProjectRoot -StartPath $PSScriptRoot
 $testRoot = Join-Path $projectRoot "test"
 
-# Buscar arquivo .sln na raiz do projeto
-Write-ColorOutput "Procurando arquivo de solution (.sln)..." "Cyan"
-$solutionFiles = Get-ChildItem -Path $projectRoot -Filter "*.sln" -File
-
-if ($solutionFiles.Count -eq 0) {
-    Write-ColorOutput "ERRO: Nenhum arquivo .sln encontrado em $projectRoot" "Red"
+# Restaurar ferramentas locais sem prompt interativo
+Write-ColorOutput "Restaurando ferramentas locais..." "Cyan"
+& dotnet tool restore --tool-manifest (Join-Path $projectRoot ".config\dotnet-tools.json")
+if ($LASTEXITCODE -ne 0) {
+    Write-ColorOutput "ERRO: Falha ao restaurar as ferramentas locais. Execute novamente com acesso ao feed NuGet." "Red"
     exit 1
+}
+
+# Resolver a solution ou o projeto de testes informado
+$solutionFiles = @()
+$testTarget = $null
+if (-not [string]::IsNullOrWhiteSpace($TestProject)) {
+    $testTarget = Resolve-RelativePathFromBase -BasePath $projectRoot -Path $TestProject
+    if (-not (Test-Path $testTarget -PathType Leaf) -or [IO.Path]::GetExtension($testTarget) -ne ".csproj") {
+        Write-ColorOutput "ERRO: TestProject deve apontar para um arquivo .csproj existente: $testTarget" "Red"
+        exit 1
+    }
+    Write-ColorOutput "Projeto de testes: $testTarget" "Cyan"
+}
+else {
+    Write-ColorOutput "Procurando arquivo de solution (.sln)..." "Cyan"
+    $solutionFiles = Get-ChildItem -Path $projectRoot -Filter "*.sln" -File
+
+    if ($solutionFiles.Count -eq 0) {
+        Write-ColorOutput "ERRO: Nenhum arquivo .sln encontrado em $projectRoot" "Red"
+        exit 1
+    }
 }
 
 if ($solutionFiles.Count -gt 1) {
@@ -432,15 +448,68 @@ else {
 }
 
 Write-ColorOutput "Diretório do projeto: $projectRoot" "Cyan"
-Write-ColorOutput "Solution: $($solutionFiles | Where-Object { $_.FullName -eq $solutionFile } | Select-Object -ExpandProperty Name)" "Cyan"
+if ($solutionFile) {
+    Write-ColorOutput "Solution: $($solutionFiles | Where-Object { $_.FullName -eq $solutionFile } | Select-Object -ExpandProperty Name)" "Cyan"
+}
 Write-ColorOutput "Configuração: $Configuration" "Cyan"
 Write-ColorOutput "Categoria de teste: $TestCategory" "Cyan"
+Write-ColorOutput "Containers de integração: $IntegrationContainers" "Cyan"
 Write-ColorOutput "Cobertura mínima: $MinimumCoverage%" "Cyan"
 Write-Host ""
 
+$runsIntegrationTests = $TestCategory -in @("All", "Integration")
+$testcontainersModeVariable = "NUUVIFY_TESTCONTAINERS_MODE"
+$previousTestcontainersMode = [Environment]::GetEnvironmentVariable($testcontainersModeVariable, "Process")
+
+if ($runsIntegrationTests -and $IntegrationContainers -ne "Disabled") {
+    $dockerAvailable = Test-CommandExists "docker"
+    if ($dockerAvailable) {
+        & docker info *> $null
+        $dockerAvailable = $LASTEXITCODE -eq 0
+    }
+
+    if (-not $dockerAvailable -and $IntegrationContainers -eq "Required") {
+        Write-ColorOutput "ERRO: Docker não está disponível. Inicie o Docker e tente novamente ou use -IntegrationContainers Auto/Disabled." "Red"
+        exit 1
+    }
+
+    if ($dockerAvailable) {
+        Write-ColorOutput "Docker disponível; os fixtures iniciarão e removerão os containers via Testcontainers." "Green"
+    }
+    else {
+        Write-ColorOutput "AVISO: Docker indisponível; fixtures em modo Auto podem usar o fallback configurado." "Yellow"
+    }
+}
+
+if ($runsIntegrationTests) {
+    [Environment]::SetEnvironmentVariable($testcontainersModeVariable, $IntegrationContainers, "Process")
+}
+
 # Remover e recriar a pasta TestResults raiz do script se -RecreateTestResults for especificado
+$testResultsRoot = Join-Path $testRoot "TestResults"
+$runLockPath = Join-Path $testRoot ".coverage-run.lock"
+$runLockStream = $null
+try {
+    $runLockStream = [System.IO.File]::Open($runLockPath, [System.IO.FileMode]::OpenOrCreate, [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::None)
+}
+catch {
+    Write-ColorOutput "ERRO: Já existe uma execução de cobertura em andamento. Aguarde a conclusão antes de iniciar outra." "Red"
+    exit 3
+}
+
+function Release-RunLock {
+    if ($script:runLockStream) {
+        $script:runLockStream.Dispose()
+        $script:runLockStream = $null
+    }
+
+    if (Test-Path -LiteralPath $runLockPath) {
+        Remove-Item -LiteralPath $runLockPath -Force -ErrorAction SilentlyContinue
+    }
+}
+
+try {
 if ($RecreateTestResults) {
-    $testResultsRoot = Join-Path $testRoot "TestResults"
     Write-ColorOutput "════════════════════════════════════════════════════════════════" "Cyan"
     Write-ColorOutput "Removendo e recriando pasta TestResults..." "Cyan"
     if (Test-Path $testResultsRoot) {
@@ -461,6 +530,7 @@ if ($RecreateTestResults) {
 
 # Limpar diretório de output se Clean estiver habilitado
 $fullOutputPath = Resolve-RelativePathFromBase -BasePath $testRoot -Path $OutputPath
+
 if ($Clean -and (Test-Path $fullOutputPath)) {
     Write-ColorOutput "Limpando diretório de output anterior..." "Cyan"
     try {
@@ -497,12 +567,18 @@ if (Test-Path $tempLogFile) {
 }
 
 # Construir comando de teste
-$testCommand = "dotnet test `"$solutionFile`""
-$testCommand += " --configuration $Configuration"
-$testCommand += " --verbosity $Verbosity"
+$testTarget ??= $solutionFile
+$testArguments = @(
+    "test",
+    $testTarget,
+    "--configuration",
+    $Configuration,
+    "--verbosity",
+    $Verbosity
+)
 
 if ($NoBuild) {
-    $testCommand += " --no-build"
+    $testArguments += "--no-build"
 }
 
 $effectiveFilter = $Filter
@@ -524,14 +600,18 @@ if (-not [string]::IsNullOrWhiteSpace($categoryFilter)) {
 }
 
 if (-not [string]::IsNullOrWhiteSpace($effectiveFilter)) {
-    $testCommand += " --filter `"$effectiveFilter`""
+    $testArguments += @("--filter", $effectiveFilter)
 }
 
 # Adicionar coleta de cobertura
 $coverageFile = Join-Path $fullOutputPath "coverage.cobertura.xml"
-$testCommand += " --collect:`"XPlat Code Coverage`""
-$testCommand += " --results-directory `"$fullOutputPath`""
-$testCommand += " --settings `"$(Join-Path $projectRoot 'test.runsettings.xml')`""
+$testArguments += @(
+    "--collect:XPlat Code Coverage",
+    "--results-directory",
+    $fullOutputPath,
+    "--settings",
+    (Join-Path $projectRoot "test.runsettings.xml")
+)
 
 Write-ColorOutput "════════════════════════════════════════════════════════════════" "Cyan"
 Write-ColorOutput "Executando Testes..." "Cyan"
@@ -546,8 +626,13 @@ $tempLogFile = Join-Path $fullOutputPath "test-output.log"
 # Redirecionar stderr para stdout (2>&1) garante que erros de build/compilação
 # sejam capturados no log, não apenas exibidos no console.
 $PSNativeCommandUseErrorActionPreference = $false
-Invoke-Expression "$testCommand 2>&1" | Tee-Object -FilePath $tempLogFile
-$testExitCode = $LASTEXITCODE
+try {
+    & dotnet @testArguments 2>&1 | Tee-Object -FilePath $tempLogFile
+    $testExitCode = $LASTEXITCODE
+}
+finally {
+    [Environment]::SetEnvironmentVariable($testcontainersModeVariable, $previousTestcontainersMode, "Process")
+}
 
 $rawExecutionOutput = ""
 if (Test-Path $tempLogFile) {
@@ -783,7 +868,10 @@ $coverageFiles = Get-ChildItem -Path $fullOutputPath -Filter "coverage.cobertura
 if ($coverageFiles.Count -eq 0) {
     Write-ColorOutput "AVISO: Nenhum arquivo de cobertura encontrado." "Yellow"
     Write-ColorOutput "Verifique se o pacote coverlet.collector está instalado nos projetos de teste." "Yellow"
-    exit $testExitCode
+    if ($testExitCode -ne 0) {
+        exit $testExitCode
+    }
+    exit 1
 }
 
 Write-ColorOutput "Encontrados $($coverageFiles.Count) arquivo(s) de cobertura." "Cyan"
@@ -807,7 +895,7 @@ $reportArgs = @(
     "-verbosity:Info"
 )
 
-& reportgenerator $reportArgs
+& dotnet tool run reportgenerator -- $reportArgs
 
 if ($LASTEXITCODE -ne 0) {
     Write-ColorOutput "ERRO: Falha ao gerar relatório de cobertura." "Red"
@@ -862,6 +950,8 @@ if ((Test-Path $summaryFile) -and ($assemblyTestStats.Count -gt 0)) {
     Add-Content -Path $summaryFile -Value $testSummaryLines -Encoding UTF8
 }
 
+$coverageExitCode = 1
+
 # Ler o resumo de cobertura
 if (Test-Path $summaryFile) {
     Write-ColorOutput "════════════════════════════════════════════════════════════════" "Cyan"
@@ -878,10 +968,12 @@ if (Test-Path $summaryFile) {
 
         if ($coveragePercent -ge $MinimumCoverage) {
             Write-ColorOutput "✓ Cobertura de código: $coveragePercent% (Mínimo: $MinimumCoverage%)" "Green"
+            $coverageExitCode = 0
         }
         else {
             Write-ColorOutput "✗ Cobertura de código: $coveragePercent% (Mínimo: $MinimumCoverage%)" "Red"
             Write-ColorOutput "AVISO: Cobertura abaixo do mínimo aceitável!" "Yellow"
+            $coverageExitCode = 2
         }
     }
 }
@@ -915,4 +1007,12 @@ Write-ColorOutput "Para visualizar o relatório posteriormente, abra:" "Cyan"
 Write-ColorOutput $indexFile "Yellow"
 Write-Host ""
 
-exit $testExitCode
+    if ($testExitCode -ne 0) {
+        exit $testExitCode
+    }
+
+    exit $coverageExitCode
+}
+finally {
+    Release-RunLock
+}

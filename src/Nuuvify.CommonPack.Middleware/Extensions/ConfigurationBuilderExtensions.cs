@@ -54,8 +54,7 @@ public static class ConfigurationBuilderExtensions
         bool optional = false,
         bool reloadOnChange = false)
     {
-        if (builder == null)
-            throw new ArgumentNullException(nameof(builder));
+        ArgumentNullException.ThrowIfNull(builder);
 
         if (string.IsNullOrWhiteSpace(directoryPath))
             throw new ArgumentException("O diretório de secrets é obrigatório.", nameof(directoryPath));
@@ -71,8 +70,7 @@ public static class ConfigurationBuilderExtensions
         ILogger logger,
         string operationName)
     {
-        if (builder == null)
-            throw new ArgumentNullException(nameof(builder));
+        ArgumentNullException.ThrowIfNull(builder);
 
         if (string.IsNullOrWhiteSpace(prefix))
             return builder;
@@ -89,7 +87,7 @@ public static class ConfigurationBuilderExtensions
         if (environmentVariables.Count == 0)
             return builder;
 
-        logger?.LogDebug("Variáveis de ambiente para {operationName} com prefixo informado: {count}", operationName, environmentVariables.Count);
+        logger?.LogDebug("Variáveis de ambiente para {OperationName} com prefixo informado: {Count}", operationName, environmentVariables.Count);
 
         var configurationValues = new Dictionary<string, string>();
         foreach (var variable in environmentVariables)

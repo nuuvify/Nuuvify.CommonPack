@@ -23,19 +23,6 @@ public static class CanonicalValidationExtensions
     }
 
     /// <summary>
-    /// Configura a resposta canônica sem registrar controllers novamente.
-    /// </summary>
-    /// <param name="services">Coleção de serviços da aplicação.</param>
-    /// <returns>A mesma coleção para composição de registros.</returns>
-    public static IServiceCollection ConfigureCanonicalValidation(this IServiceCollection services)
-    {
-        ArgumentNullException.ThrowIfNull(services);
-
-        _ = services.Configure<ApiBehaviorOptions>(ConfigureValidationOptions);
-        return services;
-    }
-
-    /// <summary>
     /// Configura um builder MVC existente para responder a model state inválido com HTTP 400.
     /// </summary>
     /// <param name="mvcBuilder">Builder MVC já registrado pela aplicação.</param>
@@ -47,6 +34,19 @@ public static class CanonicalValidationExtensions
         _ = mvcBuilder.ConfigureApiBehaviorOptions(ConfigureValidationOptions);
 
         return mvcBuilder;
+    }
+
+    /// <summary>
+    /// Configura a resposta canônica sem registrar controllers novamente.
+    /// </summary>
+    /// <param name="services">Coleção de serviços da aplicação.</param>
+    /// <returns>A mesma coleção para composição de registros.</returns>
+    public static IServiceCollection ConfigureCanonicalValidation(this IServiceCollection services)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+
+        _ = services.Configure<ApiBehaviorOptions>(ConfigureValidationOptions);
+        return services;
     }
 
     private static void ConfigureValidationOptions(ApiBehaviorOptions options)
