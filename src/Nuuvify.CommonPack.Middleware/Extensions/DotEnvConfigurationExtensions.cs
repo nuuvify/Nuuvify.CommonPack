@@ -47,7 +47,7 @@ public static class DotEnvConfigurationExtensions
         return builder;
     }
 
-    private static IReadOnlyDictionary<string, string> Parse(IEnumerable<string> lines)
+    private static Dictionary<string, string> Parse(IEnumerable<string> lines)
     {
         var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach (var rawLine in lines)
@@ -56,7 +56,7 @@ public static class DotEnvConfigurationExtensions
             if (line.Length == 0 || line.StartsWith('#'))
                 continue;
 
-            var separator = line.IndexOf('=');
+            var separator = line.IndexOf('=', StringComparison.Ordinal);
             if (separator <= 0)
                 continue;
 

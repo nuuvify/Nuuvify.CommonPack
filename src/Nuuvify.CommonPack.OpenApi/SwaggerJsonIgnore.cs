@@ -25,19 +25,18 @@ public class SwaggerJsonIgnore : IOperationFilter
     {
         var ignoredProperties = context.MethodInfo.GetParameters()
             .SelectMany(p => p.ParameterType.GetProperties()
-                             .Where(prop => prop.GetCustomAttribute<JsonIgnoreAttribute>() != null)
-            );
+                .Where(prop => prop.GetCustomAttribute<JsonIgnoreAttribute>() != null));
 
-        if (ignoredProperties.Any())
+        if (!ignoredProperties.Any())
         {
-            foreach (var property in ignoredProperties)
-            {
-                operation.Parameters = operation.Parameters
-                    .Where(p => !p.Name.Equals(property.Name, StringComparison.Ordinal) &&
-                        p.In != ParameterLocation.Header)
-                    .ToList();
-            }
+            return;
+        }
 
+        foreach (var property in ignoredProperties)
+        {
+            operation.Parameters = operation.Parameters
+                .Where(p => !p.Name.Equals(property.Name, StringComparison.Ordinal))
+                .ToList();
         }
     }
 }

@@ -42,6 +42,8 @@
 | 2026-08-23 | Em andamento -> Em andamento | `FileStreamResultCustom` e `GetFilesBase64` foram marcados como obsoletos sem erro, pois não possuem consumidores internos e têm substitutos nativos; validação do Middleware compilou |
 | 2026-08-23 | Em andamento -> Em andamento | `AddEnvironmentVariablesToMemoryCollection` e `ValidateModelStateCustomAttribute` foram marcados como obsoletos sem erro, mantendo os contratos legados e orientando os substitutos canônicos |
 | 2026-08-23 | Em andamento -> Em andamento | Corrigida a chave ausente no teste de compatibilidade de `ApiKeyFilter`; os arquivos das depreciações e do teste agora passam nos diagnósticos estáticos; execução da suíte aguarda nova invocação válida do terminal |
+| 2026-08-23 | Em andamento -> Em andamento | Consumidores atualizados para Nuuvify `2.9.0-preview.43`; projetos de observabilidade adicionados à solução para garantir a publicação das dependências transitivas de Middleware |
+| 2026-08-23 | Em andamento -> Em andamento | Confirmado que `Observability` e `Observability.Abstraction` não estavam incluídos na solução de publicação; ambos foram empacotados localmente em `2.9.0-preview.43` e a solução passou a incluí-los |
 
 > A execução depende de revisão humana. Este documento não registra aprovação, conclusão ou autorização para publicação.
 

@@ -1,7 +1,7 @@
 namespace Nuuvify.CommonPack.AzureServiceBus.xTest.Services;
 
 [Trait("Category", "Unit")]
-public class ServiceBusMessageSenderBatchOperationsTests : IDisposable
+public class ServiceBusMessageSenderBatchOperationsTests : IAsyncDisposable
 {
     private readonly ServiceBusTestFixture _fixture;
     private readonly ServiceBusMessageSender _sender;
@@ -140,18 +140,13 @@ public class ServiceBusMessageSenderBatchOperationsTests : IDisposable
         exception.ParamName.ShouldBe("queueName");
     }
 
-    protected virtual void Dispose(bool disposing)
+    public async ValueTask DisposeAsync()
     {
-        if (!_disposed && disposing)
+        if (!_disposed)
         {
-            _sender?.Dispose();
+            await _sender.DisposeAsync();
             _disposed = true;
         }
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
         GC.SuppressFinalize(this);
     }
 }

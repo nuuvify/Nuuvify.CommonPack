@@ -181,4 +181,18 @@ public class ConfigurationBuilderExtensionsTests
 
         Assert.Null(configuration["Database:Password"]);
     }
+
+    [Fact]
+    public void AddContainerSecretsRejeitaBuilderNulo()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            ConfigurationBuilderExtensions.AddContainerSecrets(null, "/run/secrets"));
+    }
+
+    [Fact]
+    public void AddContainerSecretsRejeitaDiretorioVazio()
+    {
+        Assert.Throws<ArgumentException>(() =>
+            new ConfigurationBuilder().AddContainerSecrets(" "));
+    }
 }
