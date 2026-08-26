@@ -6,7 +6,7 @@
 | --- | --- |
 | Status | Em andamento |
 | Criado em | 2026-08-20 |
-| Atualizado em | 2026-08-23 |
+| Atualizado em | 2026-08-26 |
 | Responsável | Lincoln Zocateli |
 | Última revisão | 2026-08-22 |
 
@@ -44,6 +44,8 @@
 | 2026-08-23 | Em andamento -> Em andamento | Corrigida a chave ausente no teste de compatibilidade de `ApiKeyFilter`; os arquivos das depreciações e do teste agora passam nos diagnósticos estáticos; execução da suíte aguarda nova invocação válida do terminal |
 | 2026-08-23 | Em andamento -> Em andamento | Consumidores atualizados para Nuuvify `2.9.0-preview.43`; projetos de observabilidade adicionados à solução para garantir a publicação das dependências transitivas de Middleware |
 | 2026-08-23 | Em andamento -> Em andamento | Confirmado que `Observability` e `Observability.Abstraction` não estavam incluídos na solução de publicação; ambos foram empacotados localmente em `2.9.0-preview.43` e a solução passou a incluí-los |
+| 2026-08-25 | Em andamento -> Em andamento | Consumidores atualizados para Nuuvify `2.9.0-preview.44`; CommonPack ganhou construtor canônico de `BaseRepository` com `DbContext` explícito, `RemoveLegacyModelStateFilter`, `Response<TData>` sem reflexão e registro de `IOperationContextAccessor` nos composition roots de API e Worker; pacotes validados em feed local e ambos os Templates migrados, com build e suítes unitárias aprovadas |
+| 2026-08-26 | Em andamento -> Em andamento | Testes de `UserAuthenticated.CupId` e `WithCwsJwtUserClaims` alinhados ao contrato vigente sem alterar comportamento público; todas as alterações consolidadas em CommonPack `8.7.0`, republicado localmente, com Templates de API e Worker revalidados |
 
 > A execução depende de revisão humana. Este documento não registra aprovação, conclusão ou autorização para publicação.
 
