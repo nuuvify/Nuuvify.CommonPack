@@ -1,5 +1,7 @@
 using System.Diagnostics;
+using System.Security.Cryptography;
 using System.Security.Claims;
+using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -9,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Nuuvify.CommonPack.Extensions.Implementation;
 using Nuuvify.CommonPack.Extensions.Notificator;
 using Nuuvify.CommonPack.Middleware.Abstraction.Results;
+using Nuuvify.CommonPack.Security;
 
 namespace Nuuvify.CommonPack.Middleware.Filters;
 
@@ -18,6 +21,10 @@ namespace Nuuvify.CommonPack.Middleware.Filters;
 /// [ApiKey(KeyName = new string[] {"MyKeyName")] ou <br/>
 /// [ApiKey(KeyName = new string[] {"MyKeyName", "OtherKeyName")] <br/>
 /// </summary>
+[Obsolete(
+    "Use ApiKeyAuthenticationHandler from Nuuvify.CommonPack.Security with AddApiKeyAuthentication() extension. " +
+    "See README.md in Nuuvify.CommonPack.Security for migration guide.",
+    error: false)]
 [AttributeUsage(validOn: AttributeTargets.Class |
     AttributeTargets.Method, AllowMultiple = true)]
 public class ApiKeyAttribute : Attribute, IFilterFactory
@@ -44,6 +51,15 @@ public static class ApiKeyFilterConstants
 
 }
 
+/// <summary>
+/// Legacy filter implementation for API key validation. Use ApiKeyAuthenticationHandler instead.
+/// This filter is maintained for backward compatibility during migration to the canonical authentication scheme.
+/// </summary>
+[Obsolete(
+    "Use ApiKeyAuthenticationHandler from Nuuvify.CommonPack.Security with AddApiKeyAuthentication() extension. " +
+    "This filter will be removed in a future major version. " +
+    "See README.md in Nuuvify.CommonPack.Security for migration guide.",
+    error: false)]
 public class ApiKeyFilter : IResourceFilter, IActionFilter, IExceptionFilter
 {
     private readonly string[] _keyName;
@@ -61,15 +77,17 @@ public class ApiKeyFilter : IResourceFilter, IActionFilter, IExceptionFilter
 
     }
 
-    private void AddNewClaim(ClaimsPrincipal principal, string keyName, string keyValue)
+    private static ClaimsPrincipal AddNewClaim(ClaimsPrincipal principal, string keyName)
     {
-
         var clone = principal.Clone();
         var newIdentity = (ClaimsIdentity)clone.Identity;
 
-        var claim = new Claim(ApiKeyFilterConstants.ApiKeyInfo, $"{keyName}={keyValue}");
-        newIdentity.AddClaim(claim);
-
+        // Adiciona ambas as claims: legada (compatibilidade) e nova (schema canonico)
+        var legacyClaim = new Claim(ApiKeyFilterConstants.ApiKeyInfo, keyName);
+        var canonicalClaim = new Claim(ApiKeyAuthenticationDefaults.ClaimType, keyName);
+        newIdentity.AddClaim(legacyClaim);
+        newIdentity.AddClaim(canonicalClaim);
+        return clone;
     }
 
     private bool HasClaimApiKey(ClaimsPrincipal principal)
@@ -105,7 +123,10 @@ public class ApiKeyFilter : IResourceFilter, IActionFilter, IExceptionFilter
         if (context.HttpContext.Request.Headers.TryGetValue(itemKeyName, out var headerApiKey))
         {
             var apiKeyVaultValue = _configuration.GetSection(itemKeyName)?.Value;
-            return (hasHeader: apiKeyVaultValue == headerApiKey, apiKeyValue: apiKeyVaultValue);
+            var matches = apiKeyVaultValue is not null && CryptographicOperations.FixedTimeEquals(
+                Encoding.UTF8.GetBytes(apiKeyVaultValue),
+                Encoding.UTF8.GetBytes(headerApiKey.ToString()));
+            return (hasHeader: matches, apiKeyValue: apiKeyVaultValue);
         }
 
         return (false, string.Empty);
@@ -134,7 +155,7 @@ public class ApiKeyFilter : IResourceFilter, IActionFilter, IExceptionFilter
                 (bool hasHeader, string apiKeyValue) hasKeyHeader = HasKeyHeader(context, item);
                 if (hasKeyHeader.hasHeader)
                 {
-                    AddNewClaim(context.HttpContext.User, item, hasKeyHeader.apiKeyValue);
+                    context.HttpContext.User = AddNewClaim(context.HttpContext.User, item);
                     return;
                 }
 

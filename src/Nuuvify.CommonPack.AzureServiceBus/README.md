@@ -1,4 +1,5 @@
-# Nuuvify.CommonPack.AzureServiceBus
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nuuvify_Nuuvify.CommonPack&metric=alert_status)](https://sonarcloud.io/project/overview?id=nuuvify_Nuuvify.CommonPack)
 
 [![.NET 8.0](https://img.shields.io/badge/.NET-8.0-blue.svg)](https://dotnet.microsoft.com/)
 [![Azure Service Bus](https://img.shields.io/badge/Azure-Service%20Bus-0078d4.svg)](https://azure.microsoft.com/services/service-bus/)

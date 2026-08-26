@@ -1,4 +1,5 @@
-﻿### IMPORTANTE: IBM DB2 até a versão 3.1.0.500 não é possivel usar SaveChangesAsync, pois causa exception ao fazer Add, apesar de funcionar com Update e Delete, dessa forma utilize SaveChanges (sincrono) em AppDbContext.cs
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nuuvify_Nuuvify.CommonPack&metric=alert_status)](https://sonarcloud.io/project/overview?id=nuuvify_Nuuvify.CommonPack)
 
 ```csharp
             public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

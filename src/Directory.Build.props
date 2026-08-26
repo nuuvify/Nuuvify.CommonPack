@@ -14,7 +14,7 @@
         <PackageIcon>logonuuvify.jpg</PackageIcon>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <!-- Base version — única fonte de verdade. CI sobrescreve VersionSuffix e FileVersionRevision; nunca altere Version/AssemblyVersion/FileVersion diretamente. -->
-        <VersionPrefix>2.8.0</VersionPrefix>
+        <VersionPrefix>2.9.0</VersionPrefix>
         <AssemblyVersion>$([System.Version]::Parse($(VersionPrefix)).Major).0.0.0</AssemblyVersion>
         <FileVersion Condition="'$(FileVersionRevision)' == ''">$(VersionPrefix).0</FileVersion>
         <FileVersion Condition="'$(FileVersionRevision)' != ''">$(VersionPrefix).$(FileVersionRevision)</FileVersion>

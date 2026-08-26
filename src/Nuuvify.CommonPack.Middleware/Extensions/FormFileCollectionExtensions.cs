@@ -16,6 +16,7 @@ public static class FormFileCollectionExtensions
     /// <param name="files"></param>
     /// <param name="prefixFileName">Example: IdDocument_TypeDocument</param>
     /// <returns></returns>
+    [Obsolete("Use IFormFile.CopyToAsync ou OpenReadStream para processar uploads. Consulte README.md#validação.", error: false)]
     public static IDictionary<string, byte[]> GetFilesBase64(this IFormFileCollection files, string prefixFileName = null)
     {
 

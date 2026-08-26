@@ -2,6 +2,7 @@
 
 [![PR Validation](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/pr-validation.yml/badge.svg)](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/pr-validation.yml)
 [![Publish and Release](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/publish-release.yml/badge.svg?branch=main)](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/publish-release.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nuuvify_Nuuvify.CommonPack&metric=alert_status)](https://sonarcloud.io/project/overview?id=nuuvify_Nuuvify.CommonPack)
 
 Coleção de bibliotecas .NET para desenvolvimento de aplicações robustas, escaláveis e de alta performance.
 
@@ -86,6 +87,8 @@ Coleção de bibliotecas .NET para desenvolvimento de aplicações robustas, esc
 | **Nuuvify.CommonPack.AzureServiceBus.Abstraction** | Abstrações para Azure Service Bus              | [![NuGet](https://img.shields.io/nuget/v/Nuuvify.CommonPack.AzureServiceBus.Abstraction.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.AzureServiceBus.Abstraction/) | [![Downloads](https://img.shields.io/nuget/dt/Nuuvify.CommonPack.AzureServiceBus.Abstraction.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.AzureServiceBus.Abstraction/) |
 | **Nuuvify.CommonPack.AzureStorage**                | Cliente para Azure Storage                     | [![NuGet](https://img.shields.io/nuget/v/Nuuvify.CommonPack.AzureStorage.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.AzureStorage/)                               | [![Downloads](https://img.shields.io/nuget/dt/Nuuvify.CommonPack.AzureStorage.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.AzureStorage/)                               |
 | **Nuuvify.CommonPack.AzureStorage.Abstraction**    | Abstrações para Azure Storage                  | [![NuGet](https://img.shields.io/nuget/v/Nuuvify.CommonPack.AzureStorage.Abstraction.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.AzureStorage.Abstraction/)       | [![Downloads](https://img.shields.io/nuget/dt/Nuuvify.CommonPack.AzureStorage.Abstraction.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.AzureStorage.Abstraction/)       |
+| **Nuuvify.CommonPack.Observability**               | Implementação de contexto e telemetria        | [![NuGet](https://img.shields.io/nuget/v/Nuuvify.CommonPack.Observability.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.Observability/)                               | [![Downloads](https://img.shields.io/nuget/dt/Nuuvify.CommonPack.Observability.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.Observability/)                               |
+| **Nuuvify.CommonPack.Observability.Abstraction**   | Contratos de contexto de operação             | [![NuGet](https://img.shields.io/nuget/v/Nuuvify.CommonPack.Observability.Abstraction.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.Observability.Abstraction/) | [![Downloads](https://img.shields.io/nuget/dt/Nuuvify.CommonPack.Observability.Abstraction.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.Observability.Abstraction/) |
 
 ### Comunicação e Integração
 
@@ -152,6 +155,8 @@ Cada pacote possui documentação detalhada em seu respectivo diretório:
 - 📚 [AzureServiceBus.Abstraction](src/Nuuvify.CommonPack.AzureServiceBus.Abstraction/README.md)
 - 📚 [AzureStorage](src/Nuuvify.CommonPack.AzureStorage/README.md)
 - 📚 [AzureStorage.Abstraction](src/Nuuvify.CommonPack.AzureStorage.Abstraction/README.md)
+- 📚 [Observability](src/Nuuvify.CommonPack.Observability/README.md)
+- 📚 [Observability.Abstraction](src/Nuuvify.CommonPack.Observability.Abstraction/README.md)
 
 ### Comunicação e Integração
 - 📚 [StandardHttpClient](src/Nuuvify.CommonPack.StandardHttpClient/README.md)
@@ -518,10 +523,15 @@ Resumo rápido:
 
 ## 📊 Status do Projeto
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nuuvify_CommonPack&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=nuuvify_CommonPack)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=nuuvify_CommonPack&metric=coverage)](https://sonarcloud.io/summary/new_code?id=nuuvify_CommonPack)
-[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=nuuvify_CommonPack&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=nuuvify_CommonPack)
-[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=nuuvify_CommonPack&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=nuuvify_CommonPack)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nuuvify_Nuuvify.CommonPack&metric=alert_status)](https://sonarcloud.io/project/overview?id=nuuvify_Nuuvify.CommonPack)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=nuuvify_Nuuvify.CommonPack&metric=coverage)](https://sonarcloud.io/project/overview?id=nuuvify_Nuuvify.CommonPack)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=nuuvify_Nuuvify.CommonPack&metric=code_smells)](https://sonarcloud.io/project/overview?id=nuuvify_Nuuvify.CommonPack)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=nuuvify_Nuuvify.CommonPack&metric=sqale_index)](https://sonarcloud.io/project/overview?id=nuuvify_Nuuvify.CommonPack)
+
+O workflow [SonarCloud Analysis](.github/workflows/sonarcloud.yml) envia análises
+em pushes para `main`/`qas` e em pull requests. O secret `SONAR_TOKEN` precisa
+estar configurado no repositório. Enquanto não houver análise processada, o
+Overview apresentará `Quality gate: Not computed`.
 
 ## 🔗 Links Úteis
 
@@ -537,7 +547,7 @@ Resumo rápido:
 - 🐛 [Issues](https://github.com/nuuvify/Nuuvify.CommonPack/issues)
 - 🔄 [Pull Requests](https://github.com/nuuvify/Nuuvify.CommonPack/pulls)
 - 🚀 [Releases](https://github.com/nuuvify/Nuuvify.CommonPack/releases)
-- 📊 [SonarCloud](https://sonarcloud.io/summary/new_code?id=nuuvify_CommonPack)
+- 📊 [SonarCloud](https://sonarcloud.io/project/overview?id=nuuvify_Nuuvify.CommonPack)
 
 ### Comunidade
 - 💬 [Discussions](https://github.com/nuuvify/Nuuvify.CommonPack/discussions)

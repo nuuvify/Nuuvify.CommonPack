@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.StaticFiles;
 
 namespace Nuuvify.CommonPack.Middleware;
 
+[Obsolete("Use ControllerBase.File para downloads HTTP. Consulte README.md#validação.", error: false)]
 public class FileStreamResultCustom
 {
 
