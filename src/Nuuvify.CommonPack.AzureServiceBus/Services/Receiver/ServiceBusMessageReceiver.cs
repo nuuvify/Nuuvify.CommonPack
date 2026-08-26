@@ -68,6 +68,7 @@ public abstract partial class ServiceBusMessageReceiver<T> : IServiceBusMessageR
 
     #region Constructor
 
+    [Obsolete("Use o construtor sem RequestConfiguration. Consulte Examples/ServiceBusMessageReceiverExamples.cs.", error: false)]
     protected ServiceBusMessageReceiver(
         ILogger<ServiceBusMessageReceiver<T>> logger,
         IConfigurationCustom configurationCustom,
@@ -81,6 +82,17 @@ public abstract partial class ServiceBusMessageReceiver<T> : IServiceBusMessageR
         {
             _requestConfiguration.CorrelationId = Guid.NewGuid().ToString();
         }
+    }
+
+    /// <summary>
+    /// Inicializa o receiver sem estado compartilhado de RequestConfiguration.
+    /// </summary>
+    protected ServiceBusMessageReceiver(
+        ILogger<ServiceBusMessageReceiver<T>> logger,
+        IConfigurationCustom configurationCustom)
+    {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _configurationCustom = configurationCustom ?? throw new ArgumentNullException(nameof(configurationCustom));
     }
 
     #endregion
@@ -211,7 +223,9 @@ public abstract partial class ServiceBusMessageReceiver<T> : IServiceBusMessageR
         using var activity = ActivitySourceCustom?.StartActivity(nameof(HandleMessageAsync));
         try
         {
-            _ = activity?.SetTag("ServiceBus.CorrelationId", RequestConfiguration.CorrelationId);
+            _ = activity?.SetTag("ServiceBus.CorrelationId", string.IsNullOrWhiteSpace(args.Message.CorrelationId)
+                ? Guid.NewGuid().ToString()
+                : args.Message.CorrelationId);
             _ = activity?.SetTag("ServiceBus.MessageId", args.Message.MessageId);
 
             _logger.LogInformation("Iniciando processamento da mensagem {MessageId}: {Data}",

@@ -1,4 +1,5 @@
-# Nuuvify.CommonPack.MftMailbox.Redis
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nuuvify_Nuuvify.CommonPack&metric=alert_status)](https://sonarcloud.io/project/overview?id=nuuvify_Nuuvify.CommonPack)
 
 [![NuGet Version](https://img.shields.io/nuget/v/Nuuvify.CommonPack.MftMailbox.Redis.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.MftMailbox.Redis)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/Nuuvify.CommonPack.MftMailbox.Redis.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.MftMailbox.Redis)

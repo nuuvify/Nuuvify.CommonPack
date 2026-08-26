@@ -27,9 +27,8 @@ public class PedidosMessageProcessor : ServiceBusMessageReceiver<PedidoContext>
 
     public PedidosMessageProcessor(
         ILogger<PedidosMessageProcessor> logger,
-        IConfigurationCustom configurationCustom,
-        RequestConfiguration requestConfiguration)
-        : base(logger, configurationCustom, requestConfiguration)
+        IConfigurationCustom configurationCustom)
+        : base(logger, configurationCustom)
     {
         _logger = logger;
 
@@ -155,9 +154,8 @@ public class NotificacoesQueueProcessor : ServiceBusMessageReceiver<NotificacaoC
 
     public NotificacoesQueueProcessor(
         ILogger<NotificacoesQueueProcessor> logger,
-        IConfigurationCustom configurationCustom,
-        RequestConfiguration requestConfiguration)
-        : base(logger, configurationCustom, requestConfiguration)
+        IConfigurationCustom configurationCustom)
+        : base(logger, configurationCustom)
     {
         _logger = logger;
         ActivitySourceCustom = new ActivitySource("NotificacoesService");
@@ -277,9 +275,8 @@ public class EventosAzureCredentialsProcessor : ServiceBusMessageReceiver<Evento
 
     public EventosAzureCredentialsProcessor(
         ILogger<EventosAzureCredentialsProcessor> logger,
-        IConfigurationCustom configurationCustom,
-        RequestConfiguration requestConfiguration)
-        : base(logger, configurationCustom, requestConfiguration)
+        IConfigurationCustom configurationCustom)
+        : base(logger, configurationCustom)
     {
         _logger = logger;
         ActivitySourceCustom = new ActivitySource("EventosService");
@@ -403,9 +400,8 @@ public class EventosFireAndForgetProcessor : ServiceBusMessageReceiver<EventoCon
 
     public EventosFireAndForgetProcessor(
         ILogger<EventosFireAndForgetProcessor> logger,
-        IConfigurationCustom configurationCustom,
-        RequestConfiguration requestConfiguration)
-        : base(logger, configurationCustom, requestConfiguration)
+        IConfigurationCustom configurationCustom)
+        : base(logger, configurationCustom)
     {
         _logger = logger;
         ActivitySourceCustom = new ActivitySource("EventosFireAndForgetService");
@@ -645,7 +641,6 @@ public static class ProgramExample
         builder.Logging.AddConsole();
 
         // Registrar dependências
-        builder.Services.AddScoped<RequestConfiguration>();
         builder.Services.AddScoped<IConfigurationCustom, ConfigurationCustom>();
 
         // Registrar processadores

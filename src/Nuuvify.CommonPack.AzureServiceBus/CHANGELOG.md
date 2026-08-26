@@ -9,6 +9,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ### Adicionado
 - Suporte a `ReceiveMode` no `ServiceBusMessageReceiver`, com exposição do modo configurado para customizações em classes derivadas.
+- Diagnósticos de processamento e correlação alinhados ao contexto de operação da mensagem.
 
 ### Alterado
 - Fluxo de processamento ajustado para evitar `CompleteMessageAsync` quando o receiver estiver em `ReceiveAndDelete`.
