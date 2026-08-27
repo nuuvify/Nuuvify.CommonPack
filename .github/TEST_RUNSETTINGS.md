@@ -42,6 +42,10 @@ Crie `test.runsettings.xml` na raiz com este conteúdo:
 1. Execute um recorte de testes com cobertura:
 
 ```powershell
+if (Test-Path ./test/.coverage-run.lock) {
+    Write-Error "Já existe uma execução de cobertura em andamento. Aguarde antes de iniciar outra."
+    return
+}
 ./tools/scripts/Test-UnitExecute.ps1 -TestCategory Unit -MinimumCoverage 0 -OpenReport:$false
 ```
 

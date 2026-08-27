@@ -21,7 +21,10 @@ Você é o agente de cobertura do Nuuvify.CommonPack. Seu objetivo é executar a
 
 1. Confirme que `.config/dotnet-tools.json` e `tools/scripts/Test-UnitExecute.ps1` existem.
 2. Verifique `test.runsettings.xml`. Se não existir, crie-o exatamente conforme o guia [Configuração de cobertura com test.runsettings.xml](../TEST_RUNSETTINGS.md) e valide o XML antes de prosseguir. Se já existir, preserve-o e continue.
-3. Execute a medição inicial a partir da raiz:
+3. Antes de executar qualquer script de cobertura, verifique se `test/.coverage-run.lock` existe.
+   Se existir, não execute outro script, não remova o lock e aguarde a execução existente ou
+   informe ao usuário que é necessário aguardar. Só prossiga quando o arquivo não existir.
+4. Execute a medição inicial a partir da raiz:
 
 ```powershell
 ./tools/scripts/Test-UnitExecute.ps1 -TestCategory Unit -MinimumCoverage 95 -OpenReport:$false
@@ -29,15 +32,15 @@ Você é o agente de cobertura do Nuuvify.CommonPack. Seu objetivo é executar a
 
 Substitua categoria e meta pelos valores pedidos. Para integração com banco real, acrescente `-IntegrationContainers Required`.
 
-4. Interprete o exit code:
+5. Interprete o exit code:
    - `0`: testes aprovados e cobertura atingida; encerre.
    - `2`: testes aprovados, mas cobertura abaixo da meta; analise o relatório.
    - qualquer outro valor: leia o log persistente mais recente em `test/TestResults/ExecutionLogs` e corrija a falha antes de analisar cobertura.
-5. Leia `test/TestResults/Coverage/Report/Summary.txt` e os relatórios Cobertura/HTML gerados. Identifique assemblies, classes, métodos e branches descobertos no pacote de menor cobertura.
-6. Leia apenas o código de produção dono desses caminhos e os testes vizinhos. Formule uma hipótese local e escolha o teste mais barato que possa refutá-la.
-7. Adicione ou ajuste testes com xUnit, Moq, Bogus e Shouldly conforme os padrões já usados pelo projeto. Use `[Trait("Category", "Unit")]` ou `[Trait("Category", "Integration")]` corretamente.
-8. Rode primeiro o projeto ou teste alterado. Se passar, execute novamente o script completo com a mesma categoria, meta e modo de containers.
-9. Repita as etapas 5 a 8 até o script retornar `0` ou até existir um bloqueio técnico comprovado.
+6. Leia `test/TestResults/Coverage/Report/Summary.txt` e os relatórios Cobertura/HTML gerados. Identifique assemblies, classes, métodos e branches descobertos no pacote de menor cobertura.
+7. Leia apenas o código de produção dono desses caminhos e os testes vizinhos. Formule uma hipótese local e escolha o teste mais barato que possa refutá-la.
+8. Adicione ou ajuste testes com xUnit, Moq, Bogus e Shouldly conforme os padrões já usados pelo projeto. Use `[Trait("Category", "Unit")]` ou `[Trait("Category", "Integration")]` corretamente.
+9. Rode primeiro o projeto ou teste alterado. Se passar, execute novamente o script completo com a mesma categoria, meta e modo de containers, repetindo a verificação do lock antes da execução.
+10. Repita as etapas 6 a 9 até o script retornar `0` ou até existir um bloqueio técnico comprovado.
 
 ## Regras
 
