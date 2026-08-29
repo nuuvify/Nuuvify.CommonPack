@@ -4,11 +4,11 @@
 
 | Campo           | Valor                              |
 | --------------- | ---------------------------------- |
-| Status          | Em andamento                       |
+| Status          | Concluído                          |
 | Criado em       | 2026-08-20                         |
-| Atualizado em   | 2026-08-20                         |
+| Atualizado em   | 2026-08-28                         |
 | Responsável     | Lincoln Zocateli                   |
-| Última revisão  | N/A                                |
+| Última revisão  | 2026-08-28                         |
 
 ### Histórico de Status
 
@@ -16,9 +16,11 @@
 | --- | --- | --- |
 | 2026-08-20 | N/A -> Rascunho | Criação do plano para revisão e aprovação humana |
 | 2026-08-20 | Rascunho -> Em andamento | Implementação iniciada e validada parcialmente |
+| 2026-08-28 | Em andamento -> Concluído | Etapa 8 fechada: testes focados (11/11) e do pacote (42/42) aprovados, build e pack Release sem erros, inspeção do `.nupkg` confirmando README, CHANGELOG e XML docs, e smoke test em container Docker validando `AddContainerSecrets` (resolução de `Database__Password`, arquivos montados preservados, `optional=true`/`false` e fail-closed) |
 
-> O status não registra aprovação humana. O encerramento depende das
-> validações restantes da etapa 8.
+> Plano concluído após validação completa da etapa 8, incluindo o smoke test
+> em container. O plano de modernização relacionado
+> (`middleware-modernization-compatibility.md`) já está concluído e publicado.
 
 ## Status de Execução
 
@@ -31,7 +33,7 @@
 | 5. README e migração | Concluída | README do pacote atualizado |
 | 6. Changelogs | Concluída | Changelogs do pacote e raiz atualizados |
 | 7. Auditoria de consumidores | Concluída | Consumidores revisados sem edição |
-| 8. Validação final | Em andamento | 9/9 testes focados, 31/31 testes do pacote, build amplo e pack Release aprovados; inspeção do pacote e smoke test em container pendentes |
+| 8. Validação final | Concluída | 11/11 testes focados, 42/42 testes do pacote, build e pack Release sem erros; `.nupkg` inspecionado com README, CHANGELOG e XML docs presentes; smoke test em container Docker aprovado (resolução `Database__Password` -> `Database:Password`, arquivos montados preservados, `optional=true` sem exceção e `optional=false` fail-closed com `DirectoryNotFoundException`) |
 
 ## Relação com a modernização posterior
 
