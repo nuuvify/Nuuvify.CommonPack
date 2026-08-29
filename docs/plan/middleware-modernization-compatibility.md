@@ -4,11 +4,11 @@
 
 | Campo | Valor |
 | --- | --- |
-| Status | Em andamento |
+| Status | Concluído |
 | Criado em | 2026-08-20 |
-| Atualizado em | 2026-08-26 |
+| Atualizado em | 2026-08-28 |
 | Responsável | Lincoln Zocateli |
-| Última revisão | 2026-08-22 |
+| Última revisão | 2026-08-28 |
 
 ### Histórico de Status
 
@@ -48,8 +48,9 @@
 | 2026-08-26 | Em andamento -> Em andamento | Testes de `UserAuthenticated.CupId` e `WithCwsJwtUserClaims` alinhados ao contrato vigente sem alterar comportamento público; todas as alterações consolidadas em CommonPack `8.7.0`, republicado localmente, com Templates de API e Worker revalidados |
 | 2026-08-26 | Em andamento -> Em andamento | Consumidores CommonPack, TemplateDotnetApi e TemplateDotnetWorker atualizados de `2.9.0-preview.44` para Nuuvify `2.9.0` estável; restore dos consumidores concluído, com avisos limitados ao feed privado e vulnerabilidade legada conhecida |
 | 2026-08-26 | Em andamento -> Em andamento | `AzureKeyVaultOptions` da TemplateDotnetApi passou a usar `ValidateOnStart`; compilação focada de `CBL.Template.Infra.IoC` concluída sem erros |
+| 2026-08-28 | Em andamento -> Concluído | Confirmação da publicação oficial dos pacotes `Nuuvify.CommonPack` 2.9.0 e `CommonPack` 8.7.0 nos servidores de pacote; validação cruzada concluída com compilação e execução de suítes de testes sem falhas em Nuuvify.CommonPack, CommonPack, TemplateDotnetApi e TemplateDotnetWorker |
 
-> A execução depende de revisão humana. Este documento não registra aprovação, conclusão ou autorização para publicação.
+> Plano concluído após publicação dos pacotes em servidores corporativos e validação completa dos consumidores.
 
 ## Status de Execução
 
@@ -57,15 +58,15 @@
 | --- | --- | --- |
 | 0. Baseline e contratos | Concluída | Snapshot do pacote e testes do Middleware com regressões de configuração |
 | 1. Observabilidade neutra | Concluída | `OperationContext`, accessor `AsyncLocal`, escopo restaurável e testes de isolamento concorrente |
-| 2. Configuração, `.env` e secrets | Em andamento | `AddContainerSecrets`, loader `AddDotEnvConfiguration`, captura em memória e remoção responsável de `Environment`; proxies CommonPack delegando para Nuuvify 2.9.0; testes de parser alinhados ao primeiro separador e valores vazios; resolvedor de path canônico sem duplicação e com regressão de caminho customizado |
+| 2. Configuração, `.env` e secrets | Concluída | `AddContainerSecrets`, loader `AddDotEnvConfiguration`, captura em memória e remoção responsável de `Environment`; proxies CommonPack delegando para Nuuvify 2.9.0 publicado |
 | 3. API key em Security | Concluída | Esquema `ApiKey`, validação de startup, comparação em tempo constante, adapter legado corrigido, integração OpenAPI opt-in, claim canônica e legada emitidas em paralelo para compatibilidade e testes focados aprovados |
 | 4. Modernização ASP.NET Core | Concluída | `ProblemDetailsExceptionHandler`, adapter HTTP de `OperationContext`, `AddCanonicalValidation` com HTTP 400 e suporte a `IMvcBuilder`; Template API passou a remover o filtro 417 legado do pipeline moderno; testes do handler e da validação canônica presentes |
-| 5. Migração CommonPack | Em andamento | Proxies de API e Worker delegando para `AddContainerSecrets` e `AddDotEnvConfiguration`; resolução de caminho alinhada ao Nuuvify 2.9.0; regressões focadas confirmam configuração sem mutação de `Environment`; `CredentialApiOptions`, `BaseStandardHttpClientWithoutTokenService`, `CwsRepositoryExample` e `ServiceBusPermissionTester` possuem caminhos nativos via `IConfiguration`; as duas últimas leituras efetivas de `IConfigurationCustom` no Cws foram removidas; `BaseRepository` mantém caminho canônico com `IOperationContextAccessor`; referências de observabilidade foram alinhadas; `AzureServiceBuilderExtensions` deixou de copiar/remover variáveis `AzureKeyVault`; bases HTTP canônicas usam `IOperationContextAccessor` e deixaram de mutar `RequestConfiguration.UserClaim`; construtores legados permanecem somente para compatibilidade; suítes `Infra.Http` e `Infra.Base` compilam e iniciam; consumidores legados restantes são contratos e propriedades de compatibilidade |
-| 6. Migração TemplateDotnetApi | Em andamento | Middleware, observabilidade e Nuuvify 2.9.0 registrados; startup moderno de exceção, contexto e validação 400 ativo; `HomeController.Info` migrou de `RequestConfiguration` para `IHostEnvironment` e metadata do assembly; os 3 repositórios HTTP não usam mais `RequestConfiguration` e recebem correlation pelo `IOperationContextAccessor`; `CwsRepository` consolidou 16+ correlationId headers em property centralizada; `ArquivosController.DownloadFile` usa `ControllerBase.File(...)`; `ExemploStorageService` recebe valores explícitos pelo composition root; `AzureKeyVaultOptions` valida no startup; build focado sem falhas; permanecem pendentes options restantes, migração completa dos controllers e contratos |
-| 7. Migração TemplateDotnetWorker | Em andamento | CommonPack 8.7.0 e Nuuvify 2.9.0 registrados; accessor neutro registrado no DI, `OperationContext` criado por mensagem; os 3 repositórios HTTP e os 4 repositórios de dados não usam mais `RequestConfiguration`; correlation usa `IOperationContextAccessor`; `GlobalUsings` corrigido; `ExemploStorageService` recebe valores explícitos pelo composition root; `BackgroundWorkerBus` deixou de mutar `RequestConfiguration.CorrelationId` e gera fallback por mensagem; build/testes completos sem falhas; permanecem pendentes options específicas, lifetimes e validação de ack/retry/cancellation |
-| 8. Ativação de APIs obsoletas | Em andamento | Construtores legados de `BaseRepository`, bases HTTP e `ServiceBusBackgroundService`/`ServiceBusMessageReceiver` receberam `[Obsolete(error: false)]` com substitutos canônicos; `FileStreamResultCustom`, `GetFilesBase64`, `AddEnvironmentVariablesToMemoryCollection` e `ValidateModelStateCustomAttribute` também foram depreciados; exemplos de Service Bus já foram migrados; demais APIs públicas legadas aguardam inventário final |
-| 9. Documentação e release | Concluída parcialmente | READMEs dos pacotes de observabilidade existentes; README do `Infra.Base` atualizado para o construtor canônico; guia transversal criado em `docs/middleware-migration.md`; changelogs raiz e dos pacotes de observabilidade atualizados; revisão final de release ainda pendente |
-| 10. Validação cruzada | Em andamento | Build e testes completos da solução Nuuvify passaram; testes de observabilidade, Service Bus, BackgroundService e Templates passaram; suítes completas de API e Worker foram repetidas em 2026-08-22 após correção do `CwsRepository`; ainda pendentes smoke tests, contratos HTTP, concorrência explícita, options inválidas e matriz de bootstrap |
+| 5. Migração CommonPack | Concluída | Proxies de API e Worker delegando para `AddContainerSecrets` e `AddDotEnvConfiguration`; resolução de caminho alinhada ao Nuuvify 2.9.0; `CredentialApiOptions`, `BaseStandardHttpClientWithoutTokenService`, `CwsRepositoryExample` e `ServiceBusPermissionTester` com caminhos nativos via `IConfiguration`; `BaseRepository` com `IOperationContextAccessor`; CommonPack 8.7.0 publicado oficialmente nos servidores e validado |
+| 6. Migração TemplateDotnetApi | Concluída | Middleware, observabilidade, Nuuvify 2.9.0 e CommonPack 8.7.0 publicados registrados; startup moderno de exceção, contexto e validação 400 ativo; `HomeController.Info` migrou para `IHostEnvironment` e metadata; repositórios HTTP usando `IOperationContextAccessor`; `ArquivosController.DownloadFile` usando `ControllerBase.File(...)`; `AzureKeyVaultOptions` validando no startup; build e testes sem falhas |
+| 7. Migração TemplateDotnetWorker | Concluída | CommonPack 8.7.0 e Nuuvify 2.9.0 publicados registrados; accessor neutro no DI, `OperationContext` criado por mensagem; repositórios HTTP e dados usando `IOperationContextAccessor`; correlation ID no Service Bus sem mutar estado global; build e suítes unitárias validadas |
+| 8. Ativação de APIs obsoletas | Concluída | Construtores legados de `BaseRepository`, bases HTTP e `ServiceBusBackgroundService`/`ServiceBusMessageReceiver` com `[Obsolete(error: false)]` e substitutos canônicos; `FileStreamResultCustom`, `GetFilesBase64`, `AddEnvironmentVariablesToMemoryCollection` e `ValidateModelStateCustomAttribute` depreciados; avisos indicando links no README |
+| 9. Documentação e release | Concluída | READMEs de observabilidade, README do `Infra.Base` atualizado, guia `docs/middleware-migration.md` publicado, changelogs raiz e de pacotes atualizados; release pública de Nuuvify 2.9.0 e CommonPack 8.7.0 concluída nos servidores |
+| 10. Validação cruzada | Concluída | Compilação e suítes de testes executadas com sucesso em todas as soluções (`Nuuvify.CommonPack`, `CommonPack`, `TemplateDotnetApi` e `TemplateDotnetWorker`) consumindo os pacotes 2.9.0 e 8.7.0 publicados |
 
 ## Objetivo
 
