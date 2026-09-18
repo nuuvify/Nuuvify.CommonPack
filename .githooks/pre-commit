@@ -1,0 +1,11 @@
+#!/bin/sh
+set -eu
+
+command -v docker >/dev/null 2>&1 || {
+  echo "Gitleaks obrigatorio: Docker nao foi encontrado no PATH." >&2
+  exit 1
+}
+
+git diff --cached --no-ext-diff --no-textconv | docker run --rm -i --read-only \
+  lzocateli/gitleaks:8.30.1 \
+  stdin --redact
