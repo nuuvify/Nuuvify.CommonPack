@@ -1,4 +1,3 @@
-
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nuuvify_Nuuvify.CommonPack&metric=alert_status)](https://sonarcloud.io/project/overview?id=nuuvify_Nuuvify.CommonPack)
 
 [![NuGet](https://img.shields.io/nuget/v/Nuuvify.CommonPack.BackgroundService.svg)](https://www.nuget.org/packages/Nuuvify.CommonPack.BackgroundService/)
@@ -89,16 +88,16 @@ public class OrderProcessingService : BackgroundServiceAbstract<OrderProcessingS
 
 ```json
 {
-  "AppConfig": {
-    "ServiceBus": {
-      "Cnn": "ServiceBusConnection",
-      "Topic": "orders-topic",
-      "Subscription": "order-processing-subscription"
+    "AppConfig": {
+        "ServiceBus": {
+            "Cnn": "ServiceBusConnection",
+            "Topic": "orders-topic",
+            "Subscription": "order-processing-subscription"
+        }
+    },
+    "ConnectionStrings": {
+        "ServiceBusConnection": "Endpoint=sb://your-namespace.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=your-key"
     }
-  },
-  "ConnectionStrings": {
-    "ServiceBusConnection": "Endpoint=sb://your-namespace.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=your-key"
-  }
 }
 ```
 
@@ -135,15 +134,39 @@ Configure no appsettings.json:
 
 ```json
 {
-  "AppConfig": {
-    "ServiceBus": {
-      "FullyQualifiedNamespace": "your-namespace.servicebus.windows.net",
-      "Topic": "orders-topic",
-      "Subscription": "order-processing-subscription"
+    "AppConfig": {
+        "ServiceBus": {
+            "FullyQualifiedNamespace": "your-namespace.servicebus.windows.net",
+            "Topic": "orders-topic",
+            "Subscription": "order-processing-subscription"
+        }
     }
-  }
 }
 ```
+
+## Filas com Sessão
+
+Filas criadas com sessão obrigatória (`requires_session = true`) não aceitam o processador comum. Use `ConfigureServiceBusSession` no construtor da classe derivada:
+
+```csharp
+ConfigureServiceBusSession(
+    cnnName: "ServiceBus:SuaAplicacao:ConnectionString",
+    queueName: "sua-fila",
+    serviceBusClientOptions: new ServiceBusClientOptions(),
+    serviceBusSessionProcessorOptions: new ServiceBusSessionProcessorOptions
+    {
+        MaxConcurrentSessions = 4,
+        MaxConcurrentCallsPerSession = 1,
+        MaxAutoLockRenewalDuration = TimeSpan.FromMinutes(30)
+    });
+```
+
+- Mensagens com o mesmo `SessionId` são entregues em ordem e nunca processadas em paralelo entre si.
+- `MaxConcurrentSessions` controla quantas sessões são processadas simultaneamente.
+- `SessionIds` restringe a instância a sessões específicas.
+- O resultado de `ExecuteReceivedMessageAsync` e o `AbandonMessageIfFailed` seguem as mesmas regras de settlement do fluxo sem sessão.
+- A Dead Letter Queue continua sendo tratada por `DecideDeadLetterMessageActionAsync`, preservando o `SessionId` ao reenfileirar.
+- Os métodos protegidos que recebem `ProcessMessageEventArgs` não são invocados no fluxo com sessão; para customizá-lo, sobrescreva `HandleSessionMessageAsync`.
 
 ## Interface IBackgroundServiceAbstract
 
@@ -186,31 +209,33 @@ AbandonMessageIfFailed = false;
 Todas as mensagens que falham agora incluem **propriedades de diagnóstico contextuais**:
 
 #### Dead Letter Queue Properties:
+
 ```json
 {
-  "ErrorDetails": "Unhandled exception: Database connection failed",
-  "FailureTime": "2025-10-07T19:26:30.123Z",
-  "WorkerVersion": "1.2.3.0",
-  "CorrelationId": "abc-123-def-456",
-  "DeliveryAttempt": 3,
-  "MessageId": "msg-789",
-  "ExceptionType": "SqlException",
-  "WorkerInstance": "SERVER01",
-  "ProcessedBy": "OrderProcessingService"
+    "ErrorDetails": "Unhandled exception: Database connection failed",
+    "FailureTime": "2025-10-07T19:26:30.123Z",
+    "WorkerVersion": "1.2.3.0",
+    "CorrelationId": "abc-123-def-456",
+    "DeliveryAttempt": 3,
+    "MessageId": "msg-789",
+    "ExceptionType": "SqlException",
+    "WorkerInstance": "SERVER01",
+    "ProcessedBy": "OrderProcessingService"
 }
 ```
 
 #### Abandon Message Properties:
+
 ```json
 {
-  "AbandonReason": "Operation was cancelled",
-  "AbandonTime": "2025-10-07T19:26:30.123Z",
-  "RetryCount": 2,
-  "CorrelationId": "abc-123-def-456",
-  "MessageId": "msg-789",
-  "WorkerInstance": "SERVER01",
-  "ProcessedBy": "OrderProcessingService",
-  "NextRetryHint": "2025-10-07T19:27:30.123Z"
+    "AbandonReason": "Operation was cancelled",
+    "AbandonTime": "2025-10-07T19:26:30.123Z",
+    "RetryCount": 2,
+    "CorrelationId": "abc-123-def-456",
+    "MessageId": "msg-789",
+    "WorkerInstance": "SERVER01",
+    "ProcessedBy": "OrderProcessingService",
+    "NextRetryHint": "2025-10-07T19:27:30.123Z"
 }
 ```
 

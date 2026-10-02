@@ -7,6 +7,14 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não Lançado]
 
+### Adicionado
+
+- Suporte a filas com sessão obrigatória por meio de `ConfigureServiceBusSession`, com string de conexão ou credencial Azure, e ponto de extensão `HandleSessionMessageAsync`.
+
+### Corrigido
+
+- Corrigida `NullReferenceException` ao processar, abandonar ou enviar mensagens para a Dead Letter Queue em classes que usam o construtor sem `RequestConfiguration`; a correlação passa a usar o `CorrelationId` da mensagem.
+
 ## [2.9.0] - 2026-08-26
 
 ### Adicionado
