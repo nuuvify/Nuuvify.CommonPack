@@ -78,6 +78,22 @@ public abstract partial class ServiceBusBackgroundService<T>
                 }
             }
 
+            if (_serviceBusSessionProcessor is not null)
+            {
+                try
+                {
+                    _serviceBusSessionProcessor.DisposeAsync().AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
+                }
+                catch (ObjectDisposedException ex)
+                {
+                    _logger.LogWarning(ex, "Falha ao liberar recurso síncrono do Service Bus.");
+                }
+                catch (InvalidOperationException ex)
+                {
+                    _logger.LogWarning(ex, "Falha ao liberar recurso síncrono do Service Bus.");
+                }
+            }
+
             if (_originEntitySender is not null)
             {
                 try
@@ -113,6 +129,7 @@ public abstract partial class ServiceBusBackgroundService<T>
             TryDisposeActivitySource(ActivitySourceCustom);
 
             _serviceBusProcessor = null!;
+            _serviceBusSessionProcessor = null!;
             _deadLetterProcessor = null!;
             _originEntitySender = null!;
             _serviceBusClient = null!;
@@ -150,10 +167,12 @@ public abstract partial class ServiceBusBackgroundService<T>
         if (stopProcessors)
         {
             await TryStopProcessorAsync(resources.ServiceBusProcessor, cancellationToken);
+            await TryStopSessionProcessorAsync(resources.SessionProcessor, cancellationToken);
             await TryStopProcessorAsync(resources.DeadLetterProcessor, cancellationToken);
         }
 
         await TryDisposeAsync(resources.ServiceBusProcessor);
+        await TryDisposeAsync(resources.SessionProcessor);
         await TryDisposeAsync(resources.DeadLetterProcessor);
         await TryDisposeAsync(resources.OriginEntitySender);
         await TryDisposeAsync(resources.ServiceBusClient);
@@ -174,12 +193,14 @@ public abstract partial class ServiceBusBackgroundService<T>
 
             var snapshot = new ServiceBusResourcesSnapshot(
                 _serviceBusProcessor,
+                _serviceBusSessionProcessor,
                 _deadLetterProcessor,
                 _originEntitySender,
                 _serviceBusClient,
                 ActivitySourceCustom);
 
             _serviceBusProcessor = null!;
+            _serviceBusSessionProcessor = null!;
             _deadLetterProcessor = null!;
             _originEntitySender = null!;
             _serviceBusClient = null!;
@@ -211,6 +232,31 @@ public abstract partial class ServiceBusBackgroundService<T>
         catch (ServiceBusException ex)
         {
             _logger.LogWarning(ex, "Falha ao parar processador do Service Bus durante descarte.");
+        }
+    }
+
+    private async Task TryStopSessionProcessorAsync(ServiceBusSessionProcessor processor, CancellationToken cancellationToken)
+    {
+        if (processor == null)
+        {
+            return;
+        }
+
+        try
+        {
+            await processor.StopProcessingAsync(cancellationToken);
+        }
+        catch (ObjectDisposedException ex)
+        {
+            _logger.LogWarning(ex, "Falha ao parar processador de sessões do Service Bus durante descarte.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "Falha ao parar processador de sessões do Service Bus durante descarte.");
+        }
+        catch (ServiceBusException ex)
+        {
+            _logger.LogWarning(ex, "Falha ao parar processador de sessões do Service Bus durante descarte.");
         }
     }
 
@@ -262,6 +308,7 @@ public abstract partial class ServiceBusBackgroundService<T>
 
     private readonly record struct ServiceBusResourcesSnapshot(
         ServiceBusProcessor ServiceBusProcessor,
+        ServiceBusSessionProcessor SessionProcessor,
         ServiceBusProcessor DeadLetterProcessor,
         ServiceBusSender OriginEntitySender,
         ServiceBusClient ServiceBusClient,
@@ -269,6 +316,7 @@ public abstract partial class ServiceBusBackgroundService<T>
     {
         public bool IsEmpty =>
             ServiceBusProcessor == null &&
+            SessionProcessor == null &&
             DeadLetterProcessor == null &&
             OriginEntitySender == null &&
             ServiceBusClient == null &&
