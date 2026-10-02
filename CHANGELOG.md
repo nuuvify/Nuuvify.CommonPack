@@ -13,6 +13,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 - Construtores canônicos baseados em `IOperationContextAccessor` para adapters HTTP, repositórios e processamento de mensagens.
 - Esquema de autenticação `ApiKey` com claim canônica e integração opt-in ao pipeline ASP.NET Core.
 - Testes de cobertura para configuração OpenAPI e isolamento assíncrono do contexto de operação.
+- Suporte a filas do Service Bus com sessão obrigatória no pacote `Nuuvify.CommonPack.BackgroundService`, via `ConfigureServiceBusSession`.
 
 ### Alterado
 
@@ -23,6 +24,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 ### Corrigido
 
 - Carregamento silenciosamente vazio de variáveis de ambiente no método legado do pacote `Nuuvify.CommonPack.Middleware`.
+- `NullReferenceException` no `Nuuvify.CommonPack.BackgroundService` ao processar ou liquidar mensagens em workers que usam o construtor sem `RequestConfiguration`.
 
 ### Removido
 
