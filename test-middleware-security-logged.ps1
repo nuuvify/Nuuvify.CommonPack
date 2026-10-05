@@ -1,8 +1,8 @@
 #!/usr/bin/env pwsh
 
 $dotnet = 'C:\Program Files\dotnet\dotnet.exe'
-$basePath = 'c:\Users\lzob8c1\projetos\Nuuvify.CommonPack'
-$output = 'c:\Users\lzob8c1\projetos\Nuuvify.CommonPack\test-results.txt'
+$basePath = "$env:USERPROFILE\projetos\Nuuvify.CommonPack"
+$output = "$env:USERPROFILE\projetos\Nuuvify.CommonPack\test-results.txt"
 
 "Starting tests..." | Tee-Object $output
 
