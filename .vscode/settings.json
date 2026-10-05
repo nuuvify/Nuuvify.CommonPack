@@ -1,3 +1,4 @@
 {
-    "dotnet.defaultSolution": "Nuuvify.CommonPack.sln"
+  "dotnet.defaultSolution": "Nuuvify.CommonPack.sln",
+  "dotnet.useDotnetCli": true
 }
