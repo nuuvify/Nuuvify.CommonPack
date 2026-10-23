@@ -28,11 +28,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4
-        with:
-          global-json-file: global.json
-
       - name: Resolve release channel
         id: channel
         shell: pwsh
@@ -46,15 +41,61 @@ jobs:
 
           "value=$channel" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
+      - name: Check whether stable release is already published
+        id: published
+        shell: pwsh
+        env:
+          RELEASE_CHANNEL: ${{ steps.channel.outputs.value }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          Import-Module ./.github/scripts/PublishedRelease.psm1
+
+          if ($env:RELEASE_CHANNEL -ne 'stable') {
+            "already_published=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+            Write-Host "Canal $env:RELEASE_CHANNEL não é stable; verificação ignorada."
+            exit 0
+          }
+
+          $versionContent = Get-Content -Path 'src/Directory.Build.props' -Raw
+          $versionMatch = [regex]::Match($versionContent, '<VersionPrefix>(?<version>\d+\.\d+\.\d+)</VersionPrefix>')
+          if (-not $versionMatch.Success) {
+            throw 'VersionPrefix ausente ou inválido em src/Directory.Build.props.'
+          }
+
+          $version = $versionMatch.Groups['version'].Value
+          $alreadyPublished = Test-GitHubReleasePublished `
+            -Channel $env:RELEASE_CHANNEL `
+            -Version $version `
+            -Repository $env:GITHUB_REPOSITORY `
+            -Token $env:GITHUB_TOKEN
+
+          if ($alreadyPublished) {
+            "already_published=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+            Write-Host "A release v$version já foi publicada; nenhuma etapa de build ou publicação será executada."
+          }
+          else {
+            "already_published=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+            Write-Host "A release v$version ainda não existe; a publicação continuará."
+          }
+
+      - name: Setup .NET SDK
+        if: ${{ steps.published.outputs.already_published != 'true' }}
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
       - name: Compute version
+        if: ${{ steps.published.outputs.already_published != 'true' }}
         id: version
         shell: pwsh
         run: ./.github/scripts/compute-version.ps1 -Channel '${{ steps.channel.outputs.value }}' -VersionFile 'src/Directory.Build.props' -RunNumber '${{ github.run_number }}'
 
       - name: Restore solution
+        if: ${{ steps.published.outputs.already_published != 'true' }}
         run: dotnet restore Nuuvify.CommonPack.sln
 
       - name: Build solution
+        if: ${{ steps.published.outputs.already_published != 'true' }}
         run: >
           dotnet build Nuuvify.CommonPack.sln --configuration Release --no-restore
           /p:VersionPrefix=${{ steps.version.outputs.version_prefix }}
@@ -65,12 +106,15 @@ jobs:
           /p:RepositoryCommit=${{ github.sha }}
 
       - name: Run unit tests
+        if: ${{ steps.published.outputs.already_published != 'true' }}
         run: dotnet test Nuuvify.CommonPack.sln --configuration Release --no-build --filter "Category=Unit"
 
       - name: Run integration tests
+        if: ${{ steps.published.outputs.already_published != 'true' }}
         run: dotnet test Nuuvify.CommonPack.sln --configuration Release --no-build --filter "Category=Integration"
 
       - name: Pack solution
+        if: ${{ steps.published.outputs.already_published != 'true' }}
         run: >
           dotnet pack Nuuvify.CommonPack.sln --configuration Release --no-build -o ./artifacts
           /p:VersionPrefix=${{ steps.version.outputs.version_prefix }}
@@ -81,6 +125,7 @@ jobs:
           /p:RepositoryCommit=${{ github.sha }}
 
       - name: Assert artifact versions
+        if: ${{ steps.published.outputs.already_published != 'true' }}
         shell: pwsh
         run: >
           ./.github/scripts/assert-artifact-version.ps1
@@ -91,11 +136,12 @@ jobs:
           -ExpectedFileVersion '${{ steps.version.outputs.file_version }}'
 
       - name: Build release notes
-        if: ${{ steps.version.outputs.create_release == 'true' }}
+        if: ${{ steps.published.outputs.already_published != 'true' && steps.version.outputs.create_release == 'true' }}
         shell: pwsh
         run: ./.github/scripts/build-release-notes.ps1 -Version '${{ steps.version.outputs.version }}' -Channel '${{ steps.channel.outputs.value }}' -BaseBranch '${{ github.ref_name }}' -OutputPath './artifacts/release-notes.md'
 
       - name: Upload package artifacts
+        if: ${{ steps.published.outputs.already_published != 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: nuget-${{ steps.version.outputs.version }}
@@ -106,7 +152,7 @@ jobs:
           retention-days: 14
 
       - name: Create git tag
-        if: ${{ steps.version.outputs.create_release == 'true' }}
+        if: ${{ steps.published.outputs.already_published != 'true' && steps.version.outputs.create_release == 'true' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -120,7 +166,7 @@ jobs:
           fi
 
       - name: Publish to NuGet.org
-        if: ${{ steps.channel.outputs.value != 'dev' }}
+        if: ${{ steps.published.outputs.already_published != 'true' && steps.channel.outputs.value != 'dev' }}
         shell: pwsh
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
@@ -142,7 +188,7 @@ jobs:
           }
 
       - name: Publish to nugettest
-        if: ${{ steps.channel.outputs.value == 'dev' }}
+        if: ${{ steps.published.outputs.already_published != 'true' && steps.channel.outputs.value == 'dev' }}
         shell: pwsh
         env:
           NUGETTEST_API_KEY: ${{ secrets.NUGETTEST_API_KEY }}
@@ -164,7 +210,7 @@ jobs:
           }
 
       - name: Create GitHub release
-        if: ${{ steps.version.outputs.create_release == 'true' }}
+        if: ${{ steps.published.outputs.already_published != 'true' && steps.version.outputs.create_release == 'true' }}
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
