@@ -12,6 +12,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - Suporte a `ReceiveMode` no `ServiceBusBackgroundService`, com identificação explícita do modo `ReceiveAndDelete` para classes derivadas.
 - Processamento dedicado da Dead Letter Queue com ação configurável para descartar a mensagem ou reenfileirá-la na entidade de origem.
 - Diagnósticos de processamento e correlação alinhados ao contexto de operação da mensagem.
+- Suporte a filas com sessão obrigatória por meio de `ConfigureServiceBusSession`, com string de conexão ou credencial Azure, e ponto de extensão `HandleSessionMessageAsync`.
 
 ### Alterado
 
@@ -22,6 +23,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 ### Corrigido
 
 - Corrigido o fluxo de tratamento para mensagens já removidas em `ReceiveAndDelete`, evitando exceções secundárias durante o error handling.
+- Corrigida `NullReferenceException` ao processar, abandonar ou enviar mensagens para a Dead Letter Queue em classes que usam o construtor sem `RequestConfiguration`; a correlação passa a usar o `CorrelationId` da mensagem.
 
 ### Removido
 
