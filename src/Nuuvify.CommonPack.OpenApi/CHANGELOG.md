@@ -7,18 +7,12 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ## [Não Lançado]
 
+## [2.9.0] - 2026-08-26
+
 ### Adicionado
 
 - Integração opt-in do esquema de autenticação por API key na documentação OpenAPI.
 - Testes para validar os esquemas de segurança `ApiKey` e `Bearer` registrados no Swagger.
-
-### Alterado
-
-### Corrigido
-
-### Removido
-
-### Segurança
 
 ## [Sem versão registrada] - 2026-05-29
 

@@ -7,6 +7,8 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ## [Não Lançado]
 
+## [2.9.0] - 2026-08-26
+
 ### Adicionado
 
 - Nova extensão `AddContainerSecrets` para carregar secrets montados usando o provider `KeyPerFile`.
@@ -32,8 +34,6 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 - Carregamento silenciosamente vazio de `AddEnvironmentVariablesToKeyPerFile` após a remoção do diretório temporário.
 - Validação de argumentos de `AddContainerSecrets` agora usa guard clause nativa.
-
-### Removido
 
 ### Segurança
 
