@@ -5,6 +5,13 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-br/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec/v2.0.0.html).
 
+## [2.10.0](https://github.com/nuuvify/Nuuvify.CommonPack/compare/v2.9.1...v2.10.0) (2026-10-24)
+
+
+### Adicionado
+
+* adicione sessões do Service Bus ao BackgroundService ([#251](https://github.com/nuuvify/Nuuvify.CommonPack/issues/251)) ([e8a2061](https://github.com/nuuvify/Nuuvify.CommonPack/commit/e8a2061f2eb4523c4144b1c0d618360067bf3715))
+
 ## [2.9.1](https://github.com/nuuvify/Nuuvify.CommonPack/compare/v2.9.0...v2.9.1) (2026-10-24)
 
 
