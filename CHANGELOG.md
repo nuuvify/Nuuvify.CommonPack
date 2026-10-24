@@ -5,6 +5,15 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-br/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec/v2.0.0.html).
 
+## [2.9.1](https://github.com/nuuvify/Nuuvify.CommonPack/compare/v2.9.0...v2.9.1) (2026-10-24)
+
+
+### Corrigido
+
+* **ci:** dispense bump de versão sem alteração nos pacotes ([ff369ac](https://github.com/nuuvify/Nuuvify.CommonPack/commit/ff369acfc0c3ab05ba5ecafa4b9e35bc2b756e93))
+* **ci:** ignore a publicação quando a release estável já existe ([15544ff](https://github.com/nuuvify/Nuuvify.CommonPack/commit/15544ffeacecd976f5a864a36d1f7198f0b7979c))
+* **ci:** ignore publicação de release existente e dispense bump sem mudança nos pacotes ([d78c119](https://github.com/nuuvify/Nuuvify.CommonPack/commit/d78c119529c55cdfb4d799d0668c7e8c1207f2bb))
+
 ## [2.9.0] - 2026-08-26
 
 ### Adicionado
