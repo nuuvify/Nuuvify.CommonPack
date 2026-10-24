@@ -7,6 +7,10 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ## [Não Lançado]
 
+### Alterado
+
+- Dependências atualizadas na linha compatível com .NET 8: `Microsoft.Extensions.Logging.Abstractions` 8.0.3.
+
 ## [2.9.0] - 2026-08-26
 
 ### Adicionado

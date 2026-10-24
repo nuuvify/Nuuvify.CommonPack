@@ -7,6 +7,10 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ## [Não Lançado]
 
+### Alterado
+
+- Dependências atualizadas na linha compatível com .NET 8: `Microsoft.Extensions.Configuration.KeyPerFile` 8.0.32.
+
 ## [2.9.0] - 2026-08-26
 
 ### Adicionado

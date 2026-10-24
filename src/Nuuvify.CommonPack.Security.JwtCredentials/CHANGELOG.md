@@ -11,6 +11,8 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ### Alterado
 
+- Dependências atualizadas na linha compatível com .NET 8: `Microsoft.Extensions.Caching.SqlServer` 8.0.32.
+
 ### Corrigido
 
 ### Removido
