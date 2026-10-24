@@ -7,6 +7,8 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não Lançado]
 
+## [2.10.0] - 2026-10-24
+
 ### Adicionado
 
 - Suporte a filas com sessão obrigatória por meio de `ConfigureServiceBusSession`, com string de conexão ou credencial Azure, e ponto de extensão `HandleSessionMessageAsync`.
