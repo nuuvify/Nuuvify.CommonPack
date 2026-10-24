@@ -7,14 +7,10 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ## [Não Lançado]
 
+## [2.9.0] - 2026-08-26
+
 ### Adicionado
 - Núcleo de MFT Mailbox com factory, idempotência e auditoria.
 
 ### Alterado
 - Adicionada opção de ordenação de arquivos inbound para permitir escolha entre ordem original, nome crescente e nome decrescente.
-
-### Corrigido
-
-### Removido
-
-### Segurança

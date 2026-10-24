@@ -7,6 +7,8 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ## [Não Lançado]
 
+## [2.9.0] - 2026-08-26
+
 ### Adicionado
 - Suporte a CNPJ alfanumérico no value object `Cnpj` (12 caracteres base `[A-Z0-9]` + 2 dígitos verificadores numéricos).
 - Novos cenários de máscara para CNPJ alfanumérico no formato `XX.XXX.XXX/XXXX-XX`.
@@ -17,10 +19,6 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ### Corrigido
 - Rejeição explícita de entradas com caracteres inválidos, tamanho incorreto ou repetição total de caracteres no CNPJ.
-
-### Removido
-
-### Segurança
 
 ## [Sem versão registrada] - 2026-05-29
 
