@@ -24,9 +24,16 @@ updates:
         patterns:
           - "*"
 
+  # Majors ficam fora das atualizações automáticas: exigem migração planejada e revisão de
+  # licença (MediatR e AutoMapper passaram a ser comerciais) e o ignore também vale para as
+  # atualizações de segurança. Vulnerabilidades que só se corrigem em major são tratadas à mão
+  # a partir dos avisos do NuGetAudit no build.
   - package-ecosystem: nuget
     directories:
       - "/"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     schedule:
       interval: weekly
       day: monday
@@ -40,8 +47,10 @@ updates:
     groups:
       nuget-production:
         dependency-type: production
+        update-types: [minor, patch]
       nuget-development:
         dependency-type: development
+        update-types: [minor, patch]
 
   - package-ecosystem: devcontainers
     directories:
