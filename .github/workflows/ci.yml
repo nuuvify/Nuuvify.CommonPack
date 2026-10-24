@@ -39,7 +39,7 @@ jobs:
       contents: read
     with:
       solution: Nuuvify.CommonPack.sln
-      test-filter: Category=Unit
+      test-filter: Category=Unit&Category!=ServiceBusLongRunning
       pack: true
 
   # Local: os testes de integração usam Testcontainers (SQL Server) e precisam do Docker do runner,
@@ -139,7 +139,7 @@ jobs:
       - name: Unit tests with coverage
         if: ${{ env.SONAR_ENABLED == 'true' }}
         run: >-
-          dotnet test Nuuvify.CommonPack.sln --configuration Release --no-build --filter "Category=Unit"
+          dotnet test Nuuvify.CommonPack.sln --configuration Release --no-build --filter "Category=Unit&Category!=ServiceBusLongRunning"
           --collect:"XPlat Code Coverage" --results-directory ./artifacts/sonar-test-results
           -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
 
@@ -150,6 +150,13 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: dotnet sonarscanner end "/d:sonar.token=$env:SONAR_TOKEN"
 
+  # Local: testes ServiceBusLongRunning, executados só quando o pacote AzureServiceBus muda.
+  servicebus-long-running:
+    name: Service Bus
+    uses: ./.github/workflows/servicebus-long-running.yml
+    permissions:
+      contents: read
+
   package-changelog:
     name: Package changelog
     uses: ./.github/workflows/package-changelog.yml
@@ -158,7 +165,7 @@ jobs:
 
   snapshot:
     name: Snapshot
-    needs: [hygiene, gitleaks, dotnet, integration, sonar, package-changelog]
+    needs: [hygiene, gitleaks, dotnet, integration, sonar, servicebus-long-running, package-changelog]
     if: ${{ github.event_name == 'push' }}
     uses: ./.github/workflows/gw-publish-nuget.yml
     permissions:
@@ -173,7 +180,7 @@ jobs:
   result:
     name: Result
     if: ${{ always() }}
-    needs: [hygiene, gitleaks, dotnet, integration, sonar, package-changelog]
+    needs: [hygiene, gitleaks, dotnet, integration, sonar, servicebus-long-running, package-changelog]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions: {}

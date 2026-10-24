@@ -36,6 +36,7 @@
 - Build da solução: `dotnet build Nuuvify.CommonPack.sln`
 - Testes: `dotnet test`
 - Testes por categoria: `dotnet test --filter "Category=Unit"` e `dotnet test --filter "Category=Integration"`
+- Testes do Service Bus que levem mais de 1 s por depender do Azure SDK recebem também `[Trait("Category", "ServiceBusLongRunning")]`; o CI os executa só quando o pacote AzureServiceBus muda (ver `docs/contributing/testing.md`)
 - Cobertura: `pwsh ./test/run-tests.ps1`
 
 ## Uso eficiente de contexto

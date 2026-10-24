@@ -76,8 +76,9 @@ Resumo do contrato:
 ## 6. Check obrigatório
 
 O único check obrigatório da `main` é o `Result` do workflow [CI](../../.github/workflows/ci.yml),
-que agrega `Hygiene`, `Gitleaks`, `.NET` (build, testes `Category=Unit` e pack no container da
-toolchain), `Integration tests`, `SonarCloud` e `Package changelog`. Um job pulado ou cancelado
+que agrega `Hygiene`, `Gitleaks`, `.NET` (build, testes `Category=Unit` sem
+`ServiceBusLongRunning` e pack no container da toolchain), `Integration tests`, `SonarCloud`,
+`Service Bus` (testes longos, só quando o pacote AzureServiceBus muda) e `Package changelog`. Um job pulado ou cancelado
 reprova o `Result`.
 
 `Validate community assets` continua com filtro de caminho e **não** deve ser obrigatório.

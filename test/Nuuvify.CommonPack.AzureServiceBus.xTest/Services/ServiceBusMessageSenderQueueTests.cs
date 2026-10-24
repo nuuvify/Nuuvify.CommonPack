@@ -50,6 +50,7 @@ public class ServiceBusMessageSenderQueueTests : IAsyncDisposable
 
     #region SendMessageToQueueAsync Tests
 
+    [Trait("Category", "ServiceBusLongRunning")]
     [Fact]
     public async Task SendMessageToQueueAsync_WithValidParameters_ShouldSucceed()
     {

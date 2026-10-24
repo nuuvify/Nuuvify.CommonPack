@@ -267,6 +267,7 @@ public class ServiceBusMessageReceiverBasicTests
         receiver.IsProcessingPublic.ShouldBeFalse();
     }
 
+    [Trait("Category", "ServiceBusLongRunning")]
     [Fact]
     public async Task StartProcessingAsync_WhenAlreadyProcessing_ShouldThrowInvalidOperationException()
     {
@@ -285,6 +286,7 @@ public class ServiceBusMessageReceiverBasicTests
         exception.Message.ShouldContain("O processamento já está em andamento");
     }
 
+    [Trait("Category", "ServiceBusLongRunning")]
     [Fact]
     public async Task StopProcessingAsync_WhenProcessing_ShouldStopSuccessfully()
     {
@@ -457,6 +459,7 @@ public class ServiceBusMessageReceiverBasicTests
         config.ShouldBe(_configMock.Object);
     }
 
+    [Trait("Category", "ServiceBusLongRunning")]
     [Fact]
     public async Task StartProcessingAsync_AfterConfiguration_ShouldExecuteFlow()
     {

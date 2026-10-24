@@ -36,6 +36,7 @@ public class ServiceBusMessageSenderRetryHandlingTests : IAsyncDisposable
         VerifyNoRetryLogging();
     }
 
+    [Trait("Category", "ServiceBusLongRunning")]
     [Fact]
     public async Task ExecuteWithRetryAsync_WithRetriableException_ShouldRetryAndSucceed()
     {
@@ -60,6 +61,7 @@ public class ServiceBusMessageSenderRetryHandlingTests : IAsyncDisposable
         VerifyRetryLogging(1);
     }
 
+    [Trait("Category", "ServiceBusLongRunning")]
     [Fact]
     public async Task ExecuteWithRetryAsync_WithMultipleRetriableExceptions_ShouldRetryMultipleTimes()
     {
@@ -85,6 +87,7 @@ public class ServiceBusMessageSenderRetryHandlingTests : IAsyncDisposable
         VerifyRetryLogging(failureTimes);
     }
 
+    [Trait("Category", "ServiceBusLongRunning")]
     [Fact]
     public async Task ExecuteWithRetryAsync_WithMaxRetriesExceeded_ShouldThrowInvalidOperationException()
     {
@@ -161,6 +164,7 @@ public class ServiceBusMessageSenderRetryHandlingTests : IAsyncDisposable
         exception.Message.ShouldContain("Timeout na operação");
     }
 
+    [Trait("Category", "ServiceBusLongRunning")]
     [Fact]
     public async Task ExecuteWithRetryAsync_WithRetryDelay_ShouldWaitBetweenRetries()
     {
@@ -219,6 +223,7 @@ public class ServiceBusMessageSenderRetryHandlingTests : IAsyncDisposable
         VerifyNoRetryLogging();
     }
 
+    [Trait("Category", "ServiceBusLongRunning")]
     [Fact]
     public async Task ExecuteWithRetryAsync_VoidOverload_WithRetriableException_ShouldRetry()
     {
@@ -302,6 +307,7 @@ public class ServiceBusMessageSenderRetryHandlingTests : IAsyncDisposable
             Times.Never); // No retries because the exception is not a ServiceBusException
     }
 
+    [Trait("Category", "ServiceBusLongRunning")]
     [Fact]
     public async Task ExecuteWithRetryAsync_WithCustomConfiguration_ShouldRespectSettings()
     {
