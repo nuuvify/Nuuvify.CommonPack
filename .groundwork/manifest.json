@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "toolVersion": "0.4.0",
-  "catalogVersion": "0.4.0",
+  "toolVersion": "0.5.0",
+  "catalogVersion": "0.5.0",
   "parameters": {
     "auto_deploy_environment": "",
     "commit_scopes": "docs,tooling,deps,actions,repo",
