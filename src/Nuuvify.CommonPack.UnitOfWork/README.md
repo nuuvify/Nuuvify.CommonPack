@@ -1,8 +1,8 @@
 # Nuuvify.CommonPack.UnitOfWork
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nuuvify_Nuuvify.CommonPack&metric=alert_status)](https://sonarcloud.io/project/overview?id=nuuvify_Nuuvify.CommonPack)
-[![PR Validation](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/pr-validation.yml/badge.svg)](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/pr-validation.yml)
-[![Publish and Release](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/publish-release.yml/badge.svg?branch=main)](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/publish-release.yml)
+[![CI](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/ci.yml)
+[![Release](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/gw-release.yml/badge.svg?branch=main)](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/gw-release.yml)
 
 Implementação robusta e completa do padrão **Unit of Work** e **Repository** para Entity Framework Core. Fornece uma camada de acesso a dados padronizada com suporte a filtros dinâmicos, paginação inteligente, consultas complexas e auditoria automática.
 

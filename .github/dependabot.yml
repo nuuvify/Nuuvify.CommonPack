@@ -1,12 +1,60 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for more information:
-# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
-# https://containers.dev/guide/dependabot
-
+# Semente do Altivy.Groundwork (componente dependency-updates): pertence ao projeto.
+# Mensagens compatíveis com o título de PR e com o release-please:
+# runtime = fix(deps) (gera release patch); desenvolvimento = build(deps-dev);
+# actions = ci(actions); imagens e devcontainers = build(deps) (não geram release).
+# Workflows gw-*.yml são atualizados somente no catálogo do Groundwork (groundwork update).
 version: 2
 updates:
- - package-ecosystem: "devcontainers"
-   directory: "/"
-   schedule:
-     interval: weekly
+
+  - package-ecosystem: github-actions
+    directories:
+      - "/"
+    exclude-paths:
+      - ".github/workflows/gw-*.yml"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: America/Sao_Paulo
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci(actions)"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+  - package-ecosystem: nuget
+    directories:
+      - "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: America/Sao_Paulo
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "fix"
+      prefix-development: "build"
+      include: "scope"
+    groups:
+      nuget-production:
+        dependency-type: production
+      nuget-development:
+        dependency-type: development
+
+  - package-ecosystem: devcontainers
+    directories:
+      - "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: America/Sao_Paulo
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "build(deps)"
+    groups:
+      devcontainers:
+        patterns:
+          - "*"

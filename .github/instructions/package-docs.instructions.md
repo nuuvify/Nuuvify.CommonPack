@@ -25,37 +25,9 @@ applyTo: "Readme.md, docs/**/*.md, src/**/README.md, src/**/CHANGELOG.md"
 
 ### CHANGELOG raiz (`CHANGELOG.md` na raiz do repositório)
 
-Fonte única das GitHub Release Notes. Use exatamente este template:
-
-```markdown
-# Changelog
-
-Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
-
-O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-br/1.0.0/),
-e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec/v2.0.0.html).
-
-## [Não Lançado]
-
-### Adicionado
-
-### Alterado
-
-### Corrigido
-
-### Removido
-
-### Segurança
-
-### Performance
-
-### Documentação
-
-## [x.y.z] - yyyy-mm-dd
-
-### Adicionado
-- Descrição voltada ao consumidor.
-```
+Gerado pelo release-please a partir dos títulos dos PRs em Conventional Commits e fonte das
+GitHub Release Notes. **Não edite manualmente**: corrija o título do PR antes do merge ou use o
+rodapé `Release-As` descrito em [docs/runbooks/release.md](../../docs/runbooks/release.md).
 
 ### CHANGELOG de pacote (`src/<Pacote>/CHANGELOG.md`)
 
@@ -114,20 +86,17 @@ Todos os CHANGELOGs (raiz e de pacote) devem estar inteiramente em **pt-BR**. Se
 
 ## Alinhamento com o processo de release
 
-O CHANGELOG está diretamente integrado ao `prepare-release.yml` e ao `build-release-notes.ps1`. Respeite as responsabilidades abaixo — violar qualquer uma pode abortar a publicação.
+O processo está descrito em [docs/maintainers/release-process.md](../../docs/maintainers/release-process.md). Respeite as responsabilidades abaixo.
 
 | Momento | Ator | Arquivo | Ação |
 |---|---|---|---|
-| Durante desenvolvimento | Humano / IA | `CHANGELOG.md` (raiz) e `src/pkg/CHANGELOG.md` | Adicionar itens em `## [Não Lançado]` |
-| Abertura do release PR | 🤖 `prepare-release.yml` | `CHANGELOG.md` (raiz) | Fecha `[Não Lançado]` → `## [X.Y.Z] - yyyy-mm-dd` |
-| Publicação stable | 🤖 `build-release-notes.ps1` | `CHANGELOG.md` (raiz) | Lê a seção fechada `[X.Y.Z]` para as release notes |
-| Publicação preview/dev | 🤖 `build-release-notes.ps1` | `CHANGELOG.md` (raiz) | Lê `[Não Lançado]` para as release notes |
+| Durante desenvolvimento | Humano / IA | `src/pkg/CHANGELOG.md` | Adicionar itens em `## [Não Lançado]` |
+| Release PR do release-please | 🤖 `release-please` | `CHANGELOG.md` (raiz) | Gera a seção da versão a partir dos Conventional Commits |
+| Release PR do release-please | 🤖 `package-changelog-release.yml` | `src/pkg/CHANGELOG.md` | Fecha `[Não Lançado]` → `## [X.Y.Z] - yyyy-mm-dd` nos pacotes com itens |
 
 ### Regras derivadas
 
-- **Sempre adicione a `[Não Lançado]`** — nunca crie manualmente uma seção `[X.Y.Z]`; isso é responsabilidade exclusiva do `prepare-release.yml`.
-- Atualize **ambos** os changelogs na mesma alteração de código: o raiz **e** o do pacote afetado.
-- O CHANGELOG raiz é a **fonte das GitHub Release Notes**; omita detalhes internos sem impacto para o consumidor externo.
+- **Sempre adicione a `[Não Lançado]` do pacote** — nunca crie manualmente uma seção `[X.Y.Z]`.
+- **Não edite o `CHANGELOG.md` raiz**: ele é gerado pelo release-please; o título do PR em Conventional Commits é a entrada dele.
 - O CHANGELOG de pacote é **embarcado no `.nupkg`** via `Directory.Build.props`; mantenha-o conciso e orientado ao consumidor NuGet.
-- Se `[Não Lançado]` estiver vazio ou sem itens válidos no momento do publish, o `build-release-notes.ps1` aborta a publicação — garanta pelo menos um item antes de mergear em qualquer canal de release.
-- O `PR Validation / changelog-check` bloqueia o PR se o CHANGELOG do pacote alterado não for atualizado — não tente mergear sem corrigir.
+- O check `Package changelog` (parte do `Result` do CI) bloqueia o PR se o CHANGELOG do pacote alterado não for atualizado — não tente mergear sem corrigir.

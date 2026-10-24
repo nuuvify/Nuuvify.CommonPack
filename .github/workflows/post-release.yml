@@ -1,0 +1,38 @@
+# Semente do Altivy.Groundwork (componente release): pertence ao projeto.
+# Contrato (ver .github/CI-CD.md): chamado por gw-release.yml depois que a GitHub Release foi
+# publicada, no mesmo run, com a tag e a versão. Use para distribuição que exige a release
+# pública (tap Homebrew, winget, anúncios). Recebe somente contents: read e os secrets do
+# repositório; jobs que precisam de aprovação declaram o próprio Environment. Em republish,
+# a distribuição pode já ter ocorrido: mantenha os passos idempotentes.
+name: Post release
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        description: Tag da release publicada (vX.Y.Z)
+        type: string
+        required: true
+      version:
+        description: Versão da release (X.Y.Z)
+        type: string
+        required: true
+      republish:
+        description: Execução do modo republish de uma release existente
+        type: boolean
+        default: false
+
+permissions: {}
+
+jobs:
+  none:
+    name: No post-release distribution
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Nothing to distribute
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: echo "Release $RELEASE_TAG publicada; nenhuma distribuição pós-release configurada."

@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - qas
   workflow_dispatch: {}
 
 concurrency:
@@ -79,7 +78,7 @@ jobs:
             '/d:sonar.qualitygate.wait=true',
             '/d:sonar.cs.opencover.reportsPaths=**/coverage.opencover.xml',
             '/d:sonar.coverage.exclusions=**/*Tests.cs,**/*Test.cs,**/Migrations/**,**/Examples/**',
-            '/d:sonar.exclusions=**/Examples/**,**/.github/**,**/*.ps1'
+            '/d:sonar.exclusions=**/Examples/**,**/.github/**,**/.groundwork/**,**/*.ps1'
           )
 
           dotnet sonarscanner @arguments

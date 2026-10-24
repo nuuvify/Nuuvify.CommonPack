@@ -1,5 +1,10 @@
 # Plano: Padronização e Automação de CHANGELOGs
 
+> **Status: substituído.** O fluxo de `prepare-release.yml`, `publish-release.yml` e
+> `.github/scripts/` foi substituído pelo processo do Altivy.Groundwork (release-please, CHANGELOG
+> raiz gerado e fechamento automático dos CHANGELOGs por pacote). O processo vigente está em
+> [release-process.md](./release-process.md). Este plano permanece como registro histórico.
+
 Este documento registra o plano completo para padronizar os arquivos `CHANGELOG.md` do repositório e dos pacotes individuais, e para automatizar a geração e validação dessas informações no CI/CD.
 
 ## Decisões

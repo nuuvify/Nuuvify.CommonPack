@@ -1,0 +1,179 @@
+# Gerenciado pelo Altivy.Groundwork (componente publish-nuget). Não edite: mudanças vão para o catálogo.
+# release: chamado pelo publish.yml na tag, no Environment release; emite release-entries-nuget.
+# snapshot: chamado pelo ci.yml na branch padrão, no Environment preview, sempre no feed do owner.
+name: Publish NuGet
+
+on:
+  workflow_call:
+    inputs:
+      channel:
+        description: release ou snapshot
+        type: string
+        default: release
+      tag:
+        description: Tag da release (canal release)
+        type: string
+        default: ''
+      feed:
+        description: github (GitHub Packages do owner) ou nugetorg (somente canal release)
+        type: string
+        default: github
+      solution:
+        description: Solução ou projeto; vazio usa dotnet.solution de .github/ci-cd.json
+        type: string
+        default: ''
+      run-tests:
+        description: Executa dotnet test antes de empacotar
+        type: boolean
+        default: true
+    secrets:
+      NUGET_API_KEY:
+        description: Chave do NuGet.org (somente feed nugetorg)
+        required: false
+
+permissions: {}
+
+jobs:
+  config:
+    name: Configuration
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      image: ${{ steps.read.outputs.image }}
+      solution: ${{ steps.read.outputs.solution }}
+      ref: ${{ steps.read.outputs.ref }}
+      environment: ${{ steps.read.outputs.environment }}
+    steps:
+      - name: Validate inputs
+        id: inputs
+        shell: bash
+        env:
+          CHANNEL: ${{ inputs.channel }}
+          TAG: ${{ inputs.tag }}
+          FEED: ${{ inputs.feed }}
+        run: |
+          set -euo pipefail
+          case "$CHANNEL" in
+            release)
+              [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] || { echo "::error::Tag inválida: $TAG"; exit 1; }
+              ref="refs/tags/$TAG"; environment=release ;;
+            snapshot)
+              [[ "$FEED" == "github" ]] || { echo "::error::Snapshots só podem ir para o feed interno (github)."; exit 1; }
+              ref="$GITHUB_SHA"; environment=preview ;;
+            *) echo "::error::Canal inválido: $CHANNEL"; exit 1 ;;
+          esac
+          [[ "$FEED" == "github" || "$FEED" == "nugetorg" ]] || { echo "::error::Feed inválido: $FEED"; exit 1; }
+          { echo "ref=$ref"; echo "environment=$environment"; } >> "$GITHUB_OUTPUT"
+
+      - name: Checkout configuration
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ steps.inputs.outputs.ref }}
+          persist-credentials: false
+          sparse-checkout: .github/ci-cd.json
+          sparse-checkout-cone-mode: false
+
+      - name: Read .github/ci-cd.json
+        id: read
+        shell: bash
+        env:
+          INPUT_SOLUTION: ${{ inputs.solution }}
+          REF: ${{ steps.inputs.outputs.ref }}
+          ENVIRONMENT: ${{ steps.inputs.outputs.environment }}
+        run: |
+          set -euo pipefail
+          image=$(jq -er '.dotnet.sdkImage' .github/ci-cd.json)
+          solution="${INPUT_SOLUTION:-$(jq -r '.dotnet.solution // ""' .github/ci-cd.json)}"
+          [[ -n "$solution" ]] || { echo "::error::Informe a solução em inputs.solution ou dotnet.solution."; exit 1; }
+          [[ "$image" =~ ^[a-z0-9./_-]+(:[A-Za-z0-9._-]+)?(@sha256:[0-9a-f]{64})?$ ]] || { echo "::error::dotnet.sdkImage inválido."; exit 1; }
+          { echo "image=$image"; echo "solution=$solution"; echo "ref=$REF"; echo "environment=$ENVIRONMENT"; } >> "$GITHUB_OUTPUT"
+
+  publish:
+    name: Publish packages
+    needs: config
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: ${{ needs.config.outputs.environment }}
+    permissions:
+      contents: read
+      packages: write
+    container:
+      image: ${{ needs.config.outputs.image }}
+      options: --user 0
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_NOLOGO: '1'
+      CHANNEL: ${{ inputs.channel }}
+      TAG: ${{ inputs.tag }}
+      FEED: ${{ inputs.feed }}
+      SOLUTION: ${{ needs.config.outputs.solution }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.config.outputs.ref }}
+          persist-credentials: false
+
+      - name: Compute version
+        id: version
+        shell: pwsh
+        run: ./tools/scripts/ci/Get-BuildVersion.ps1 -Channel $env:CHANNEL -Tag $env:TAG -RunNumber $env:GITHUB_RUN_NUMBER -OutputPath $env:GITHUB_OUTPUT
+
+      - name: Build
+        env:
+          VERSION_PREFIX: ${{ steps.version.outputs.version_prefix }}
+          VERSION_SUFFIX: ${{ steps.version.outputs.version_suffix }}
+          ASSEMBLY_VERSION: ${{ steps.version.outputs.assembly_version }}
+          FILE_VERSION: ${{ steps.version.outputs.file_version }}
+        run: >
+          dotnet build "$SOLUTION" --configuration Release
+          "-p:VersionPrefix=$VERSION_PREFIX" "-p:VersionSuffix=$VERSION_SUFFIX"
+          "-p:AssemblyVersion=$ASSEMBLY_VERSION" "-p:FileVersion=$FILE_VERSION"
+          -p:ContinuousIntegrationBuild=true "-p:RepositoryCommit=$GITHUB_SHA"
+
+      - name: Test
+        if: ${{ inputs.run-tests }}
+        run: dotnet test "$SOLUTION" --configuration Release --no-build
+
+      - name: Pack
+        env:
+          VERSION_PREFIX: ${{ steps.version.outputs.version_prefix }}
+          VERSION_SUFFIX: ${{ steps.version.outputs.version_suffix }}
+          ASSEMBLY_VERSION: ${{ steps.version.outputs.assembly_version }}
+          FILE_VERSION: ${{ steps.version.outputs.file_version }}
+        run: >
+          dotnet pack "$SOLUTION" --configuration Release --no-build --output ./artifacts/nupkg
+          "-p:VersionPrefix=$VERSION_PREFIX" "-p:VersionSuffix=$VERSION_SUFFIX"
+          "-p:AssemblyVersion=$ASSEMBLY_VERSION" "-p:FileVersion=$FILE_VERSION"
+          -p:ContinuousIntegrationBuild=true "-p:RepositoryCommit=$GITHUB_SHA"
+
+      - name: Assert artifact versions
+        shell: pwsh
+        env:
+          EXPECTED_VERSION: ${{ steps.version.outputs.version }}
+          EXPECTED_ASSEMBLY_VERSION: ${{ steps.version.outputs.assembly_version }}
+          EXPECTED_FILE_VERSION: ${{ steps.version.outputs.file_version }}
+        run: >
+          ./tools/scripts/ci/Assert-ArtifactVersion.ps1 -ArtifactsPath ./artifacts/nupkg
+          -ExpectedVersion $env:EXPECTED_VERSION -ExpectedAssemblyVersion $env:EXPECTED_ASSEMBLY_VERSION
+          -ExpectedFileVersion $env:EXPECTED_FILE_VERSION
+
+      - name: Publish packages
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: >
+          ./tools/scripts/ci/Publish-NuGet.ps1 -ArtifactsPath ./artifacts/nupkg -Feed $env:FEED
+          -Owner $env:GITHUB_REPOSITORY_OWNER -EntriesPath ./artifacts/release-entries/nuget.json
+
+      - name: Upload release entries
+        if: ${{ inputs.channel == 'release' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-entries-nuget
+          path: artifacts/release-entries/nuget.json
+          if-no-files-found: error
+          retention-days: 7

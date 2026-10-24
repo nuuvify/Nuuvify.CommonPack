@@ -86,10 +86,9 @@ Se a alteração impactar release notes, atualize o [CHANGELOG.md](../CHANGELOG.
 - Prefira prefixos como `feat/`, `fix/`, `docs/`, `refactor/` ou `test/`.
 - Não envie trabalho diretamente para `main`.
 - PRs para `main` exigem aprovação do code owner `@lzocateli`.
-- O fluxo de release do projeto é baseado em branch:
-	- `main`: release estável com tag e GitHub Release
-	- `qas`: pacote preview no NuGet.org
-	- `nugettest/qas`: pacote `dev` no feed interno de homologação
+- Todo PR vai para `main`; o título em Conventional Commits define o impacto na próxima versão.
+- Cada merge na `main` publica um snapshot `X.Y.Z-preview.N` no GitHub Packages da organização.
+- Versões estáveis saem pelo Release PR do release-please; veja o [processo de release](../docs/maintainers/release-process.md).
 
 ## Testes
 

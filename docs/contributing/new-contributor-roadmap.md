@@ -104,11 +104,11 @@ No PR:
 
 Consulte também o template: [pull_request_template.md](../../pull_request_template.md)
 
-## 9. Escolha a branch de destino correta
+## 9. Abra o PR para a `main`
 
-- `main`: release estável
-- `qas`: preview
-- `nugettest/qas`: build `dev` para homologação
+Todo PR vai para `main`. Use um título em Conventional Commits, porque ele define o impacto na
+próxima versão, e atualize o `CHANGELOG.md` de cada pacote alterado. Veja o
+[processo de release](../maintainers/release-process.md).
 
 ## 10. Comece por contribuições de baixo risco
 

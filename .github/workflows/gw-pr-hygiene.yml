@@ -1,0 +1,65 @@
+# Gerenciado pelo Altivy.Groundwork (componente ci). Não edite: mudanças vão para o catálogo.
+name: PR Hygiene
+
+on:
+  workflow_call:
+
+permissions: {}
+
+jobs:
+  title:
+    name: Conventional title
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Validate title and summarize release impact
+        shell: pwsh
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+        run: ./tools/scripts/ci/Test-PullRequestTitle.ps1 -Title $env:PR_TITLE -Body $env:PR_BODY -Author $env:PR_AUTHOR -SummaryPath $env:GITHUB_STEP_SUMMARY
+
+  actionlint:
+    name: Actionlint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Lint workflows
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --rm --read-only --network none \
+            --volume "$GITHUB_WORKSPACE:/repo:ro" --workdir /repo \
+            docker.io/rhysd/actionlint:1.7.12 -color
+
+  managed-files:
+    name: Managed files
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Verify files managed by Groundwork
+        shell: pwsh
+        run: ./tools/scripts/ci/Test-ManagedFiles.ps1 -SummaryPath $env:GITHUB_STEP_SUMMARY

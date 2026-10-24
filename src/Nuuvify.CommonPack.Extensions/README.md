@@ -1,8 +1,8 @@
 # Nuuvify.CommonPack.Extensions
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nuuvify_Nuuvify.CommonPack&metric=alert_status)](https://sonarcloud.io/project/overview?id=nuuvify_Nuuvify.CommonPack)
-[![PR Validation](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/pr-validation.yml/badge.svg)](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/pr-validation.yml)
-[![Publish and Release](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/publish-release.yml/badge.svg?branch=main)](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/publish-release.yml)
+[![CI](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/ci.yml)
+[![Release](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/gw-release.yml/badge.svg?branch=main)](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/gw-release.yml)
 
 Biblioteca fundamental com implementação do Notification Pattern e extensões utilitárias essenciais. Fornece uma base sólida para aplicações .NET com tratamento padronizado de notificações, extensões para strings, coleções, enums e outros tipos comuns.
 

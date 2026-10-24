@@ -1,0 +1,192 @@
+# Semente do Altivy.Groundwork (componente ci): pertence ao projeto.
+# Adicione aqui os jobs do projeto e inclua cada um em "needs" do job Result,
+# que é o ÚNICO check obrigatório da branch padrão (ver .github/CI-CD.md).
+name: CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions: {}
+
+# Em PRs, uma execução nova espera a anterior: cancelar uma execução em andamento deixa um check
+# Result com falha no mesmo commit, e o ruleset considera todas as execuções do check, bloqueando o merge.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'pull_request' }}
+
+jobs:
+  hygiene:
+    name: Hygiene
+    uses: ./.github/workflows/gw-pr-hygiene.yml
+    permissions:
+      contents: read
+
+  gitleaks:
+    name: Gitleaks
+    uses: ./.github/workflows/gw-gitleaks.yml
+    permissions:
+      contents: read
+
+  dotnet:
+    name: .NET
+    uses: ./.github/workflows/gw-dotnet.yml
+    permissions:
+      contents: read
+    with:
+      solution: Nuuvify.CommonPack.sln
+      test-filter: Category=Unit
+      pack: true
+
+  # Local: os testes de integração usam Testcontainers (SQL Server) e precisam do Docker do runner,
+  # indisponível dentro do container do gw-dotnet.yml.
+  integration:
+    name: Integration tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_NOLOGO: '1'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore Nuuvify.CommonPack.sln
+
+      - name: Build
+        run: dotnet build Nuuvify.CommonPack.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test Nuuvify.CommonPack.sln --configuration Release --no-build --filter "Category=Integration"
+
+  # Local: análise de PR no SonarCloud. Sem SONAR_TOKEN (Dependabot, forks) ou fora de PR, o job
+  # termina com sucesso sem analisar; a branch padrão é analisada pelo sonarcloud.yml.
+  sonar:
+    name: SonarCloud
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_NOLOGO: '1'
+      SONAR_ENABLED: ${{ github.event_name == 'pull_request' && secrets.SONAR_TOKEN != '' }}
+    steps:
+      - name: Report skipped analysis
+        if: ${{ env.SONAR_ENABLED != 'true' }}
+        run: echo "Análise do SonarCloud não executada (evento $GITHUB_EVENT_NAME ou SONAR_TOKEN indisponível)."
+
+      - name: Checkout
+        if: ${{ env.SONAR_ENABLED == 'true' }}
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup .NET SDK
+        if: ${{ env.SONAR_ENABLED == 'true' }}
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        if: ${{ env.SONAR_ENABLED == 'true' }}
+        run: |
+          dotnet tool restore
+          dotnet restore Nuuvify.CommonPack.sln
+
+      - name: Begin SonarCloud analysis
+        if: ${{ env.SONAR_ENABLED == 'true' }}
+        shell: pwsh
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_PULL_REQUEST_KEY: ${{ github.event.pull_request.number }}
+        run: |
+          $arguments = @(
+            'begin',
+            '/k:nuuvify_Nuuvify.CommonPack',
+            '/o:nuuvify',
+            '/d:sonar.host.url=https://sonarcloud.io',
+            "/d:sonar.token=$env:SONAR_TOKEN",
+            '/d:sonar.qualitygate.wait=true',
+            '/d:sonar.cs.opencover.reportsPaths=**/coverage.opencover.xml',
+            '/d:sonar.coverage.exclusions=**/*Tests.cs,**/*Test.cs,**/Migrations/**,**/Examples/**',
+            '/d:sonar.exclusions=**/Examples/**,**/.github/**,**/.groundwork/**,**/*.ps1',
+            "/d:sonar.pullrequest.key=$env:SONAR_PULL_REQUEST_KEY",
+            "/d:sonar.pullrequest.branch=$env:GITHUB_HEAD_REF",
+            "/d:sonar.pullrequest.base=$env:GITHUB_BASE_REF"
+          )
+          dotnet sonarscanner @arguments
+
+      - name: Build
+        if: ${{ env.SONAR_ENABLED == 'true' }}
+        run: dotnet build Nuuvify.CommonPack.sln --configuration Release --no-restore
+
+      - name: Unit tests with coverage
+        if: ${{ env.SONAR_ENABLED == 'true' }}
+        run: >-
+          dotnet test Nuuvify.CommonPack.sln --configuration Release --no-build --filter "Category=Unit"
+          --collect:"XPlat Code Coverage" --results-directory ./artifacts/sonar-test-results
+          -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+
+      - name: End SonarCloud analysis
+        if: ${{ env.SONAR_ENABLED == 'true' }}
+        shell: pwsh
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: dotnet sonarscanner end "/d:sonar.token=$env:SONAR_TOKEN"
+
+  package-changelog:
+    name: Package changelog
+    uses: ./.github/workflows/package-changelog.yml
+    permissions:
+      contents: read
+
+  snapshot:
+    name: Snapshot
+    needs: [hygiene, gitleaks, dotnet, integration, sonar, package-changelog]
+    if: ${{ github.event_name == 'push' }}
+    uses: ./.github/workflows/gw-publish-nuget.yml
+    permissions:
+      contents: read
+      packages: write
+    with:
+      channel: snapshot
+      # Os jobs dotnet e integration já testaram este commit; o container não roda Testcontainers.
+      run-tests: false
+    secrets: inherit
+
+  result:
+    name: Result
+    if: ${{ always() }}
+    needs: [hygiene, gitleaks, dotnet, integration, sonar, package-changelog]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Evaluate required jobs
+        shell: bash
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: |
+          set -euo pipefail
+          failed=$(jq -r 'to_entries[] | select(.value.result != "success") | "\(.key)=\(.value.result)"' <<<"$NEEDS")
+          if [[ -n "$failed" ]]; then
+            echo "::error::Jobs obrigatórios sem sucesso: ${failed//$'\n'/, }"
+            exit 1
+          fi
+          echo "Todos os jobs obrigatórios terminaram com sucesso."

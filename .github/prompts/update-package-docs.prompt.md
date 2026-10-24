@@ -39,35 +39,9 @@ Ao atualizar qualquer `CHANGELOG.md`, use **exatamente** um dos templates abaixo
 
 ### CHANGELOG raiz
 
-```markdown
-# Changelog
-
-Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
-
-O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-br/1.0.0/),
-e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec/v2.0.0.html).
-
-## [Não Lançado]
-
-### Adicionado
-
-### Alterado
-
-### Corrigido
-
-### Removido
-
-### Segurança
-
-### Performance
-
-### Documentação
-
-## [x.y.z] - yyyy-mm-dd
-
-### Adicionado
-- Descrição voltada ao consumidor.
-```
+Gerado pelo release-please a partir dos títulos dos PRs em Conventional Commits e fonte das
+GitHub Release Notes. **Não edite manualmente**: corrija o título do PR antes do merge ou use o
+rodapé `Release-As` descrito em [docs/runbooks/release.md](../../docs/runbooks/release.md).
 
 ### CHANGELOG de pacote
 
@@ -116,29 +90,25 @@ Siga estas regras sempre que atualizar qualquer `CHANGELOG.md` neste repositóri
 | Seção | Criada por | Quando |
 |---|---|---|
 | `## [Não Lançado]` | Humano / IA (você) | A cada mudança de comportamento ou API |
-| `## [X.Y.Z] - yyyy-mm-dd` | 🤖 `prepare-release.yml` | Ao disparar o release PR via `workflow_dispatch` |
+| `## [X.Y.Z] - yyyy-mm-dd` | 🤖 `package-changelog-release.yml` | No Release PR aberto pelo release-please |
 
-**Nunca crie uma seção `[X.Y.Z]` manualmente.** O workflow `prepare-release.yml` fecha `[Não Lançado]` para `[X.Y.Z]` automaticamente ao abrir o PR de release.
+**Nunca crie uma seção `[X.Y.Z]` manualmente.** O workflow `package-changelog-release.yml` fecha `[Não Lançado]` para `[X.Y.Z]` nos pacotes com itens quando o release-please abre ou atualiza o Release PR.
 
 ### Quais arquivos atualizar
 
-Sempre que houver mudança de comportamento ou API pública em um pacote, atualize **os dois arquivos no mesmo commit**:
+Sempre que houver mudança de comportamento ou API pública em um pacote, atualize `src/<Pacote>/CHANGELOG.md` — entry embarcada no `.nupkg` publicado no NuGet.
 
-1. `CHANGELOG.md` (raiz do repositório) — entry visível no GitHub Release e nos release notes.
-2. `src/<Pacote>/CHANGELOG.md` — entry embarcada no `.nupkg` publicado no NuGet.
-
-Se a mudança afetar mais de um pacote, atualize o `CHANGELOG.md` de **cada** pacote afetado.
+Se a mudança afetar mais de um pacote, atualize o `CHANGELOG.md` de **cada** pacote afetado. **Não edite o `CHANGELOG.md` raiz**: o release-please o gera a partir dos títulos dos PRs em Conventional Commits.
 
 ### Bloqueios de CI que você precisa evitar
 
-- `PR Validation / changelog-check` — falha se o CHANGELOG do pacote alterado não foi atualizado. Corrija antes de mergear.
-- `publish-release.yml` — aborta se `[Não Lançado]` estiver vazio no momento do publish. Garanta pelo menos um item antes de mergear em canal de release.
+- `CI / Package changelog` — falha se o CHANGELOG do pacote alterado não foi atualizado e bloqueia o `Result`. Corrija antes de mergear.
 
 ### Resumo da ação esperada
 
 ```
 Você alterou src/Nuuvify.CommonPack.<Pacote>/
   → adicione um item em ## [Não Lançado] de src/<Pacote>/CHANGELOG.md
-  → adicione um item em ## [Não Lançado] de CHANGELOG.md (raiz)
-  → NÃO crie seção [X.Y.Z] — isso é feito por prepare-release.yml
+  → NÃO edite CHANGELOG.md (raiz) — o release-please gera a partir do título do PR
+  → NÃO crie seção [X.Y.Z] — isso é feito por package-changelog-release.yml
 ```

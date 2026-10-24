@@ -47,119 +47,57 @@ Confirme que o GitHub reconheceu `.github/CODEOWNERS`.
 
 Com a configuração atual, `@lzocateli` será solicitado por padrão para revisão das áreas mapeadas.
 
-## 5. Proteção de branches
+## 5. Políticas do repositório (rulesets, merge e Environments)
 
-Em `Settings > Branches`, configure regras para `main`, `qas` e `nugettest/qas`.
+As regras da `main`, das tags `v*`, das opções de merge e dos Environments são versionadas em
+[.github/repository-policy.json](../../.github/repository-policy.json), descritas em
+[.github/REPOSITORY-POLICY.md](../../.github/REPOSITORY-POLICY.md) e aplicadas pelo
+`groundwork github` do Altivy.Groundwork. Não configure branch protection clássica nem rulesets à
+mão: a configuração manual diverge do contrato e é removida ou reportada na próxima reconciliação.
 
-### `main`
+```bash
+# Conferir divergências (somente leitura; código 0 = conforme)
+groundwork github
+# Aplicar o contrato
+groundwork github --sync
+# Remover a proteção clássica e os rulesets legados depois de validar o CI
+groundwork github --sync --replace-legacy
+```
 
-Recomendado:
+Resumo do contrato:
 
-- Require a pull request before merging
-- Require approvals: `1`
-- Dismiss stale pull request approvals when new commits are pushed
-- Require review from Code Owners
-- Require conversation resolution before merging
-- Require branches to be up to date before merging
-- Do not allow force pushes
-- Do not allow deletions
+- `gw-main-integrity`: sem deleção, sem force push, histórico linear e check `Result`
+  obrigatório, **sem bypass**.
+- `gw-main-review`: PR obrigatório com 1 aprovação e somente squash; admins podem fazer merge do
+  próprio PR via bypass em modo `pull_request`, mas nunca com o `Result` vermelho.
+- `gw-release-tags`: somente o GitHub App de release cria, altera ou apaga tags `v*`.
+- Environments `release` (revisor `@lzocateli`; `main` e `tag:v*`) e `preview` (`main`).
 
-Com `CODEOWNERS` apontando para `@lzocateli`, todo PR em `main` exigirá sua aprovação.
+## 6. Check obrigatório
 
-### `qas`
+O único check obrigatório da `main` é o `Result` do workflow [CI](../../.github/workflows/ci.yml),
+que agrega `Hygiene`, `Gitleaks`, `.NET` (build, testes `Category=Unit` e pack no container da
+toolchain), `Integration tests`, `SonarCloud` e `Package changelog`. Um job pulado ou cancelado
+reprova o `Result`.
 
-Recomendado:
+`Validate community assets` continua com filtro de caminho e **não** deve ser obrigatório.
 
-- Require a pull request before merging
-- Require branches to be up to date before merging
-- Require status checks to pass
-- Do not allow force pushes
-- Do not allow deletions
+## 6.1 Secrets e variáveis
 
-### `nugettest/qas`
+| Nome | Tipo | Onde | Uso |
+| --- | --- | --- | --- |
+| `RELEASE_APP_ID` | Variável | Organização `nuuvify` (repositórios selecionados) | GitHub App de release |
+| `RELEASE_APP_PRIVATE_KEY` | Secret | Organização `nuuvify` (repositórios selecionados) | GitHub App de release |
+| `NUGET_API_KEY` | Secret | Environment `release` | Push no NuGet.org |
+| `SONAR_TOKEN` | Secret | Organização `nuuvify` | Análise do SonarCloud |
 
-Recomendado:
+Para criar o `NUGET_API_KEY` no Environment `release` sem expor o valor no histórico do shell:
 
-- Require a pull request before merging
-- Require status checks to pass
-- Do not allow force pushes
-- Do not allow deletions
+```bash
+gh secret set NUGET_API_KEY --repo nuuvify/Nuuvify.CommonPack --env release
+```
 
-## 6. Required status checks
-
-O GitHub Actions deve ser a fonte oficial dos checks obrigatórios.
-
-Quando os checks estiverem aparecendo nos PRs, marque como obrigatórios:
-
-**Sempre executam em PRs para `main`, `qas` e `nugettest/qas`:**
-
-- `Version policy check`
-- `Verify package CHANGELOG updated`
-
-**Path-filtered — executam apenas quando os paths relevantes são alterados (não adicionar como required):**
-
-- `Lint workflows` — somente quando `.github/workflows/**` muda
-- `Validate community assets` — somente quando `.github/**`, `docs/**`, `Readme.md` ou `CHANGELOG.md` mudam
-
-Configuração recomendada em `Require status checks to pass before merging`:
-
-- Required: `Version policy check`
-- Required: `Verify package CHANGELOG updated`
-- Não required: `Lint workflows`
-- Não required: `Validate community assets`
-
-Motivo: checks path-filtered podem não executar em todos os PRs; se forem marcados como required, o merge pode ficar bloqueado sem necessidade.
-
-> `Build and unit tests` e `Integration tests` também rodam em PRs (workflow `PR Validation`) e podem rodar novamente no fluxo de publicação.
-
-## 6.1 Environments e segredos
-
-Onde configurar no GitHub:
-
-- `Settings > Environments`
-
-Crie os environments (botao `New environment`):
-
-- `production`
-- `preview`
-- `nugettest`
-
-Mapeamento usado pelo workflow `publish-release.yml`:
-
-- branch `main` -> environment `production`
-- branch `qas` -> environment `preview`
-- branch `nugettest/qas` -> environment `nugettest`
-
-Configure os secrets em cada environment:
-
-- Em `production`:
-   - `NUGET_API_KEY` (token do NuGet.org)
-- Em `preview`:
-   - `NUGET_API_KEY` (token do NuGet.org)
-- Em `nugettest`:
-   - `NUGETTEST_API_KEY` (token do `https://int.nugettest.org/`)
-
-Como adicionar secret (por environment):
-
-1. `Settings > Environments > <environment>`
-2. Seção `Environment secrets`
-3. `Add secret`
-4. `Name`: use exatamente o nome esperado pelo workflow
-5. `Value`: cole o token
-6. `Add secret` para salvar
-
-Opcional de governanca:
-
-- Em `production`, configure `Required reviewers` para exigir aprovação antes do job de publish.
-- Se quiser, aplique a mesma proteção em `preview`.
-
-Validacao rapida apos configurar:
-
-1. Rode manualmente `publish-release.yml` via `Actions > Publish and Release > Run workflow` apontando para cada branch.
-2. Confirme no job `Publish packages and release` que o campo `Environment` corresponde ao branch.
-3. Se secret faltar, o job falha com mensagem explicita indicando o nome do secret ausente.
-
-O workflow `Publish and Release` é disparado por `push` em `main`, `qas` e `nugettest/qas`. As branch protections devem impedir push direto para que somente commits aprovados em PR sejam publicados.
+O processo de release está em [release-process.md](./release-process.md).
 
 ## 6.2 Variável de runner do GitHub Actions
 
@@ -212,11 +150,8 @@ Para manter histórico legível:
 
 - use títulos de PR claros
 - exija descrição objetiva do impacto técnico
-- prefira squash merge quando o branch contiver commits de trabalho intermediários
-- bloqueie merge direto em `main`
-- use `main` apenas para releases estáveis
-- use `qas` para preview
-- use `nugettest/qas` para publicações `dev`
+- use títulos em Conventional Commits: eles viram a mensagem do squash e o CHANGELOG raiz
+- todo PR vai para `main`; releases estáveis saem somente pelo Release PR do release-please
 
 ## 9. Labels recomendadas
 
@@ -245,13 +180,12 @@ Para auditar e reconciliar esse estado, siga [github-access-governance.md](./git
 
 - Discussions habilitado
 - Private vulnerability reporting habilitado
-- Branch protection configurada
+- `groundwork github` sem divergências (código 0)
 - Sua aprovação obrigatória validada em PR para `main`
 - CODEOWNERS reconhecido
 - Issue forms ativos
 - PR template ativo
-- Checks obrigatórios definidos
-- Environments e secrets configurados
+- `NUGET_API_KEY` configurado no Environment `release`
 - Labels iniciais criadas
 - Governança de acesso auditada sem `DRIFT` ou `BLOCKED`
 
@@ -261,4 +195,3 @@ Depois de subir os arquivos de automação:
 
 - `Label Sync` sincroniza os labels versionados em `.github/labels.yml`
 - `PR Triage` aplica labels iniciais por caminho em pull requests
-- `.github/release.yml` usa os labels para categorizar as release notes

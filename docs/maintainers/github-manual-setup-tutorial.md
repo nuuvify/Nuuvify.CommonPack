@@ -1,289 +1,90 @@
 # Tutorial de configuração manual no GitHub
 
-Este documento mostra exatamente onde e como executar as configurações manuais no GitHub para ativar o fluxo completo de CI/CD, release e proteção de branches do repositório.
-
-Use este tutorial depois que os workflows já estiverem versionados no repositório.
+Este documento lista o que ainda depende de ação manual no GitHub para o fluxo de CI/CD e
+release do repositório. Rulesets, opções de merge, permissões do `GITHUB_TOKEN` e Environments
+são aplicados pelo `groundwork github` a partir de
+[.github/repository-policy.json](../../.github/repository-policy.json); não os configure pela
+interface. A visão geral está em [github-setup.md](./github-setup.md) e o processo de release em
+[release-process.md](./release-process.md).
 
 ## Pré-requisitos
 
-- Ser administrador do repositório no GitHub
-- Ter em mãos as chaves:
-  - `NUGET_API_KEY`
-  - `NUGETTEST_API_KEY`
-- Confirmar que as branches `main`, `qas` e `nugettest/qas` já existem no remoto
+- Ser administrador do repositório e da organização `nuuvify` no GitHub.
+- Ter a CLI `gh` autenticada e a CLI `groundwork` do Altivy.Groundwork instalada.
+- Ter em mãos uma chave do NuGet.org com permissão de push para os pacotes `Nuuvify.CommonPack.*`.
 
-## 1. Abrir as configurações do repositório
-
-No GitHub, entre no repositório e acesse:
-
-1. `Settings`
-2. `General`
-3. `Security`
-4. `Branches`
-5. `Environments`
-6. `Actions`
-
-## 2. Habilitar features básicas
+## 1. Habilitar features básicas
 
 Caminho: `Settings > General > Features`
 
-Confirme:
-
 - `Issues`: habilitado
 - `Discussions`: habilitado
-- `Projects`: opcional
-- `Wiki`: opcional
+- `Projects` e `Wiki`: opcionais
 
-Ainda em `Settings > General`, recomendo:
+As opções de merge (somente squash, apagar branch após o merge) são aplicadas pelo
+`groundwork github --sync`.
 
-- `Automatically delete head branches`: habilitado
-- `Allow squash merging`: habilitado
-- `Allow rebase merging`: opcional
-- `Allow merge commits`: opcional, conforme sua estratégia
+## 2. Validar CODEOWNERS
 
-## 3. Validar CODEOWNERS
+Abra um PR de teste para `main` e confirme que o GitHub solicita revisão de `@lzocateli`.
 
-Caminho: `Settings > General`
+## 3. GitHub App de release
 
-Depois de fazer push do arquivo `.github/CODEOWNERS`, abra um PR de teste para `main` e confirme se o GitHub solicita revisão de `@lzocateli` automaticamente.
+O App `Altivy Release` precisa estar instalado na organização com acesso ao repositório, e a
+variável `RELEASE_APP_ID` e o secret `RELEASE_APP_PRIVATE_KEY` precisam estar disponíveis para o
+repositório no nível da organização. Sem eles, o Release PR não dispara checks e o workflow
+`Release` falha de forma explícita.
 
-Sem isso, a regra `Require review from Code Owners` não terá o efeito esperado.
+## 4. Aplicar as políticas do repositório
 
-## 4. Configurar branch protection da `main`
-
-Caminho: `Settings > Branches > Add branch protection rule`
-
-Branch name pattern:
-
-```text
-main
+```bash
+groundwork github                         # conferência, somente leitura
+groundwork github --sync                  # cria rulesets gw-*, Environments e opções
+groundwork github --sync --replace-legacy # remove a proteção clássica depois de validar o CI
 ```
 
-Habilite:
+Use `--replace-legacy` somente depois que o check `Result` estiver verde em um PR, para não
+deixar a `main` sem o check obrigatório.
 
-- `Require a pull request before merging`
-- `Require approvals`: `1`
-- `Dismiss stale pull request approvals when new commits are pushed`
-- `Require review from Code Owners`
-- `Require conversation resolution before merging`
-- `Require status checks to pass before merging`
-- `Require branches to be up to date before merging`
-- `Do not allow bypassing the above settings`, se quiser endurecer o fluxo
-- `Restrict pushes that create files larger than 100 MB`, opcional
-- `Do not allow force pushes`
-- `Do not allow deletions`
+## 5. Cadastrar o `NUGET_API_KEY`
 
-Resultado esperado:
+Depois do `--sync`, o Environment `release` existe. Cadastre a chave nele:
 
-- nenhum PR para `main` será mergeado sem sua aprovação
-- os checks obrigatórios terão de passar antes do merge
-
-## 5. Configurar branch protection da `qas`
-
-Caminho: `Settings > Branches > Add branch protection rule`
-
-Branch name pattern:
-
-```text
-qas
+```bash
+gh secret set NUGET_API_KEY --repo nuuvify/Nuuvify.CommonPack --env release
 ```
 
-Habilite:
-
-- `Require a pull request before merging`
-- `Require status checks to pass before merging`
-- `Require branches to be up to date before merging`
-- `Do not allow force pushes`
-- `Do not allow deletions`
-
-## 6. Configurar branch protection da `nugettest/qas`
-
-Caminho: `Settings > Branches > Add branch protection rule`
-
-Branch name pattern:
-
-```text
-nugettest/qas
-```
-
-Habilite:
-
-- `Require a pull request before merging`
-- `Require status checks to pass before merging`
-- `Do not allow force pushes`
-- `Do not allow deletions`
-
-## 7. Definir os required checks
-
-Caminho: `Settings > Branches > Edit rule`
-
-Depois que os workflows rodarem ao menos uma vez, marque como obrigatórios.
-
-Os nomes devem ser digitados exatamente como aparecem na interface (campo *Search for status checks in the last week*).
-
-Para `main`, `qas` e `nugettest/qas` (checks que sempre executam em PRs):
-
-- `Version policy check`
-- `Verify package CHANGELOG updated`
-
-> **Não adicione** `Lint workflows` e `Validate community assets` como required — esses checks são path-filtered e não executam em todos os PRs. Quando ausentes, o GitHub trata o check como faltante e bloqueia o merge indevidamente.
-
-> `Build and unit tests` e `Integration tests` executam apenas no workflow `Publish and Release`, disparado por push após o merge — não estão disponíveis como status checks de PR.
-
-## 8. Criar os environments
-
-Caminho: `Settings > Environments`
-
-Crie:
-
-- `production`
-- `preview`
-- `nugettest`
-
-### `production`
-
-Uso esperado: publishes da branch `main`.
-
-Opcionalmente habilite `Required reviewers` se quiser uma segunda barreira manual antes do publish estável.
-
-### `preview`
-
-Uso esperado: publishes da branch `qas`.
-
-Normalmente não precisa de approval manual.
-
-### `nugettest`
-
-Uso esperado: publishes da branch `nugettest/qas`.
-
-Normalmente não precisa de approval manual.
-
-## 9. Configurar os secrets
-
-Caminho: `Settings > Secrets and variables > Actions`
-
-Crie os repository secrets:
-
-- `NUGET_API_KEY`
-- `NUGETTEST_API_KEY`
-
-Se preferir, você pode mover esses segredos para os environments em vez de deixá-los no escopo do repositório.
-
-Recomendação:
-
-- `NUGET_API_KEY` no environment `production` e `preview`
-- `NUGETTEST_API_KEY` no environment `nugettest`
-
-## 10. Permissões do GitHub Actions
-
-Caminho: `Settings > Actions > General`
-
-Confirme:
-
-- Actions habilitadas para o repositório
-- Permissão para rodar ações do marketplace GitHub
-- `Workflow permissions`: `Read and write permissions`
-
-Essa última é importante para permitir criação de tags e releases pelo workflow de publish.
-
-Se quiser ser mais restritivo, mantenha permissões mínimas por workflow, como já foi configurado nos arquivos YAML, mas o repositório precisa permitir escrita para criação de release/tag.
-
-## 11. Sincronizar labels e validar triagem
-
-Depois do push dos arquivos abaixo:
-
-- `.github/labels.yml`
-- `.github/labeler.yml`
-- `.github/release.yml`
-- `.github/workflows/label-sync.yml`
-- `.github/workflows/pr-triage.yml`
-
-faça o seguinte:
-
-1. Abra a aba `Actions`.
-2. Execute manualmente o workflow `Label Sync`, se necessário.
-3. Confirme se os labels foram criados no caminho `Issues > Labels`.
-4. Abra um PR de teste mexendo em `docs/` ou `test/`.
-5. Verifique se o workflow `PR Triage` aplicou labels automaticamente por caminho.
-
-Resultado esperado:
-
-- o repositório passa a ter catálogo padronizado de labels
-- PRs recebem labels iniciais automaticamente
-- as release notes passam a ser categorizadas a partir desses labels
-
-## 12. Teste controlado do fluxo
-
-Faça o teste nesta ordem:
-
-1. Abra um PR para `main` sem aprová-lo.
-2. Verifique se o merge está bloqueado.
-3. Aprove o PR com `@lzocateli`.
-4. Faça merge e confirme que:
-   - os workflows executaram
-   - houve publish no NuGet.org
-   - uma tag `vX.Y.Z` foi criada
-   - uma GitHub Release foi criada
-
-Depois repita:
-
-1. Um PR para `qas` e confirme publish preview.
-2. Um PR para `nugettest/qas` e confirme publish `dev` em `https://int.nugettest.org/`.
-
-## 13. Solução de problemas rápida
-
-### O PR para `main` não exige sua aprovação
-
-Verifique:
-
-- se `.github/CODEOWNERS` foi reconhecido
-- se a rule de `main` tem `Require review from Code Owners`
-- se o PR realmente aponta para `main`
-
-### O workflow não consegue criar tag ou release
-
-Verifique:
-
-- `Settings > Actions > General > Workflow permissions`
-- permissões `contents: write` no workflow
-- se a branch protection não bloqueia o comportamento esperado do bot
-
-### O publish falha no NuGet
-
-Verifique:
-
-- se `NUGET_API_KEY` está correto
-- se a versão não foi publicada anteriormente
-- se os pacotes foram realmente gerados em `./artifacts`
-
-### Os labels não foram criados automaticamente
-
-Verifique:
-
-- se o workflow `Label Sync` executou com sucesso
-- se o repositório permite actions do marketplace
-- se `.github/labels.yml` está válido e no branch correto
-
-### O PR não recebeu labels automáticos
-
-Verifique:
-
-- se o workflow `PR Triage` foi disparado
-- se `.github/labeler.yml` cobre os caminhos alterados
-- se o token do workflow tem permissão `pull-requests: write`
-
-### O publish falha no nugettest
-
-Verifique:
-
-- se `NUGETTEST_API_KEY` está correto
-- se o feed `https://int.nugettest.org/` aceita push com a chave atual
-
-## Resumo do que voce precisa executar manualmente
-
-- configurar branch protections
-- configurar required checks
-- criar environments
-- cadastrar secrets
-- executar `Label Sync`
-- validar PRs reais em `main`, `qas` e `nugettest/qas`
+O comando lê o valor do terminal sem gravá-lo no histórico do shell.
+
+## 6. Sincronizar labels e validar triagem
+
+1. Execute o workflow `Label Sync` em `Actions`, se necessário.
+2. Confirme os labels em `Issues > Labels`.
+3. Abra um PR de teste mexendo em `docs/` ou `test/` e confirme que o `PR Triage` aplicou labels.
+
+## 7. Teste controlado do fluxo
+
+1. Abra um PR para `main` e confirme que o merge fica bloqueado até o `Result` verde.
+2. Faça o merge e confirme o job `Snapshot` publicando `X.Y.(Z+1)-preview.N` no GitHub Packages.
+3. Confirme que o release-please abriu ou atualizou o Release PR e que o workflow
+   `Package changelog release` fechou os CHANGELOGs dos pacotes.
+4. Faça o merge do Release PR, aprove o Environment `release` e confirme os pacotes no NuGet.org
+   e a GitHub Release publicada.
+
+## 8. Solução de problemas rápida
+
+| Sintoma | Verifique |
+| --- | --- |
+| Merge bloqueado com `Result` verde | Proteção clássica ainda ativa: rode `groundwork github --sync --replace-legacy` |
+| Release PR sem checks | `RELEASE_APP_ID`, `RELEASE_APP_PRIVATE_KEY` e instalação do App |
+| `Publish packages` sem credencial | `NUGET_API_KEY` no Environment `release` |
+| Labels não criados | Execução do `Label Sync` e validade de `.github/labels.yml` |
+| PR sem labels automáticos | Execução do `PR Triage` e cobertura de `.github/labeler.yml` |
+
+## Resumo do que é manual
+
+- habilitar Issues e Discussions;
+- garantir o App de release e seus secrets na organização;
+- executar `groundwork github --sync` e, após validar o CI, `--replace-legacy`;
+- cadastrar `NUGET_API_KEY` no Environment `release`;
+- executar `Label Sync` e validar o fluxo com um PR real.

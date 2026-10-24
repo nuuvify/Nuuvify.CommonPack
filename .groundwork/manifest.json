@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "toolVersion": "0.4.0",
+  "catalogVersion": "0.4.0",
+  "parameters": {
+    "auto_deploy_environment": "",
+    "commit_scopes": "docs,tooling,deps,actions,repo",
+    "default_branch": "main",
+    "dependabot_ecosystems": "github-actions,nuget,devcontainers",
+    "deploy_environments": "",
+    "deploy_reviewers": "lzocateli",
+    "dotnet_sdk_image": "mcr.microsoft.com/dotnet/sdk:8.0.423-noble",
+    "dotnet_solution": "Nuuvify.CommonPack.sln",
+    "github_owner": "nuuvify",
+    "github_repo": "Nuuvify.CommonPack",
+    "initial_version": "2.9.0",
+    "issue_areas": "Arquitetura,Backend,Frontend,Banco de dados,Seguran\u00E7a,DevOps,Documenta\u00E7\u00E3o,Testes",
+    "legacy_rulesets": "",
+    "license": "MIT",
+    "project_description": "Bibliotecas .NET reutiliz\u00E1veis da Nuuvify",
+    "project_name": "Nuuvify CommonPack",
+    "project_slug": "nuuvify-commonpack",
+    "publish_snapshots": "true",
+    "release_app_id": "5441343",
+    "release_reviewers": "lzocateli",
+    "release_type": "simple",
+    "require_signed_commits": "false",
+    "required_approvals": "1",
+    "secrets_dir_name": "Nuuvify.CommonPack",
+    "version_files": "src/Directory.Build.props"
+  },
+  "components": [
+    "ci",
+    "release",
+    "publish-nuget",
+    "dependency-updates",
+    "repository-policy"
+  ],
+  "files": {
+    ".github/CI-CD.md": {
+      "component": "ci",
+      "sha256": "1500f5d283850023e4dce76551b1e94fe14bf64aa23eedae8b3a02fd3d9d1a14"
+    },
+    ".github/REPOSITORY-POLICY.md": {
+      "component": "repository-policy",
+      "sha256": "2c6e86b064b7aa70187814fceead1db833be9ed60a6d18808246e3770e92f24f"
+    },
+    ".github/repository-policy.json": {
+      "component": "repository-policy",
+      "sha256": "3f47c41efd59d5112dab7e4a6094b5d7066801cab7b53427f9a2d0fdac502b9e"
+    },
+    ".github/workflows/gw-dotnet.yml": {
+      "component": "ci",
+      "sha256": "78bd46ca2ef0bccbac37549e1167b34512e4117f3e4cfcd89a47714d9c5c8aa0"
+    },
+    ".github/workflows/gw-gitleaks.yml": {
+      "component": "ci",
+      "sha256": "4a1cf6b0ca1225468c58ec1f555eb2d3a60ab1d62a081b305a33331d44418047"
+    },
+    ".github/workflows/gw-node.yml": {
+      "component": "ci",
+      "sha256": "d1dd2d5eb4b5997fd92d77056ba6355b413717a05c2d693c5d1e1c8f89297546"
+    },
+    ".github/workflows/gw-pr-hygiene.yml": {
+      "component": "ci",
+      "sha256": "b884f9ddac4a9ea19006c06269c76e3032572c30a4b17e630543fe13cbb88ca9"
+    },
+    ".github/workflows/gw-publish-nuget.yml": {
+      "component": "publish-nuget",
+      "sha256": "b3f2cd6fa09eb87fe17c1c44c088a81b3edf502e315c50f0962f44ee3a1342a7"
+    },
+    ".github/workflows/gw-release.yml": {
+      "component": "release",
+      "sha256": "cd884359cc0eafea8bd7c75ab96606c7fd88c3a2095d77ed8dafea66826a097c"
+    },
+    "docs/runbooks/release.md": {
+      "component": "release",
+      "sha256": "7df6dfc7bc81e416477aadd554f0cea70f194aec97d75385739324ab04fc2549"
+    },
+    "tools/scripts/ci/Assert-ArtifactVersion.ps1": {
+      "component": "release",
+      "sha256": "0fca851b62cfaab991da7367bb94dd5aef3d2d8775f85d37a1442ff0bf40374f"
+    },
+    "tools/scripts/ci/Assert-ReleaseTag.ps1": {
+      "component": "release",
+      "sha256": "5a28cce85718d55573e2c935503bfc672a216a478e5058e8b4b17641003bb458"
+    },
+    "tools/scripts/ci/Get-BuildVersion.ps1": {
+      "component": "release",
+      "sha256": "9f00894b538b2f833db672ee23f310e1ded32c2127db0e7eaed798742614f9ca"
+    },
+    "tools/scripts/ci/GroundworkRelease.psm1": {
+      "component": "release",
+      "sha256": "64108e3406d38dd2de8c5c51faec0cd09b17b077f2b8bbf5ceb96fda830d1e18"
+    },
+    "tools/scripts/ci/New-ReleaseManifest.ps1": {
+      "component": "release",
+      "sha256": "7a175f4edba84cbe33820372bbe249a64e8ca3da0e5e28c3a081eba2a3b4d06e"
+    },
+    "tools/scripts/ci/Publish-NuGet.ps1": {
+      "component": "publish-nuget",
+      "sha256": "3c46e7e47c04807c79b0c33ae7c9cdeaa6c3d629f26ed29656c9070417e430a1"
+    },
+    "tools/scripts/ci/Test-ManagedFiles.ps1": {
+      "component": "ci",
+      "sha256": "55516208cd8ea7d550fecde7d0a4891d9f550e18f96d7a28a4e3e39776f0efc5"
+    },
+    "tools/scripts/ci/Test-PublishedRelease.ps1": {
+      "component": "release",
+      "sha256": "6794e5f375e7f17ad5c8f1b871e71f9f5bc833cdf6be9472ea2ee930eedd288a"
+    },
+    "tools/scripts/ci/Test-PullRequestTitle.ps1": {
+      "component": "ci",
+      "sha256": "bc0273227b343cfa1089a945d4f4ed38963d76e5a99f637b923d9d339bc8f7fa"
+    }
+  }
+}

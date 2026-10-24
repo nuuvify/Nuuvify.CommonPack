@@ -1,8 +1,8 @@
 # Nuuvify.CommonPack.Security.Abstraction
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nuuvify_Nuuvify.CommonPack&metric=alert_status)](https://sonarcloud.io/project/overview?id=nuuvify_Nuuvify.CommonPack)
-[![PR Validation](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/pr-validation.yml/badge.svg)](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/pr-validation.yml)
-[![Publish and Release](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/publish-release.yml/badge.svg?branch=main)](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/publish-release.yml)
+[![CI](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/ci.yml)
+[![Release](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/gw-release.yml/badge.svg?branch=main)](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/gw-release.yml)
 
 Biblioteca de abstrações para segurança e autenticação JWT. Esta biblioteca contém interfaces, extensões e classes auxiliares que definem os contratos para implementações de segurança em aplicações .NET.
 
