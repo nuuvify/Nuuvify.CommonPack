@@ -5,6 +5,13 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-br/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec/v2.0.0.html).
 
+## [2.10.1](https://github.com/nuuvify/Nuuvify.CommonPack/compare/v2.10.0...v2.10.1) (2026-10-24)
+
+
+### Corrigido
+
+* Bump Azure.Messaging.ServiceBus and 12 others ([#256](https://github.com/nuuvify/Nuuvify.CommonPack/issues/256)) ([24bfcb3](https://github.com/nuuvify/Nuuvify.CommonPack/commit/24bfcb37c001541cb812678babb9bae6264ef328))
+
 ## [2.10.0](https://github.com/nuuvify/Nuuvify.CommonPack/compare/v2.9.1...v2.10.0) (2026-10-24)
 
 
