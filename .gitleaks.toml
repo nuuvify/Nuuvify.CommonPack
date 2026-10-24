@@ -1,0 +1,15 @@
+# Configuração local do Gitleaks, lida pelo gw-gitleaks.yml. O scan do histórico usa o modo stdin
+# (git log -p), sem caminho de arquivo: as exceções casam o valor exato, nunca padrões genéricos.
+title = "Nuuvify.CommonPack secret scanning"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Valores fictícios: chave JWT dos testes do pacote Security (configTest.json) e fingerprint de exemplo do README do pacote MftMailbox.Sftp"
+targetRules = ["generic-api-key"]
+regexTarget = "secret"
+regexes = [
+  '''^3bb869c0\-e17b\-4a6f\-bad1\-123e5ea6ea9b$''',
+  '''^ab12cd34ef56\.\.\.$''',
+]
