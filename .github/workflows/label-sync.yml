@@ -19,10 +19,10 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
 
             - name: Sync labels from file
-              uses: crazy-max/ghaction-github-labeler@v5
+              uses: crazy-max/ghaction-github-labeler@v6
               with:
                   yaml-file: .github/labels.yml
                   skip-delete: false
