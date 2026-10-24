@@ -11,6 +11,8 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ### Alterado
 
+- Dependências atualizadas na linha compatível com .NET 8: `Azure.Messaging.ServiceBus` 7.20.1, `Microsoft.Extensions.Logging.Abstractions` 8.0.3.
+
 ### Corrigido
 
 ### Removido
