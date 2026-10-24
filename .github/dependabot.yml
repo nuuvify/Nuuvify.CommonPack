@@ -34,6 +34,14 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
+      # O projeto é net8.0 e mantém Microsoft.Extensions.* e System.Diagnostics.DiagnosticSource na
+      # linha 8. Versões acima destas puxam o Azure.Core >= 1.60, que exige a linha 10 (NU1605).
+      - dependency-name: "Azure.Messaging.ServiceBus"
+        versions: [">= 7.20.2"]
+      - dependency-name: "Azure.Storage.Blobs"
+        versions: [">= 12.28.0"]
+      - dependency-name: "Azure.Monitor.OpenTelemetry.AspNetCore"
+        versions: [">= 1.3.0"]
     schedule:
       interval: weekly
       day: monday
