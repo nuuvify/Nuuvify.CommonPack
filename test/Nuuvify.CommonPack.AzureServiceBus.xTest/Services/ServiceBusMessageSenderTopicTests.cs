@@ -83,6 +83,7 @@ public class ServiceBusMessageSenderTopicTests : IClassFixture<ServiceBusTestFix
             Times.AtLeastOnce);
     }
 
+    [Trait("Category", "ServiceBusLongRunning")]
     [Fact]
     public async Task SendMessageToTopicAsync_WithOperationOptions_ShouldSucceed()
     {
@@ -351,6 +352,7 @@ public class ServiceBusMessageSenderTopicTests : IClassFixture<ServiceBusTestFix
 
     #region ScheduleMessageToTopicAsync Tests
 
+    [Trait("Category", "ServiceBusLongRunning")]
     [Fact]
     public async Task ScheduleMessageToTopicAsync_WithValidParameters_ShouldReturnSequenceNumber()
     {
@@ -564,6 +566,7 @@ public class ServiceBusMessageSenderTopicTests : IClassFixture<ServiceBusTestFix
 
     #region Integration Tests
 
+    [Trait("Category", "ServiceBusLongRunning")]
     [Fact]
     public async Task TopicOperations_IntegratedWorkflow_ShouldWorkEndToEnd()
     {

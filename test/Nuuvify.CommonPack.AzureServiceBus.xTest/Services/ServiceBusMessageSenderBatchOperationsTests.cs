@@ -110,6 +110,7 @@ public class ServiceBusMessageSenderBatchOperationsTests : IAsyncDisposable
             _sender.SendBatchMessagesToQueueAsync("test-queue", messages, null, null, cts.Token));
     }
 
+    [Trait("Category", "ServiceBusLongRunning")]
     [Fact]
     public async Task SendBatchMessagesToQueueAsync_WithLargeMessageCount_ShouldProcessAllMessages()
     {

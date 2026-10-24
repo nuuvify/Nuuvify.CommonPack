@@ -28,6 +28,12 @@ Executar somente testes unitários:
 dotnet test --filter "Category=Unit"
 ```
 
+Executar os testes unitários rápidos, como o CI faz:
+
+```powershell
+dotnet test --filter "Category=Unit&Category!=ServiceBusLongRunning"
+```
+
 Executar somente testes de integração:
 
 ```powershell
@@ -39,6 +45,32 @@ Gerar cobertura com o script do repositório:
 ```powershell
 cd test
 pwsh ./run-tests.ps1
+```
+
+## Testes longos do Service Bus
+
+Alguns testes de `Nuuvify.CommonPack.AzureServiceBus.xTest` dependem das tentativas de conexão do
+Azure SDK e podem levar mais de 15 minutos. Eles têm, além de `Unit`, a categoria
+`ServiceBusLongRunning`:
+
+```csharp
+[Trait("Category", "ServiceBusLongRunning")]
+[Fact]
+public async Task SendMessageToTopicAsync_WithOperationOptions_ShouldSucceed()
+```
+
+- O CI exclui essa categoria dos testes unitários e do SonarCloud.
+- O workflow [servicebus-long-running.yml](../../.github/workflows/servicebus-long-running.yml)
+  executa a categoria, dentro do `Result`, somente quando o PR altera
+  `src/Nuuvify.CommonPack.AzureServiceBus/CHANGELOG.md` ou o projeto de testes do pacote. Também
+  pode ser disparado manualmente em `Actions`.
+- Marque com essa categoria todo teste novo do pacote que leve mais de 1 segundo por depender do
+  Azure SDK.
+
+Para executá-los localmente:
+
+```powershell
+dotnet test test/Nuuvify.CommonPack.AzureServiceBus.xTest --filter "Category=ServiceBusLongRunning"
 ```
 
 ## Convenções adotadas

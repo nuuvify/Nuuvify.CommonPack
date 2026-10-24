@@ -88,7 +88,7 @@ jobs:
 
       - name: Run unit tests with coverage
         run: >-
-          dotnet test Nuuvify.CommonPack.sln --configuration Release --no-build --filter "Category=Unit" --collect:"XPlat Code Coverage" --results-directory ./artifacts/sonar-test-results -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+          dotnet test Nuuvify.CommonPack.sln --configuration Release --no-build --filter "Category=Unit&Category!=ServiceBusLongRunning" --collect:"XPlat Code Coverage" --results-directory ./artifacts/sonar-test-results -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
 
       - name: End SonarCloud analysis
         shell: pwsh
