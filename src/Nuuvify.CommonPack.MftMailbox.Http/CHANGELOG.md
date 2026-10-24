@@ -7,6 +7,8 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ## [Não Lançado]
 
+## [2.9.1] - 2026-10-24
+
 ### Adicionado
 - Adapter HTTPS Mailbox com envio/recebimento streaming, status e ACK/NACK.
 
@@ -16,7 +18,3 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ### Corrigido
 - ReceiveBatchAsync passou a respeitar itens explicitamente informados no envelope, conforme contrato da abstração inbound.
-
-### Removido
-
-### Segurança

@@ -7,16 +7,10 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ## [Não Lançado]
 
+## [2.9.1] - 2026-10-24
+
 ### Adicionado
 - Store distribuída de idempotência com <c>SET NX EX</c> via Redis.
 - Cache de status compartilhado com TTL configurável e fallback para cliente interno.
 - Sink de auditoria em Redis Streams com trim assíncrono e observabilidade de falhas.
 - Setup de DI com validação de pré-requisitos e decoração opcional de status cache.
-
-### Alterado
-
-### Corrigido
-
-### Removido
-
-### Segurança

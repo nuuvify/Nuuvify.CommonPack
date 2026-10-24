@@ -7,6 +7,8 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ## [Não Lançado]
 
+## [2.9.1] - 2026-10-24
+
 ### Adicionado
 - Suporte a `ReceiveMode` no `ServiceBusMessageReceiver`, com exposição do modo configurado para customizações em classes derivadas.
 - Diagnósticos de processamento e correlação alinhados ao contexto de operação da mensagem.
@@ -17,10 +19,6 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ### Corrigido
 - Evitadas tentativas de `DeadLetter`/`Abandon` em cenários `ReceiveAndDelete`, reduzindo falhas operacionais durante o consumo.
-
-### Removido
-
-### Segurança
 
 ## [Sem versão registrada] - 2025-10-13
 

@@ -2,6 +2,8 @@
 
 ## [Não Lançado]
 
+## [2.9.1] - 2026-10-24
+
 - Documentado o contrato neutro de `IOperationContextAccessor` para migração de `RequestConfiguration`.
 
 ## 2.8.0

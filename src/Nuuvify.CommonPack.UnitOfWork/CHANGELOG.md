@@ -7,6 +7,8 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ## [Não Lançado]
 
+## [2.9.1] - 2026-10-24
+
 ### Adicionado
 - Nova implementação `ShortLivedDbContextFactory<TContext>` para criação de `DbContext` curto por operação, com aplicação opcional de auditoria no contexto criado.
 - Nova extensão de DI `AddShortLivedDbContextFactory<TContext>()` para registrar a factory genérica de contexto curto.
@@ -14,12 +16,6 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ### Alterado
 - Documentação de migração ampliada para cenários de worker/background com contexto curto por operação.
-
-### Corrigido
-
-### Removido
-
-### Segurança
 
 ### ⚠️ Depreciação (Controlada)
 

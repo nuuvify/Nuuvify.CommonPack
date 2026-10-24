@@ -7,17 +7,11 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ## [Não Lançado]
 
+## [2.9.1] - 2026-10-24
+
 ### Adicionado
 - Nova interface `IShortLivedDbContextFactory<TContext>` para criação explícita de contexto EF curto por operação com suporte a auditoria (`usernameContext`/`userIdContext`).
 - Nova interface `IWorkerDbContextFactory<TContext>` para cenários de worker/background com contrato especializado sobre contexto EF curto.
-
-### Alterado
-
-### Corrigido
-
-### Removido
-
-### Segurança
 
 ## [Sem versão registrada] - 2025-10-30
 

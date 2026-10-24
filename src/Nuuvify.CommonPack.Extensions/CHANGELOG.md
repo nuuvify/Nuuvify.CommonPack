@@ -7,7 +7,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ## [Não Lançado]
 
-### Adicionado
+## [2.9.1] - 2026-10-24
 
 ### Alterado
 - Geração automática de Id em `DomainEntity` atualizada para UUID orientado a banco de dados (UUID v7), visando melhor ordenação e redução de page split em cenários persistidos.
@@ -17,10 +17,6 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ### Corrigido
 - `NuuvifyLogFormatter` passou a descartar corretamente os dois tokens de recarga observados pelos `IOptionsMonitor`, evitando retenção indevida de callbacks em cenários de bootstrap e reload de configuração.
-
-### Removido
-
-### Segurança
 
 ## [Sem versão registrada] - 2026-05-29
 

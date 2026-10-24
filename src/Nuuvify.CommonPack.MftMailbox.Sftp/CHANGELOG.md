@@ -7,6 +7,8 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ## [Não Lançado]
 
+## [2.9.1] - 2026-10-24
+
 ### Adicionado
 - Adapter SFTP com upload/download streaming, commit atomico e ACK/NACK.
 
@@ -14,9 +16,3 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 - ACK/NACK agora suporta modos configuráveis: sem ação, metadados, arquivo marcador e modo combinado.
 - Conteúdo do arquivo marcador ACK/NACK agora permite configuração de encoding (incluindo code pages usadas em integração com mainframe).
 - Recepção inbound por listagem automática agora respeita ordenação configurável por nome de arquivo.
-
-### Corrigido
-
-### Removido
-
-### Segurança
