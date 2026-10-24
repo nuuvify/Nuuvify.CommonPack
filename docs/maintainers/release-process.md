@@ -93,6 +93,22 @@ tratar uma release defeituosa, siga o [runbook de release](../runbooks/release.m
 | Sintoma | Ação |
 | --- | --- |
 | `Package changelog` falha no PR | Atualize `## [Não Lançado]` de cada pacote listado na mensagem |
-| Release PR sem o commit de fechamento | Confira a execução de `Package changelog release`; para reaplicar, feche e reabra o Release PR |
+| Release PR sem o commit de fechamento | Confira a execução de `Package changelog release`; para reaplicar, regenere o Release PR (abaixo) |
+| Release PR desatualizado em relação à `main` | Use **Update branch**; se houver conflito nos CHANGELOGs dos pacotes, regenere o Release PR (abaixo) |
 | `Publish packages` falha com credencial ausente | Crie ou renove `NUGET_API_KEY` no Environment `release` e republique pela seção 4 do runbook |
 | Versão já existente no NuGet.org | O push é ignorado (`--skip-duplicate`); versões publicadas são imutáveis, então corrija com um patch |
+
+### Regenerar o Release PR
+
+O release-please só refaz a branch do Release PR quando o conteúdo que ele gera muda: notas do
+CHANGELOG raiz, manifesto e `VersionPrefix`. Commits `docs`, `ci` ou `chore` na `main`, inclusive
+os que alteram CHANGELOGs de pacote, deixam o Release PR como está, e o fechamento feito nele pode
+ficar desatualizado. Para regenerar a partir da `main` atual:
+
+```bash
+gh pr close <numero> --repo nuuvify/Nuuvify.CommonPack --delete-branch
+gh run rerun <id-da-ultima-execucao-do-workflow-Release-na-main> --repo nuuvify/Nuuvify.CommonPack
+```
+
+O release-please abre um Release PR novo, e o `package-changelog-release.yml` fecha de novo os
+CHANGELOGs dos pacotes.
