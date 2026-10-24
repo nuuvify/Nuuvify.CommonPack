@@ -7,6 +7,8 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ## [Não Lançado]
 
+## [2.9.0] - 2026-08-26
+
 ### Adicionado
 
 - Validação de startup para header e credenciais do esquema de API key.
@@ -21,8 +23,6 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 ### Corrigido
 
 - Testes de autenticação passaram a usar comparação explícita e configuração determinística.
-
-### Removido
 
 ### Segurança
 

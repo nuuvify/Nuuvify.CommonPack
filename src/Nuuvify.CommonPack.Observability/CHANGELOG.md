@@ -2,6 +2,8 @@
 
 ## [Não Lançado]
 
+## [2.9.0] - 2026-08-26
+
 ### Corrigido
 
 - Teste de isolamento concorrente convertido para fluxo assíncrono sem operações bloqueantes.
