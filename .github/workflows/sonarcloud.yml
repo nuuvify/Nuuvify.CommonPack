@@ -27,7 +27,7 @@ jobs:
       # workflow_dispatch já exige permissão de escrita no repositório; aqui restringimos ainda mais, a admins
       - name: Restrict manual trigger to admins
         if: github.event_name == 'workflow_dispatch'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const { data } = await github.rest.repos.getCollaboratorPermissionLevel({
@@ -40,12 +40,12 @@ jobs:
             }
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
 
