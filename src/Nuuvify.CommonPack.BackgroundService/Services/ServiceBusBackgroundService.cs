@@ -20,6 +20,7 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
 
     private ServiceBusClient _serviceBusClient = null!;
     private ServiceBusProcessor _serviceBusProcessor = null!;
+    private ServiceBusSessionProcessor _serviceBusSessionProcessor = null!;
     private ServiceBusProcessor _deadLetterProcessor = null!;
     private ServiceBusSender _originEntitySender = null!;
 
@@ -355,7 +356,7 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
             ["ErrorDetails"] = errorDetails,
             ["FailureTime"] = DateTimeOffset.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", System.Globalization.CultureInfo.InvariantCulture),
             ["WorkerVersion"] = Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? UnknownValue,
-            ["CorrelationId"] = RequestConfiguration.CorrelationId,
+            ["CorrelationId"] = ResolveCorrelationId(message),
             ["DeliveryAttempt"] = message.DeliveryCount,
             ["MessageId"] = message.MessageId,
             ["ExceptionType"] = exceptionType ?? "ProcessingFailure",
@@ -393,7 +394,7 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
             ["AbandonReason"] = abandonReason,
             ["AbandonTime"] = DateTimeOffset.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", System.Globalization.CultureInfo.InvariantCulture),
             ["RetryCount"] = message.DeliveryCount,
-            ["CorrelationId"] = RequestConfiguration.CorrelationId,
+            ["CorrelationId"] = ResolveCorrelationId(message),
             ["MessageId"] = message.MessageId,
             ["WorkerInstance"] = Environment.MachineName,
             ["NextRetryHint"] = DateTimeOffset.UtcNow.AddMinutes(1).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", System.Globalization.CultureInfo.InvariantCulture),
@@ -412,18 +413,27 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
 
         try
         {
-            if (_serviceBusProcessor == null)
+            if (_serviceBusProcessor == null && _serviceBusSessionProcessor == null)
             {
-                throw new InvalidOperationException("ServiceBus não foi configurado. Chame um dos métodos ConfigureServiceBus antes de iniciar o processamento.");
+                throw new InvalidOperationException("ServiceBus não foi configurado. Chame um dos métodos ConfigureServiceBus ou ConfigureServiceBusSession antes de iniciar o processamento.");
             }
-
-            _serviceBusProcessor.ProcessMessageAsync += (args) => HandleMessageAsync(args, stoppingToken);
-            _serviceBusProcessor.ProcessErrorAsync += HandleErrorAsync;
 
             _deadLetterProcessor.ProcessMessageAsync += (args) => HandleDeadLetterMessageAsync(args, stoppingToken);
             _deadLetterProcessor.ProcessErrorAsync += HandleErrorAsync;
 
-            await _serviceBusProcessor.StartProcessingAsync(stoppingToken);
+            if (_serviceBusSessionProcessor != null)
+            {
+                _serviceBusSessionProcessor.ProcessMessageAsync += (args) => HandleSessionMessageAsync(args, stoppingToken);
+                _serviceBusSessionProcessor.ProcessErrorAsync += HandleErrorAsync;
+                await _serviceBusSessionProcessor.StartProcessingAsync(stoppingToken);
+            }
+            else
+            {
+                _serviceBusProcessor.ProcessMessageAsync += (args) => HandleMessageAsync(args, stoppingToken);
+                _serviceBusProcessor.ProcessErrorAsync += HandleErrorAsync;
+                await _serviceBusProcessor.StartProcessingAsync(stoppingToken);
+            }
+
             await _deadLetterProcessor.StartProcessingAsync(stoppingToken);
 
             // Aguarda até que o token de cancelamento seja acionado
@@ -461,7 +471,7 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
         using var activity = ActivitySourceCustom.StartActivity(nameof(HandleMessageAsync));
         try
         {
-            _ = (activity?.SetTag("Worker.CorrelationId", RequestConfiguration.CorrelationId));
+            _ = (activity?.SetTag("Worker.CorrelationId", ResolveCorrelationId(args.Message)));
 
             _logger.LogInformation("Iniciando {ClassName} Worker: {Data}", nameof(HandleMessageAsync), DateTimeOffset.Now);
 
@@ -511,6 +521,17 @@ public abstract partial class ServiceBusBackgroundService<T> : Microsoft.Extensi
             args.ErrorSource, args.EntityPath, args.FullyQualifiedNamespace);
 
         return Task.CompletedTask;
+    }
+
+    // O construtor sem RequestConfiguration não mantém correlação compartilhada; usa a da própria mensagem.
+    private string ResolveCorrelationId(ServiceBusReceivedMessage message)
+    {
+        if (!string.IsNullOrWhiteSpace(_requestConfiguration?.CorrelationId))
+        {
+            return _requestConfiguration.CorrelationId;
+        }
+
+        return string.IsNullOrWhiteSpace(message?.CorrelationId) ? UnknownValue : message.CorrelationId;
     }
 
 }
