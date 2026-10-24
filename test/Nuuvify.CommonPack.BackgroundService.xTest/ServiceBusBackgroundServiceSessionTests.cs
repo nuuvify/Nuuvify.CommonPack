@@ -296,8 +296,14 @@ public sealed class TestSessionServiceBusBackgroundService : ServiceBusBackgroun
     public void TestConfigureServiceBusSession(string cnnName, string queueName, ServiceBusSessionProcessorOptions options)
         => ConfigureServiceBusSession(cnnName, queueName, new ServiceBusClientOptions(), options);
 
+    public void TestConfigureServiceBusSession(string queueName, string fullyQualifiedNamespace, Azure.Core.TokenCredential credential, ServiceBusSessionProcessorOptions options)
+        => ConfigureServiceBusSession(queueName, fullyQualifiedNamespace, credential, new ServiceBusClientOptions(), options);
+
     public void TestConfigureServiceBus(string cnnName, string queueName)
         => ConfigureServiceBus(cnnName, queueName, new ServiceBusClientOptions(), new ServiceBusProcessorOptions());
+
+    public Task TestExecuteAsync(CancellationToken stoppingToken)
+        => ExecuteAsync(stoppingToken);
 
     public Task TestHandleSessionMessageAsync(ProcessSessionMessageEventArgs args, CancellationToken cancellationToken)
         => HandleSessionMessageAsync(args, cancellationToken);
