@@ -7,6 +7,12 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não Lançado]
 
+## [2.10.1] - 2026-10-24
+
+### Alterado
+
+- Dependências atualizadas na linha compatível com .NET 8: `Azure.Messaging.ServiceBus` 7.20.1.
+
 ## [2.10.0] - 2026-10-24
 
 ### Adicionado

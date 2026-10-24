@@ -7,6 +7,12 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ## [Não Lançado]
 
+## [2.10.1] - 2026-10-24
+
+### Alterado
+
+- Dependências atualizadas na linha compatível com .NET 8: `Microsoft.AspNetCore.Authentication.JwtBearer` 8.0.32, `Microsoft.AspNetCore.Authentication.OpenIdConnect` 8.0.32, `Microsoft.AspNetCore.Authorization` 8.0.32, `Microsoft.Extensions.Caching.SqlServer` 8.0.32, `System.Text.Json` 8.0.6.
+
 ## [2.9.0] - 2026-08-26
 
 ### Adicionado
