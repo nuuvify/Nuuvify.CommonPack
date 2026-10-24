@@ -1,8 +1,8 @@
 # Nuuvify.CommonPack.Email
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nuuvify_Nuuvify.CommonPack&metric=alert_status)](https://sonarcloud.io/project/overview?id=nuuvify_Nuuvify.CommonPack)
-[![PR Validation](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/pr-validation.yml/badge.svg)](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/pr-validation.yml)
-[![Publish and Release](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/publish-release.yml/badge.svg?branch=main)](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/publish-release.yml)
+[![CI](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/ci.yml)
+[![Release](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/gw-release.yml/badge.svg?branch=main)](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/gw-release.yml)
 
 Implementação robusta e completa de serviço de envio de e-mails usando **MailKit**. Fornece uma abstração de alto nível para envio de e-mails com suporte a templates HTML, anexos, múltiplos destinatários e configuração flexível via appsettings.json.
 

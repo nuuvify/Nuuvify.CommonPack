@@ -1,0 +1,124 @@
+# Gerenciado pelo Altivy.Groundwork (componente ci). Não edite: mudanças vão para o catálogo.
+name: .NET
+
+on:
+  workflow_call:
+    inputs:
+      solution:
+        description: Solução ou projeto; vazio usa dotnet.solution de .github/ci-cd.json
+        type: string
+        default: ''
+      configuration:
+        description: Configuração de build
+        type: string
+        default: Release
+      test-filter:
+        description: Filtro opcional repassado a dotnet test --filter
+        type: string
+        default: ''
+      pack:
+        description: Executa dotnet pack e envia os pacotes como artifact
+        type: boolean
+        default: false
+      artifact-name:
+        description: Nome do artifact com os pacotes gerados
+        type: string
+        default: nupkg
+
+permissions: {}
+
+jobs:
+  config:
+    name: Configuration
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      image: ${{ steps.read.outputs.image }}
+      solution: ${{ steps.read.outputs.solution }}
+    steps:
+      - name: Checkout configuration
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: .github/ci-cd.json
+          sparse-checkout-cone-mode: false
+
+      - name: Read .github/ci-cd.json
+        id: read
+        shell: bash
+        env:
+          INPUT_SOLUTION: ${{ inputs.solution }}
+        run: |
+          set -euo pipefail
+          image=$(jq -er '.dotnet.sdkImage' .github/ci-cd.json)
+          solution="$INPUT_SOLUTION"
+          if [[ -z "$solution" ]]; then
+            solution=$(jq -r '.dotnet.solution // ""' .github/ci-cd.json)
+          fi
+          if [[ -z "$solution" ]]; then
+            echo "::error::Informe a solução em inputs.solution ou em dotnet.solution de .github/ci-cd.json."
+            exit 1
+          fi
+          if [[ ! "$image" =~ ^[a-z0-9./_-]+(:[A-Za-z0-9._-]+)?(@sha256:[0-9a-f]{64})?$ ]]; then
+            echo "::error::dotnet.sdkImage inválido em .github/ci-cd.json."
+            exit 1
+          fi
+          {
+            echo "image=$image"
+            echo "solution=$solution"
+          } >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build and test
+    needs: config
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    container:
+      image: ${{ needs.config.outputs.image }}
+      options: --user 0
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_NOLOGO: '1'
+      SOLUTION: ${{ needs.config.outputs.solution }}
+      CONFIGURATION: ${{ inputs.configuration }}
+      TEST_FILTER: ${{ inputs.test-filter }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Restore
+        run: dotnet restore "$SOLUTION"
+
+      - name: Build
+        run: dotnet build "$SOLUTION" --configuration "$CONFIGURATION" --no-restore
+
+      - name: Test
+        shell: bash
+        run: |
+          set -euo pipefail
+          filter_args=()
+          if [[ -n "$TEST_FILTER" ]]; then
+            filter_args=(--filter "$TEST_FILTER")
+          fi
+          dotnet test "$SOLUTION" --configuration "$CONFIGURATION" --no-build "${filter_args[@]}"
+
+      - name: Pack
+        if: ${{ inputs.pack }}
+        run: dotnet pack "$SOLUTION" --configuration "$CONFIGURATION" --no-build --output ./artifacts/nupkg
+
+      - name: Upload packages
+        if: ${{ inputs.pack }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: |
+            artifacts/nupkg/*.nupkg
+            artifacts/nupkg/*.snupkg
+          if-no-files-found: error
+          retention-days: 7

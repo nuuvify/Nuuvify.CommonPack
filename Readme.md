@@ -1,7 +1,7 @@
 # Nuuvify.CommonPack
 
-[![PR Validation](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/pr-validation.yml/badge.svg)](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/pr-validation.yml)
-[![Publish and Release](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/publish-release.yml/badge.svg?branch=main)](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/publish-release.yml)
+[![CI](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/ci.yml)
+[![Release](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/gw-release.yml/badge.svg?branch=main)](https://github.com/nuuvify/Nuuvify.CommonPack/actions/workflows/gw-release.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nuuvify_Nuuvify.CommonPack&metric=alert_status)](https://sonarcloud.io/project/overview?id=nuuvify_Nuuvify.CommonPack)
 
 Coleção de bibliotecas .NET para desenvolvimento de aplicações robustas, escaláveis e de alta performance.
@@ -529,8 +529,8 @@ Resumo rápido:
 [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=nuuvify_Nuuvify.CommonPack&metric=sqale_index)](https://sonarcloud.io/project/overview?id=nuuvify_Nuuvify.CommonPack)
 
 O workflow [SonarCloud Analysis](.github/workflows/sonarcloud.yml) envia análises
-em pushes para `main`/`qas` e em pull requests. O secret `SONAR_TOKEN` precisa
-estar configurado no repositório. Enquanto não houver análise processada, o
+em pushes para `main`, e o job `SonarCloud` do [CI](.github/workflows/ci.yml) analisa
+os pull requests. O secret `SONAR_TOKEN` precisa estar disponível para o repositório. Enquanto não houver análise processada, o
 Overview apresentará `Quality gate: Not computed`.
 
 ## 🔗 Links Úteis

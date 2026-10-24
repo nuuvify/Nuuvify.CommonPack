@@ -1,39 +1,71 @@
-[CmdletBinding()]
+#!/usr/bin/env pwsh
+# Gerenciado pelo Altivy.Groundwork (componente release). Não edite: mudanças vão para o catálogo.
+
+<#
+.SYNOPSIS
+Audita versões de pacotes NuGet gerados antes da publicação.
+
+.DESCRIPTION
+Para cada .nupkg, confere a versão do nuspec e, no assembly próprio do pacote,
+AssemblyVersion, FileVersion e ProductVersion (InformationalVersion) contra os
+valores esperados calculados por Get-BuildVersion.ps1. Somente leitura.
+
+.PARAMETER ArtifactsPath
+Diretório com os .nupkg.
+
+.PARAMETER ExpectedVersion
+Versão NuGet esperada (X.Y.Z[-pre]).
+
+.PARAMETER ExpectedAssemblyVersion
+AssemblyVersion esperado; vazio valida apenas o major.
+
+.PARAMETER ExpectedFileVersion
+FileVersion esperado; vazio não valida.
+
+.EXAMPLE
+./tools/scripts/ci/Assert-ArtifactVersion.ps1 -ArtifactsPath artifacts/nupkg -ExpectedVersion 1.4.0
+
+.EXAMPLE
+./tools/scripts/ci/Assert-ArtifactVersion.ps1 --help
+
+.NOTES
+Requer PowerShell 7+. Código de saída 0 válido, 1 divergente e 2 argumento desconhecido.
+
+.LINK
+../../../docs/runbooks/release.md
+#>
+#Requires -Version 7.0
+[CmdletBinding(PositionalBinding = $false)]
 param(
-    [Parameter(Mandatory = $true)]
-    [string]$ArtifactsPath,
-
-    [Parameter(Mandatory = $true)]
-    [string]$VersionFile,
-
-    [Parameter(Mandatory = $false)]
-    [string]$ExpectedVersion = '',
-
-    [Parameter(Mandatory = $false)]
-    [string]$ExpectedAssemblyVersion = '',
-
-    [Parameter(Mandatory = $false)]
-    [string]$ExpectedFileVersion = ''
+    [string] $ArtifactsPath,
+    [string] $ExpectedVersion,
+    [string] $ExpectedAssemblyVersion = '',
+    [string] $ExpectedFileVersion = '',
+    [Alias('h')]
+    [switch] $Help,
+    [Parameter(ValueFromRemainingArguments)]
+    [string[]] $RemainingArguments
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+if ($Help -or ($RemainingArguments | Where-Object { $_ -in @('--help', '-h', '/?', 'help') })) {
+    Get-Help -Full $PSCommandPath
+    exit 0
+}
+
+if ($RemainingArguments) {
+    [Console]::Error.WriteLine("Argumento desconhecido: $($RemainingArguments -join ' '). Use --help.")
+    exit 2
+}
+
+if (-not $ArtifactsPath -or -not $ExpectedVersion) {
+    [Console]::Error.WriteLine('Informe -ArtifactsPath e -ExpectedVersion. Use --help.')
+    exit 2
+}
+
 Add-Type -AssemblyName System.IO.Compression.FileSystem
-
-function Get-VersionPrefixFromFile {
-    param([string]$FilePath)
-    $content = Get-Content -Path $FilePath -Raw
-    $match = [regex]::Match($content, '<VersionPrefix>(?<v>\d+\.\d+\.\d+)</VersionPrefix>')
-    if (-not $match.Success) {
-        throw "VersionPrefix ausente em $FilePath"
-    }
-    return $match.Groups['v'].Value
-}
-
-if ([string]::IsNullOrWhiteSpace($ExpectedVersion)) {
-    $ExpectedVersion = Get-VersionPrefixFromFile -FilePath $VersionFile
-}
 
 $nupkgs = @(Get-ChildItem -Path $ArtifactsPath -Filter '*.nupkg' -Recurse)
 if ($nupkgs.Count -eq 0) {
@@ -64,6 +96,7 @@ foreach ($pkg in $nupkgs) {
             continue
         }
         $nuspecVersion = $nuspecMatch.Groups[1].Value.Trim()
+        $packageId = [regex]::Match($nuspecContent, '<id>([^<]+)</id>').Groups[1].Value.Trim()
 
         if ($nuspecVersion -ne $ExpectedVersion) {
             $failures.Add("[$($pkg.Name)] nuspec version='$nuspecVersion' != esperado='$ExpectedVersion'.")
@@ -72,8 +105,14 @@ foreach ($pkg in $nupkgs) {
             Write-Host "  nuspec version: $nuspecVersion OK"
         }
 
-        # Inspeciona assemblies em lib/**
-        $libEntries = $zip.Entries | Where-Object { $_.FullName -like 'lib/*/*.dll' }
+        # dotnet tool empacota em tools/<tfm>/any/ junto com as dependências; só o assembly próprio é auditado.
+        $libEntries = @($zip.Entries | Where-Object {
+                ($_.FullName -like 'lib/*/*.dll' -or $_.FullName -like 'tools/*/*/*.dll') -and $_.Name -eq "$packageId.dll"
+            })
+        if ($libEntries.Count -eq 0) {
+            $failures.Add("[$($pkg.Name)] assembly '$packageId.dll' nao encontrado em lib/ ou tools/.")
+        }
+
         foreach ($entry in $libEntries) {
             $tmp = [System.IO.Path]::GetTempFileName() + '.dll'
             try {
@@ -101,7 +140,7 @@ foreach ($pkg in $nupkgs) {
                 }
                 else {
                     # Sem valor esperado: valida que major bate com VersionPrefix
-                    $expectedMajor = ([System.Version]$ExpectedVersion).Major
+                    $expectedMajor = ([System.Version]($ExpectedVersion -split '-')[0]).Major
                     $actualMajor = $assemblyName.Version.Major
                     if ($actualMajor -ne $expectedMajor) {
                         $failures.Add("[$($pkg.Name) / $($entry.Name)] AssemblyVersion major='$actualMajor' != major esperado='$expectedMajor'.")
@@ -131,7 +170,10 @@ foreach ($pkg in $nupkgs) {
 }
 
 if ($failures.Count -gt 0) {
-    Write-Error ("Auditoria de artefatos falhou com $($failures.Count) problema(s):`n" + ($failures -join "`n"))
+    foreach ($failure in $failures) {
+        Write-Output "::error title=Versão do artefato::$failure"
+    }
+
     exit 1
 }
 

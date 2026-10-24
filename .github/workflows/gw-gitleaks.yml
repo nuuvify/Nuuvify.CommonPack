@@ -1,0 +1,44 @@
+# Gerenciado pelo Altivy.Groundwork (componente ci). Não edite: mudanças vão para o catálogo.
+name: Gitleaks
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  full-history:
+    name: Full History
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Test secret scanning rules
+        if: ${{ hashFiles('tools/scripts/test-gitleaks.ps1') != '' }}
+        shell: pwsh
+        run: ./tools/scripts/test-gitleaks.ps1
+
+      - name: Scan full Git history
+        shell: bash
+        run: |
+          set -euo pipefail
+          config_args=()
+          if [[ -f .gitleaks.toml ]]; then
+            config_args=(--volume "$GITHUB_WORKSPACE/.gitleaks.toml:/gitleaks.toml:ro")
+          fi
+          scan_args=(stdin --redact)
+          if [[ -f .gitleaks.toml ]]; then
+            scan_args+=(--config /gitleaks.toml)
+          fi
+          git log --all --full-history -p -- |
+            docker run --rm -i --read-only "${config_args[@]}" \
+              docker.io/lzocateli/gitleaks:8.30.1 \
+              "${scan_args[@]}"

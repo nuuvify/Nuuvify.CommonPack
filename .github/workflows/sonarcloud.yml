@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - qas
   workflow_dispatch: {}
 
 concurrency:

@@ -21,6 +21,9 @@
 *.ps1     text eol=lf
 *.psm1    text eol=lf
 
+# Scripts gerenciados pelo Altivy.Groundwork mantêm os bytes do catálogo (hash conferido pelo Test-ManagedFiles)
+tools/scripts/ci/*.ps1 text eol=crlf
+
 # Treat images and binaries as binary
 *.png     binary
 *.jpg     binary

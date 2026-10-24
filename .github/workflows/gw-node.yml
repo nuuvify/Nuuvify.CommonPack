@@ -1,0 +1,63 @@
+# Gerenciado pelo Altivy.Groundwork (componente ci). Não edite: mudanças vão para o catálogo.
+name: Node
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        description: Diretório do projeto Node (com package-lock.json)
+        type: string
+        required: true
+      image:
+        description: Imagem Node fixada por versão (ou digest) usada como container do job
+        type: string
+        required: true
+      install-command:
+        description: Comando de instalação com lockfile
+        type: string
+        default: npm ci --no-audit --no-fund
+      test-command:
+        description: Comando de testes; vazio pula a etapa
+        type: string
+        default: npm test
+      build-command:
+        description: Comando de build; vazio pula a etapa
+        type: string
+        default: npm run build
+
+permissions: {}
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    container:
+      image: ${{ inputs.image }}
+      options: --user 0
+    defaults:
+      run:
+        shell: bash
+        working-directory: ${{ inputs.working-directory }}
+    env:
+      INSTALL_COMMAND: ${{ inputs.install-command }}
+      TEST_COMMAND: ${{ inputs.test-command }}
+      BUILD_COMMAND: ${{ inputs.build-command }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install locked dependencies
+        run: bash -euo pipefail -c "$INSTALL_COMMAND"
+
+      - name: Test
+        if: ${{ inputs.test-command != '' }}
+        run: bash -euo pipefail -c "$TEST_COMMAND"
+
+      - name: Build
+        if: ${{ inputs.build-command != '' }}
+        run: bash -euo pipefail -c "$BUILD_COMMAND"

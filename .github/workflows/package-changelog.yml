@@ -1,0 +1,34 @@
+# Local do Nuuvify.CommonPack (fora do catálogo do Altivy.Groundwork): gate dos CHANGELOGs por
+# pacote, chamado pelo ci.yml e incluído no job Result. Ver docs/maintainers/release-process.md.
+name: Package changelog
+
+on:
+  workflow_call:
+
+permissions: {}
+
+jobs:
+  check:
+    name: Verify package CHANGELOG updated
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Skip outside pull requests
+        if: ${{ github.event_name != 'pull_request' }}
+        run: echo "Sem pull request; nada a verificar."
+
+      - name: Checkout
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Check package CHANGELOGs
+        if: ${{ github.event_name == 'pull_request' }}
+        shell: pwsh
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: ./tools/scripts/Test-PackageChangelogs.ps1 -BaseRef "origin/$env:BASE_REF"

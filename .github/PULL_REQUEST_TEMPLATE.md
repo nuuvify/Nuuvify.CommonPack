@@ -11,11 +11,13 @@
 
 Descreva objetivamente o problema e a solução proposta.
 
-# Branch de destino
+# Impacto na release
 
-- [ ] `main` para release estável
-- [ ] `qas` para preview
-- [ ] `nugettest/qas` para build `dev`
+Todo PR vai para `main`. O título em Conventional Commits define o impacto na próxima versão
+(`feat` → minor, `fix`/`perf`/`revert`/`deps` → patch, `!` → major); veja
+[docs/runbooks/release.md](../docs/runbooks/release.md).
+
+- [ ] O título do PR segue Conventional Commits e reflete o impacto esperado na versão
 
 # Checklist do autor
 
@@ -23,9 +25,8 @@ Descreva objetivamente o problema e a solução proposta.
 - [ ] O código segue as convenções do projeto e o `.editorconfig`
 - [ ] Executei build e os testes relevantes localmente
 - [ ] Adicionei ou atualizei testes quando necessário
-- [ ] Atualizei documentação e changelog quando necessário
+- [ ] Atualizei documentação e o `CHANGELOG.md` de cada pacote alterado (seção `## [Não Lançado]`)
 - [ ] Avaliei impacto em compatibilidade, segurança e performance
-- [ ] Escolhi a branch de destino correta para o tipo de release esperado
 
 # Evidências
 

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/v17.6.0/schemas/config.json",
+  "release-type": "simple",
+  "include-component-in-tag": false,
+  "include-v-in-tag": true,
+  "bump-minor-pre-major": true,
+  "bump-patch-for-minor-pre-major": false,
+  "draft": true,
+  "force-tag-creation": true,
+  "changelog-sections": [
+    { "type": "feat", "section": "Adicionado" },
+    { "type": "fix", "section": "Corrigido" },
+    { "type": "deps", "section": "Dependências" },
+    { "type": "perf", "section": "Desempenho" },
+    { "type": "revert", "section": "Revertido" },
+    { "type": "docs", "section": "Documentação", "hidden": true },
+    { "type": "style", "section": "Estilo", "hidden": true },
+    { "type": "refactor", "section": "Refatoração", "hidden": true },
+    { "type": "test", "section": "Testes", "hidden": true },
+    { "type": "build", "section": "Build", "hidden": true },
+    { "type": "ci", "section": "CI", "hidden": true },
+    { "type": "chore", "section": "Manutenção", "hidden": true }
+  ],
+  "packages": {
+    ".": {
+      "changelog-path": "CHANGELOG.md",
+      "extra-files": [
+        { "type": "xml", "path": "src/Directory.Build.props", "xpath": "//Project/PropertyGroup/VersionPrefix" }
+      ]
+    }
+  }
+}

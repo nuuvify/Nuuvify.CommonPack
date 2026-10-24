@@ -1,0 +1,18 @@
+{
+  "$comment": "Semente do Altivy.Groundwork: pertence ao projeto e é lida pelos workflows gw-*. Revise mudanças em PR.",
+  "schemaVersion": 1,
+  "defaultBranch": "main",
+  "commitScopes": ["docs", "tooling", "deps", "actions", "repo"],
+  "dotnet": {
+    "sdkImage": "mcr.microsoft.com/dotnet/sdk:8.0.423-noble",
+    "solution": "Nuuvify.CommonPack.sln"
+  },
+  "versionFiles": ["src/Directory.Build.props"],
+  "publishSnapshots": true,
+  "deploy": {
+    "environments": [],
+    "autoDeployEnvironment": ""
+  },
+  "attestations": true,
+  "rollbackMinimumVersion": "0.0.0"
+}

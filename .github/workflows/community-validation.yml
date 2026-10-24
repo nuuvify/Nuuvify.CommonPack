@@ -83,14 +83,18 @@ jobs:
             - name: Validate CHANGELOG format
               shell: pwsh
               run: |
+                  # O CHANGELOG raiz é gerado pelo release-please; os de pacote mantêm '## [Não Lançado]'.
                   $content = Get-Content -Path 'CHANGELOG.md' -Raw
 
-                  if ($content -notmatch '## \[Não Lançado\]') {
-                    Write-Error "CHANGELOG.md não contém a seção '## [Não Lançado]'"
+                  if ($content -notmatch '(?m)^## \[\d+\.\d+\.\d+\]( - \d{4}-\d{2}-\d{2}|\(\S+\) \(\d{4}-\d{2}-\d{2}\))') {
+                    Write-Error "CHANGELOG.md não contém nenhuma release no formato '## [x.y.z] - yyyy-mm-dd' ou do release-please"
                   }
 
-                  if ($content -notmatch '## \[\d+\.\d+\.\d+\] - \d{4}-\d{2}-\d{2}') {
-                    Write-Error "CHANGELOG.md não contém nenhuma release no formato '## [x.y.z] - yyyy-mm-dd'"
+                  $packagesWithoutUnreleased = Get-ChildItem -Path 'src/*/CHANGELOG.md' |
+                    Where-Object { (Get-Content -LiteralPath $_.FullName -Raw) -notmatch '(?m)^## \[Não Lançado\]' } |
+                    ForEach-Object { Resolve-Path -LiteralPath $_.FullName -Relative }
+                  if ($packagesWithoutUnreleased) {
+                    Write-Error ("CHANGELOGs de pacote sem a seção '## [Não Lançado]':`n- " + ($packagesWithoutUnreleased -join "`n- "))
                   }
 
                   $forbidden = @('Planned Features', 'Aguardando', 'Current Version', 'Technical Debt')

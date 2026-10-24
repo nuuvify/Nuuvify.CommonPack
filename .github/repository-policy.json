@@ -1,0 +1,100 @@
+{
+  "$comment": "Gerenciado pelo Altivy.Groundwork (componente repository-policy). Aplicado por 'groundwork github --sync'. Não edite: mudanças vão para o catálogo.",
+  "schemaVersion": 1,
+  "defaultBranch": "main",
+  "repository": {
+    "allow_merge_commit": false,
+    "allow_rebase_merge": false,
+    "allow_squash_merge": true,
+    "squash_merge_commit_title": "PR_TITLE",
+    "squash_merge_commit_message": "PR_BODY",
+    "delete_branch_on_merge": true,
+    "allow_update_branch": true
+  },
+  "actions": {
+    "default_workflow_permissions": "read",
+    "can_approve_pull_request_reviews": false
+  },
+  "dependabot": {
+    "vulnerabilityAlerts": true,
+    "automatedSecurityFixes": true
+  },
+  "publicRepositorySecurity": {
+    "secretScanning": true,
+    "pushProtection": true
+  },
+  "rulesets": [
+    {
+      "name": "gw-main-integrity",
+      "target": "branch",
+      "enforcement": "active",
+      "conditions": { "ref_name": { "include": ["~DEFAULT_BRANCH"], "exclude": [] } },
+      "bypass_actors": [],
+      "rules": [
+        { "type": "deletion" },
+        { "type": "non_fast_forward" },
+        { "type": "required_linear_history" },
+        {
+          "type": "required_status_checks",
+          "parameters": {
+            "strict_required_status_checks_policy": true,
+            "do_not_enforce_on_create": false,
+            "required_status_checks": [{ "context": "Result", "integration_id": 15368 }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "gw-main-review",
+      "target": "branch",
+      "enforcement": "active",
+      "conditions": { "ref_name": { "include": ["~DEFAULT_BRANCH"], "exclude": [] } },
+      "bypass_actors": [{ "actor_id": 5, "actor_type": "RepositoryRole", "bypass_mode": "pull_request" }],
+      "rules": [
+        {
+          "type": "pull_request",
+          "parameters": {
+            "required_approving_review_count": 1,
+            "dismiss_stale_reviews_on_push": true,
+            "require_code_owner_review": false,
+            "require_last_push_approval": false,
+            "required_review_thread_resolution": true,
+            "allowed_merge_methods": ["squash"]
+          }
+        }
+      ]
+    },
+    {
+      "name": "gw-release-tags",
+      "target": "tag",
+      "enforcement": "active",
+      "conditions": { "ref_name": { "include": ["refs/tags/v*"], "exclude": [] } },
+      "bypass_actors": [{ "actor_id": 5441343, "actor_type": "Integration", "bypass_mode": "always" }],
+      "rules": [
+        { "type": "creation" },
+        { "type": "update" },
+        { "type": "deletion" }
+      ]
+    }
+  ],
+  "environments": [
+    {
+      "name": "release",
+      "reviewers": ["lzocateli"],
+      "preventSelfReview": false,
+      "reviewersFallback": "release-pr",
+      "deploymentPolicies": [{ "name": "main", "type": "branch" }, { "name": "v*", "type": "tag" }]
+    },
+    {
+      "name": "preview",
+      "reviewers": [],
+      "preventSelfReview": false,
+      "deploymentPolicies": [{ "name": "main", "type": "branch" }]
+    }
+  ],
+  "prerequisites": {
+    "variables": ["RELEASE_APP_ID"],
+    "secrets": ["RELEASE_APP_PRIVATE_KEY"]
+  },
+  "legacyRulesets": []
+}

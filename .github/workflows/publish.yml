@@ -1,0 +1,39 @@
+# Semente do Altivy.Groundwork (componente release): pertence ao projeto.
+# Contrato (ver .github/CI-CD.md): chamado por gw-release.yml com a tag e a versão; publica
+# artefatos imutáveis no Environment "release" e envia artifacts release-entries-* com
+# { kind, name, reference, digest } para o manifesto da release. Em republish, só envia o que falta.
+name: Publish
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        description: Tag da release (vX.Y.Z)
+        type: string
+        required: true
+      version:
+        description: Versão da release (X.Y.Z)
+        type: string
+        required: true
+      republish:
+        description: Reenvio de artefatos ausentes de uma release existente
+        type: boolean
+        default: false
+
+permissions: {}
+
+jobs:
+  nuget:
+    name: NuGet
+    uses: ./.github/workflows/gw-publish-nuget.yml
+    permissions:
+      contents: read
+      packages: write
+    with:
+      channel: release
+      tag: ${{ inputs.tag }}
+      feed: nugetorg
+      # A tag aponta para o commit do Release PR, que só entra na main com o Result do ci.yml
+      # verde (testes unitários e de integração); o container não roda Testcontainers.
+      run-tests: false
+    secrets: inherit
