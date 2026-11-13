@@ -1,7 +1,7 @@
 #!/usr/bin/env pwsh
 
 $dotnet = 'C:\Program Files\dotnet\dotnet.exe'
-$basePath = 'c:\Users\lzob8c1\projetos\Nuuvify.CommonPack'
+$basePath = "$env:USERPROFILE\projetos\Nuuvify.CommonPack"
 
 Write-Host "Testing Middleware.xTest..." -ForegroundColor Cyan
 & $dotnet test "$basePath\test\Nuuvify.CommonPack.Middleware.xTest\Nuuvify.CommonPack.Middleware.xTest.csproj" `
