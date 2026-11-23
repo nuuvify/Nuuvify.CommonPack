@@ -11,7 +11,7 @@ interface. A visão geral está em [github-setup.md](./github-setup.md) e o proc
 
 - Ser administrador do repositório e da organização `nuuvify` no GitHub.
 - Ter a CLI `gh` autenticada e a CLI `groundwork` do Altivy.Groundwork instalada.
-- Ter em mãos uma chave do NuGet.org com permissão de push para os pacotes `Nuuvify.CommonPack.*`.
+- Ter acesso à conta NuGet.org proprietária dos pacotes `Nuuvify.CommonPack.*`.
 
 ## 1. Habilitar features básicas
 
@@ -46,16 +46,67 @@ groundwork github --sync --replace-legacy # remove a proteção clássica depois
 Use `--replace-legacy` somente depois que o check `Result` estiver verde em um PR, para não
 deixar a `main` sem o check obrigatório.
 
-## 5. Cadastrar o `NUGET_API_KEY`
+## 5. Configurar Trusted Publishing no NuGet.org
 
-Depois do `--sync`, os Environments `preview` e `release` existem. Cadastre a chave em ambos:
+Depois do `--sync`, os Environments `preview` e `release` existem.
+
+### Preencher a tela Trusted Publishing
+
+1. Acesse [NuGet.org > Trusted Publishing](https://www.nuget.org/account/trustedpublishing)
+   com a conta proprietária dos pacotes e abra o formulário de criação.
+2. Crie **duas políticas**, uma para cada coluna. Preencha todos os campos assim:
+
+   | Campo da tela | Preview | Release |
+   | --- | --- | --- |
+   | **Policy Name** | `NuuvifyCommonPackPreview` | `NuuvifyCommonPackRelease` |
+   | **Package Owner** | `lincoln.zocateli` | `lincoln.zocateli` |
+   | **CI/CD Provider** | `GitHub Actions` | `GitHub Actions` |
+   | **Repository Owner** | `nuuvify` | `nuuvify` |
+   | **Repository** | `Nuuvify.CommonPack` | `Nuuvify.CommonPack` |
+   | **Workflow File** | `ci.yml` | `gw-release.yml` |
+   | **Environment** | `preview` | `release` |
+   | **Select Scopes: Push** | Marcar | Marcar |
+   | **Push new packages and package versions** | Selecionar | Selecionar |
+   | **Push only new package versions** | Não selecionar | Não selecionar |
+   | **Unlist or relist package versions** | Desmarcar | Desmarcar |
+   | **Stage packages** | Desmarcar | Desmarcar |
+   | **Glob Patterns and Packages (Separate by a new line)** | `Nuuvify.CommonPack.*` | `Nuuvify.CommonPack.*` |
+
+   Os nomes das políticas são sugestões para identificá-las em **Manage**.
+   **Package Owner** é o proprietário no NuGet.org: selecione `lincoln.zocateli`, dono,
+   por exemplo, de [MftMailbox.Sftp](https://www.nuget.org/packages/Nuuvify.CommonPack.MftMailbox.Sftp/)
+   e [AutoHistory](https://www.nuget.org/packages/Nuuvify.CommonPack.AutoHistory/).
+   Não selecione `Altivy` para esses pacotes enquanto ela não for proprietária.
+   **Repository Owner** é diferente: `nuuvify` identifica a organização no GitHub.
+
+   Em **Workflow File**, informe somente o nome do arquivo, sem `.github/workflows/`.
+   Para release, use `gw-release.yml`: ele é o workflow chamador de `publish.yml`.
+   O padrão `Nuuvify.CommonPack.*` limita a política aos IDs iniciados por
+   `Nuuvify.CommonPack.`; não use `*` sozinho, que permitiria todos os pacotes da conta.
+
+   O escopo **Push new packages and package versions** também permite criar novos pacotes
+   dentro desse padrão. Para limitar a política aos pacotes já existentes, escolha
+   **Push only new package versions**; será necessário ajustar a permissão antes de publicar
+   um novo pacote.
+3. Clique em **Create** para cada política e confira as duas em **Manage**.
+   Quando aplicável, uma política fica temporariamente ativa por sete dias e passa à ativação
+   permanente após uma publicação bem-sucedida; se expirar, reative-a no NuGet.org.
+
+### Configurar o usuário no GitHub
+
+Cadastre a variável de Actions `NUGET_USER` com o nome de usuário NuGet.org
+`lincoln.zocateli`, associado às políticas (não use e-mail nem o login do GitHub):
 
 ```bash
-gh secret set NUGET_API_KEY --repo nuuvify/Nuuvify.CommonPack --env release
-gh secret set NUGET_API_KEY --repo nuuvify/Nuuvify.CommonPack --env preview
+gh variable set NUGET_USER --repo nuuvify/Nuuvify.CommonPack --body lincoln.zocateli
 ```
 
-O comando lê o valor do terminal sem gravá-lo no histórico do shell.
+O job solicita `id-token: write` e executa `NuGet/login` imediatamente antes do push.
+A credencial emitida expira em uma hora e não é persistida em secrets nem artifacts.
+Depois de validar o novo fluxo, remova os secrets antigos `NUGET_API_KEY` dos Environments
+`preview` e `release` e revogue as chaves permanentes no NuGet.org.
+
+Consulte a [documentação oficial](https://learn.microsoft.com/en-us/nuget/nuget-org/trusted-publishing).
 
 ## 6. Sincronizar labels e validar triagem
 
@@ -78,7 +129,8 @@ O comando lê o valor do terminal sem gravá-lo no histórico do shell.
 | --- | --- |
 | Merge bloqueado com `Result` verde | Proteção clássica ainda ativa: rode `groundwork github --sync --replace-legacy` |
 | Release PR sem checks | `RELEASE_APP_ID`, `RELEASE_APP_PRIVATE_KEY` e instalação do App |
-| Publicação sem credencial | `NUGET_API_KEY` no Environment `preview` ou `release`, conforme o canal |
+| Login NuGet falha | `NUGET_USER`, proprietário/escopo da política, workflow chamador e Environment; confirme `id-token: write` |
+| Política pendente de ativação | Execute a primeira publicação no prazo indicado pelo NuGet.org; reative a política se necessário |
 | Labels não criados | Execução do `Label Sync` e validade de `.github/labels.yml` |
 | PR sem labels automáticos | Execução do `PR Triage` e cobertura de `.github/labeler.yml` |
 
@@ -87,5 +139,5 @@ O comando lê o valor do terminal sem gravá-lo no histórico do shell.
 - habilitar Issues e Discussions;
 - garantir o App de release e seus secrets na organização;
 - executar `groundwork github --sync` e, após validar o CI, `--replace-legacy`;
-- cadastrar `NUGET_API_KEY` nos Environments `preview` e `release`;
+- cadastrar as duas políticas Trusted Publishing e a variável `NUGET_USER`;
 - executar `Label Sync` e validar o fluxo com um PR real.

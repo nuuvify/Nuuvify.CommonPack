@@ -89,16 +89,13 @@ reprova o `Result`.
 | --- | --- | --- | --- |
 | `RELEASE_APP_ID` | Variável | Organização `nuuvify` (repositórios selecionados) | GitHub App de release |
 | `RELEASE_APP_PRIVATE_KEY` | Secret | Organização `nuuvify` (repositórios selecionados) | GitHub App de release |
-| `NUGET_API_KEY` | Secret | Environments `preview` e `release` | Push de previews e releases no NuGet.org |
+| `NUGET_USER` | Variável | Repositório (ou Environments `preview` e `release`) | Nome de usuário do NuGet.org para login OIDC |
 | `SONAR_TOKEN` | Secret | Organização `nuuvify` | Análise do SonarCloud |
 
-Para cadastrar `NUGET_API_KEY` em cada Environment sem expor o valor no histórico do shell:
-
-```bash
-gh secret set NUGET_API_KEY --repo nuuvify/Nuuvify.CommonPack --env release
-gh secret set NUGET_API_KEY --repo nuuvify/Nuuvify.CommonPack --env preview
-```
-
+Previews e releases usam Trusted Publishing: `NuGet/login` troca a identidade OIDC do
+GitHub por uma credencial temporária. Não há fallback para o secret `NUGET_API_KEY`.
+Cadastre as políticas do NuGet.org e a variável conforme o
+[tutorial de configuração](./github-manual-setup-tutorial.md#5-configurar-trusted-publishing-no-nugetorg).
 O processo de release está em [release-process.md](./release-process.md).
 
 ## 6.2 Variável de runner do GitHub Actions
@@ -187,7 +184,7 @@ Para auditar e reconciliar esse estado, siga [github-access-governance.md](./git
 - CODEOWNERS reconhecido
 - Issue forms ativos
 - PR template ativo
-- `NUGET_API_KEY` configurado no Environment `release`
+- Trusted Publishing configurado para `preview` e `release`, com a variável `NUGET_USER`
 - Labels iniciais criadas
 - Governança de acesso auditada sem `DRIFT` ou `BLOCKED`
 

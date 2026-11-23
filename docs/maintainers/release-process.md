@@ -40,8 +40,10 @@ flowchart TB
 | Snapshot | Cada push na `main` (job `Snapshot` do CI) | `X.Y.(Z+1)-preview.N` | NuGet.org | `preview` |
 | Estável | Merge do Release PR | `X.Y.Z` | NuGet.org | `release` (com aprovação) |
 
-- Configure o secret `NUGET_API_KEY` nos Environments `preview` e `release`, com permissão
-  para publicar os pacotes. Snapshots não geram tag nem GitHub Release; selecione versões
+- Os dois canais usam Trusted Publishing via OIDC, sem chave permanente. Configure as políticas
+  do NuGet.org e a variável `NUGET_USER` conforme o
+  [tutorial](./github-manual-setup-tutorial.md#5-configurar-trusted-publishing-no-nugetorg).
+  Snapshots não geram tag nem GitHub Release; selecione versões
   prévias no NuGet.org para consumi-los. O cálculo usa o próximo patch da versão registrada,
   mesmo que a próxima release estável seja minor ou major.
 - As branches `qas` e `nugettest/qas` e os Environments `production` e `nugettest` não fazem
@@ -95,8 +97,17 @@ tratar uma release defeituosa, siga o [runbook de release](../runbooks/release.m
 | `Package changelog` falha no PR | Atualize `## [Não Lançado]` de cada pacote listado na mensagem |
 | Release PR sem o commit de fechamento | Confira a execução de `Package changelog release`; para reaplicar, regenere o Release PR (abaixo) |
 | Release PR desatualizado em relação à `main` | Use **Update branch**; se houver conflito nos CHANGELOGs dos pacotes, regenere o Release PR (abaixo) |
-| `Publish packages` falha com credencial ausente | Crie ou renove `NUGET_API_KEY` no Environment `release` e republique pela seção 4 do runbook |
+| Login Trusted Publishing falha | Confira `NUGET_USER` e a política do NuGet.org (workflow chamador, Environment, proprietário e escopo) |
 | Versão já existente no NuGet.org | O push é ignorado (`--skip-duplicate`); versões publicadas são imutáveis, então corrija com um patch |
+
+### Migração de tags anteriores ao Trusted Publishing
+
+Reexecutar um workflow antigo ou usar `republish` numa tag antiga executa a definição
+de workflow daquela revisão; não aplica automaticamente esta migração. Em particular,
+`v3.0.0` ainda usa o fluxo com chave permanente. Não mova a tag nem altere artefatos
+publicados para atualizar a autenticação. Para usar OIDC pelo fluxo normal, uma nova
+release deve conter estes workflows; a recuperação de uma tag antiga exige um
+procedimento separado, revisado e autorizado.
 
 ### Regenerar o Release PR
 
