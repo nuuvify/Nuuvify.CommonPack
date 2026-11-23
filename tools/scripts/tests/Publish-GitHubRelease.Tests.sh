@@ -3,7 +3,17 @@ set -euo pipefail
 
 script="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/Publish-GitHubRelease.sh"
 preview_script="$(dirname "$script")/Publish-PreviewNuGet.sh"
+package_list_script="$(dirname "$script")/Get-PreviewPackageList.sh"
 repo_root="$(cd "$(dirname "$script")/../.." && pwd)"
+package_list="$(printf '%s\n' \
+  "Snapshot	Publish preview packages	2026-11-23T16:01:16Z Pushing Nuuvify.CommonPack.AutoHistory.3.0.1-preview.94.nupkg to 'https://www.nuget.org/api/v2/package'..." \
+  "2026-11-23T16:01:17Z Pushing Nuuvify.CommonPack.MftMailbox.Sftp.3.0.1-preview.94.nupkg to 'https://www.nuget.org/api/v2/package'..." \
+  "2026-11-23T16:01:18Z Pushing Nuuvify.CommonPack.MftMailbox.Sftp.3.0.1-preview.94.snupkg to 'https://www.nuget.org/api/v2/symbolpackage'..." |
+  bash "$package_list_script")"
+if [[ "$package_list" != $'Nuuvify.CommonPack.AutoHistory 3.0.1-preview.94\nNuuvify.CommonPack.MftMailbox.Sftp 3.0.1-preview.94' ]]; then
+  echo "Expected package IDs and versions from both formatted and raw job logs." >&2
+  exit 1
+fi
 ci_workflow="$repo_root/.github/workflows/ci.yml"
 prepare_line="$(awk '/run: bash \.\/tools\/scripts\/Publish-GitHubRelease\.sh prepare-preview/ {print NR}' "$ci_workflow")"
 publish_line="$(awk '/run: bash \.\/tools\/scripts\/Publish-PreviewNuGet\.sh/ {print NR}' "$ci_workflow")"
@@ -25,6 +35,7 @@ temp_dir="$(mktemp -d)"
 trap 'rm -rf -- "$temp_dir"' EXIT
 mkdir -p "$temp_dir/bin" "$temp_dir/artifacts/nupkg"
 export TEST_STATE="$temp_dir/release.json" TEST_LOG="$temp_dir/log" TEST_TAG="$temp_dir/tag"
+export TEST_LIST_LAG="$temp_dir/list-lag"
 export TEST_PACKAGE="$temp_dir/package" TEST_SYMBOLS="$temp_dir/symbols"
 export PATH="$temp_dir/bin:$PATH" GH_TOKEN=test GITHUB_REPOSITORY=example/repo
 export RELEASE_COMMIT=0123456789abcdef0123456789abcdef01234567
@@ -49,7 +60,13 @@ if [[ "$1" == api ]]; then
       cat "$TEST_TAG"
     fi
   elif [[ "$*" == *releases?per_page=100* ]]; then
-    jq -c 'if . == null then [[]] else [[.]] end' "$TEST_STATE"
+    if [[ -f "$TEST_LIST_LAG" ]] && (( $(<"$TEST_LIST_LAG") > 0 )); then
+      remaining="$(<"$TEST_LIST_LAG")"
+      printf '%s\n' "$((remaining - 1))" > "$TEST_LIST_LAG"
+      printf '[[]]\n'
+    else
+      jq -c 'if . == null then [[]] else [[.]] end' "$TEST_STATE"
+    fi
   else
     exit 1
   fi
@@ -66,6 +83,7 @@ elif [[ "$1 $2" == 'release create' ]]; then
     --argjson prerelease "$prerelease" --argjson draft "$draft" \
     '{tag_name:$tag,target_commitish:$commit,prerelease:$prerelease,draft:$draft,assets:[]}' > "$TEST_STATE"
   printf '%s\n' "$RELEASE_COMMIT" > "$TEST_TAG"
+  printf '%s\n' "${TEST_LIST_DELAY:-0}" > "$TEST_LIST_LAG"
 elif [[ "$1 $2" == 'release upload' ]]; then
   shift 3
   while [[ "$1" != --repo ]]; do
@@ -108,6 +126,12 @@ jq -e --arg tag "$RELEASE_TAG" '.tag_name == $tag and .prerelease == true and .d
 printf 'nuget-push\n' >> "$TEST_LOG"
 EOF
 chmod +x "$temp_dir/bin/dotnet"
+cat > "$temp_dir/bin/sleep" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+printf 'sleep %s\n' "$1" >> "$TEST_LOG"
+EOF
+chmod +x "$temp_dir/bin/sleep"
 printf 'package' > "$TEST_PACKAGE"
 printf 'symbols' > "$TEST_SYMBOLS"
 printf 'package' > "$ARTIFACTS_PATH/Nuuvify.CommonPack.Test.3.0.1-preview.94.nupkg"
@@ -134,8 +158,24 @@ if grep -q '^nuget-push$' "$TEST_LOG"; then
 fi
 unset TEST_CREATE_FAIL
 
-bash "$script" prepare-preview
+export TEST_LIST_DELAY=99
+if (bash "$script" prepare-preview && cd "$temp_dir" && bash "$preview_script") > "$temp_dir/output" 2>&1; then
+  echo "Expected failure when the new pre-release cannot be confirmed." >&2
+  exit 1
+fi
+grep -q 'não ficou disponível para confirmação' "$temp_dir/output"
+if grep -q '^nuget-push$' "$TEST_LOG"; then
+  echo "NuGet must not be called before the pre-release is confirmed." >&2
+  exit 1
+fi
+unset TEST_LIST_DELAY
+echo null > "$TEST_STATE"
+rm -f -- "$TEST_TAG" "$TEST_LIST_LAG"
+: > "$TEST_LOG"
+
+TEST_LIST_DELAY=2 bash "$script" prepare-preview
 jq -e '.draft == false and .prerelease == true and (.assets | length == 0)' "$TEST_STATE" >/dev/null
+[[ "$(grep -c '^sleep ' "$TEST_LOG")" == 2 ]]
 if grep -q '^download$' "$TEST_LOG"; then
   echo "Pre-release creation must not depend on NuGet downloads." >&2
   exit 1
