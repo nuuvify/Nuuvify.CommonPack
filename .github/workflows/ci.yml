@@ -60,7 +60,9 @@ jobs:
           persist-credentials: false
 
       - name: Test preview publication
-        run: bash ./tools/scripts/tests/Publish-PreviewNuGet.Tests.sh
+        run: |
+          bash ./tools/scripts/tests/Publish-PreviewNuGet.Tests.sh
+          bash ./tools/scripts/tests/Publish-GitHubRelease.Tests.sh
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
@@ -251,6 +253,22 @@ jobs:
         env:
           NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
         run: bash ./tools/scripts/Publish-PreviewNuGet.sh
+
+      - name: Create release GitHub App token
+        id: release-app
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          permission-contents: write
+
+      - name: Publish preview GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ steps.release-app.outputs.token }}
+          RELEASE_TAG: v${{ steps.version.outputs.version }}
+          RELEASE_COMMIT: ${{ github.sha }}
+        run: bash ./tools/scripts/Publish-GitHubRelease.sh preview
 
   result:
     name: Result
