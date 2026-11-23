@@ -42,7 +42,10 @@ public sealed class SftpMftMailboxOptions
     /// </summary>
     public string? HostKeyFingerprint { get; set; }
 
-    /// <summary>Diretório remoto de destino para arquivos enviados (outbound/upload). Padrão: <c>/outbound</c>.</summary>
+    /// <summary>
+    /// Diretório remoto de destino para arquivos enviados (outbound/upload). Padrão: <c>/outbound</c>.
+    /// Deve existir antes do envio; o cliente não consulta nem cria diretórios durante o upload.
+    /// </summary>
     public string OutboundDirectory { get; set; } = "/outbound";
 
     /// <summary>Diretório remoto de origem para arquivos recebidos (inbound/download). Padrão: <c>/inbound</c>.</summary>

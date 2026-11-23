@@ -32,7 +32,7 @@ namespace Nuuvify.CommonPack.MftMailbox.Sftp;
 /// <item>Checksum SHA-256 calculado após upload e download.</item>
 /// <item>Retry com backoff exponencial e jitter configurável em <c>MftMailboxOptions.Retry</c>.</item>
 /// <item>Circuit breaker configurável em <c>MftMailboxOptions.CircuitBreaker</c>.</item>
-/// <item>Upload atômico usando arquivo temporário (.tmp) renomeado após envio completo.</item>
+/// <item>Upload direto com o nome definitivo, sem consultar, excluir ou renomear arquivos remotos.</item>
 /// <item>Download para arquivo temporário local com exclusão automática no descarte.</item>
 /// <item>Auditoria de cada operação via <c>ITransferAuditSink</c>.</item>
 /// </list>
@@ -50,6 +50,7 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
     private readonly IMftIdempotencyStore _idempotencyStore;
     private readonly ITransferAuditSink _auditSink;
     private readonly ILogger<SftpMftMailboxClient> _logger;
+    private readonly Func<ConnectionInfo, ISftpClient> _clientFactory;
     private readonly ResilienceGate _resilienceGate;
     private readonly ConcurrentDictionary<string, TransferStatus> _status = new(StringComparer.OrdinalIgnoreCase);
 
@@ -67,12 +68,24 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
         IMftIdempotencyStore idempotencyStore,
         ITransferAuditSink auditSink,
         ILogger<SftpMftMailboxClient> logger)
+        : this(options, baseOptions, idempotencyStore, auditSink, logger, connectionInfo => new SftpClient(connectionInfo))
+    {
+    }
+
+    internal SftpMftMailboxClient(
+        IOptions<SftpMftMailboxOptions> options,
+        IOptions<MftMailboxOptions> baseOptions,
+        IMftIdempotencyStore idempotencyStore,
+        ITransferAuditSink auditSink,
+        ILogger<SftpMftMailboxClient> logger,
+        Func<ConnectionInfo, ISftpClient> clientFactory)
     {
         _options = options.Value;
         _baseOptions = baseOptions.Value;
         _idempotencyStore = idempotencyStore;
         _auditSink = auditSink;
         _logger = logger;
+        _clientFactory = clientFactory;
         _resilienceGate = new ResilienceGate(_baseOptions.CircuitBreaker);
     }
 
@@ -80,6 +93,12 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
     public MftProtocol Protocol => MftProtocol.Sftp;
 
     /// <inheritdoc />
+    /// <remarks>
+    /// Cria o arquivo diretamente no caminho definitivo, sem arquivo temporário ou operações
+    /// remotas de consulta, exclusão, renomeação ou criação de diretório.
+    /// O diretório de destino deve existir. O arquivo pode ficar visível antes do fim do envio
+    /// e permanecer parcial em caso de falha. A sobrescrita depende das permissões do servidor.
+    /// </remarks>
     [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Membro de contrato de interface e dependente do estado da instância via SendItemAsync.")]
     public async Task<TransferItemResult> SendSingleAsync(TransferEnvelope envelope, CancellationToken cancellationToken = default)
     {
@@ -93,6 +112,10 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
     }
 
     /// <inheritdoc />
+    /// <remarks>
+    /// Cada item é enviado diretamente com o nome definitivo, conforme <see cref="SendSingleAsync"/>.
+    /// Não executa operações remotas adicionais sobre o arquivo após o upload.
+    /// </remarks>
     public async Task<TransferBatchResult> SendBatchAsync(TransferEnvelope envelope, CancellationToken cancellationToken = default)
     {
         ValidateEnvelope(envelope);
@@ -289,7 +312,7 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
         }, cancellationToken).ConfigureAwait(false);
     }
 
-    private void ApplyMetadataAckNack(SftpClient sftp, AckNackCommand command, string fileName)
+    private void ApplyMetadataAckNack(ISftpClient sftp, AckNackCommand command, string fileName)
     {
         var source = CombinePath(_options.InboundDirectory, fileName);
         var target = command.Decision == AckNackType.Ack
@@ -303,7 +326,7 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
         }
     }
 
-    private void ApplyMarkerFileAckNack(SftpClient sftp, AckNackCommand command, string fileName)
+    private void ApplyMarkerFileAckNack(ISftpClient sftp, AckNackCommand command, string fileName)
     {
         EnsureDirectory(sftp, _options.AckMarkerDirectory);
         var suffix = command.Decision == AckNackType.Ack ? "ack" : "nack";
@@ -390,19 +413,8 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
                         var sftp = sftpScope.Client;
                         sftp.Connect();
 
-                        EnsureDirectory(sftp, _options.OutboundDirectory);
-
                         var remotePath = ResolveOutboundPath(item);
-                        var tempPath = $"{remotePath}.tmp-{Guid.NewGuid():N}";
-
-                        sftp.UploadFile(stream, tempPath, true);
-
-                        if (sftp.Exists(remotePath))
-                        {
-                            sftp.DeleteFile(remotePath);
-                        }
-
-                        sftp.RenameFile(tempPath, remotePath);
+                        sftp.UploadFile(stream, remotePath, true);
                         sftp.Disconnect();
                     }, timeoutCts.Token).ConfigureAwait(false);
 
@@ -485,7 +497,7 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
         var connectionInfo = BuildConnectionInfo();
         try
         {
-            var client = new SftpClient(connectionInfo.ConnectionInfo);
+            var client = _clientFactory(connectionInfo.ConnectionInfo);
 
             ConfigureHostKeyValidation(client);
 
@@ -556,7 +568,7 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
         throw new InvalidOperationException("SFTP credentials are not configured. Configure Password or PrivateKeyPath.");
     }
 
-    private void ConfigureHostKeyValidation(SftpClient client)
+    private void ConfigureHostKeyValidation(ISftpClient client)
     {
         if (string.IsNullOrWhiteSpace(_options.HostKeyFingerprint))
         {
@@ -588,13 +600,13 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
     {
         private readonly IReadOnlyCollection<IDisposable> _ownedDisposables;
 
-        public SftpClientScope(SftpClient client, IReadOnlyCollection<IDisposable> ownedDisposables)
+        public SftpClientScope(ISftpClient client, IReadOnlyCollection<IDisposable> ownedDisposables)
         {
             Client = client;
             _ownedDisposables = ownedDisposables;
         }
 
-        public SftpClient Client { get; }
+        public ISftpClient Client { get; }
 
         void IDisposable.Dispose()
         {
@@ -756,7 +768,7 @@ public sealed class SftpMftMailboxClient : IProtocolMftClient
         }
     }
 
-    private static void EnsureDirectory(SftpClient sftp, string fullPath)
+    private static void EnsureDirectory(ISftpClient sftp, string fullPath)
     {
         if (string.IsNullOrWhiteSpace(fullPath) || fullPath == "/")
         {

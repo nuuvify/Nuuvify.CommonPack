@@ -1,3 +1,4 @@
+# Nuuvify.CommonPack.MftMailbox.Sftp
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nuuvify_Nuuvify.CommonPack&metric=alert_status)](https://sonarcloud.io/project/overview?id=nuuvify_Nuuvify.CommonPack)
 
@@ -9,7 +10,7 @@
 Adapter SFTP para MFT Mailbox com suporte a:
 
 - envio e recebimento por streaming
-- commit atômico em upload (tmp + rename)
+- upload direto com o nome definitivo, compatível com usuários que só podem criar arquivos
 - status por item
 - confirmação ACK/NACK por metadado ou arquivo marcador
 
@@ -26,6 +27,7 @@ Adapter SFTP para MFT Mailbox com suporte a:
 - [Mainframe (UTF-8 e EBCDIC)](#mainframe-utf-8-e-ebcdic)
 - [Segurança](#segurança)
 - [Troubleshooting](#troubleshooting)
+- [Compatibilidade](#compatibilidade)
 
 ## Quando usar
 
@@ -92,6 +94,19 @@ builder.Services.AddMftMailboxSftp(options =>
 ```
 
 ## Exemplo de envio
+
+`SendSingleAsync` e `SendBatchAsync` criam o arquivo diretamente no caminho definitivo,
+sem arquivo temporário, consulta de existência, exclusão, renomeação ou criação de diretórios.
+O diretório remoto deve existir antes do envio. Para enviar `03I30003.TXT`, informe esse
+nome em `TransferItem.FileName`; se `RemotePath` estiver preenchido, ele é usado como
+caminho completo do arquivo, incluindo o nome.
+
+O envio não é atômico: o arquivo pode ficar visível durante o upload e permanecer parcial
+se houver falha. A sobrescrita é solicitada ao servidor, mas depende das permissões do
+usuário; se um destino existente não puder ser sobrescrito, a falha é registrada e propagada.
+O cliente não exclui o destino nem remove arquivos parciais. Coordenar consumo e reenvio
+é responsabilidade da integração. Idempotência, checksum, status e auditoria são mantidos.
+ACK/NACK é uma operação separada e não é chamado automaticamente pelo envio.
 
 ```csharp
 using Nuuvify.CommonPack.MftMailbox.Abstraction.Interfaces;
@@ -227,5 +242,14 @@ builder.Services.AddMftMailboxSftp(options =>
 
 - Connection timeout: revise host, porta, firewall e timeout por arquivo.
 - Falha em autenticação: valide credenciais/chave e permissões no servidor.
+- Permission denied no envio: confirme que o diretório de destino já existe e que o usuário
+  pode criar o arquivo com o nome definitivo. Reenvios podem exigir permissão de sobrescrita.
 - Erro de host key: confirme fingerprint e política de rotação.
 - Muitos arquivos no lote: ajuste MaxBatchSize no núcleo MFT.
+
+## Compatibilidade
+
+- .NET 8.
+- SSH.NET e os pacotes Nuuvify.CommonPack.MftMailbox e Nuuvify.CommonPack.MftMailbox.Abstraction.
+- O envio não exige permissão para renomear ou excluir arquivos; operações de recepção e
+  ACK/NACK continuam exigindo as permissões correspondentes ao modo configurado.
