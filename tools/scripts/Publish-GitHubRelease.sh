@@ -42,11 +42,11 @@ for package in "${packages[@]}"; do
       "$entries" >/dev/null
   fi
 
-  curl --fail --silent --show-error --location --retry 80 --retry-delay 10 --retry-all-errors \
+  curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' --retry 80 --retry-delay 10 --retry-all-errors \
     --retry-max-time 900 --connect-timeout 10 --max-time 30 \
     "https://api.nuget.org/v3-flatcontainer/$lower_id/$version/$lower_id.$version.nupkg" -o "$package.download"
   mv "$package.download" "$package"
-  curl --fail --silent --show-error --location --retry 80 --retry-delay 10 --retry-all-errors \
+  curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' --retry 80 --retry-delay 10 --retry-all-errors \
     --retry-max-time 900 --connect-timeout 10 --max-time 30 \
     "https://www.nuget.org/api/v2/symbolpackage/$id/$version" -o "$symbols.download"
   mv "$symbols.download" "$symbols"
@@ -82,11 +82,9 @@ if [[ "$release" == null ]]; then
     jq -c --arg tag "$tag" '[.[][] | select(.tag_name == $tag)] | if length == 1 then .[0] else error("Release não encontrada") end')"
 fi
 
-if [[ "$mode" == preview ]]; then
-  if ! jq -e --arg commit "$commit" '.prerelease and .target_commitish == $commit' <<<"$release" >/dev/null; then
-    echo "::error::A release preview existente não corresponde ao commit ou canal."
-    exit 1
-  fi
+if [[ "$mode" == preview ]] && ! jq -e --arg commit "$commit" '.prerelease and .target_commitish == $commit' <<<"$release" >/dev/null; then
+  echo "::error::A release preview existente não corresponde ao commit ou canal."
+  exit 1
 fi
 
 missing=()

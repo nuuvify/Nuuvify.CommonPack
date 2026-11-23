@@ -49,10 +49,10 @@ jobs:
           mkdir -p artifacts/nupkg
           while read -r id version; do
             lower_id="${id,,}"
-            curl --fail --silent --show-error --location --retry 5 --retry-delay 10 \
+            curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' --retry 5 --retry-delay 10 \
               "https://api.nuget.org/v3-flatcontainer/$lower_id/$version/$lower_id.$version.nupkg" \
               --output "artifacts/nupkg/$id.$version.nupkg"
-            curl --fail --silent --show-error --location --retry 5 --retry-delay 10 \
+            curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' --retry 5 --retry-delay 10 \
               "https://www.nuget.org/api/v2/symbolpackage/$id/$version" \
               --output "artifacts/nupkg/$id.$version.snupkg"
           done < "$RUNNER_TEMP/preview-packages"
