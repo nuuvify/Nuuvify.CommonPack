@@ -5,6 +5,17 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-br/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec/v2.0.0.html).
 
+## [3.0.0](https://github.com/nuuvify/Nuuvify.CommonPack/compare/v2.10.1...v3.0.0) (2026-11-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* **mft-sftp:** envie arquivos diretamente ao destino ([#269](https://github.com/nuuvify/Nuuvify.CommonPack/issues/269))
+
+### Corrigido
+
+* **mft-sftp:** envie arquivos diretamente ao destino ([#269](https://github.com/nuuvify/Nuuvify.CommonPack/issues/269)) ([6f9ee5a](https://github.com/nuuvify/Nuuvify.CommonPack/commit/6f9ee5adfecfe7dd86e127f7cc918c45a322def6))
+
 ## [2.10.1](https://github.com/nuuvify/Nuuvify.CommonPack/compare/v2.10.0...v2.10.1) (2026-10-24)
 
 
