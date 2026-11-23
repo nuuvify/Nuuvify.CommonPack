@@ -2,7 +2,7 @@
 set -euo pipefail
 
 if [[ -z "${NUGET_API_KEY:-}" ]]; then
-  echo "::error::Configure NUGET_API_KEY no Environment preview."
+  echo "::error::Credencial temporaria ausente; execute NuGet/login antes da publicacao."
   exit 1
 fi
 

@@ -175,17 +175,18 @@ jobs:
     environment: preview
     permissions:
       contents: read
+      id-token: write
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: '1'
       DOTNET_NOLOGO: '1'
     steps:
-      - name: Validate NuGet credential
+      - name: Validate NuGet account
         shell: bash
         env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+          NUGET_USER: ${{ vars.NUGET_USER }}
         run: |
-          if [[ -z "$NUGET_API_KEY" ]]; then
-            echo "::error::Configure NUGET_API_KEY no Environment preview."
+          if [[ -z "$NUGET_USER" ]]; then
+            echo "::error::Configure a variável NUGET_USER com o nome de usuário do NuGet.org."
             exit 1
           fi
 
@@ -239,10 +240,16 @@ jobs:
           -ExpectedVersion $env:EXPECTED_VERSION -ExpectedAssemblyVersion $env:EXPECTED_ASSEMBLY_VERSION
           -ExpectedFileVersion $env:EXPECTED_FILE_VERSION
 
+      - name: NuGet login (Trusted Publishing)
+        id: login
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1
+        with:
+          user: ${{ vars.NUGET_USER }}
+
       - name: Publish preview packages
         shell: bash
         env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
         run: bash ./tools/scripts/Publish-PreviewNuGet.sh
 
   result:

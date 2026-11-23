@@ -25,15 +25,104 @@ permissions: {}
 jobs:
   nuget:
     name: NuGet
-    uses: ./.github/workflows/gw-publish-nuget.yml
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: release
     permissions:
       contents: read
-      packages: write
-    with:
-      channel: release
-      tag: ${{ inputs.tag }}
-      feed: nugetorg
-      # A tag aponta para o commit do Release PR, que só entra na main com o Result do ci.yml
-      # verde (testes unitários e de integração); o container não roda Testcontainers.
-      run-tests: false
-    secrets: inherit
+      id-token: write
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_NOLOGO: '1'
+    steps:
+      - name: Validate release inputs and NuGet account
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+          RELEASE_VERSION: ${{ inputs.version }}
+          NUGET_USER: ${{ vars.NUGET_USER }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ || "$RELEASE_TAG" != "v$RELEASE_VERSION" ]]; then
+            echo "::error::Tag e versão da release inválidas ou divergentes."
+            exit 1
+          fi
+          if [[ -z "$NUGET_USER" ]]; then
+            echo "::error::Configure a variável NUGET_USER com o nome de usuário do NuGet.org."
+            exit 1
+          fi
+
+      - name: Checkout release tag
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: refs/tags/${{ inputs.tag }}
+          persist-credentials: false
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Compute version
+        id: version
+        shell: pwsh
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: ./tools/scripts/ci/Get-BuildVersion.ps1 -Channel release -Tag $env:RELEASE_TAG -RunNumber $env:GITHUB_RUN_NUMBER -OutputPath $env:GITHUB_OUTPUT
+
+      - name: Build
+        env:
+          VERSION_PREFIX: ${{ steps.version.outputs.version_prefix }}
+          VERSION_SUFFIX: ${{ steps.version.outputs.version_suffix }}
+          ASSEMBLY_VERSION: ${{ steps.version.outputs.assembly_version }}
+          FILE_VERSION: ${{ steps.version.outputs.file_version }}
+        run: >
+          dotnet build Nuuvify.CommonPack.sln --configuration Release
+          "-p:VersionPrefix=$VERSION_PREFIX" "-p:VersionSuffix=$VERSION_SUFFIX"
+          "-p:AssemblyVersion=$ASSEMBLY_VERSION" "-p:FileVersion=$FILE_VERSION"
+          -p:ContinuousIntegrationBuild=true "-p:RepositoryCommit=$(git rev-parse HEAD)"
+
+      - name: Pack
+        env:
+          VERSION_PREFIX: ${{ steps.version.outputs.version_prefix }}
+          VERSION_SUFFIX: ${{ steps.version.outputs.version_suffix }}
+          ASSEMBLY_VERSION: ${{ steps.version.outputs.assembly_version }}
+          FILE_VERSION: ${{ steps.version.outputs.file_version }}
+        run: >
+          dotnet pack Nuuvify.CommonPack.sln --configuration Release --no-build --output ./artifacts/nupkg
+          "-p:VersionPrefix=$VERSION_PREFIX" "-p:VersionSuffix=$VERSION_SUFFIX"
+          "-p:AssemblyVersion=$ASSEMBLY_VERSION" "-p:FileVersion=$FILE_VERSION"
+          -p:ContinuousIntegrationBuild=true "-p:RepositoryCommit=$(git rev-parse HEAD)"
+
+      - name: Assert artifact versions
+        shell: pwsh
+        env:
+          EXPECTED_VERSION: ${{ steps.version.outputs.version }}
+          EXPECTED_ASSEMBLY_VERSION: ${{ steps.version.outputs.assembly_version }}
+          EXPECTED_FILE_VERSION: ${{ steps.version.outputs.file_version }}
+        run: >
+          ./tools/scripts/ci/Assert-ArtifactVersion.ps1 -ArtifactsPath ./artifacts/nupkg
+          -ExpectedVersion $env:EXPECTED_VERSION -ExpectedAssemblyVersion $env:EXPECTED_ASSEMBLY_VERSION
+          -ExpectedFileVersion $env:EXPECTED_FILE_VERSION
+
+      - name: NuGet login (Trusted Publishing)
+        id: login
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1
+        with:
+          user: ${{ vars.NUGET_USER }}
+
+      - name: Publish packages and generate release entries
+        shell: pwsh
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: >
+          ./tools/scripts/ci/Publish-NuGet.ps1 -ArtifactsPath ./artifacts/nupkg -Feed nugetorg
+          -EntriesPath ./artifacts/release-entries/nuget.json
+
+      - name: Upload release entries
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-entries-nuget
+          path: artifacts/release-entries/nuget.json
+          if-no-files-found: error
+          retention-days: 7

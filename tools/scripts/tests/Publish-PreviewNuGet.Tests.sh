@@ -23,7 +23,7 @@ if env -u NUGET_API_KEY bash "$script" > output 2>&1; then
   echo "Expected failure without NUGET_API_KEY." >&2
   exit 1
 fi
-grep -q 'Configure NUGET_API_KEY' output
+grep -q 'Credencial temporaria ausente' output
 
 export NUGET_API_KEY="test-key"
 if bash "$script" > output 2>&1; then
