@@ -3,13 +3,6 @@ set -euo pipefail
 
 mode="${1:?Informe resolve ou version.}"
 tag="${PREVIEW_DRAFT_TAG:-}"
-output="${GITHUB_OUTPUT:?Informe GITHUB_OUTPUT.}"
-
-if [[ "$mode" == resolve && -z "$tag" ]]; then
-  [[ "${GITHUB_EVENT_NAME:?}" == push ]] || { echo "::error::Uma tag é obrigatória para o preview manual." >&2; exit 1; }
-  printf 'commit=%s\n' "${GITHUB_SHA:?}" >> "$output"
-  exit 0
-fi
 
 if [[ ! "$tag" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
   echo "::error::Informe uma tag estável no formato vX.Y.Z." >&2
@@ -44,10 +37,10 @@ case "$mode" in
       exit 1
     fi
     echo "Os arquivos de produção e teste da main correspondem à tag $tag."
-    printf 'commit=%s\n' "$GITHUB_SHA" >> "$output"
     ;;
   version)
     run_number="${GITHUB_RUN_NUMBER:?}"
+    output="${GITHUB_OUTPUT:?Informe GITHUB_OUTPUT.}"
     if [[ ! "$run_number" =~ ^[1-9][0-9]*$ ]]; then
       echo "::error::Número de execução inválido." >&2
       exit 1

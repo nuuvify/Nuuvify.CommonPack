@@ -49,7 +49,7 @@ expect_failure() {
 printf '[[{"tag_name":"v3.0.0","draft":true,"prerelease":false}]]\n' > "$TEST_RELEASES"
 : > "$GITHUB_OUTPUT"
 bash "$script" resolve
-grep -Fxq "commit=$GITHUB_SHA" "$GITHUB_OUTPUT"
+[[ ! -s "$GITHUB_OUTPUT" ]]
 
 : > "$GITHUB_OUTPUT"
 bash "$script" version
@@ -60,9 +60,6 @@ grep -Fxq 'assembly_version=3.0.0.0' "$GITHUB_OUTPUT"
 grep -Fxq 'file_version=3.0.0.112' "$GITHUB_OUTPUT"
 grep -Fxq 'file_revision=112' "$GITHUB_OUTPUT"
 
-: > "$GITHUB_OUTPUT"
-env GITHUB_EVENT_NAME=push PREVIEW_DRAFT_TAG='' bash "$script" resolve
-grep -Fxq "commit=$GITHUB_SHA" "$GITHUB_OUTPUT"
 pwsh "$(dirname "$script")/ci/Get-BuildVersion.ps1" -Channel snapshot -RunNumber 112 -OutputPath "$temp_dir/snapshot"
 grep -Fxq 'version=3.0.1-preview.112' "$temp_dir/snapshot"
 

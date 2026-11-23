@@ -212,8 +212,8 @@ jobs:
           private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
           permission-contents: write
 
-      - name: Resolve preview source
-        id: source
+      - name: Validate draft preview
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         shell: bash
         env:
           GH_TOKEN: ${{ steps.release-app.outputs.token }}
@@ -243,12 +243,11 @@ jobs:
           VERSION_SUFFIX: ${{ steps.version.outputs.version_suffix }}
           ASSEMBLY_VERSION: ${{ steps.version.outputs.assembly_version }}
           FILE_VERSION: ${{ steps.version.outputs.file_version }}
-          SOURCE_COMMIT: ${{ steps.source.outputs.commit }}
         run: >
           dotnet build Nuuvify.CommonPack.sln --configuration Release
           "-p:VersionPrefix=$VERSION_PREFIX" "-p:VersionSuffix=$VERSION_SUFFIX"
           "-p:AssemblyVersion=$ASSEMBLY_VERSION" "-p:FileVersion=$FILE_VERSION"
-          -p:ContinuousIntegrationBuild=true "-p:RepositoryCommit=$SOURCE_COMMIT"
+          -p:ContinuousIntegrationBuild=true "-p:RepositoryCommit=$GITHUB_SHA"
 
       - name: Pack
         env:
@@ -256,12 +255,11 @@ jobs:
           VERSION_SUFFIX: ${{ steps.version.outputs.version_suffix }}
           ASSEMBLY_VERSION: ${{ steps.version.outputs.assembly_version }}
           FILE_VERSION: ${{ steps.version.outputs.file_version }}
-          SOURCE_COMMIT: ${{ steps.source.outputs.commit }}
         run: >
           dotnet pack Nuuvify.CommonPack.sln --configuration Release --no-build --output ./artifacts/nupkg
           "-p:VersionPrefix=$VERSION_PREFIX" "-p:VersionSuffix=$VERSION_SUFFIX"
           "-p:AssemblyVersion=$ASSEMBLY_VERSION" "-p:FileVersion=$FILE_VERSION"
-          -p:ContinuousIntegrationBuild=true "-p:RepositoryCommit=$SOURCE_COMMIT"
+          -p:ContinuousIntegrationBuild=true "-p:RepositoryCommit=$GITHUB_SHA"
 
       - name: Assert artifact versions
         shell: pwsh
@@ -279,7 +277,7 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.release-app.outputs.token }}
           RELEASE_TAG: v${{ steps.version.outputs.version }}
-          RELEASE_COMMIT: ${{ steps.source.outputs.commit }}
+          RELEASE_COMMIT: ${{ github.sha }}
         run: bash ./tools/scripts/Publish-GitHubRelease.sh prepare-preview
 
       - name: NuGet login (Trusted Publishing)
@@ -299,7 +297,7 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.release-app.outputs.token }}
           RELEASE_TAG: v${{ steps.version.outputs.version }}
-          RELEASE_COMMIT: ${{ steps.source.outputs.commit }}
+          RELEASE_COMMIT: ${{ github.sha }}
         run: bash ./tools/scripts/Publish-GitHubRelease.sh preview
 
   result:
