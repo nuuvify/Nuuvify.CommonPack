@@ -3,7 +3,17 @@ set -euo pipefail
 
 script="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/Publish-GitHubRelease.sh"
 preview_script="$(dirname "$script")/Publish-PreviewNuGet.sh"
+package_list_script="$(dirname "$script")/Get-PreviewPackageList.sh"
 repo_root="$(cd "$(dirname "$script")/../.." && pwd)"
+package_list="$(printf '%s\n' \
+  "Snapshot	Publish preview packages	2026-11-23T16:01:16Z Pushing Nuuvify.CommonPack.AutoHistory.3.0.1-preview.94.nupkg to 'https://www.nuget.org/api/v2/package'..." \
+  "2026-11-23T16:01:17Z Pushing Nuuvify.CommonPack.MftMailbox.Sftp.3.0.1-preview.94.nupkg to 'https://www.nuget.org/api/v2/package'..." \
+  "2026-11-23T16:01:18Z Pushing Nuuvify.CommonPack.MftMailbox.Sftp.3.0.1-preview.94.snupkg to 'https://www.nuget.org/api/v2/symbolpackage'..." |
+  bash "$package_list_script")"
+if [[ "$package_list" != $'Nuuvify.CommonPack.AutoHistory 3.0.1-preview.94\nNuuvify.CommonPack.MftMailbox.Sftp 3.0.1-preview.94' ]]; then
+  echo "Expected package IDs and versions from both formatted and raw job logs." >&2
+  exit 1
+fi
 ci_workflow="$repo_root/.github/workflows/ci.yml"
 prepare_line="$(awk '/run: bash \.\/tools\/scripts\/Publish-GitHubRelease\.sh prepare-preview/ {print NR}' "$ci_workflow")"
 publish_line="$(awk '/run: bash \.\/tools\/scripts\/Publish-PreviewNuGet\.sh/ {print NR}' "$ci_workflow")"

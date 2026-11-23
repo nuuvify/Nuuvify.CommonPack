@@ -40,8 +40,8 @@ jobs:
           number="$(jq -er .run_number <<<"$run")"
           job="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID/jobs?per_page=100" |
             jq -er '[.jobs[] | select(.name == "Snapshot" and .conclusion == "success") | .id] | if length == 1 then .[0] else error("Snapshot bem-sucedido não encontrado") end')"
-          gh run view --repo "$GITHUB_REPOSITORY" --job "$job" --log |
-            sed -nE 's/^Snapshot[[:space:]]+Publish preview packages[[:space:]]+[^ ]+ Pushing (Nuuvify\.CommonPack\.[A-Za-z0-9.]+)\.([0-9]+\.[0-9]+\.[0-9]+-preview\.[0-9]+)\.nupkg to .*/\1 \2/p' > "$RUNNER_TEMP/preview-packages"
+          gh api --allow-escape-sequences "repos/$GITHUB_REPOSITORY/actions/jobs/$job/logs" |
+            bash ./tools/scripts/Get-PreviewPackageList.sh > "$RUNNER_TEMP/preview-packages"
           [[ -s "$RUNNER_TEMP/preview-packages" ]] || { echo "::error::Nenhum pacote encontrado no log."; exit 1; }
           versions="$(awk '{print $2}' "$RUNNER_TEMP/preview-packages" | sort -u)"
           [[ "$versions" =~ ^[0-9]+\.[0-9]+\.[0-9]+-preview\.[0-9]+$ && "$versions" == *"-preview.$number" ]] || { echo "::error::Versão inconsistente com a execução."; exit 1; }
