@@ -89,13 +89,14 @@ reprova o `Result`.
 | --- | --- | --- | --- |
 | `RELEASE_APP_ID` | Variável | Organização `nuuvify` (repositórios selecionados) | GitHub App de release |
 | `RELEASE_APP_PRIVATE_KEY` | Secret | Organização `nuuvify` (repositórios selecionados) | GitHub App de release |
-| `NUGET_API_KEY` | Secret | Environment `release` | Push no NuGet.org |
+| `NUGET_API_KEY` | Secret | Environments `preview` e `release` | Push de previews e releases no NuGet.org |
 | `SONAR_TOKEN` | Secret | Organização `nuuvify` | Análise do SonarCloud |
 
-Para criar o `NUGET_API_KEY` no Environment `release` sem expor o valor no histórico do shell:
+Para cadastrar `NUGET_API_KEY` em cada Environment sem expor o valor no histórico do shell:
 
 ```bash
 gh secret set NUGET_API_KEY --repo nuuvify/Nuuvify.CommonPack --env release
+gh secret set NUGET_API_KEY --repo nuuvify/Nuuvify.CommonPack --env preview
 ```
 
 O processo de release está em [release-process.md](./release-process.md).

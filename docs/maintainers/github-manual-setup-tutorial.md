@@ -48,10 +48,11 @@ deixar a `main` sem o check obrigatório.
 
 ## 5. Cadastrar o `NUGET_API_KEY`
 
-Depois do `--sync`, o Environment `release` existe. Cadastre a chave nele:
+Depois do `--sync`, os Environments `preview` e `release` existem. Cadastre a chave em ambos:
 
 ```bash
 gh secret set NUGET_API_KEY --repo nuuvify/Nuuvify.CommonPack --env release
+gh secret set NUGET_API_KEY --repo nuuvify/Nuuvify.CommonPack --env preview
 ```
 
 O comando lê o valor do terminal sem gravá-lo no histórico do shell.
@@ -65,7 +66,7 @@ O comando lê o valor do terminal sem gravá-lo no histórico do shell.
 ## 7. Teste controlado do fluxo
 
 1. Abra um PR para `main` e confirme que o merge fica bloqueado até o `Result` verde.
-2. Faça o merge e confirme o job `Snapshot` publicando `X.Y.(Z+1)-preview.N` no GitHub Packages.
+2. Faça o merge e confirme o job `Snapshot` publicando `X.Y.(Z+1)-preview.N` no NuGet.org.
 3. Confirme que o release-please abriu ou atualizou o Release PR e que o workflow
    `Package changelog release` fechou os CHANGELOGs dos pacotes.
 4. Faça o merge do Release PR, aprove o Environment `release` e confirme os pacotes no NuGet.org
@@ -77,7 +78,7 @@ O comando lê o valor do terminal sem gravá-lo no histórico do shell.
 | --- | --- |
 | Merge bloqueado com `Result` verde | Proteção clássica ainda ativa: rode `groundwork github --sync --replace-legacy` |
 | Release PR sem checks | `RELEASE_APP_ID`, `RELEASE_APP_PRIVATE_KEY` e instalação do App |
-| `Publish packages` sem credencial | `NUGET_API_KEY` no Environment `release` |
+| Publicação sem credencial | `NUGET_API_KEY` no Environment `preview` ou `release`, conforme o canal |
 | Labels não criados | Execução do `Label Sync` e validade de `.github/labels.yml` |
 | PR sem labels automáticos | Execução do `PR Triage` e cobertura de `.github/labeler.yml` |
 
@@ -86,5 +87,5 @@ O comando lê o valor do terminal sem gravá-lo no histórico do shell.
 - habilitar Issues e Discussions;
 - garantir o App de release e seus secrets na organização;
 - executar `groundwork github --sync` e, após validar o CI, `--replace-legacy`;
-- cadastrar `NUGET_API_KEY` no Environment `release`;
+- cadastrar `NUGET_API_KEY` nos Environments `preview` e `release`;
 - executar `Label Sync` e validar o fluxo com um PR real.

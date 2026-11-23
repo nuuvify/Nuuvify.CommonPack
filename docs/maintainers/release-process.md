@@ -14,7 +14,7 @@ deste repositório: versão compartilhada, canais de publicação e CHANGELOG po
 flowchart TB
     PR([PR para main<br/>título em Conventional Commits<br/>+ CHANGELOG do pacote]) --> CI{CI / Result<br/>unit, integration, Sonar,<br/>package changelog}
     CI -->|squash| MAIN[(main)]
-    MAIN --> SNAP[Snapshot X.Y.Z+1-preview.N<br/>GitHub Packages nuuvify]
+    MAIN --> SNAP[Snapshot X.Y.Z+1-preview.N<br/>NuGet.org]
     MAIN --> RPR([Release PR do release-please<br/>CHANGELOG raiz + VersionPrefix])
     RPR --> CLOSE[package-changelog-release.yml<br/>fecha os CHANGELOGs dos pacotes]
     CLOSE --> RPR
@@ -37,13 +37,13 @@ flowchart TB
 
 | Canal | Quando | Versão | Destino | Environment |
 | --- | --- | --- | --- | --- |
-| Snapshot | Cada push na `main` (job `Snapshot` do CI) | `X.Y.(Z+1)-preview.N` | GitHub Packages da organização `nuuvify` | `preview` |
+| Snapshot | Cada push na `main` (job `Snapshot` do CI) | `X.Y.(Z+1)-preview.N` | NuGet.org | `preview` |
 | Estável | Merge do Release PR | `X.Y.Z` | NuGet.org | `release` (com aprovação) |
 
-- O secret `NUGET_API_KEY` precisa existir no Environment `release`. Snapshots usam apenas o
-  `GITHUB_TOKEN` do job.
-- Para consumir snapshots, adicione o feed `https://nuget.pkg.github.com/nuuvify/index.json`
-  com um token que tenha `read:packages`. Snapshots não geram tag nem GitHub Release.
+- Configure o secret `NUGET_API_KEY` nos Environments `preview` e `release`, com permissão
+  para publicar os pacotes. Snapshots não geram tag nem GitHub Release; selecione versões
+  prévias no NuGet.org para consumi-los. O cálculo usa o próximo patch da versão registrada,
+  mesmo que a próxima release estável seja minor ou major.
 - As branches `qas` e `nugettest/qas` e os Environments `production` e `nugettest` não fazem
   mais parte do fluxo. O script local [CreatePack.ps1](../../tools/scripts/CreatePack.ps1)
   continua disponível para testes manuais no NuGet de homologação.
