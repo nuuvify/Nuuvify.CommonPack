@@ -59,6 +59,9 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Test preview publication
+        run: bash ./tools/scripts/tests/Publish-PreviewNuGet.Tests.sh
+
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
@@ -167,15 +170,80 @@ jobs:
     name: Snapshot
     needs: [hygiene, gitleaks, dotnet, integration, sonar, servicebus-long-running, package-changelog]
     if: ${{ github.event_name == 'push' }}
-    uses: ./.github/workflows/gw-publish-nuget.yml
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: preview
     permissions:
       contents: read
-      packages: write
-    with:
-      channel: snapshot
-      # Os jobs dotnet e integration já testaram este commit; o container não roda Testcontainers.
-      run-tests: false
-    secrets: inherit
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_NOLOGO: '1'
+    steps:
+      - name: Validate NuGet credential
+        shell: bash
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          if [[ -z "$NUGET_API_KEY" ]]; then
+            echo "::error::Configure NUGET_API_KEY no Environment preview."
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Compute version
+        id: version
+        shell: pwsh
+        run: ./tools/scripts/ci/Get-BuildVersion.ps1 -Channel snapshot -RunNumber $env:GITHUB_RUN_NUMBER -OutputPath $env:GITHUB_OUTPUT
+
+      - name: Build
+        env:
+          VERSION_PREFIX: ${{ steps.version.outputs.version_prefix }}
+          VERSION_SUFFIX: ${{ steps.version.outputs.version_suffix }}
+          ASSEMBLY_VERSION: ${{ steps.version.outputs.assembly_version }}
+          FILE_VERSION: ${{ steps.version.outputs.file_version }}
+        run: >
+          dotnet build Nuuvify.CommonPack.sln --configuration Release
+          "-p:VersionPrefix=$VERSION_PREFIX" "-p:VersionSuffix=$VERSION_SUFFIX"
+          "-p:AssemblyVersion=$ASSEMBLY_VERSION" "-p:FileVersion=$FILE_VERSION"
+          -p:ContinuousIntegrationBuild=true "-p:RepositoryCommit=$GITHUB_SHA"
+
+      - name: Pack
+        env:
+          VERSION_PREFIX: ${{ steps.version.outputs.version_prefix }}
+          VERSION_SUFFIX: ${{ steps.version.outputs.version_suffix }}
+          ASSEMBLY_VERSION: ${{ steps.version.outputs.assembly_version }}
+          FILE_VERSION: ${{ steps.version.outputs.file_version }}
+        run: >
+          dotnet pack Nuuvify.CommonPack.sln --configuration Release --no-build --output ./artifacts/nupkg
+          "-p:VersionPrefix=$VERSION_PREFIX" "-p:VersionSuffix=$VERSION_SUFFIX"
+          "-p:AssemblyVersion=$ASSEMBLY_VERSION" "-p:FileVersion=$FILE_VERSION"
+          -p:ContinuousIntegrationBuild=true "-p:RepositoryCommit=$GITHUB_SHA"
+
+      - name: Assert artifact versions
+        shell: pwsh
+        env:
+          EXPECTED_VERSION: ${{ steps.version.outputs.version }}
+          EXPECTED_ASSEMBLY_VERSION: ${{ steps.version.outputs.assembly_version }}
+          EXPECTED_FILE_VERSION: ${{ steps.version.outputs.file_version }}
+        run: >
+          ./tools/scripts/ci/Assert-ArtifactVersion.ps1 -ArtifactsPath ./artifacts/nupkg
+          -ExpectedVersion $env:EXPECTED_VERSION -ExpectedAssemblyVersion $env:EXPECTED_ASSEMBLY_VERSION
+          -ExpectedFileVersion $env:EXPECTED_FILE_VERSION
+
+      - name: Publish preview packages
+        shell: bash
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: bash ./tools/scripts/Publish-PreviewNuGet.sh
 
   result:
     name: Result
