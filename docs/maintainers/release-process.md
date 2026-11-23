@@ -109,6 +109,7 @@ tratar uma release defeituosa, siga o [runbook de release](../runbooks/release.m
 | Release PR desatualizado em relação à `main` | Use **Update branch**; se houver conflito nos CHANGELOGs dos pacotes, regenere o Release PR (abaixo) |
 | Login Trusted Publishing falha | Confira `NUGET_USER` e a política do NuGet.org (workflow chamador, Environment, proprietário e escopo) |
 | Pre-release criada sem pacotes | Confira a falha no CI e reexecute o job `Snapshot`; o envio ao NuGet.org e os anexos são idempotentes |
+| Pre-release criada, mas não confirmada | Aguarde a disponibilidade na API do GitHub e reexecute o job `Snapshot`; o envio ao NuGet.org não inicia sem confirmação |
 | Versão já existente no NuGet.org | O push é ignorado (`--skip-duplicate`); versões publicadas são imutáveis, então corrija com um patch |
 | Preview publicado no NuGet.org sem GitHub Release | Use o workflow de recuperação abaixo com o ID da execução CI original |
 | Asset já existente com digest diferente | Não sobrescreva o asset; investigue a divergência entre a release e o pacote publicado |

@@ -47,7 +47,18 @@ if [[ "$release" == null ]]; then
   fi
   gh release create "$tag" --repo "$repository" --target "$commit" --prerelease \
     --title "$tag" --notes "Preview do commit $commit. Os pacotes serão anexados após a publicação e indexação no NuGet.org. Consulte o CI para verificar o resultado."
-  release="$(find_release)"
+  for attempt in {1..12}; do
+    release="$(find_release)"
+    if jq -e '.prerelease == true and .draft == false' <<<"$release" >/dev/null; then
+      break
+    fi
+    if (( attempt == 12 )); then
+      echo "::error::A pre-release $tag foi criada, mas não ficou disponível para confirmação. Reexecute o job Snapshot."
+      exit 1
+    fi
+    echo "Aguardando confirmação da pre-release $tag ($attempt/12)."
+    sleep 5
+  done
 fi
 
 verify_tag true
