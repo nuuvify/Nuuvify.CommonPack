@@ -7,6 +7,18 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ## [Não Lançado]
 
+### Corrigido
+
+- `SendBatchAsync` e `SendSingleAsync` enviam diretamente com o nome definitivo, sem
+  consultar, excluir ou renomear arquivos remotos, permitindo uso com contas restritas à criação.
+
+### Alterado
+
+- O envio não cria diretórios remotos automaticamente: o destino deve existir.
+  O upload deixa de ser atômico; consumidores devem considerar arquivos visíveis durante
+  a transferência e arquivos parciais em caso de falha. A sobrescrita depende das permissões
+  do servidor, sem exclusão prévia do destino. Alteração restrita ao pacote MftMailbox.Sftp.
+
 ## [2.10.1] - 2026-10-24
 
 ### Alterado
