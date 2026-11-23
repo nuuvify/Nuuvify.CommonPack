@@ -7,6 +7,8 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ## [Não Lançado]
 
+## [3.0.0] - 2026-11-23
+
 ### Corrigido
 
 - `SendBatchAsync` e `SendSingleAsync` enviam diretamente com o nome definitivo, sem
