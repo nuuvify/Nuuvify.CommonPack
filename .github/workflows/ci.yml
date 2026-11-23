@@ -242,6 +242,22 @@ jobs:
           -ExpectedVersion $env:EXPECTED_VERSION -ExpectedAssemblyVersion $env:EXPECTED_ASSEMBLY_VERSION
           -ExpectedFileVersion $env:EXPECTED_FILE_VERSION
 
+      - name: Create release GitHub App token
+        id: release-app
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          permission-contents: write
+
+      - name: Create preview GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ steps.release-app.outputs.token }}
+          RELEASE_TAG: v${{ steps.version.outputs.version }}
+          RELEASE_COMMIT: ${{ github.sha }}
+        run: bash ./tools/scripts/Publish-GitHubRelease.sh prepare-preview
+
       - name: NuGet login (Trusted Publishing)
         id: login
         uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1
@@ -254,15 +270,7 @@ jobs:
           NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
         run: bash ./tools/scripts/Publish-PreviewNuGet.sh
 
-      - name: Create release GitHub App token
-        id: release-app
-        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
-        with:
-          client-id: ${{ vars.RELEASE_APP_ID }}
-          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
-          permission-contents: write
-
-      - name: Publish preview GitHub Release
+      - name: Attach packages to preview GitHub Release
         shell: bash
         env:
           GH_TOKEN: ${{ steps.release-app.outputs.token }}

@@ -58,6 +58,13 @@ jobs:
           ref: refs/tags/${{ inputs.tag }}
           persist-credentials: false
 
+      - name: Verify GitHub Release exists
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: RELEASE_COMMIT="$(git rev-parse HEAD)" bash ./tools/scripts/Publish-GitHubRelease.sh verify-release
+
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:

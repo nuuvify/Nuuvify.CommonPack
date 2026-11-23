@@ -72,4 +72,7 @@ jobs:
           GH_TOKEN: ${{ steps.release-app.outputs.token }}
           RELEASE_TAG: ${{ steps.packages.outputs.tag }}
           RELEASE_COMMIT: ${{ steps.packages.outputs.commit }}
-        run: bash ./tools/scripts/Publish-GitHubRelease.sh preview
+        run: |
+          set -euo pipefail
+          bash ./tools/scripts/Publish-GitHubRelease.sh prepare-preview
+          bash ./tools/scripts/Publish-GitHubRelease.sh preview

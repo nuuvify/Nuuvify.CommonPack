@@ -14,7 +14,9 @@ deste repositório: versão compartilhada, canais de publicação e CHANGELOG po
 flowchart TB
     PR([PR para main<br/>título em Conventional Commits<br/>+ CHANGELOG do pacote]) --> CI{CI / Result<br/>unit, integration, Sonar,<br/>package changelog}
     CI -->|squash| MAIN[(main)]
-    MAIN --> SNAP[Snapshot X.Y.Z+1-preview.N<br/>NuGet.org + GitHub Release]
+    MAIN --> SNAP[Tag + GitHub pre-release<br/>X.Y.Z+1-preview.N]
+    SNAP --> SNAPN[Pacotes preview no NuGet.org]
+    SNAPN --> SNAPFILES[Anexar pacotes à pre-release]
     MAIN --> RPR([Release PR do release-please<br/>CHANGELOG raiz + VersionPrefix])
     RPR --> CLOSE[package-changelog-release.yml<br/>fecha os CHANGELOGs dos pacotes]
     CLOSE --> RPR
@@ -43,10 +45,11 @@ flowchart TB
 - Os dois canais usam Trusted Publishing via OIDC, sem chave permanente. Configure as políticas
   do NuGet.org e a variável `NUGET_USER` conforme o
   [tutorial](./github-manual-setup-tutorial.md#5-configurar-trusted-publishing-no-nugetorg).
-  Após publicar no NuGet.org, o snapshot cria uma tag e uma GitHub pre-release com os
-  arquivos `.nupkg` e `.snupkg` baixados do NuGet.org após a indexação. A criação da
-  tag usa o GitHub App de release, autorizado pelo ruleset `gw-release-tags`. Os previews
-  não são aceitos pelo fluxo de deploy estável.
+  Antes de publicar no NuGet.org, o snapshot cria a tag e publica a GitHub pre-release.
+  A criação da tag usa o GitHub App de release, autorizado pelo ruleset `gw-release-tags`.
+  Após a publicação e indexação no NuGet.org, os arquivos `.nupkg` e `.snupkg` são baixados
+  e anexados à pre-release. Até essa etapa, ela fica visível sem os pacotes; se o envio
+  falhar, consulte e reexecute o CI. Os previews não são aceitos pelo fluxo de deploy estável.
   O cálculo usa o próximo patch da versão registrada, mesmo que a próxima release estável
   seja minor ou major.
 - Esta pre-release é uma exceção do projeto à regra genérica de snapshots no runbook
@@ -87,7 +90,8 @@ Para conferir localmente, a partir da raiz do repositório:
    - seção gerada no `CHANGELOG.md` raiz;
    - commit `docs: feche os CHANGELOGs dos pacotes na versão X.Y.Z` e os pacotes fechados.
 3. Aprove e faça squash do Release PR quando o `Result` estiver verde.
-4. O workflow `Release` cria a tag e a release em rascunho e chama o `publish.yml`.
+4. O workflow `Release` cria a tag e a release em rascunho e chama o `publish.yml`,
+   que confirma a existência da release antes de publicar no NuGet.org.
 5. Aprove o deployment no Environment `release`. Os pacotes vão para o NuGet.org com
    `--skip-duplicate` e, após indexação, são baixados e anexados à release. O manifesto
    atestado registra os digests dos arquivos efetivamente distribuídos pelo NuGet.org.
@@ -104,6 +108,7 @@ tratar uma release defeituosa, siga o [runbook de release](../runbooks/release.m
 | Release PR sem o commit de fechamento | Confira a execução de `Package changelog release`; para reaplicar, regenere o Release PR (abaixo) |
 | Release PR desatualizado em relação à `main` | Use **Update branch**; se houver conflito nos CHANGELOGs dos pacotes, regenere o Release PR (abaixo) |
 | Login Trusted Publishing falha | Confira `NUGET_USER` e a política do NuGet.org (workflow chamador, Environment, proprietário e escopo) |
+| Pre-release criada sem pacotes | Confira a falha no CI e reexecute o job `Snapshot`; o envio ao NuGet.org e os anexos são idempotentes |
 | Versão já existente no NuGet.org | O push é ignorado (`--skip-duplicate`); versões publicadas são imutáveis, então corrija com um patch |
 | Preview publicado no NuGet.org sem GitHub Release | Use o workflow de recuperação abaixo com o ID da execução CI original |
 | Asset já existente com digest diferente | Não sobrescreva o asset; investigue a divergência entre a release e o pacote publicado |
