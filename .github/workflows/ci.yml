@@ -10,6 +10,11 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      draft_tag:
+        description: Tag estável em rascunho para gerar um preview (opcional)
+        required: false
+        type: string
 
 permissions: {}
 
@@ -61,6 +66,7 @@ jobs:
 
       - name: Test preview publication
         run: |
+          bash ./tools/scripts/tests/Prepare-DraftPreview.Tests.sh
           bash ./tools/scripts/tests/Publish-PreviewNuGet.Tests.sh
           bash ./tools/scripts/tests/Publish-GitHubRelease.Tests.sh
 
@@ -171,7 +177,7 @@ jobs:
   snapshot:
     name: Snapshot
     needs: [hygiene, gitleaks, dotnet, integration, sonar, servicebus-long-running, package-changelog]
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.draft_tag != '') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     environment: preview
@@ -195,7 +201,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          fetch-depth: 0
           persist-credentials: false
+
+      - name: Create release GitHub App token
+        id: release-app
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          permission-contents: write
+
+      - name: Resolve preview source
+        id: source
+        shell: bash
+        env:
+          GH_TOKEN: ${{ steps.release-app.outputs.token }}
+          PREVIEW_DRAFT_TAG: ${{ inputs.draft_tag }}
+        run: bash ./tools/scripts/Prepare-DraftPreview.sh resolve
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
@@ -204,8 +227,15 @@ jobs:
 
       - name: Compute version
         id: version
-        shell: pwsh
-        run: ./tools/scripts/ci/Get-BuildVersion.ps1 -Channel snapshot -RunNumber $env:GITHUB_RUN_NUMBER -OutputPath $env:GITHUB_OUTPUT
+        shell: bash
+        env:
+          PREVIEW_DRAFT_TAG: ${{ inputs.draft_tag }}
+        run: |
+          if [[ -n "$PREVIEW_DRAFT_TAG" ]]; then
+            bash "$GITHUB_WORKSPACE/tools/scripts/Prepare-DraftPreview.sh" version
+          else
+            pwsh "$GITHUB_WORKSPACE/tools/scripts/ci/Get-BuildVersion.ps1" -Channel snapshot -RunNumber "$GITHUB_RUN_NUMBER" -OutputPath "$GITHUB_OUTPUT"
+          fi
 
       - name: Build
         env:
@@ -213,11 +243,12 @@ jobs:
           VERSION_SUFFIX: ${{ steps.version.outputs.version_suffix }}
           ASSEMBLY_VERSION: ${{ steps.version.outputs.assembly_version }}
           FILE_VERSION: ${{ steps.version.outputs.file_version }}
+          SOURCE_COMMIT: ${{ steps.source.outputs.commit }}
         run: >
           dotnet build Nuuvify.CommonPack.sln --configuration Release
           "-p:VersionPrefix=$VERSION_PREFIX" "-p:VersionSuffix=$VERSION_SUFFIX"
           "-p:AssemblyVersion=$ASSEMBLY_VERSION" "-p:FileVersion=$FILE_VERSION"
-          -p:ContinuousIntegrationBuild=true "-p:RepositoryCommit=$GITHUB_SHA"
+          -p:ContinuousIntegrationBuild=true "-p:RepositoryCommit=$SOURCE_COMMIT"
 
       - name: Pack
         env:
@@ -225,11 +256,12 @@ jobs:
           VERSION_SUFFIX: ${{ steps.version.outputs.version_suffix }}
           ASSEMBLY_VERSION: ${{ steps.version.outputs.assembly_version }}
           FILE_VERSION: ${{ steps.version.outputs.file_version }}
+          SOURCE_COMMIT: ${{ steps.source.outputs.commit }}
         run: >
           dotnet pack Nuuvify.CommonPack.sln --configuration Release --no-build --output ./artifacts/nupkg
           "-p:VersionPrefix=$VERSION_PREFIX" "-p:VersionSuffix=$VERSION_SUFFIX"
           "-p:AssemblyVersion=$ASSEMBLY_VERSION" "-p:FileVersion=$FILE_VERSION"
-          -p:ContinuousIntegrationBuild=true "-p:RepositoryCommit=$GITHUB_SHA"
+          -p:ContinuousIntegrationBuild=true "-p:RepositoryCommit=$SOURCE_COMMIT"
 
       - name: Assert artifact versions
         shell: pwsh
@@ -242,20 +274,12 @@ jobs:
           -ExpectedVersion $env:EXPECTED_VERSION -ExpectedAssemblyVersion $env:EXPECTED_ASSEMBLY_VERSION
           -ExpectedFileVersion $env:EXPECTED_FILE_VERSION
 
-      - name: Create release GitHub App token
-        id: release-app
-        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
-        with:
-          client-id: ${{ vars.RELEASE_APP_ID }}
-          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
-          permission-contents: write
-
       - name: Create preview GitHub Release
         shell: bash
         env:
           GH_TOKEN: ${{ steps.release-app.outputs.token }}
           RELEASE_TAG: v${{ steps.version.outputs.version }}
-          RELEASE_COMMIT: ${{ github.sha }}
+          RELEASE_COMMIT: ${{ steps.source.outputs.commit }}
         run: bash ./tools/scripts/Publish-GitHubRelease.sh prepare-preview
 
       - name: NuGet login (Trusted Publishing)
@@ -275,7 +299,7 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.release-app.outputs.token }}
           RELEASE_TAG: v${{ steps.version.outputs.version }}
-          RELEASE_COMMIT: ${{ github.sha }}
+          RELEASE_COMMIT: ${{ steps.source.outputs.commit }}
         run: bash ./tools/scripts/Publish-GitHubRelease.sh preview
 
   result:

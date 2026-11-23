@@ -40,9 +40,10 @@ flowchart TB
 | Canal | Quando | Versão | Destino | Environment |
 | --- | --- | --- | --- | --- |
 | Snapshot | Cada push na `main` (job `Snapshot` do CI) | `X.Y.(Z+1)-preview.N` | NuGet.org e GitHub pre-release | `preview` |
+| Preview de rascunho | Disparo manual do CI na `main` para a tag estável em rascunho | `X.Y.Z-preview.N` | NuGet.org e GitHub pre-release | `preview` |
 | Estável | Merge do Release PR | `X.Y.Z` | NuGet.org e GitHub Release | `release` (com aprovação) |
 
-- Os dois canais usam Trusted Publishing via OIDC, sem chave permanente. Configure as políticas
+- Todos os canais usam Trusted Publishing via OIDC, sem chave permanente. Configure as políticas
   do NuGet.org e a variável `NUGET_USER` conforme o
   [tutorial](./github-manual-setup-tutorial.md#5-configurar-trusted-publishing-no-nugetorg).
   Antes de publicar no NuGet.org, o snapshot cria a tag e publica a GitHub pre-release.
@@ -57,6 +58,24 @@ flowchart TB
 - As branches `qas` e `nugettest/qas` e os Environments `production` e `nugettest` não fazem
   mais parte do fluxo. O script local [CreatePack.ps1](../../tools/scripts/CreatePack.ps1)
   continua disponível para testes manuais no NuGet de homologação.
+
+### Gerar preview de uma release em rascunho
+
+Após o CI automático da `main` terminar, dispare o CI manualmente com a tag estável:
+
+```bash
+gh workflow run ci.yml --repo nuuvify/Nuuvify.CommonPack --ref main -f draft_tag=v3.0.0
+```
+
+O fluxo exige uma release estável em rascunho cuja tag seja ancestral da `main`. Ele falha se
+os arquivos versionados diferirem da tag, exceto nas pastas `.github/workflows/`, `docs/` e
+`tools/scripts/`. Após os testes, compila o commit da `main` e valida a versão registrada.
+A pre-release e sua tag apontam para esse commit, e o rascunho estável não é alterado.
+A versão é `X.Y.Z-preview.N`, onde `N` é o número da execução CI. O envio ao NuGet.org e os
+anexos seguem a mesma ordem do snapshot.
+
+Previews de um patch maior já publicados têm precedência SemVer superior e não podem ser
+renumerados. Quando necessário, instale o preview pretendido informando sua versão explicitamente.
 
 ## CHANGELOG por pacote
 
@@ -112,6 +131,7 @@ tratar uma release defeituosa, siga o [runbook de release](../runbooks/release.m
 | Pre-release criada, mas não confirmada | Aguarde a disponibilidade na API do GitHub e reexecute o job `Snapshot`; o envio ao NuGet.org não inicia sem confirmação |
 | Versão já existente no NuGet.org | O push é ignorado (`--skip-duplicate`); versões publicadas são imutáveis, então corrija com um patch |
 | Preview publicado no NuGet.org sem GitHub Release | Use o workflow de recuperação abaixo com o ID da execução CI original |
+| Recuperação de preview histórico falha com HTTP 403 | Se o commit difere da `main` em workflows, o GitHub exige `Workflows: write` no App e no token de recuperação; avalie a concessão antes de alterar essas permissões |
 | Asset já existente com digest diferente | Não sobrescreva o asset; investigue a divergência entre a release e o pacote publicado |
 
 ### Recuperar uma GitHub Release preview
@@ -133,9 +153,9 @@ falha. Logs de Actions expirados impedem essa recuperação automática.
 Reexecutar um workflow antigo ou usar `republish` numa tag antiga executa a definição
 de workflow daquela revisão; não aplica automaticamente esta migração. Em particular,
 `v3.0.0` ainda usa o fluxo com chave permanente. Não mova a tag nem altere artefatos
-publicados para atualizar a autenticação. Para usar OIDC pelo fluxo normal, uma nova
-release deve conter estes workflows; a recuperação de uma tag antiga exige um
-procedimento separado, revisado e autorizado.
+publicados para atualizar a autenticação. O procedimento de preview de rascunho acima usa o
+workflow atual e OIDC, mas não publica a versão estável. A recuperação estável de uma tag
+antiga continua exigindo um procedimento separado, revisado e autorizado.
 
 ### Regenerar o Release PR
 
