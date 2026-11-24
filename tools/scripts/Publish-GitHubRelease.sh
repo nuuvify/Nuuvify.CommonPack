@@ -12,6 +12,10 @@ if [[ ! "$mode" =~ ^(prepare-preview|preview|verify-release|release)$ || ! "$tag
   echo "::error::Modo, tag ou commit inválido."
   exit 1
 fi
+if [[ -n "${EXPECTED_RELEASE_COMMIT:-}" && "$commit" != "$EXPECTED_RELEASE_COMMIT" ]]; then
+  echo "::error::O commit da tag não corresponde ao commit validado."
+  exit 1
+fi
 if [[ "$mode" =~ ^(prepare-preview|preview)$ && ! "$version" =~ -preview\.[0-9]+$ ]] ||
   [[ "$mode" =~ ^(verify-release|release)$ && "$version" == *-* ]]; then
   echo "::error::A tag não corresponde ao canal informado."

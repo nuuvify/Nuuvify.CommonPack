@@ -1,0 +1,167 @@
+name: Recover stable release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag estável de uma release em rascunho (vX.Y.Z)
+        required: true
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: release-refs/tags/${{ inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  context:
+    name: Stable recovery context
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+      version: ${{ steps.tag.outputs.version }}
+      commit: ${{ steps.tag.outputs.commit }}
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate stable draft
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PREVIEW_DRAFT_TAG: ${{ inputs.tag }}
+        run: bash ./tools/scripts/Prepare-DraftPreview.sh resolve
+
+      - name: Checkout release tag
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: refs/tags/${{ inputs.tag }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate tag and versions
+        id: tag
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          ./tools/scripts/ci/Assert-ReleaseTag.ps1 -Tag $env:RELEASE_TAG -DefaultBranch $env:DEFAULT_BRANCH -OutputPath $env:GITHUB_OUTPUT
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./tools/scripts/ci/Test-PublishedRelease.ps1 -Tag $env:RELEASE_TAG -Repository $env:GITHUB_REPOSITORY -Expect Draft
+          exit $LASTEXITCODE
+
+  publish:
+    name: Publish
+    needs: context
+    uses: ./.github/workflows/publish.yml
+    permissions:
+      contents: write
+      id-token: write
+    with:
+      tag: ${{ needs.context.outputs.tag }}
+      version: ${{ needs.context.outputs.version }}
+      republish: true
+      use_caller_tooling: true
+      expected_commit: ${{ needs.context.outputs.commit }}
+
+  finalize:
+    name: Finalize release
+    needs: [context, publish]
+    if: ${{ !cancelled() && needs.context.result == 'success' && needs.publish.result == 'success' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: ${{ needs.context.outputs.tag }}
+      RELEASE_VERSION: ${{ needs.context.outputs.version }}
+      RELEASE_COMMIT: ${{ needs.context.outputs.commit }}
+    steps:
+      - name: Checkout release tag
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: refs/tags/${{ needs.context.outputs.tag }}
+          persist-credentials: false
+
+      - name: Verify release commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          checkout_commit="$(git rev-parse HEAD)"
+          tag_commit="$(gh api "repos/$GITHUB_REPOSITORY/commits/$RELEASE_TAG" --jq .sha)"
+          if [[ "$checkout_commit" != "$RELEASE_COMMIT" || "$tag_commit" != "$RELEASE_COMMIT" ]]; then
+            echo "::error::O commit da tag mudou após a validação."
+            exit 1
+          fi
+
+      - name: Download release entries
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: release-entries-*
+          path: artifacts/release-entries
+          merge-multiple: true
+
+      - name: Read attestation policy
+        id: policy
+        shell: pwsh
+        run: |
+          Import-Module ./tools/scripts/ci/GroundworkRelease.psm1
+          $enabled = Get-AttestationPolicy -Config (Read-CiCdConfig)
+          if (-not $enabled) {
+            Write-Output '::warning title=Atestação desativada::"attestations": false em .github/ci-cd.json; artefatos sem atestação não são aceitos pelo deploy.'
+          }
+          "enabled=$($enabled.ToString().ToLowerInvariant())" | Add-Content -LiteralPath $env:GITHUB_OUTPUT -Encoding utf8
+
+      - name: Build release manifest
+        id: manifest
+        shell: pwsh
+        env:
+          ATTESTATION: ${{ steps.policy.outputs.enabled == 'true' && 'github' || 'none' }}
+        run: >
+          ./tools/scripts/ci/New-ReleaseManifest.ps1
+          -Tag $env:RELEASE_TAG -Version $env:RELEASE_VERSION -Commit $env:RELEASE_COMMIT
+          -Repository $env:GITHUB_REPOSITORY -EntriesPath artifacts/release-entries
+          -OutputPath artifacts/release-manifest.json -Attestation $env:ATTESTATION -GitHubOutputPath $env:GITHUB_OUTPUT
+
+      - name: Attest release manifest
+        if: ${{ steps.manifest.outputs.upload == 'true' && steps.policy.outputs.enabled == 'true' }}
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: artifacts/release-manifest.json
+
+      - name: Upload manifest and publish release
+        shell: pwsh
+        env:
+          UPLOAD_MANIFEST: ${{ steps.manifest.outputs.upload }}
+        run: |
+          if ($env:UPLOAD_MANIFEST -eq 'true') {
+            gh release upload $env:RELEASE_TAG artifacts/release-manifest.json --repo $env:GITHUB_REPOSITORY
+            if ($LASTEXITCODE -ne 0) { throw 'Falha ao anexar release-manifest.json.' }
+          }
+
+          ./tools/scripts/ci/Test-PublishedRelease.ps1 -Tag $env:RELEASE_TAG -Repository $env:GITHUB_REPOSITORY -Publish
+          exit $LASTEXITCODE
+
+  post-release:
+    name: Post release
+    needs: [context, finalize]
+    if: ${{ !cancelled() && needs.context.result == 'success' && needs.finalize.result == 'success' }}
+    uses: ./.github/workflows/post-release.yml
+    permissions:
+      contents: read
+    with:
+      tag: ${{ needs.context.outputs.tag }}
+      version: ${{ needs.context.outputs.version }}
+      republish: true
