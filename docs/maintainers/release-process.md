@@ -153,9 +153,25 @@ falha. Logs de Actions expirados impedem essa recuperação automática.
 Reexecutar um workflow antigo ou usar `republish` numa tag antiga executa a definição
 de workflow daquela revisão; não aplica automaticamente esta migração. Em particular,
 `v3.0.0` ainda usa o fluxo com chave permanente. Não mova a tag nem altere artefatos
-publicados para atualizar a autenticação. O procedimento de preview de rascunho acima usa o
-workflow atual e OIDC, mas não publica a versão estável. A recuperação estável de uma tag
-antiga continua exigindo um procedimento separado, revisado e autorizado.
+publicados para atualizar a autenticação.
+
+Para recuperar uma release estável ainda em rascunho:
+
+1. Configure a política adicional `recover-stable-release.yml` no Environment `release`,
+   conforme o [tutorial](./github-manual-setup-tutorial.md#5-configurar-trusted-publishing-no-nugetorg).
+2. Execute o workflow atual na `main`, informando a tag existente:
+
+   ```bash
+   gh workflow run recover-stable-release.yml --repo nuuvify/Nuuvify.CommonPack --ref main \
+     -f tag=v3.0.0
+   ```
+
+3. Aprove o Environment `release` e acompanhe a execução até a publicação da GitHub Release.
+
+O fluxo exige uma tag ancestral da `main`, uma release estável em rascunho e equivalência dos
+arquivos de produção e teste, com as mesmas exceções do preview de rascunho. Compila o commit
+original da tag, usa o script de publicação do workflow atual e valida novamente o commit antes
+de publicar. Após o NuGet.org, anexa os pacotes, gera e atesta o manifesto e publica o rascunho.
 
 ### Regenerar o Release PR
 

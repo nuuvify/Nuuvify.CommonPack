@@ -19,6 +19,14 @@ on:
         description: Reenvio de artefatos ausentes de uma release existente
         type: boolean
         default: false
+      use_caller_tooling:
+        description: Usar o script de publicação do commit do workflow chamador
+        type: boolean
+        default: false
+      expected_commit:
+        description: Commit da tag validado pelo workflow chamador
+        type: string
+        default: ''
 
 permissions: {}
 
@@ -34,17 +42,24 @@ jobs:
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: '1'
       DOTNET_NOLOGO: '1'
+      RELEASE_SCRIPT: ${{ inputs.use_caller_tooling && '.release-tooling/tools/scripts/Publish-GitHubRelease.sh' || 'tools/scripts/Publish-GitHubRelease.sh' }}
+      EXPECTED_RELEASE_COMMIT: ${{ inputs.expected_commit }}
     steps:
       - name: Validate release inputs and NuGet account
         shell: bash
         env:
           RELEASE_TAG: ${{ inputs.tag }}
           RELEASE_VERSION: ${{ inputs.version }}
+          USE_CALLER_TOOLING: ${{ inputs.use_caller_tooling }}
           NUGET_USER: ${{ vars.NUGET_USER }}
         run: |
           set -euo pipefail
           if [[ ! "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ || "$RELEASE_TAG" != "v$RELEASE_VERSION" ]]; then
             echo "::error::Tag e versão da release inválidas ou divergentes."
+            exit 1
+          fi
+          if [[ "$USE_CALLER_TOOLING" == true && ! "$EXPECTED_RELEASE_COMMIT" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::Informe o commit da tag validado para usar o script do workflow chamador."
             exit 1
           fi
           if [[ -z "$NUGET_USER" ]]; then
@@ -58,12 +73,22 @@ jobs:
           ref: refs/tags/${{ inputs.tag }}
           persist-credentials: false
 
+      - name: Checkout caller publication tooling
+        if: ${{ inputs.use_caller_tooling }}
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          path: .release-tooling
+          sparse-checkout: tools/scripts/Publish-GitHubRelease.sh
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
       - name: Verify GitHub Release exists
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ inputs.tag }}
-        run: RELEASE_COMMIT="$(git rev-parse HEAD)" bash ./tools/scripts/Publish-GitHubRelease.sh verify-release
+        run: RELEASE_COMMIT="$(git rev-parse HEAD)" bash "$RELEASE_SCRIPT" verify-release
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
@@ -132,7 +157,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ inputs.tag }}
           RELEASE_ENTRIES: ./artifacts/release-entries/nuget.json
-        run: RELEASE_COMMIT="$(git rev-parse HEAD)" bash ./tools/scripts/Publish-GitHubRelease.sh release
+        run: RELEASE_COMMIT="$(git rev-parse HEAD)" bash "$RELEASE_SCRIPT" release
 
       - name: Upload release entries
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

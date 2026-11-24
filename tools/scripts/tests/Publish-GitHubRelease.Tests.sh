@@ -24,7 +24,7 @@ if [[ ! "$prepare_line" =~ ^[0-9]+$ || ! "$publish_line" =~ ^[0-9]+$ || ! "$atta
   exit 1
 fi
 release_workflow="$repo_root/.github/workflows/publish.yml"
-verify_line="$(awk '/Publish-GitHubRelease\.sh verify-release/ {print NR}' "$release_workflow")"
+verify_line="$(awk '/bash "\$RELEASE_SCRIPT" verify-release/ {print NR}' "$release_workflow")"
 stable_publish_line="$(awk '/Publish-NuGet\.ps1 -ArtifactsPath/ {print NR}' "$release_workflow")"
 if [[ ! "$verify_line" =~ ^[0-9]+$ || ! "$stable_publish_line" =~ ^[0-9]+$ ]] ||
   (( verify_line >= stable_publish_line )); then
@@ -237,6 +237,14 @@ fi
 grep -q 'GitHub Release .* não existe' "$temp_dir/output"
 jq -n --arg tag "$RELEASE_TAG" '{tag_name:$tag,draft:true,prerelease:false,assets:[]}' > "$TEST_STATE"
 bash "$script" verify-release
+EXPECTED_RELEASE_COMMIT="$RELEASE_COMMIT" bash "$script" verify-release
+calls="$(wc -l < "$TEST_LOG")"
+if EXPECTED_RELEASE_COMMIT=ffffffffffffffffffffffffffffffffffffffff bash "$script" verify-release > "$temp_dir/output" 2>&1; then
+  echo "Expected failure when the checked-out commit differs from the validated commit." >&2
+  exit 1
+fi
+grep -q 'não corresponde ao commit validado' "$temp_dir/output"
+[[ "$(wc -l < "$TEST_LOG")" == "$calls" ]]
 jq '.prerelease = true' "$TEST_STATE" > "$TEST_STATE.tmp"
 mv "$TEST_STATE.tmp" "$TEST_STATE"
 if bash "$script" verify-release > "$temp_dir/output" 2>&1; then
