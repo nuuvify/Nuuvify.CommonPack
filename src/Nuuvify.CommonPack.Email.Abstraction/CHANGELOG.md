@@ -8,6 +8,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 ## [Não Lançado]
 
 ### Adicionado
+- Propriedades `CheckCertificateRevocation`, `EnableStrictSslValidation`, `EnableCertificatePinning` e `AllowedCertificateThumbprints` em `EmailServerConfiguration`, com padrões que preservam o comportamento anterior.
 
 ### Alterado
 
