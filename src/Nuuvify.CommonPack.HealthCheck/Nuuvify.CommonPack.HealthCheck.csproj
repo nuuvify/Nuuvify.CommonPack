@@ -24,6 +24,11 @@
         <PackageReference Include="AspNetCore.HealthChecks.UI.SqlServer.Storage" />
         <PackageReference Include="AspNetCore.HealthChecks.AzureKeyVault" />
         <PackageReference Include="AspNetCore.HealthChecks.Azure.Storage.Blobs" />
+        <PackageReference Include="Azure.Storage.Blobs" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
         <PackageReference Include="Microsoft.Extensions.Logging.Console" />
     </ItemGroup>
 
