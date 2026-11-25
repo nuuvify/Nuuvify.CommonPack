@@ -63,7 +63,7 @@ Depois do `--sync`, os Environments `preview` e `release` existem.
    | **CI/CD Provider** | `GitHub Actions` | `GitHub Actions` |
    | **Repository Owner** | `nuuvify` | `nuuvify` |
    | **Repository** | `Nuuvify.CommonPack` | `Nuuvify.CommonPack` |
-   | **Workflow File** | `ci.yml` | `gw-release.yml` |
+   | **Workflow File** | `ci.yml` | `publish.yml` |
    | **Environment** | `preview` | `release` |
    | **Select Scopes: Push** | Marcar | Marcar |
    | **Push new packages and package versions** | Selecionar | Selecionar |
@@ -80,7 +80,10 @@ Depois do `--sync`, os Environments `preview` e `release` existem.
    **Repository Owner** é diferente: `nuuvify` identifica a organização no GitHub.
 
    Em **Workflow File**, informe somente o nome do arquivo, sem `.github/workflows/`.
-   Para release, use `gw-release.yml`: ele é o workflow chamador de `publish.yml`.
+   Para release, use `publish.yml`, e não `gw-release.yml`: o NuGet.org valida o arquivo do
+   job que executa `NuGet/login`. Como `gw-release.yml` chama o workflow reutilizável
+   `publish.yml`, uma política com `gw-release.yml` falha com HTTP 401
+   (`Workflow mismatch ... expected 'gw-release.yml', actual 'publish.yml'`).
    O padrão `Nuuvify.CommonPack.*` limita a política aos IDs iniciados por
    `Nuuvify.CommonPack.`; não use `*` sozinho, que permitiria todos os pacotes da conta.
 
@@ -89,10 +92,9 @@ Depois do `--sync`, os Environments `preview` e `release` existem.
    **Push only new package versions**; será necessário ajustar a permissão antes de publicar
    um novo pacote.
 
-   Para recuperar uma release estável em rascunho de uma tag anterior ao Trusted Publishing,
-   crie uma terceira política com os mesmos campos da coluna **Release**, exceto
-   **Policy Name** = `NuuvifyCommonPackStableRecovery` e **Workflow File** =
-   `recover-stable-release.yml`. O **Environment** continua sendo `release`.
+   A recuperação de release estável (`recover-stable-release.yml`) também chama
+   `publish.yml` no Environment `release`, portanto usa a mesma política **Release**;
+   não é necessária uma terceira política.
 3. Clique em **Create** para cada política e confira-as em **Manage**.
    Quando aplicável, uma política fica temporariamente ativa por sete dias e passa à ativação
    permanente após uma publicação bem-sucedida; se expirar, reative-a no NuGet.org.

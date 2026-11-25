@@ -157,7 +157,7 @@ publicados para atualizar a autenticação.
 
 Para recuperar uma release estável ainda em rascunho:
 
-1. Configure a política adicional `recover-stable-release.yml` no Environment `release`,
+1. Confirme a política **Release** (Workflow File `publish.yml`, Environment `release`),
    conforme o [tutorial](./github-manual-setup-tutorial.md#5-configurar-trusted-publishing-no-nugetorg).
 2. Execute o workflow atual na `main`, informando a tag existente:
 
