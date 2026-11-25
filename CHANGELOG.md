@@ -5,6 +5,13 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-br/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec/v2.0.0.html).
 
+## [3.1.0](https://github.com/nuuvify/Nuuvify.CommonPack/compare/v3.0.0...v3.1.0) (2026-11-25)
+
+
+### Adicionado
+
+* **email:** configurable TLS certificate validation for SMTP ([#277](https://github.com/nuuvify/Nuuvify.CommonPack/issues/277)) ([43da982](https://github.com/nuuvify/Nuuvify.CommonPack/commit/43da9822d49fac41b5f0d242a0f9b9b769ff78a6))
+
 ## [3.0.0](https://github.com/nuuvify/Nuuvify.CommonPack/compare/v2.10.1...v3.0.0) (2026-11-23)
 
 
