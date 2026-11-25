@@ -7,17 +7,11 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec
 
 ## [Não Lançado]
 
+## [3.1.0] - 2026-11-25
+
 ### Adicionado
 - Políticas de validação do certificado TLS do servidor SMTP configuráveis em `EmailServerConfiguration`: `CheckCertificateRevocation`, `EnableStrictSslValidation`, `EnableCertificatePinning` e `AllowedCertificateThumbprints` (pinning pelo thumbprint do servidor ou da CA raiz).
 - Registro em `LogMessage`/`Notifications` do motivo da aceitação ou rejeição do certificado quando uma política customizada é aplicada.
-
-### Alterado
-
-### Corrigido
-
-### Removido
-
-### Segurança
 
 ## [Sem versão registrada] - 2025-10-08
 
