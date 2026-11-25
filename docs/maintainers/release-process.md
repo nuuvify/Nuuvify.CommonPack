@@ -14,7 +14,7 @@ deste repositório: versão compartilhada, canais de publicação e CHANGELOG po
 flowchart TB
     PR([PR para main<br/>título em Conventional Commits<br/>+ CHANGELOG do pacote]) --> CI{CI / Result<br/>unit, integration, Sonar,<br/>package changelog}
     CI -->|squash| MAIN[(main)]
-    MAIN --> SNAP[Tag + GitHub pre-release<br/>X.Y.Z+1-preview.N]
+    MAIN --> SNAP[Tag + GitHub pre-release<br/>próximo SemVer-preview.N]
     SNAP --> SNAPN[Pacotes preview no NuGet.org]
     SNAPN --> SNAPFILES[Anexar pacotes à pre-release]
     MAIN --> RPR([Release PR do release-please<br/>CHANGELOG raiz + VersionPrefix])
@@ -39,7 +39,7 @@ flowchart TB
 
 | Canal | Quando | Versão | Destino | Environment |
 | --- | --- | --- | --- | --- |
-| Snapshot | Cada push na `main` (job `Snapshot` do CI) | `X.Y.(Z+1)-preview.N` | NuGet.org e GitHub pre-release | `preview` |
+| Snapshot | Push releasable na `main` (job `Snapshot` do CI) | Próxima versão SemVer + `-preview.N` | NuGet.org e GitHub pre-release | `preview` |
 | Preview de rascunho | Disparo manual do CI na `main` para a tag estável em rascunho | `X.Y.Z-preview.N` | NuGet.org e GitHub pre-release | `preview` |
 | Estável | Merge do Release PR | `X.Y.Z` | NuGet.org e GitHub Release | `release` (com aprovação) |
 
@@ -51,8 +51,10 @@ flowchart TB
   Após a publicação e indexação no NuGet.org, os arquivos `.nupkg` e `.snupkg` são baixados
   e anexados à pre-release. Até essa etapa, ela fica visível sem os pacotes; se o envio
   falhar, consulte e reexecute o CI. Os previews não são aceitos pelo fluxo de deploy estável.
-  O cálculo usa o próximo patch da versão registrada, mesmo que a próxima release estável
-  seja minor ou major.
+  O cálculo usa os Conventional Commits desde a última tag estável: `feat` gera preview
+  minor, `fix`/`perf`/`revert`/`deps` geram preview patch, e breaking changes seguem a regra
+  de major (ou minor antes de 1.0). Commits sem impacto de release e o commit do Release PR
+  não publicam snapshot.
 - Esta pre-release é uma exceção do projeto à regra genérica de snapshots no runbook
   gerenciado; ela não altera as regras de deploy ou de release estável.
 - As branches `qas` e `nugettest/qas` e os Environments `production` e `nugettest` não fazem

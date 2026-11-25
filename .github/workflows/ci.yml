@@ -66,6 +66,7 @@ jobs:
 
       - name: Test preview publication
         run: |
+          bash ./tools/scripts/tests/Get-SnapshotVersion.Tests.sh
           bash ./tools/scripts/tests/Prepare-DraftPreview.Tests.sh
           bash ./tools/scripts/tests/Publish-PreviewNuGet.Tests.sh
           bash ./tools/scripts/tests/Publish-GitHubRelease.Tests.sh
@@ -174,10 +175,43 @@ jobs:
     permissions:
       contents: read
 
+  snapshot-version:
+    name: Snapshot version
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      publish: ${{ steps.version.outputs.publish_snapshot || steps.skip.outputs.publish_snapshot }}
+      version: ${{ steps.version.outputs.version }}
+      version_prefix: ${{ steps.version.outputs.version_prefix }}
+      version_suffix: ${{ steps.version.outputs.version_suffix }}
+      assembly_version: ${{ steps.version.outputs.assembly_version }}
+      file_version: ${{ steps.version.outputs.file_version }}
+    steps:
+      - name: Skip non-automatic snapshots
+        id: skip
+        if: ${{ github.event_name != 'push' }}
+        run: echo "publish_snapshot=false" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout
+        if: ${{ github.event_name == 'push' }}
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Compute snapshot version
+        id: version
+        if: ${{ github.event_name == 'push' }}
+        run: >
+          pwsh ./tools/scripts/ci/Get-SnapshotVersion.ps1
+          -RunNumber "$GITHUB_RUN_NUMBER" -OutputPath "$GITHUB_OUTPUT"
+
   snapshot:
     name: Snapshot
-    needs: [hygiene, gitleaks, dotnet, integration, sonar, servicebus-long-running, package-changelog]
-    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.draft_tag != '') }}
+    needs: [hygiene, gitleaks, dotnet, integration, sonar, servicebus-long-running, package-changelog, snapshot-version]
+    if: ${{ success() && ((github.event_name == 'push' && needs.snapshot-version.outputs.publish == 'true') || (github.event_name == 'workflow_dispatch' && inputs.draft_tag != '')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     environment: preview
@@ -230,13 +264,16 @@ jobs:
         shell: bash
         env:
           PREVIEW_DRAFT_TAG: ${{ inputs.draft_tag }}
+          SNAPSHOT_VERSION_OUTPUTS: ${{ toJSON(needs.snapshot-version.outputs) }}
         run: |
           if [[ -n "$PREVIEW_DRAFT_TAG" ]]; then
             bash "$GITHUB_WORKSPACE/tools/scripts/Prepare-DraftPreview.sh" version
           else
-            pwsh "$GITHUB_WORKSPACE/tools/scripts/ci/Get-BuildVersion.ps1" -Channel snapshot -RunNumber "$GITHUB_RUN_NUMBER" -OutputPath "$GITHUB_OUTPUT"
+            for key in version version_prefix version_suffix assembly_version file_version; do
+              value="$(jq -r --arg key "$key" '.[$key] // ""' <<<"$SNAPSHOT_VERSION_OUTPUTS")"
+              printf '%s=%s\n' "$key" "$value" >> "$GITHUB_OUTPUT"
+            done
           fi
-
       - name: Build
         env:
           VERSION_PREFIX: ${{ steps.version.outputs.version_prefix }}
@@ -303,7 +340,7 @@ jobs:
   result:
     name: Result
     if: ${{ always() }}
-    needs: [hygiene, gitleaks, dotnet, integration, sonar, servicebus-long-running, package-changelog]
+    needs: [hygiene, gitleaks, dotnet, integration, sonar, servicebus-long-running, package-changelog, snapshot-version]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions: {}

@@ -124,7 +124,9 @@ Consulte a [documentação oficial](https://learn.microsoft.com/en-us/nuget/nuge
 ## 7. Teste controlado do fluxo
 
 1. Abra um PR para `main` e confirme que o merge fica bloqueado até o `Result` verde.
-2. Faça o merge e confirme o job `Snapshot` publicando `X.Y.(Z+1)-preview.N` no NuGet.org.
+2. Faça o merge e, se o título for releasable, confirme o job `Snapshot` publicando a próxima
+   versão SemVer com sufixo `-preview.N` no NuGet.org. Commits de documentação e o merge do
+   Release PR não publicam snapshot.
 3. Confirme que o release-please abriu ou atualizou o Release PR e que o workflow
    `Package changelog release` fechou os CHANGELOGs dos pacotes.
 4. Faça o merge do Release PR, aprove o Environment `release` e confirme os pacotes no NuGet.org
