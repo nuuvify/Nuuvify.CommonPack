@@ -5,6 +5,13 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-br/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/spec/v2.0.0.html).
 
+## [3.1.1](https://github.com/nuuvify/Nuuvify.CommonPack/compare/v3.1.0...v3.1.1) (2026-11-25)
+
+
+### Corrigido
+
+* **ci:** alinhar snapshots ao versionamento SemVer ([#280](https://github.com/nuuvify/Nuuvify.CommonPack/issues/280)) ([d750dd6](https://github.com/nuuvify/Nuuvify.CommonPack/commit/d750dd67ef222eb264bb91dfea75f699e82e2e8d))
+
 ## [3.1.0](https://github.com/nuuvify/Nuuvify.CommonPack/compare/v3.0.0...v3.1.0) (2026-11-25)
 
 
