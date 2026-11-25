@@ -1164,6 +1164,10 @@ public class EmailServerConfiguration
     public SslProtocols Security { get; set; }
     public string AccountUserName { get; set; }
     public string AccountPassword { get; set; }
+    public bool CheckCertificateRevocation { get; set; } = true;
+    public bool EnableStrictSslValidation { get; set; } = true;
+    public bool EnableCertificatePinning { get; set; }
+    public string[] AllowedCertificateThumbprints { get; set; } = Array.Empty<string>();
 }
 ```
 
@@ -1306,10 +1310,30 @@ var variables = new Dictionary<string, string>
 {
   "Security": "StartTls"  // Ou "Tls12" dependendo do servidor
 }
-
-// Para desenvolvimento (NÃO usar em produção)
-// Adicionar callback para ignorar erros de certificado
 ```
+
+**Problema**: "self-signed certificate in certificate chain" ou "unable to get certificate CRL"
+
+**Causa**: o servidor usa uma PKI corporativa que não está no trust store do container, ou as CRLs dessa PKI não podem ser obtidas (ex.: proxy corporativo).
+
+**Solução**: aceitar a PKI por pinning do thumbprint da **CA raiz** (não muda quando o certificado do servidor é renovado) e, se necessário, desabilitar a verificação de revogação:
+```json
+"EmailServerConfiguration": {
+  "ServerHost": "smtp.empresa.com",
+  "CheckCertificateRevocation": false,
+  "EnableCertificatePinning": true,
+  "AllowedCertificateThumbprints": [ "C34D332866A92862D540200702AF1B2DC4DAD7FB" ]
+}
+```
+
+| Propriedade | Padrão | Descrição |
+|---|---|---|
+| `CheckCertificateRevocation` | `true` | Verifica revogação (CRL/OCSP) do certificado do servidor |
+| `EnableStrictSslValidation` | `true` | Exige certificado sem erros. `false` sem pinning aceita qualquer certificado (apenas desenvolvimento) |
+| `EnableCertificatePinning` | `false` | Aceita cadeia não confiável no SO se o thumbprint do servidor ou da raiz estiver na lista |
+| `AllowedCertificateThumbprints` | `[]` | Thumbprints SHA-1 aceitos no pinning |
+
+No pinning, apenas os erros de raiz não confiável e de revogação não verificável são tolerados; nome do host divergente, certificado expirado ou assinatura inválida continuam sendo rejeitados. Quando `SmtpCustomClient` é informado, essas opções não são aplicadas.
 
 #### 6. Timeout ao enviar e-mail
 

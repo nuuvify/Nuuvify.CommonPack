@@ -200,13 +200,44 @@ public partial class Email
 
         if (!IsValid()) return false;
 
-        SmtpCustomClient ??= new SmtpClient();
+        SmtpCustomClient ??= CreateSmtpClient();
 
         bool returnTask = await SendEmailCustom(SmtpCustomClient, emailMessage, cancellationToken);
 
         MultipartMessage.Clear();
 
         return returnTask;
+    }
+
+    /// <summary>
+    /// Cria o <see cref="SmtpClient"/> aplicando as políticas de validação TLS de <see cref="EmailServerConfiguration"/>.
+    /// </summary>
+    /// <returns>Cliente SMTP configurado.</returns>
+    internal SmtpClient CreateSmtpClient()
+    {
+        var client = new SmtpClient
+        {
+            CheckCertificateRevocation = EmailServerConfiguration.CheckCertificateRevocation
+        };
+
+        var validator = new SmtpCertificateValidator(EmailServerConfiguration);
+
+        if (validator.HasCustomPolicy)
+        {
+            client.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) =>
+            {
+                var accepted = validator.Validate(sender, certificate, chain, sslPolicyErrors);
+
+                if (!accepted)
+                    Notifications.Add(new NotificationR(nameof(CreateSmtpClient), validator.LastValidationMessage, EmailServerConfiguration.ServerHost));
+                else if (sslPolicyErrors != System.Net.Security.SslPolicyErrors.None)
+                    LogMessage.Add(new NotificationR(nameof(CreateSmtpClient), validator.LastValidationMessage, EmailServerConfiguration.ServerHost));
+
+                return accepted;
+            };
+        }
+
+        return client;
     }
 
     private async Task<bool> SendEmailCustom(
